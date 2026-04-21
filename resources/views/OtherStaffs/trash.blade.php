@@ -3,74 +3,157 @@
 @section('content')
     <style>
         :root {
-            --primary: #4e54c8;
-            --secondary: #8f94fb;
-            --info: #17a2b8;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --success: #28a745;
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
             --light: #f8f9fa;
-            --dark: #343a40;
+            --dark: #212529;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
+            position: relative;
             overflow-x: hidden;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow-y: visible;
-            margin-top: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            position: relative;
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .card-header-custom {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 12px 15px;
-            position: relative;
-            overflow: visible;
-            z-index: 100;
-        }
-
-        .card-header-custom::before {
+        .animated-bg::before {
             content: '';
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            transform: rotate(30deg);
-            z-index: -1;
+            background:
+                radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Main Container */
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modern Card */
+        .modern-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Card Header */
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px 25px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .header-title {
-            font-weight: 700;
+            color: white;
             margin: 0;
-            position: relative;
-            z-index: 1;
-            font-size: 24px;
         }
 
-        .card-body {
-            padding: 10px;
-            position: relative;
-            z-index: 1;
+        .header-title h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .header-title p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         /* Tabs Styling */
         .nav-tabs-custom {
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            border-bottom: none;
             margin-bottom: 0;
-            background: transparent;
+            display: flex;
+            gap: 5px;
         }
 
         .nav-tabs-custom .nav-link {
@@ -79,10 +162,13 @@
             font-weight: 600;
             padding: 8px 20px;
             transition: all 0.3s;
-            position: relative;
             background: transparent;
-            border-radius: 0;
+            border-radius: 8px;
             font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .nav-tabs-custom .nav-link:hover {
@@ -92,22 +178,11 @@
 
         .nav-tabs-custom .nav-link.active {
             color: white;
-            background: transparent;
-        }
-
-        .nav-tabs-custom .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: white;
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .nav-tabs-custom .nav-link i {
-            margin-right: 8px;
+            margin-right: 4px;
         }
 
         .badge-tab {
@@ -116,137 +191,141 @@
             border-radius: 50px;
             padding: 2px 8px;
             font-size: 11px;
-            margin-left: 8px;
+            margin-left: 6px;
         }
 
-        .nav-tabs-custom .nav-link.active .badge-tab {
-            background: rgba(255, 255, 255, 0.3);
+        /* Card Body */
+        .card-body-modern {
+            padding: 25px;
         }
 
-        .table-container {
+        /* Table Container */
+        .table-container-modern {
             background: white;
-            border-radius: 15px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .table-custom {
-            margin-bottom: 0;
+        /* Modern Table */
+        .table-modern {
             width: 100%;
+            border-collapse: collapse;
         }
 
-        .table-custom thead th {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        .table-modern thead th {
+            background: linear-gradient(135deg, #2b3d5c 0%, #1a2a44 100%);
             color: white;
-            border: none;
-            padding: 15px 12px;
             font-weight: 600;
-            font-size: 14px;
+            padding: 12px 12px;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .table-custom tbody td {
-            padding: 15px 12px;
-            vertical-align: middle;
-            border-color: #e9ecef;
-        }
-
-        .table-custom tbody tr:nth-child(even) {
-            background-color: rgba(78, 84, 200, 0.05);
-        }
-
-        .table-custom tbody tr:hover {
-            background-color: rgba(78, 84, 200, 0.1);
-        }
-
-        .badge-danger-custom {
-            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
-            color: white;
-            border-radius: 50px;
-            padding: 8px 16px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .action-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .action-list li {
-            display: inline-block;
-        }
-
-        .action-btn {
-            background: none;
             border: none;
-            color: var(--primary);
-            font-size: 16px;
-            transition: all 0.3s;
-            padding: 8px;
-            border-radius: 5px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            white-space: nowrap;
         }
 
-        .action-btn:hover {
-            background-color: rgba(78, 84, 200, 0.1);
-            transform: scale(1.1);
-            color: var(--secondary);
+        .table-modern tbody td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #edf2f7;
+            color: #4a5568;
+            vertical-align: middle;
+            font-size: 0.9rem;
         }
 
-        .action-btn-success:hover {
-            background-color: rgba(40, 167, 69, 0.1);
-            color: var(--success);
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
         }
 
-        .action-btn-danger:hover {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
+        .table-modern tbody tr:hover {
+            background: #f7fafc;
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
+        /* User Info */
         .user-info {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
-        .gender-badge {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            color: white;
-            border-radius: 50px;
-            padding: 6px 12px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-flex;
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
         }
 
+        /* Gender Badge */
+        .gender-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .gender-male {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        }
+
+        .gender-female {
+            background: linear-gradient(135deg, #e83e8c 0%, #c2185b 100%);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .status-deleted {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* Position Badge */
+        .position-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            display: inline-block;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #36b9cc 0%, #1a8a9e 100%);
+            color: white;
+        }
+
+        /* Staff ID Badge */
+        .staff-id-badge {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: monospace;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* Action Icons */
         .action-icons {
             display: flex;
             gap: 4px;
@@ -270,20 +349,8 @@
             flex-shrink: 0;
         }
 
-        .action-icon.view {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        }
-
-        .action-icon.warning {
-            background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
-        }
-
         .action-icon.success {
             background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
-        }
-
-        .action-icon.danger {
-            background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
         }
 
         .action-icon:hover {
@@ -291,243 +358,278 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .gender-badge.male {
-            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+        /* Empty State */
+        .empty-state-modern {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
+            border-radius: 16px;
+            border: 2px dashed #ffc107;
         }
 
-        .gender-badge.female {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e9e 100%);
+        .empty-state-modern i {
+            font-size: 50px;
+            color: #ffc107;
+            margin-bottom: 15px;
         }
 
-        .floating-icons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 60px;
-            opacity: 0.1;
-            color: white;
-            z-index: 0;
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .table-modern {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .action-icons {
+                justify-content: flex-start;
+            }
         }
 
         @media (max-width: 768px) {
-            .card-body {
-                padding: 10px;
-            }
-
-            .header-title {
-                font-size: 20px;
-            }
-
-            .table-responsive {
-                font-size: 14px;
-            }
-
-            .action-list {
+            .header-content {
                 flex-direction: column;
-                gap: 8px;
+                align-items: stretch;
             }
 
-            .user-info {
-                flex-direction: column;
-                align-items: flex-start;
+            .nav-tabs-custom {
+                justify-content: center;
+            }
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
             }
 
-            .user-avatar {
-                margin-right: 0;
-                margin-bottom: 8px;
+            .modern-card {
+                background: rgba(33, 37, 41, 0.95);
             }
 
-            .nav-tabs-custom .nav-link {
-                padding: 6px 12px;
-                font-size: 12px;
+            .table-modern tbody td {
+                color: #e9ecef;
+                border-bottom-color: #495057;
             }
 
-            .nav-tabs-custom .nav-link i {
-                margin-right: 4px;
+            .table-modern tbody tr:hover {
+                background: #343a40;
             }
 
-            .badge-tab {
-                font-size: 9px;
-                padding: 1px 6px;
-                margin-left: 4px;
+            .status-deleted {
+                background: #742a2a;
+                color: #fed7d7;
+            }
+
+            .staff-id-badge {
+                background: #495057;
+                color: #e9ecef;
             }
         }
     </style>
 
-    <div class="">
-        <div class="glass-card">
-            <!-- Card Header with Tabs -->
-            <div class="card-header-custom">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h4 class="header-title text-white">
-                            <i class="fas fa-trash-alt me-2"></i> Deleted Non-teaching Staffs
-                        </h4>
-                        <p class="mb-0 text-white">Manage deleted non-teaching staffs and restore access</p>
+    <div class="animated-bg"></div>
+
+    <div class="dashboard-container">
+        <div class="modern-card">
+            <!-- Header with Tabs -->
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="header-title">
+                            <h3>Deleted Non-Teaching Staffs</h3>
+                            <p>Manage and restore deleted non-teaching staff accounts</p>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <!-- Tabs Navigation -->
-                        <ul class="nav nav-tabs-custom justify-content-end" id="deletedAccountsTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link {{ request()->routeIs('Teachers.trashed') ? 'active' : '' }}"
-                                   href="{{ route('Teachers.trashed') }}"
-                                   role="tab">
-                                    <i class="fas fa-chalkboard-teacher"></i> Teachers
-                                    <span class="badge-tab">{{ $teachersCount ?? 0 }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link {{ request()->routeIs('students.trash') ? 'active' : '' }}"
-                                   href="{{ route('students.trash') }}"
-                                   role="tab">
-                                    <i class="fas fa-user-graduate"></i> Students
-                                    <span class="badge-tab">{{ $studentsCount ?? 0 }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link {{ request()->routeIs('staffs.trash') ? 'active' : '' }}"
-                                   href="{{ route('staffs.trash') }}"
-                                   role="tab">
-                                    <i class="fas fa-user-tie"></i> Other Staffs
-                                    <span class="badge-tab">{{ $combinedStaffs->count() ?? 0 }}</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="nav-tabs-custom">
+                        <a class="nav-link {{ request()->routeIs('Teachers.trashed') ? 'active' : '' }}"
+                           href="{{ route('Teachers.trashed') }}">
+                            <i class="fas fa-chalkboard-teacher"></i> Teachers
+                            <span class="badge-tab">{{ $teachersCount ?? 0 }}</span>
+                        </a>
+                        <a class="nav-link {{ request()->routeIs('students.trash') ? 'active' : '' }}"
+                           href="{{ route('students.trash') }}">
+                            <i class="fas fa-user-graduate"></i> Students
+                            <span class="badge-tab">{{ $studentsCount ?? 0 }}</span>
+                        </a>
+                        <a class="nav-link {{ request()->routeIs('staffs.trash') ? 'active' : '' }}"
+                           href="{{ route('staffs.trash') }}">
+                            <i class="fas fa-user-tie"></i> Other Staffs
+                            <span class="badge-tab">{{ $combinedStaffs->count() ?? 0 }}</span>
+                        </a>
                     </div>
                 </div>
-                <i class="fas fa-user-slash floating-icons"></i>
             </div>
 
-            <!-- Card Body with Table -->
-            <div class="card-body">
-                <div class="table-container">
-                    <div class="table-responsive">
-                        <table class="table table-custom table-responsive-md" id="myTable">
-                            <thead class="table-dark">
+            <!-- Body -->
+            <div class="card-body-modern">
+                @if ($combinedStaffs->isEmpty())
+                    <div class="empty-state-modern">
+                        <i class="fas fa-user-tie"></i>
+                        <h6>No Deleted Staffs Found</h6>
+                        <p class="text-muted small">There are no deleted non-teaching staff accounts at the moment.</p>
+                    </div>
+                @else
+                    <div class="table-container-modern">
+                        <table class="table-modern" id="deletedStaffsTable">
+                            <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Staff's Name</th>
-                                    <th scope="col">Gender</th>
-                                    <th scope="col">Phone</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Position</th>
-                                    <th scope="col">Joined</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col" class="text-center">Action</th>
+                                    <th class="text-white">#</th>
+                                    <th class="text-white">Staff ID</th>
+                                    <th class="text-white">Staff Name</th>
+                                    <th class="text-white">Gender</th>
+                                    <th class="text-white">Phone</th>
+                                    <th class="text-white">Email</th>
+                                    <th class="text-white">Position</th>
+                                    <th class="text-white">Joined</th>
+                                    <th class="text-white">Status</th>
+                                    <th class="text-white text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($combinedStaffs as $staff)
+                                @foreach ($combinedStaffs as $staff)
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                                        <td><span class="fw-bold">{{ $loop->iteration }}</span></td>
+                                        <td>
+                                            <span class="staff-id-badge">{{ strtoupper($staff->staff_id) }}</span>
+                                        </td>
                                         <td>
                                             <div class="user-info">
-                                                <div class="user-avatar text-capitalize">
+                                                <div class="user-avatar text-uppercase">
                                                     @if (isset($staff->driver_name))
-                                                        {{ ucwords(strtolower(substr($staff->driver_name, 0, 1))) }}
+                                                        {{ substr($staff->driver_name, 0, 1) }}
                                                     @else
-                                                        {{ ucwords(strtolower(substr($staff->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($staff->last_name, 0, 1))) }}
+                                                        {{ substr($staff->first_name, 0, 1) }}{{ substr($staff->last_name, 0, 1) }}
                                                     @endif
                                                 </div>
                                                 <div>
-                                                    @if (isset($staff->driver_name))
-                                                        <div class="text-capitalize fw-bold">
+                                                    <strong class="text-capitalize">
+                                                        @if (isset($staff->driver_name))
                                                             {{ ucwords(strtolower($staff->driver_name)) }}
-                                                        </div>
-                                                    @else
-                                                        <div class="text-capitalize fw-bold">
+                                                        @else
                                                             {{ ucwords(strtolower($staff->first_name)) }} {{ ucwords(strtolower($staff->last_name)) }}
-                                                        </div>
-                                                    @endif
-                                                    <small class="text-muted">ID:
-                                                        {{ strtoupper($staff->staff_id) }}
-                                                    </small>
+                                                        @endif
+                                                    </strong>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center">
-                                            @if (strtolower($staff->gender[0]) === 'm')
-                                                <span class="gender-badge male" title="Male">M</span>
-                                            @elseif(strtolower($staff->gender[0]) === 'f')
-                                                <span class="gender-badge female" title="Female">F</span>
-                                            @else
-                                                <span class="gender-badge" title="Other">{{ $staff->gender[0] }}</span>
-                                            @endif
+                                        <td>
+                                            <div class="gender-badge {{ strtolower($staff->gender) == 'male' ? 'gender-male' : 'gender-female' }}">
+                                                {{ strtoupper(substr($staff->gender, 0, 1)) }}
+                                            </div>
                                         </td>
                                         <td>{{ $staff->phone ?? 'N/A' }}</td>
                                         <td>{{ $staff->email ?? 'N/A' }}</td>
                                         <td>
-                                            <span class="badge bg-info text-white">
+                                            <span class="position-badge">
                                                 {{ ucwords(str_replace('_', ' ', $staff->job_title)) }}
                                             </span>
                                         </td>
                                         <td>{{ $staff->joined ?? 'N/A' }}</td>
                                         <td>
-                                            @if ($staff->status == 0)
-                                                <span class="badge-danger-custom">
-                                                    <i class="fas fa-trash me-1"></i> Deleted
-                                                </span>
-                                            @endif
+                                            <span class="status-badge status-deleted">
+                                                <i class="fas fa-trash"></i> Deleted
+                                            </span>
                                         </td>
                                         <td class="text-center">
-                                            <ul class="action-list">
-                                                <li>
-                                                    <form action="{{ route('unblock.other.staffs', ['type' => $staff->job_title, 'id' => Hashids::encode($staff->id)]) }}"
-                                                          method="POST"
-                                                          class="d-inline"
-                                                          onsubmit="return confirmRestore('{{ $staff->first_name ?? $staff->driver_name }}', '{{ $staff->last_name ?? '' }}')">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="action-btn action-btn-success" title="Restore Staff">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('remove.other.staffs', ['type' => $staff->job_title, 'id' => Hashids::encode($staff->id)]) }}"
-                                                          method="POST"
-                                                          class="d-inline"
-                                                          onsubmit="return confirmPermanentDelete('{{ $staff->first_name ?? $staff->driver_name }}', '{{ $staff->last_name ?? '' }}')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="action-btn action-btn-danger" title="Permanently Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
+                                            <div class="action-icons justify-content-center">
+                                                <!-- Restore Button -->
+                                                <form action="{{ route('unblock.other.staffs', ['type' => $staff->job_title, 'id' => Hashids::encode($staff->id)]) }}"
+                                                      method="POST"
+                                                      class="restore-form"
+                                                      data-name="{{ $staff->first_name ?? $staff->driver_name }} {{ $staff->last_name ?? '' }}">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="action-icon success" title="Restore Staff">
+                                                        <i class="fas fa-undo-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="9" class="text-center py-5">
-                                            <i class="fas fa-trash-alt fa-3x text-muted mb-3 d-block"></i>
-                                            <h5 class="text-muted">No Deleted Staffs Found</h5>
-                                            <p class="text-muted">There are no deleted non-teaching staff accounts at the moment.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Function to handle restore confirmation
-            window.confirmRestore = function(firstName, lastName) {
-                const userName = `${(firstName || '').toUpperCase()} ${(lastName || '').toUpperCase()}`.trim();
-                return confirm(`Are you sure you want to RESTORE ${userName}?`);
-            };
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-            // Function to handle permanent delete confirmation
-            window.confirmPermanentDelete = function(firstName, lastName) {
-                const userName = `${(firstName || '').toUpperCase()} ${(lastName || '').toUpperCase()}`.trim();
-                return confirm(`⚠️ WARNING: Are you sure you want to PERMANENTLY DELETE ${userName}?\n\nThis action cannot be undone!`);
-            };
+    <!-- DataTables CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            // ============ DATATABLE INITIALIZATION ============
+            if ($.fn.DataTable.isDataTable('#deletedStaffsTable')) {
+                $('#deletedStaffsTable').DataTable().destroy();
+            }
+
+            $('#deletedStaffsTable').DataTable({
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                ordering: true,
+                info: true,
+                searching: true,
+                autoWidth: false,
+                stateSave: false,
+                language: {
+                    emptyTable: "No deleted records found",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    lengthMenu: "Show _MENU_ entries",
+                    search: "Search:",
+                    zeroRecords: "No matching records found",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
+
+            // ============ RESTORE CONFIRMATION WITH SWEETALERT ============
+            $('.restore-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const userName = $(this).data('name');
+
+                Swal.fire({
+                    title: 'Restore Staff Account?',
+                    html: `Are you sure you want to restore <strong>${userName}</strong>?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, restore it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Restoring...',
+                            text: 'Please wait',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        this.submit();
+                    }
+                });
+            });
         });
     </script>
 @endsection

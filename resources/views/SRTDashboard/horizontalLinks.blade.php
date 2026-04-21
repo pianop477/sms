@@ -78,13 +78,13 @@
     /* Fix for navigation menu icons spacing */
     #nav_menu li a i {
         margin-right: 6px;
-        width: 20px;
+        width: 10px;
         text-align: center;
     }
 
     /* Submenu icons */
     .submenu li a i {
-        margin-right: 7px;
+        margin-right: 6px;
         width: 18px;
         font-size: 14px;
     }

@@ -64,7 +64,7 @@
         }
 
         .school-name {
-            font-size: 12px;
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
             margin: 2px 0;
@@ -73,10 +73,11 @@
         .school-address {
             font-size: 9px;
             margin: 2px 0;
+            text-transform: uppercase;
         }
 
         .school-contacts {
-            font-size: 9px;
+            font-size: 10px;
             margin: 2px 0;
         }
 
@@ -109,8 +110,9 @@
         }
 
         .report-title p {
-            font-size: 10px;
+            font-size: 12px;
             margin-top: 2px;
+            text-transform: uppercase;
         }
 
         /* ============ SECTION HEADER ============ */
@@ -119,7 +121,7 @@
             color: white;
             padding: 4px;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             letter-spacing: 0.5px;
             margin: 10px 0 6px 0;
@@ -141,14 +143,14 @@
 
         .info-label {
             font-weight: bold;
-            width: 28%;
+            width: 35%;
             background-color: #f5f5f5;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .info-value {
-            width: 72%;
-            font-size: 10px;
+            width: 65%;
+            font-size: 12px;
         }
 
         /* ============ RESULTS TABLE ============ */
@@ -156,7 +158,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 8px 0;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         .report-table th {
@@ -165,14 +167,14 @@
             background-color: #f0f0f0;
             font-weight: bold;
             text-align: center;
-            font-size: 9.5px;
+            font-size: 11px;
         }
 
         .report-table td {
             border: 1px solid #000000;
             padding: 5px 3px;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .subject-name {
@@ -183,83 +185,108 @@
             text-align: left;
         }
 
-        /* ============ GRADE COLORS ============ */
+        /* ============ GRADE BADGES - Optimized for Color & B&W Printing ============ */
         .grade-A {
             background-color: #e8f5e9;
+            border: 1px solid #2e7d32;
             font-weight: bold;
             padding: 2px 7px;
             border-radius: 3px;
             display: inline-block;
-            font-size: 10px;
+            font-size: 12px;
         }
         .grade-B {
             background-color: #e3f2fd;
+            border: 1px solid #1565c0;
             padding: 2px 7px;
             border-radius: 3px;
             display: inline-block;
-            font-size: 10px;
+            font-size: 12px;
         }
         .grade-C {
             background-color: #fff3e0;
+            border: 1px solid #e65100;
             padding: 2px 7px;
             border-radius: 3px;
             display: inline-block;
-            font-size: 10px;
+            font-size: 12px;
         }
         .grade-D {
             background-color: #ffebee;
+            border: 1px solid #c62828;
             padding: 2px 7px;
             border-radius: 3px;
             display: inline-block;
-            font-size: 10px;
+            font-size: 12px;
         }
-        .grade-E {
+        .grade-E, .grade-F {
             background-color: #fce4ec;
+            border: 1px solid #b71c1c;
             padding: 2px 7px;
             border-radius: 3px;
             display: inline-block;
-            font-size: 10px;
+            font-size: 12px;
         }
 
-        .excellent {
-            background-color: #4caf50;
+        /* General Remarks Badges */
+        .remark-excellent {
+            background-color: #2e7d32;
             color: white;
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 12px;
+            display: inline-block;
         }
-        .good {
-            background-color: #2196f3;
+        .remark-good {
+            background-color: #1565c0;
             color: white;
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 12px;
+            display: inline-block;
         }
-        .pass {
-            background-color: #ff9800;
+        .remark-pass {
+            background-color: #e65100;
             color: white;
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 12px;
+            display: inline-block;
         }
-        .poor {
-            background-color: #9e9e9e;
+        .remark-poor {
+            background-color: #c62828;
             color: white;
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 12px;
+            display: inline-block;
         }
-        .fail {
-            background-color: #f44336;
+        .remark-fail {
+            background-color: #b71c1c;
             color: white;
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        /* For B&W Printing - patterns instead of colors */
+        @media print {
+            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Ensure text is readable in B&W */
+            .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
 
         /* ============ SUMMARY ROW ============ */
@@ -267,7 +294,7 @@
             font-weight: bold;
             padding: 5px;
             background-color: #fafafa;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .highlight-bg {
@@ -281,7 +308,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 6px 0;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .exam-key-table th,
@@ -304,8 +331,8 @@
         }
 
         .qr-code {
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto;
         }
 
@@ -315,14 +342,16 @@
             font-weight: bold;
         }
 
-        /* ============ FOOTER - Last part after QR ============ */
+        /* ============ FOOTER ============ */
         .footer {
+            position: fixed;
+            bottom: 3px;
             width: 100%;
             margin-top: 8px;
             padding-top: 6px;
             border-top: 1px solid #000000;
             text-align: center;
-            font-size: 8px;
+            font-size: 9px;
         }
 
         /* Print Optimization */
@@ -336,9 +365,20 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E {
+            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+            }
+            .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
             }
         }
 
@@ -382,7 +422,7 @@
                     </div>
                     <div class="school-contacts">
                         Email: {{ strtolower($schoolInfo->school_email ?? 'info@school.ac.tz') }} |
-                        Phone: {{ $schoolInfo->school_phone ?? '_________' }}
+                        Tel: {{ $schoolInfo->school_phone ?? '_________' }}
                     </div>
                 </td>
                 <td class="photo-cell">
@@ -393,9 +433,7 @@
                     @if($hasImage)
                         <img src="{{ $studentImage }}" class="student-photo" alt="Student Photo">
                     @else
-                        <div style="width: 75px; height: 75px; border: 1px solid #ccc; text-align: center; line-height: 75px; font-size: 9px;">
-                            <img src="{{ public_path('storage/students/student.jpg') }}" class="student-photo" alt="Student Photo">
-                        </div>
+                        <img src="{{ storage_path('app/public/students/student.jpg') }}" class="student-photo" alt="Student Photo">
                     @endif
                 </td>
             </tr>
@@ -415,7 +453,7 @@
         <div class="section-header">STUDENT'S INFORMATION</div>
         <table class="student-info" cellpadding="6" cellspacing="0">
             <tr>
-                <td class="info-label">ADMISSION NUMBER</td>
+                <td class="info-label">ADMISSION No.</td>
                 <td class="info-value">{{ strtoupper($students->admission_number ?? 'N/A') }}</td>
                 <td class="info-label">CLASS</td>
                 <td class="info-value">{{ strtoupper($students->class_name ?? 'N/A') }}</td>
@@ -478,53 +516,30 @@
                         @php
                             $subjGrade = '';
                             if ($reports->marking_style === 1) {
-                                if ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 30.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Average';
-                                }
-                                elseif ($subject['average'] >= 10.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 40.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 30.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 10.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             } else {
-                                if ($subject['average'] >= 80.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 60.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Pass';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 80.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 60.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 40.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             }
                         @endphp
                         <span class="grade-{{ $subjGrade }}">{{ $subjGrade }}</span>
                     </td>
                     <td>{{ $subject['position'] }}</td>
-                    <td style="font-style: italic;">{{ $subject['remarks'] }}</td>
+                    <td style="font-style: italic;">
+                        @if($subjGrade == 'A') Excellent
+                        @elseif($subjGrade == 'B') Good
+                        @elseif($subjGrade == 'C') Pass
+                        @elseif($subjGrade == 'D') Poor
+                        @else Fail
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
 
@@ -606,53 +621,30 @@
                         @php
                             $subjGrade = '';
                             if ($reports->marking_style === 1) {
-                                if ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 30.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Pass';
-                                }
-                                elseif ($subject['average'] >= 10.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 40.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 30.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 10.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             } else {
-                                if ($subject['average'] >= 80.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 60.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Pass';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 80.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 60.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 40.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             }
                         @endphp
                         <span class="grade-{{ $subjGrade }}">{{ $subjGrade }}</span>
                     </td>
                     <td>{{ $subject['position'] }}</td>
-                    <td style="font-style: italic;">{{ $subject['remarks']}}</td>
+                    <td style="font-style: italic;">
+                        @if($subjGrade == 'A') Excellent
+                        @elseif($subjGrade == 'B') Good
+                        @elseif($subjGrade == 'C') Pass
+                        @elseif($subjGrade == 'D') Poor
+                        @else Fail
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -683,53 +675,30 @@
                         @php
                             $subjGrade = '';
                             if ($reports->marking_style === 1) {
-                                if ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 30.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Pass';
-                                }
-                                elseif ($subject['average'] >= 10.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 40.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 30.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 10.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             } else {
-                                if ($subject['average'] >= 80.5) {
-                                    $subjGrade = 'A';
-                                    $subject['remarks'] = 'Excellent';
-                                }
-                                elseif ($subject['average'] >= 60.5) {
-                                    $subjGrade = 'B';
-                                    $subject['remarks'] = 'Good';
-                                }
-                                elseif ($subject['average'] >= 40.5) {
-                                    $subjGrade = 'C';
-                                    $subject['remarks'] = 'Pass';
-                                }
-                                elseif ($subject['average'] >= 20.5) {
-                                    $subjGrade = 'D';
-                                    $subject['remarks'] = 'Poor';
-                                }
-                                else {
-                                    $subjGrade = 'E';
-                                    $subject['remarks'] = 'Fail';
-                                }
+                                if ($subject['average'] >= 80.5) $subjGrade = 'A';
+                                elseif ($subject['average'] >= 60.5) $subjGrade = 'B';
+                                elseif ($subject['average'] >= 40.5) $subjGrade = 'C';
+                                elseif ($subject['average'] >= 20.5) $subjGrade = 'D';
+                                else $subjGrade = 'E';
                             }
                         @endphp
                         <span class="grade-{{ $subjGrade }}">{{ $subjGrade }}</span>
                     </td>
                     <td>{{ $subject['position'] }}</td>
-                    <td style="font-style: italic;">{{ $subject['remarks'] }}</td>
+                    <td style="font-style: italic;">
+                        @if($subjGrade == 'A') Excellent
+                        @elseif($subjGrade == 'B') Good
+                        @elseif($subjGrade == 'C') Pass
+                        @elseif($subjGrade == 'D') Poor
+                        @else Fail
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -758,22 +727,68 @@
                         @php
                             $overallGrade = '';
                             $gradeComment = '';
+                            $remarkClass = '';
                             if ($reports->marking_style === 1) {
-                                if (($studentGeneralAverage ?? 0) >= 40.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 30.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 20.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 10.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; }
-                                else { $overallGrade = 'E'; $gradeComment = 'FAIL'; }
+                                if (($studentGeneralAverage ?? 0) >= 40.5) {
+                                    $overallGrade = 'A';
+                                    $gradeComment = 'EXCELLENT';
+                                    $remarkClass = 'remark-excellent';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 30.5) {
+                                    $overallGrade = 'B';
+                                    $gradeComment = 'GOOD';
+                                    $remarkClass = 'remark-good';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 20.5) {
+                                    $overallGrade = 'C';
+                                    $gradeComment = 'PASS';
+                                    $remarkClass = 'remark-pass';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 10.5) {
+                                    $overallGrade = 'D';
+                                    $gradeComment = 'POOR';
+                                    $remarkClass = 'remark-poor';
+                                }
+                                else {
+                                    $overallGrade = 'E';
+                                    $gradeComment = 'FAIL';
+                                    $remarkClass = 'remark-fail';
+                                }
                             } else {
-                                if (($studentGeneralAverage ?? 0) >= 80.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 60.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 40.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; }
-                                elseif (($studentGeneralAverage ?? 0) >= 20.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; }
-                                else { $overallGrade = 'E'; $gradeComment = 'FAIL'; }
+                                if (($studentGeneralAverage ?? 0) >= 80.5) {
+                                    $overallGrade = 'A';
+                                    $gradeComment = 'EXCELLENT';
+                                    $remarkClass = 'remark-excellent';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 60.5) {
+                                    $overallGrade = 'B';
+                                    $gradeComment = 'GOOD';
+                                    $remarkClass = 'remark-good';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 40.5) {
+                                    $overallGrade = 'C';
+                                    $gradeComment = 'PASS';
+                                    $remarkClass = 'remark-pass';
+                                }
+                                elseif (($studentGeneralAverage ?? 0) >= 20.5) {
+                                    $overallGrade = 'D';
+                                    $gradeComment = 'POOR';
+                                    $remarkClass = 'remark-poor';
+                                }
+                                else {
+                                    $overallGrade = 'E';
+                                    $gradeComment = 'FAIL';
+                                    $remarkClass = 'remark-fail';
+                                }
                             }
                         @endphp
-                        <strong>Grade {{ $overallGrade }}</strong> -
-                        <span class="{{ strtolower($gradeComment) }}">{{ $gradeComment }}</span>
+                        <strong>Grade {{ $overallGrade }}</strong>
+                    </td>
+                </tr>
+                <tr class="summary-row">
+                    <td>GENERAL REMARKS</td>
+                    <td colspan="3">
+                        <span class="{{ $remarkClass }}">{{ $gradeComment }}</span>
                     </td>
                 </tr>
             </tbody>
@@ -782,53 +797,31 @@
         <!-- ==================== HEAD TEACHER'S COMMENT ==================== -->
         @php
             $headComment = '';
-            $motivationalMessage = '';
-            $nextGoal = '';
             $avgScore = $studentGeneralAverage ?? 0;
 
             if ($reports->marking_style == 1) {
                 if ($avgScore >= 40.5) {
-                    $headComment = 'Outstanding Achievement! Excellent mastery of all subjects.';
-                    $motivationalMessage = '"Excellence is not a skill, it is an attitude." Keep shining!';
-                    $nextGoal = 'Maintain this excellent performance next term.';
+                    $headComment = 'Outstanding Achievement! Excellent mastery of all subjects. Keep shining!';
                 } elseif ($avgScore >= 30.5) {
-                    $headComment = 'Very Good Performance! Strong understanding across the curriculum.';
-                    $motivationalMessage = '"Success is the sum of small efforts." Push harder!';
-                    $nextGoal = 'Aim for Grade A next term - just a little more effort!';
+                    $headComment = 'Very Good Performance! Strong understanding across the curriculum. Push harder!';
                 } elseif ($avgScore >= 20.5) {
-                    $headComment = 'Good Effort! You are on the right track.';
-                    $motivationalMessage = '"Education is the most powerful weapon." Keep building!';
-                    $nextGoal = 'Focus on daily revision and complete all assignments.';
+                    $headComment = 'Good Effort! You are on the right track. Keep building!';
                 } elseif ($avgScore >= 10.5) {
-                    $headComment = 'Room for Improvement. You can rise higher!';
-                    $motivationalMessage = '"It always seems impossible until it\'s done." Believe in yourself!';
-                    $nextGoal = 'Create a study timetable. Small daily progress adds up!';
+                    $headComment = 'Room for Improvement. You can rise higher! Believe in yourself!';
                 } else {
-                    $headComment = 'Fresh Start Ahead. Every setback is a comeback.';
-                    $motivationalMessage = '"The only person you are destined to become is the person you decide to be."';
-                    $nextGoal = 'Meet with subject teachers weekly. We will support you!';
+                    $headComment = 'Fresh Start Ahead. Every setback is a comeback. We will support you!';
                 }
             } else {
                 if ($avgScore >= 80.5) {
-                    $headComment = 'Exceptional Achievement! You have set a standard of excellence.';
-                    $motivationalMessage = '"Excellence is not an act, but a habit." Continue being a role model!';
-                    $nextGoal = 'Maintain top position and help classmates.';
+                    $headComment = 'Exceptional Achievement! You have set a standard of excellence. Continue being a role model!';
                 } elseif ($avgScore >= 60.5) {
-                    $headComment = 'Commendable Performance! Your hard work is paying off.';
-                    $motivationalMessage = '"Shoot for the moon. Even if you miss, you\'ll land among the stars."';
-                    $nextGoal = 'Push your average above 70% - you have the ability!';
+                    $headComment = 'Commendable Performance! Your hard work is paying off. Keep pushing forward!';
                 } elseif ($avgScore >= 40.5) {
-                    $headComment = 'Making Progress! Keep the momentum going.';
-                    $motivationalMessage = '"Believe you can and you\'re halfway there." You have what it takes!';
-                    $nextGoal = 'Improve by 10% next term through consistent effort.';
+                    $headComment = 'Making Progress! Keep the momentum going. You have what it takes!';
                 } elseif ($avgScore >= 20.5) {
-                    $headComment = 'Time to Unlock Your Potential.';
-                    $motivationalMessage = '"The secret of getting ahead is getting started." Start today!';
-                    $nextGoal = 'Attend all remedial classes and ask questions.';
+                    $headComment = 'Time to Unlock Your Potential. Start today and attend all remedial classes!';
                 } else {
-                    $headComment = 'Your Comeback Story Starts Now.';
-                    $motivationalMessage = '"Failure is not the opposite of success, it\'s part of success."';
-                    $nextGoal = 'One-on-one mentoring sessions arranged. Let\'s turn things around!';
+                    $headComment = 'Your Comeback Story Starts Now. One-on-one mentoring sessions arranged!';
                 }
             }
         @endphp
@@ -848,12 +841,12 @@
         <div class="qr-section">
             <img src="data:image/png;base64,{{ $qrPng ?? '' }}" class="qr-code" alt="Verification QR Code">
             <div class="qr-text">
-                <strong>Scan to Verify Authenticity</strong><br>
+                <strong>Scan to Verify Authenticity</strong>
             </div>
         </div>
 
-        <!-- ==================== FOOTER - LAST PART AFTER QR CODE ==================== -->
-        <div class="footer" style="position: fixed; bottom: 2;">
+        <!-- ==================== FOOTER ==================== -->
+        <div class="footer">
             &copy; {{ date('Y') }} - {{ strtoupper($schoolInfo->school_name ?? 'SCHOOL') }} |
             Printed: {{ now()->format('d-M-Y H:i:s') }} |
             Document ID: {{ strtoupper(substr(md5(uniqid()), 0, 8)) }}

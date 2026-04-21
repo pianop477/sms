@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Academic Report - {{ $studentId->first_name }} {{ $studentId->last_name }}</title>
     <style>
-        /* RESET & BASE */
+        /* RESET & BASE - Normal Readable Fonts */
         * {
             margin: 0;
             padding: 0;
@@ -14,17 +14,17 @@
 
         body {
             font-family: 'Times New Roman', 'Arial', serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 11px;
+            line-height: 1.35;
             background: white;
             color: #000000;
-            padding: 0.5cm;
+            padding: 0.4cm;
         }
 
-        /* Page Setup for Printing */
+        /* Page Setup for Printing - Optimized for One Page */
         @page {
             size: A4;
-            margin: 1cm 1cm 1.2cm 1cm;
+            margin: 0.8cm 0.8cm 1cm 0.8cm;
         }
 
         /* Container */
@@ -37,8 +37,8 @@
         .school-header {
             width: 100%;
             border-bottom: 2px solid #000000;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
         }
 
         .school-header table {
@@ -47,32 +47,33 @@
         }
 
         .logo-cell {
-            width: 15%;
+            width: 12%;
             text-align: center;
             vertical-align: middle;
         }
 
         .logo-img {
-            max-width: 80px;
-            max-height: 80px;
+            max-width: 75px;
+            max-height: 75px;
         }
 
         .school-info-cell {
-            width: 70%;
+            width: 76%;
             text-align: center;
             vertical-align: middle;
         }
 
         .school-name {
-            font-size: 13px;
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
             margin: 2px 0;
         }
 
         .school-address {
-            font-size: 10px;
+            font-size: 9px;
             margin: 2px 0;
+            text-transform: uppercase;
         }
 
         .school-contacts {
@@ -81,14 +82,14 @@
         }
 
         .photo-cell {
-            width: 15%;
+            width: 12%;
             text-align: center;
             vertical-align: middle;
         }
 
         .student-photo {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             object-fit: cover;
             border: 1px solid #cccccc;
             padding: 2px;
@@ -97,57 +98,72 @@
         /* ============ REPORT TITLE ============ */
         .report-title {
             text-align: center;
-            margin: 12px 0;
+            margin: 8px 0;
         }
 
         .report-title h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 5px 0;
+            margin: 3px 0;
         }
 
         .report-title p {
-            font-size: 11px;
-            margin-top: 3px;
+            font-size: 12px;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ============ SECTION HEADER ============ */
+        .section-header {
+            background: #000000;
+            color: white;
+            padding: 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin: 10px 0 6px 0;
         }
 
         /* ============ STUDENT INFO SECTION ============ */
         .student-info {
             width: 100%;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 1px solid #000000;
             border-collapse: collapse;
         }
 
         .student-info td {
             border: 1px solid #000000;
-            padding: 8px 10px;
+            padding: 6px 8px;
             vertical-align: top;
         }
 
         .info-label {
             font-weight: bold;
-            width: 40%;
+            width: 35%;
             background-color: #f5f5f5;
+            font-size: 12px;
         }
 
         .info-value {
-            width: 60%;
+            width: 65%;
+            font-size: 12px;
         }
 
         /* ============ RESULTS TABLE ============ */
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
+            margin: 8px 0;
             font-size: 11px;
         }
 
         .results-table th {
             border: 1px solid #000000;
-            padding: 8px 5px;
+            padding: 5px 3px;
             background-color: #f0f0f0;
             font-weight: bold;
             text-align: center;
@@ -156,44 +172,156 @@
 
         .results-table td {
             border: 1px solid #000000;
-            padding: 6px 5px;
+            padding: 5px 3px;
             text-align: center;
+            font-size: 12px;
         }
 
         .subject-name-cell {
             text-align: left;
-            font-weight: normal;
+        }
+
+        /* ============ GRADE BADGES - Optimized for Color & B&W Printing ============ */
+        .grade-A {
+            background-color: #e8f5e9;
+            border: 1px solid #2e7d32;
+            font-weight: bold;
+            padding: 2px 7px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .grade-B {
+            background-color: #e3f2fd;
+            border: 1px solid #1565c0;
+            padding: 2px 7px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .grade-C {
+            background-color: #fff3e0;
+            border: 1px solid #e65100;
+            padding: 2px 7px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .grade-D {
+            background-color: #ffebee;
+            border: 1px solid #c62828;
+            padding: 2px 7px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .grade-E, .grade-F {
+            background-color: #fce4ec;
+            border: 1px solid #b71c1c;
+            padding: 2px 7px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        /* General Remarks Badges */
+        .remark-excellent {
+            background-color: #2e7d32;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .remark-good {
+            background-color: #1565c0;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .remark-pass {
+            background-color: #e65100;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .remark-poor {
+            background-color: #c62828;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .remark-fail {
+            background-color: #b71c1c;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        /* For B&W Printing */
+        @media print {
+            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .results-table th {
+                background-color: #e0e0e0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
 
         /* ============ SUMMARY SECTION ============ */
         .summary-section {
             width: 100%;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 1px solid #000000;
             border-collapse: collapse;
         }
 
         .summary-section td {
             border: 1px solid #000000;
-            padding: 8px 10px;
+            padding: 6px 8px;
         }
 
         .summary-label {
             font-weight: bold;
             background-color: #f5f5f5;
+            font-size: 12px;
+        }
+
+        .summary-value {
+            font-size: 12px;
         }
 
         /* ============ DIVISION SECTION ============ */
         .division-section {
             width: 100%;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 2px solid #000000;
             border-collapse: collapse;
             background-color: #f9f9f9;
         }
 
         .division-section td {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
         }
 
@@ -205,92 +333,91 @@
         /* ============ HEAD TEACHER COMMENT ============ */
         .comment-section {
             width: 100%;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 1px solid #000000;
             border-collapse: collapse;
         }
 
         .comment-section td {
-            padding: 10px 12px;
+            padding: 8px 10px;
             vertical-align: top;
         }
 
         .comment-label {
             font-weight: bold;
-            width: 18%;
+            width: 22%;
             background-color: #f5f5f5;
             text-align: center;
+            font-size: 12px;
         }
 
         .comment-content {
-            width: 82%;
-            line-height: 1.5;
+            width: 78%;
+            line-height: 1.4;
+            font-size: 12px;
+            font-style: italic;
         }
 
         /* ============ QR CODE SECTION ============ */
         .qr-section {
-            width: 100%;
-            margin: 20px 0;
             text-align: center;
+            margin: 10px 0 8px 0;
             page-break-inside: avoid;
         }
 
         .qr-code {
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             margin: 0 auto;
         }
 
         .qr-text {
             font-size: 9px;
-            margin-top: 2px;
+            margin-top: 0px;
+            font-weight: bold;
         }
 
         /* ============ FOOTER ============ */
         .footer {
-            width: 100%;
-            margin-top: 15px;
-            padding-top: 8px;
-            border-top: 1px solid #cccccc;
-            font-size: 9px;
-            text-align: center;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
+            bottom: 3px;
+            width: 100%;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid #000000;
+            text-align: center;
+            font-size: 9px;
         }
 
-        /* ============ GRADE COLORS ============ */
-        .grade-A { background-color: #e8f5e9; font-weight: bold; padding: 2px 6px; border-radius: 2px; }
-        .grade-B { background-color: #e3f2fd; padding: 2px 6px; border-radius: 2px; }
-        .grade-C { background-color: #fff3e0; padding: 2px 6px; border-radius: 2px; }
-        .grade-D { background-color: #ffebee; padding: 2px 6px; border-radius: 2px; }
-        .grade-E { background-color: #fce4ec; padding: 2px 6px; border-radius: 2px; }
-        .grade-F { background-color: #ffcdd2; padding: 2px 6px; border-radius: 2px; }
-
-        .excellent-text { font-weight: bold; color: #2e7d32; }
-        .good-text { font-weight: bold; color: #1565c0; }
-        .pass-text { font-weight: bold; color: #e65100; }
-        .poor-text { font-weight: bold; color: #c62828; }
-        .fail-text { font-weight: bold; color: #b71c1c; }
-
+        /* Print Optimization */
         @media print {
-            body { padding: 0; margin: 0; }
-            .results-table th {
-                background-color: #e0e0e0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
             }
         }
 
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .text-uppercase { text-transform: uppercase; }
+        .text-capitalize { text-transform: capitalize; }
         .bold { font-weight: bold; }
     </style>
 </head>
 
 <body>
     <div class="report-container">
-        <table class="school-header" cellpadding="5" cellspacing="0">
+        <!-- ==================== HEADER ==================== -->
+        <table class="school-header" cellpadding="4" cellspacing="0">
             <tr>
                 <td class="logo-cell">
                     @php
@@ -300,13 +427,13 @@
                     @if($logoExists)
                         <img src="{{ $logoPath }}" class="logo-img" alt="School Logo">
                     @else
-                        <div style="width: 80px; height: 80px; border: 1px solid #ccc; margin: 0 auto;"></div>
+                        <div style="width: 75px; height: 75px; border: 1px solid #ccc; margin: 0 auto;"></div>
                     @endif
                 </td>
                 <td class="school-info-cell">
                     <div class="school-name">THE UNITED REPUBLIC OF TANZANIA</div>
                     <div class="school-name">PRESIDENT'S OFFICE - TAMISEMI</div>
-                    <div class="school-name" style="font-size: 13px; margin-top: 5px;">
+                    <div class="school-name" style="font-size: 11px; margin-top: 3px;">
                         {{ strtoupper($results->first()->school_name ?? 'SCHOOL NAME') }}
                     </div>
                     <div class="school-address">
@@ -316,7 +443,7 @@
                     </div>
                     <div class="school-contacts">
                         Email: {{ strtolower($results->first()->school_email ?? 'info@school.ac.tz') }} |
-                        Phone: {{ $results->first()->school_phone ?? '_________' }}
+                        Tel: {{ $results->first()->school_phone ?? '_________' }}
                     </div>
                 </td>
                 <td class="photo-cell">
@@ -327,14 +454,13 @@
                     @if($hasImage)
                         <img src="{{ $studentImage }}" class="student-photo" alt="Student Photo">
                     @else
-                        <div style="width: 80px; height: 80px; border: 1px solid #ccc; text-align: center; line-height: 80px;">
-                            <img src="{{storage_path('app/public/students/student.jpg')}}" class="student-photo" alt="Student Photo">
-                        </div>
+                        <img src="{{ storage_path('app/public/students/student.jpg') }}" class="student-photo" alt="Student Photo">
                     @endif
                 </td>
             </tr>
         </table>
 
+        <!-- ==================== REPORT TITLE ==================== -->
         <div class="report-title">
             <h3>ACADEMIC PROGRESS REPORT</h3>
             <p>
@@ -344,7 +470,9 @@
             </p>
         </div>
 
-        <table class="student-info" cellpadding="8" cellspacing="0">
+        <!-- ==================== STUDENT INFORMATION ==================== -->
+        <div class="section-header">STUDENT'S INFORMATION</div>
+        <table class="student-info" cellpadding="6" cellspacing="0">
             <tr>
                 <td class="info-label">ADMISSION NUMBER</td>
                 <td class="info-value">{{ strtoupper($results->first()->admission_number ?? 'N/A') }}</td>
@@ -369,16 +497,18 @@
             </tr>
         </table>
 
-        <table class="results-table" cellpadding="6" cellspacing="0">
+        <!-- ==================== RESULTS TABLE ==================== -->
+        <div class="section-header">SUBJECT PERFORMANCE</div>
+        <table class="results-table" cellpadding="5" cellspacing="0">
             <thead>
                 <tr>
-                    <th width="25%">SUBJECT NAME</th>
+                    <th width="28%">SUBJECT NAME</th>
                     <th width="10%">CODE</th>
                     <th width="15%">TEACHER</th>
                     <th width="10%">SCORE</th>
                     <th width="8%">GRADE</th>
                     <th width="8%">RANK</th>
-                    <th width="24%">REMARKS</th>
+                    <th width="21%">REMARKS</th>
                 </tr>
             </thead>
             <tbody>
@@ -386,9 +516,9 @@
                 @foreach ($results as $result)
                 @php $subjectCount++; @endphp
                 <tr>
-                    <td class="subject-name-cell">{{ ucwords(strtolower($result->course_name ?? 'N/A')) }}</td>
-                    <td>{{ strtoupper($result->course_code ?? 'N/A') }}</td>
-                    <td>
+                    <td class="subject-name-cell text-capitalize">{{ ucwords(strtolower($result->course_name ?? 'N/A')) }}</td>
+                    <td class="text-uppercase">{{ strtoupper($result->course_code ?? 'N/A') }}</td>
+                    <td class="text-capitalize">
                         {{ ucwords(strtolower($result->teacher_first_name ?? '')) }}
                         {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.
                     </td>
@@ -396,34 +526,134 @@
                     <td>
                         @php
                             $grade = $result->grade ?? 'X';
-                            $gradeClass = 'grade-' . $grade;
+                            if($grade == 'A') $gradeClass = 'grade-A';
+                            elseif($grade == 'B') $gradeClass = 'grade-B';
+                            elseif($grade == 'C') $gradeClass = 'grade-C';
+                            elseif($grade == 'D') $gradeClass = 'grade-D';
+                            elseif($grade == 'E') $gradeClass = 'grade-E';
+                            else $gradeClass = '';
                         @endphp
-                        <span class="{{ $gradeClass }}">{{ $grade }}</span>
+                        @if($grade != 'X')
+                            <span class="{{ $gradeClass }}">{{ $grade }}</span>
+                        @else
+                            <span>{{ $grade }}</span>
+                        @endif
                     </td>
                     <td>{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
-                    <td>{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
+                    <td class="italic">{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <table class="summary-section" cellpadding="8" cellspacing="0">
-            <tr>
-                <td class="summary-label" width="25%">TOTAL MARKS</td>
-                <td width="25%"><strong>{{ $totalScore ?? 0 }}</strong></td>
-                <td class="summary-label" width="25%">CLASS POSITION</td>
-                <td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
-            </tr>
-            <tr>
-                <td class="summary-label">AVERAGE SCORE</td>
-                <td><strong>{{ number_format($averageScore ?? 0, 2) }}%</strong></td>
-                <td class="summary-label">SUBJECTS TAKEN</td>
-                <td><strong>{{ $subjectCount }}</strong></td>
-            </tr>
+        <!-- ==================== OVERALL PERFORMANCE SUMMARY ==================== -->
+        <div class="section-header">OVERALL PERFORMANCE SUMMARY</div>
+        <table class="summary-section" cellpadding="6" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td class="summary-label" width="25%">TOTAL MARKS</td>
+                    <td class="summary-value" width="25%"><strong>{{ $totalScore ?? 0 }}</strong></td>
+                    <td class="summary-label" width="25%">CLASS POSITION</td>
+                    <td class="summary-value" width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
+                </tr>
+                <tr>
+                    <td class="summary-label">GENERAL AVERAGE</td>
+                    <td class="summary-value"><strong>{{ number_format($averageScore ?? 0, 2) }}%</strong></td>
+                    <td class="summary-label">SUBJECTS TAKEN</td>
+                    <td class="summary-value"><strong>{{ $subjectCount }}</strong></td>
+                </tr>
+                <tr>
+                    <td class="summary-label">OVERALL GRADE</td>
+                    <td colspan="3">
+                        @php
+                            $overallGrade = '';
+                            $gradeComment = '';
+                            $remarkClass = '';
+
+                            if ($marking_style == 1) {
+                                if (($averageScore ?? 0) >= 40.5) {
+                                    $overallGrade = 'A';
+                                    $gradeComment = 'EXCELLENT';
+                                    $remarkClass = 'remark-excellent';
+                                } elseif (($averageScore ?? 0) >= 30.5) {
+                                    $overallGrade = 'B';
+                                    $gradeComment = 'GOOD';
+                                    $remarkClass = 'remark-good';
+                                } elseif (($averageScore ?? 0) >= 20.5) {
+                                    $overallGrade = 'C';
+                                    $gradeComment = 'PASS';
+                                    $remarkClass = 'remark-pass';
+                                } elseif (($averageScore ?? 0) >= 10.5) {
+                                    $overallGrade = 'D';
+                                    $gradeComment = 'POOR';
+                                    $remarkClass = 'remark-poor';
+                                } else {
+                                    $overallGrade = 'E';
+                                    $gradeComment = 'FAIL';
+                                    $remarkClass = 'remark-fail';
+                                }
+                            } elseif ($marking_style == 2) {
+                                if (($averageScore ?? 0) >= 80.5) {
+                                    $overallGrade = 'A';
+                                    $gradeComment = 'EXCELLENT';
+                                    $remarkClass = 'remark-excellent';
+                                } elseif (($averageScore ?? 0) >= 60.5) {
+                                    $overallGrade = 'B';
+                                    $gradeComment = 'GOOD';
+                                    $remarkClass = 'remark-good';
+                                } elseif (($averageScore ?? 0) >= 40.5) {
+                                    $overallGrade = 'C';
+                                    $gradeComment = 'PASS';
+                                    $remarkClass = 'remark-pass';
+                                } elseif (($averageScore ?? 0) >= 20.5) {
+                                    $overallGrade = 'D';
+                                    $gradeComment = 'POOR';
+                                    $remarkClass = 'remark-poor';
+                                } else {
+                                    $overallGrade = 'E';
+                                    $gradeComment = 'FAIL';
+                                    $remarkClass = 'remark-fail';
+                                }
+                            } else {
+                                // Marking style 3 with division
+                                if ($division == 'I') {
+                                    $overallGrade = 'I';
+                                    $gradeComment = 'EXCELLENT';
+                                    $remarkClass = 'remark-excellent';
+                                } elseif ($division == 'II') {
+                                    $overallGrade = 'II';
+                                    $gradeComment = 'GOOD';
+                                    $remarkClass = 'remark-good';
+                                } elseif ($division == 'III') {
+                                    $overallGrade = 'III';
+                                    $gradeComment = 'PASS';
+                                    $remarkClass = 'remark-pass';
+                                } elseif ($division == 'IV') {
+                                    $overallGrade = 'IV';
+                                    $gradeComment = 'POOR';
+                                    $remarkClass = 'remark-poor';
+                                } else {
+                                    $overallGrade = '0';
+                                    $gradeComment = 'FAIL';
+                                    $remarkClass = 'remark-fail';
+                                }
+                            }
+                        @endphp
+                        <strong>Grade {{ $overallGrade }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="summary-label">GENERAL REMARKS</td>
+                    <td colspan="3">
+                        <span class="{{ $remarkClass }}">{{ $gradeComment }}</span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
+        <!-- ==================== DIVISION SECTION (For Marking Style 3) ==================== -->
         @if ($marking_style == 3)
-        <table class="division-section" cellpadding="10" cellspacing="0">
+        <table class="division-section" cellpadding="8" cellspacing="0">
             <tr>
                 <td width="50%">
                     <strong>AGGREGATE POINTS</strong><br>
@@ -433,123 +663,96 @@
                     <strong>DIVISION</strong><br>
                     <span class="division-score" style="
                         background-color:
-                            @if($division == 'I') #4caf50
-                            @elseif($division == 'II') #2196f3
-                            @elseif($division == 'III') #ff9800
-                            @elseif($division == 'IV') #9e9e9e
-                            @else #f44336
+                            @if($division == 'I') #2e7d32
+                            @elseif($division == 'II') #1565c0
+                            @elseif($division == 'III') #e65100
+                            @elseif($division == 'IV') #c62828
+                            @else #b71c1c
                             @endif;
-                        color: white; padding: 5px 25px; border-radius: 5px; display: inline-block;
+                        color: white; padding: 4px 20px; border-radius: 4px; display: inline-block;
                     ">
                         {{ $division === '0' ? '0' : $division }}
                     </span>
                 </td>
             </tr>
+            <tr>
+                <td colspan="2" style="font-size: 8px; padding: 4px;">
+                    <strong>Division Guide:</strong> I (Excellent) | II (Good) | III (Pass) | IV (Poor) | 0 (Fail)
+                </td>
+            </tr>
         </table>
         @endif
 
-         @php
-            // Generate motivational Head Teacher's Comment based on performance
+        <!-- ==================== HEAD TEACHER'S COMMENT ==================== -->
+        @php
             $headComment = '';
-            $motivationalMessage = '';
-            $nextGoal = '';
+            $avgScore = $averageScore ?? 0;
 
             if ($marking_style == 3) {
                 if ($division == 'I') {
-                    $headComment = 'Outstanding Achievement! You have demonstrated exceptional mastery of all subjects.';
-                    $motivationalMessage = '"Excellence is not a skill, it is an attitude." Keep shining and inspire others!';
-                    $nextGoal = 'Target: Maintain Division I next term. You have proven you can do it!';
+                    $headComment = 'Outstanding Achievement! You have demonstrated exceptional mastery of all subjects. Keep shining!';
                 } elseif ($division == 'II') {
-                    $headComment = 'Very Good Performance! You have shown strong understanding across the curriculum.';
-                    $motivationalMessage = '"Success is the sum of small efforts, repeated day in and day out." Push harder!';
-                    $nextGoal = 'Target: Aim for Division I next term - just a little more effort will get you there!';
+                    $headComment = 'Very Good Performance! You have shown strong understanding across the curriculum. Push harder!';
                 } elseif ($division == 'III') {
-                    $headComment = 'Satisfactory Performance. You have met the basic requirements.';
-                    $motivationalMessage = '"The only limit to your impact is your imagination and commitment." You can do better!';
-                    $nextGoal = 'Target: Focus on weaker subjects to reach Division II. We believe in your potential!';
+                    $headComment = 'Good Effort! You are on the right track. Keep building on this foundation!';
                 } elseif ($division == 'IV') {
-                    $headComment = 'You have potential to do better. This term was a learning experience.';
-                    $motivationalMessage = '"Every expert was once a beginner." Let\'s work together to improve next term.';
-                    $nextGoal = 'Target: Regular study schedule and homework completion will boost your performance.';
+                    $headComment = 'Room for Improvement. You can rise higher! Believe in yourself and work harder!';
                 } else {
-                    $headComment = 'This is a wake-up call. You are capable of achieving more than this.';
-                    $motivationalMessage = '"Your attitude, not your aptitude, will determine your altitude." Time to rise up!';
-                    $nextGoal = 'Target: Attend extra classes and seek help from teachers. We are here to support you.';
+                    $headComment = 'Fresh Start Ahead. Every setback is a setup for a comeback. We will support you!';
                 }
             } else {
-                $avg = $averageScore ?? 0;
                 if ($marking_style == 1) {
-                    if ($avg >= 40.5) {
-                        $headComment = 'Magnificent Performance! You have excelled brilliantly this term.';
-                        $motivationalMessage = '"Success is no accident. It is hard work, perseverance, learning, and most of all, love for what you are doing."';
-                        $nextGoal = 'Keep setting higher targets. Aim for 100% attendance and perfect scores!';
-                    } elseif ($avg >= 30.5) {
-                        $headComment = 'Well Done! You have shown consistent improvement and good understanding.';
-                        $motivationalMessage = '"The future depends on what you do today." A few more steps and you reach excellence!';
-                        $nextGoal = 'Target: Improve your average by 5% next term. You can achieve Grade A!';
-                    } elseif ($avg >= 20.5) {
-                        $headComment = 'Good Effort! You are on the right track. Keep building on this foundation.';
-                        $motivationalMessage = '"Education is the most powerful weapon which you can use to change the world."';
-                        $nextGoal = 'Target: Focus on daily revision and complete all assignments on time.';
-                    } elseif ($avg >= 10.5) {
-                        $headComment = 'Room for Improvement. This is not your full potential - you can rise higher!';
-                        $motivationalMessage = '"It always seems impossible until it\'s done." Start believing in yourself!';
-                        $nextGoal = 'Target: Create a study timetable and stick to it. Small daily progress adds up!';
+                    if ($avgScore >= 40.5) {
+                        $headComment = 'Outstanding Achievement! Excellent mastery of all subjects. Keep shining!';
+                    } elseif ($avgScore >= 30.5) {
+                        $headComment = 'Very Good Performance! Strong understanding across the curriculum. Push harder!';
+                    } elseif ($avgScore >= 20.5) {
+                        $headComment = 'Good Effort! You are on the right track. Keep building!';
+                    } elseif ($avgScore >= 10.5) {
+                        $headComment = 'Room for Improvement. You can rise higher! Believe in yourself!';
                     } else {
-                        $headComment = 'A Fresh Start Ahead. Every setback is a setup for a comeback.';
-                        $motivationalMessage = '"The only person you are destined to become is the person you decide to be."';
-                        $nextGoal = 'Target: Meet with subject teachers weekly. We will support your journey to success.';
+                        $headComment = 'Fresh Start Ahead. Every setback is a comeback. We will support you!';
                     }
                 } else {
-                    if ($avg >= 80.5) {
-                        $headComment = 'Exceptional Achievement! You have set a standard of excellence.';
-                        $motivationalMessage = '"Excellence is not an act, but a habit." Continue being a role model!';
-                        $nextGoal = 'Target: Maintain top position and help classmates who are struggling.';
-                    } elseif ($avg >= 60.5) {
-                        $headComment = 'Commendable Performance! Your hard work is paying off.';
-                        $motivationalMessage = '"Shoot for the moon. Even if you miss, you\'ll land among the stars."';
-                        $nextGoal = 'Target: Push your average above 70% - you have the ability!';
-                    } elseif ($avg >= 40.5) {
-                        $headComment = 'You are making progress. Keep the momentum going!';
-                        $motivationalMessage = '"Believe you can and you\'re halfway there." You have what it takes!';
-                        $nextGoal = 'Target: Improve by 10% next term through consistent effort.';
-                    } elseif ($avg >= 20.5) {
-                        $headComment = 'Time to Unlock Your Potential. You have hidden talents waiting to shine.';
-                        $motivationalMessage = '"The secret of getting ahead is getting started." Start today!';
-                        $nextGoal = 'Target: Attend all remedial classes and ask questions without fear.';
+                    if ($avgScore >= 80.5) {
+                        $headComment = 'Exceptional Achievement! You have set a standard of excellence. Continue being a role model!';
+                    } elseif ($avgScore >= 60.5) {
+                        $headComment = 'Commendable Performance! Your hard work is paying off. Keep pushing forward!';
+                    } elseif ($avgScore >= 40.5) {
+                        $headComment = 'Making Progress! Keep the momentum going. You have what it takes!';
+                    } elseif ($avgScore >= 20.5) {
+                        $headComment = 'Time to Unlock Your Potential. Start today and attend all remedial classes!';
                     } else {
-                        $headComment = 'Your Comeback Story Starts Now. Every master was once a beginner.';
-                        $motivationalMessage = '"Failure is not the opposite of success, it\'s part of success."';
-                        $nextGoal = 'Target: One-on-one mentoring sessions arranged. Let\'s turn things around together!';
+                        $headComment = 'Your Comeback Story Starts Now. One-on-one mentoring sessions arranged!';
                     }
                 }
             }
         @endphp
 
-        <table class="comment-section" cellpadding="10" cellspacing="0">
-            <tr>
-                <td class="comment-label">HEAD TEACHER'S<br>REMARKS</td>
-                <td class="comment-content">
-                    <i>{{ $headComment }}</i>
-                </td>
-            </tr>
+        <table class="comment-section" cellpadding="7" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td class="comment-label">HEAD TEACHER'S REMARKS</td>
+                    <td class="comment-content">
+                        {{ $headComment }}
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
+        <!-- ==================== QR CODE SECTION ==================== -->
         <div class="qr-section">
-            <div style="display: inline-block; text-align: center;">
-                <img src="data:image/png;base64,{{ $qrPng ?? '' }}" class="qr-code" alt="Verification QR Code">
-                <div class="qr-text">
-                    <strong>Scan to Verify Authenticity</strong><br>
-                </div>
+            <img src="data:image/png;base64,{{ $qrPng ?? '' }}" class="qr-code" alt="Verification QR Code">
+            <div class="qr-text">
+                <strong>Scan to Verify Authenticity</strong>
             </div>
         </div>
 
+        <!-- ==================== FOOTER ==================== -->
         <div class="footer">
-            <span>&copy; {{ date('Y') }} - {{ strtoupper($results->first()->school_name ?? 'SCHOOL') }}</span>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            <span>Printed: {{ now()->format('d-M-Y H:i:s') }}</span>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            <span>Document ID: {{ strtoupper(substr(md5(uniqid()), 0, 8)) }}</span>
+            &copy; {{ date('Y') }} - {{ strtoupper($results->first()->school_name ?? 'SCHOOL') }} |
+            Printed: {{ now()->format('d-M-Y H:i:s') }} |
+            Document ID: {{ strtoupper(substr(md5(uniqid()), 0, 8)) }}
         </div>
     </div>
 </body>
