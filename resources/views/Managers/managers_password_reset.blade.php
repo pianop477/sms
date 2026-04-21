@@ -392,8 +392,8 @@
                                     </td>
                                     <td>
                                         <form class="reset-password-form"
-                                            action="{{ route('admin.update.password', $user->id) }}" method="POST"
-                                            data-user-id="{{ $user->id }}">
+                                            action="{{ route('admin.update.password', ['user' => Hashids::encode($user->id)]) }}"
+                                            method="POST" data-user-id="{{ $user->id }}">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn-reset" title="Reset Password">
@@ -422,32 +422,50 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Search functionality
+            // ============ SEARCH FUNCTIONALITY ============
             const searchInput = document.getElementById('searchInput');
-            const tableRows = document.querySelectorAll('.modern-table tbody tr');
+            if (searchInput) {
+                const tableRows = document.querySelectorAll('.modern-table tbody tr');
 
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-
-                tableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    tableRows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
                 });
+            }
+
+            // ============ SIMPLE CONFIRMATION FOR PASSWORD RESET ============
+            const resetForms = document.querySelectorAll('.reset-password-form');
+
+            if (resetForms.length > 0) {
+                resetForms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        // Show confirmation dialog
+                        const isConfirmed = confirm(
+                            '⚠️ RESET PASSWORD CONFIRMATION\n\nThis will reset the password to: shule2025\n\nAre you sure you want to continue?'
+                            );
+
+                        if (!isConfirmed) {
+                            e.preventDefault(); // Stop form submission if cancelled
+                            return false;
+                        }
+
+                        // If confirmed, allow form to submit normally (page will reload)
+                        // No AJAX, no preloader, just normal form submission
+                        return true;
+                    });
+                });
+            }
+
+            // ============ ADD TOOLTIPS ============
+            const resetButtons = document.querySelectorAll('.btn-reset');
+            resetButtons.forEach(button => {
+                button.setAttribute('title', 'Reset password to default (shule2025)');
             });
 
-            const searchInput = document.getElementById('searchInput');
-            const tableRows = document.querySelectorAll('.modern-table tbody tr');
-
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-
-                tableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
-                });
-            });
-
-            // Add GSAP animations if available
+            // ============ GSAP ANIMATIONS ============
             if (typeof gsap !== 'undefined') {
                 gsap.from('.fade-in', {
                     duration: 1,
@@ -466,7 +484,7 @@
                 });
             }
 
-            // Add real-time update simulation
+            // ============ REAL-TIME UPDATE SIMULATION ============
             setInterval(() => {
                 document.querySelectorAll('.badge-modern').forEach(badge => {
                     badge.style.opacity = '0.8';

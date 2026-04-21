@@ -167,9 +167,10 @@ class ManagerController extends Controller
      */
     public function resetPassword(Request $request, $user)
     {
+        $decoded = Hashids::decode($user);
         try {
-            dd('Request inaweza kufika hapa');
-            $users = User::findOrFail($user);
+            // dd('Request inaweza kufika hapa');
+            $users = User::findOrFail($decoded[0]);
             $defaultPassword = 'shule2025';
             $users->password = Hash::make($defaultPassword);
             $users->save();
@@ -184,6 +185,7 @@ class ManagerController extends Controller
             }
 
             // Normal form submission
+            $this->notifyPasswordReset($users, $defaultPassword);
             Alert()->toast('Account Password reset successfully', 'success');
 
             return back();
@@ -197,6 +199,37 @@ class ManagerController extends Controller
 
             Alert()->toast('Failed to reset password', 'error');
             return back();
+        }
+    }
+
+    private function notifyPasswordReset(User $user, $newPassword)
+    {
+        try {
+            $link = $this->appBaseUrl;
+            $message = "Hello " . strtoupper($user->first_name) . ", Your password has been reset to: {$newPassword}. Use link {$link} to Login and change your password. Thank you.";
+
+            $school = school::find($user->school_id);
+            $formattedPhone = $this->formatPhoneNumber($user->phone);
+
+            if ($formattedPhone && $school) {
+                $sms = new NextSmsService();
+                $response = $sms->sendSmsByNext(
+                    $school->sender_id ?? 'SHULE APP',
+                    $formattedPhone,
+                    $message,
+                    uniqid()
+                );
+
+                if (!$response['success'] ?? false) {
+                    Log::warning('SMS failed: ' . ($response['error'] ?? 'Unknown error'));
+                }
+
+                // Log::info("Password reset notification with message: {$message}");
+            }
+
+            event(new PasswordResetEvent($user));
+        } catch (\Exception $e) {
+            Log::error('Notification failed: ' . $e->getMessage());
         }
     }
 
