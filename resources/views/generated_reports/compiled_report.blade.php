@@ -717,7 +717,7 @@
                 </tr>
                 <tr class="summary-row">
                     <td>GENERAL AVERAGE</td>
-                    <td><strong>{{ number_format($studentGeneralAverage ?? 0, 2) }}%</strong></td>
+                    <td><strong>{{ number_format($studentGeneralAverage ?? 0, 2) }}</strong></td>
                     <td>SUBJECTS TAKEN</td>
                     <td><strong>{{ count($finalData) }}</strong></td>
                 </tr>

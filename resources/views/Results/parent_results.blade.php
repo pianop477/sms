@@ -558,7 +558,7 @@
                 </tr>
                 <tr>
                     <td class="summary-label">GENERAL AVERAGE</td>
-                    <td class="summary-value"><strong>{{ number_format($averageScore ?? 0, 2) }}%</strong></td>
+                    <td class="summary-value"><strong>{{ number_format($averageScore ?? 0, 2) }}</strong></td>
                     <td class="summary-label">SUBJECTS TAKEN</td>
                     <td class="summary-value"><strong>{{ $subjectCount }}</strong></td>
                 </tr>
