@@ -368,109 +368,260 @@
         </div>
     </div>
 
-    {{-- Badilisha sehemu ya DataTables CSS na JS --}}
+    {{-- REMOVE hizi scripts za zamani na uweke hizi kwa order sahihi --}}
+
+    {{-- 1. FIRST: jQuery (from official CDN) --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    {{-- 2. SECOND: Bootstrap JS (depends on jQuery) --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- 3. THIRD: DataTables CSS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+    {{-- 4. FOURTH: DataTables JS (depends on jQuery) --}}
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
+    {{-- 5. FIFTH: SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- 6. SIXTH: Your custom script --}}
     <script>
+        // Wrap everything in $(document).ready to ensure DOM is loaded
         $(document).ready(function() {
+            console.log('jQuery is loaded and ready!');
+
             // ==================== INITIALIZE DATATABLES ====================
 
-            // Initialize DataTable for pending deductions
-            // Hakikisha table ina idadi sawa ya columns
-            const pendingTable = $('#pendingTable');
-            if (pendingTable.length) {
-                // Check if table has valid data
-                const pendingRows = pendingTable.find('tbody tr').length;
-                const pendingColumns = pendingTable.find('thead th').length;
+            // Helper function to validate table before initializing
+            function initializeDataTable(tableId, options = {}) {
+                const table = $(tableId);
+                if (!table.length) {
+                    console.log(`Table ${tableId} not found`);
+                    return false;
+                }
 
-                if (pendingRows > 0 && pendingColumns > 0) {
-                    try {
-                        if ($.fn.DataTable.isDataTable('#pendingTable')) {
-                            $('#pendingTable').DataTable().destroy();
-                        }
+                // Check if table has any rows
+                const hasRows = table.find('tbody tr').length > 0;
+                if (!hasRows) {
+                    console.log(`Table ${tableId} has no data, skipping DataTable initialization`);
+                    return false;
+                }
 
-                        $('#pendingTable').DataTable({
-                            pageLength: 10,
-                            lengthMenu: [
-                                [5, 10, 25, 50, -1],
-                                [5, 10, 25, 50, "All"]
-                            ],
-                            order: [
-                                [0, 'asc']
-                            ],
-                            language: {
-                                search: "🔍 Search:",
-                                lengthMenu: "Show _MENU_ entries",
-                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                                infoEmpty: "No entries found",
-                                infoFiltered: "(filtered from _MAX_ total entries)",
-                                paginate: {
-                                    previous: "← Previous",
-                                    next: "Next →"
-                                },
-                                zeroRecords: "No matching records found"
-                            },
-                            columnDefs: [{
-                                    orderable: false,
-                                    targets: [9]
-                                } // Actions column
-                            ],
-                            responsive: true,
-                            autoWidth: false,
-                            drawCallback: function() {
-                                // Reinitialize any event handlers if needed
-                            }
-                        });
-                    } catch (e) {
-                        console.log('Pending table error:', e);
+                // Check if already initialized
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    console.log(`Table ${tableId} already initialized, destroying first`);
+                    $(tableId).DataTable().destroy();
+                }
+
+                // Default options
+                const defaultOptions = {
+                    pageLength: 10,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
+                    language: {
+                        search: "🔍 Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "No entries found",
+                        infoFiltered: "(filtered from _MAX_ total entries)",
+                        paginate: {
+                            previous: "← Previous",
+                            next: "Next →"
+                        },
+                        zeroRecords: "No matching records found"
+                    },
+                    responsive: true,
+                    autoWidth: false,
+                    drawCallback: function() {
+                        console.log(`Table ${tableId} redrawn`);
                     }
+                };
+
+                // Merge options
+                const finalOptions = {
+                    ...defaultOptions,
+                    ...options
+                };
+
+                try {
+                    $(tableId).DataTable(finalOptions);
+                    console.log(`Table ${tableId} initialized successfully`);
+                    return true;
+                } catch (error) {
+                    console.error(`Error initializing ${tableId}:`, error);
+                    return false;
                 }
             }
 
-            // Initialize DataTable for history deductions
-            const historyTable = $('#historyTable');
-            if (historyTable.length) {
-                const historyRows = historyTable.find('tbody tr').length;
-                const historyColumns = historyTable.find('thead th').length;
+            // Initialize Pending Deductions Table
+            initializeDataTable('#pendingTable', {
+                order: [
+                    [0, 'asc']
+                ],
+                columnDefs: [{
+                        orderable: false,
+                        targets: [9]
+                    } // Actions column (index 9)
+                ]
+            });
 
-                if (historyRows > 0 && historyColumns > 0) {
-                    try {
-                        if ($.fn.DataTable.isDataTable('#historyTable')) {
-                            $('#historyTable').DataTable().destroy();
-                        }
-
-                        $('#historyTable').DataTable({
-                            pageLength: 10,
-                            lengthMenu: [
-                                [5, 10, 25, 50, -1],
-                                [5, 10, 25, 50, "All"]
-                            ],
-                            order: [
-                                [0, 'desc']
-                            ],
-                            language: {
-                                search: "🔍 Search:",
-                                lengthMenu: "Show _MENU_ entries",
-                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                                infoEmpty: "No entries found",
-                                infoFiltered: "(filtered from _MAX_ total entries)",
-                                paginate: {
-                                    previous: "← Previous",
-                                    next: "Next →"
-                                },
-                                zeroRecords: "No matching records found"
-                            },
-                            responsive: true,
-                            autoWidth: false
-                        });
-                    } catch (e) {
-                        console.log('History table error:', e);
-                    }
-                }
+            // Initialize History Table (if it exists and has data)
+            if ($('#historyTable').length && $('#historyTable tbody tr').length > 0) {
+                initializeDataTable('#historyTable', {
+                    order: [
+                        [0, 'desc']
+                    ]
+                });
+            } else {
+                console.log('History table has no data or does not exist');
             }
         });
+
+        // ==================== FORM HANDLERS ====================
+        // Get elements with null checks
+        document.addEventListener('DOMContentLoaded', function() {
+            const deductionType = document.getElementById('deductionType');
+            const recurringOptionDiv = document.getElementById('recurringOptionDiv');
+            const recurringMonthsDiv = document.getElementById('recurringMonthsDiv');
+            const isRecurringCheckbox = document.getElementById('isRecurring');
+            const amountInput = document.getElementById('amountInput');
+            const recurringMonthsSelect = document.getElementById('recurringMonthsSelect');
+            const totalAmountPreview = document.getElementById('totalAmountPreview');
+            const amountHelpText = document.getElementById('amountHelpText');
+
+            // Show/hide recurring option based on deduction type (only for loans)
+            function toggleRecurringOption() {
+                if (!deductionType) return;
+
+                if (deductionType.value === 'loan') {
+                    if (recurringOptionDiv) recurringOptionDiv.style.display = 'block';
+                    if (amountHelpText) {
+                        amountHelpText.innerHTML =
+                            '<strong>Monthly installment amount</strong> - This amount will be deducted each month';
+                    }
+                } else {
+                    if (recurringOptionDiv) recurringOptionDiv.style.display = 'none';
+                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
+                    if (isRecurringCheckbox) isRecurringCheckbox.checked = false;
+                    if (amountHelpText) {
+                        amountHelpText.innerHTML = '<strong>Total amount to deduct</strong> - One-time deduction';
+                    }
+                }
+            }
+
+            // Show/hide recurring months field and calculate total
+            function toggleRecurringMonths() {
+                if (!isRecurringCheckbox) return;
+
+                if (isRecurringCheckbox.checked) {
+                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'block';
+                    calculateTotalAmount();
+                } else {
+                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
+                }
+            }
+
+            // Calculate total amount when amount or months change
+            function calculateTotalAmount() {
+                const amount = parseFloat(amountInput?.value) || 0;
+                const months = parseInt(recurringMonthsSelect?.value) || 0;
+                const total = amount * months;
+
+                if (totalAmountPreview && months > 0) {
+                    totalAmountPreview.textContent = total.toLocaleString();
+                } else if (totalAmountPreview) {
+                    totalAmountPreview.textContent = '0';
+                }
+            }
+
+            // Event listeners (only if elements exist)
+            if (deductionType) deductionType.addEventListener('change', toggleRecurringOption);
+            if (isRecurringCheckbox) isRecurringCheckbox.addEventListener('change', toggleRecurringMonths);
+            if (amountInput) amountInput.addEventListener('input', calculateTotalAmount);
+            if (recurringMonthsSelect) recurringMonthsSelect.addEventListener('change', calculateTotalAmount);
+
+            // On page load
+            toggleRecurringOption();
+            if (isRecurringCheckbox && isRecurringCheckbox.checked) {
+                toggleRecurringMonths();
+            }
+        });
+
+        // ==================== CANCEL DEDUCTION FUNCTION ====================
+        function cancelDeduction(id) {
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert not loaded');
+                alert('Are you sure you want to cancel this deduction?');
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
+                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
+                document.body.appendChild(form);
+                form.submit();
+                return;
+            }
+
+            Swal.fire({
+                title: 'Cancel Deduction?',
+                text: 'This will cancel the pending deduction and it will not be processed in payroll.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Yes, Cancel',
+                cancelButtonText: 'No, Keep'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
+                    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // ==================== SWEETALERT NOTIFICATIONS ====================
+        @if (session('success'))
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        @endif
+
+        @if (session('error'))
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            }
+        @endif
+
+        @if ($errors->any())
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: '{!! implode('<br>', $errors->all()) !!}',
+                    confirmButtonText: 'OK'
+                });
+            }
+        @endif
     </script>
 
 @endsection
