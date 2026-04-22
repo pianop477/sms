@@ -368,204 +368,109 @@
         </div>
     </div>
 
-    {{-- resources/views/staff-loans/index.blade.php --}}
-
-    {{-- First, include jQuery --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    {{-- Then include DataTables CSS and JS --}}
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    {{-- Badilisha sehemu ya DataTables CSS na JS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
-    {{-- Then include SweetAlert --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    {{-- Then your custom script --}}
     <script>
         $(document).ready(function() {
             // ==================== INITIALIZE DATATABLES ====================
 
             // Initialize DataTable for pending deductions
-            if ($('#pendingTable').length && $('#pendingTable tbody tr').length > 0) {
-                $('#pendingTable').DataTable({
-                    pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    order: [
-                        [0, 'asc']
-                    ],
-                    language: {
-                        search: "🔍 Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "No entries found",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        paginate: {
-                            previous: "← Previous",
-                            next: "Next →"
-                        },
-                        zeroRecords: "No matching records found"
-                    },
-                    columnDefs: [{
-                        orderable: false,
-                        targets: [10]
-                    }],
-                    responsive: true,
-                    autoWidth: false
-                });
+            // Hakikisha table ina idadi sawa ya columns
+            const pendingTable = $('#pendingTable');
+            if (pendingTable.length) {
+                // Check if table has valid data
+                const pendingRows = pendingTable.find('tbody tr').length;
+                const pendingColumns = pendingTable.find('thead th').length;
+
+                if (pendingRows > 0 && pendingColumns > 0) {
+                    try {
+                        if ($.fn.DataTable.isDataTable('#pendingTable')) {
+                            $('#pendingTable').DataTable().destroy();
+                        }
+
+                        $('#pendingTable').DataTable({
+                            pageLength: 10,
+                            lengthMenu: [
+                                [5, 10, 25, 50, -1],
+                                [5, 10, 25, 50, "All"]
+                            ],
+                            order: [
+                                [0, 'asc']
+                            ],
+                            language: {
+                                search: "🔍 Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                infoEmpty: "No entries found",
+                                infoFiltered: "(filtered from _MAX_ total entries)",
+                                paginate: {
+                                    previous: "← Previous",
+                                    next: "Next →"
+                                },
+                                zeroRecords: "No matching records found"
+                            },
+                            columnDefs: [{
+                                    orderable: false,
+                                    targets: [9]
+                                } // Actions column
+                            ],
+                            responsive: true,
+                            autoWidth: false,
+                            drawCallback: function() {
+                                // Reinitialize any event handlers if needed
+                            }
+                        });
+                    } catch (e) {
+                        console.log('Pending table error:', e);
+                    }
+                }
             }
 
             // Initialize DataTable for history deductions
-            if ($('#historyTable').length && $('#historyTable tbody tr').length > 0) {
-                $('#historyTable').DataTable({
-                    pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    order: [
-                        [0, 'desc']
-                    ],
-                    language: {
-                        search: "🔍 Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "No entries found",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        paginate: {
-                            previous: "← Previous",
-                            next: "Next →"
-                        },
-                        zeroRecords: "No matching records found"
-                    },
-                    responsive: true,
-                    autoWidth: false
-                });
+            const historyTable = $('#historyTable');
+            if (historyTable.length) {
+                const historyRows = historyTable.find('tbody tr').length;
+                const historyColumns = historyTable.find('thead th').length;
+
+                if (historyRows > 0 && historyColumns > 0) {
+                    try {
+                        if ($.fn.DataTable.isDataTable('#historyTable')) {
+                            $('#historyTable').DataTable().destroy();
+                        }
+
+                        $('#historyTable').DataTable({
+                            pageLength: 10,
+                            lengthMenu: [
+                                [5, 10, 25, 50, -1],
+                                [5, 10, 25, 50, "All"]
+                            ],
+                            order: [
+                                [0, 'desc']
+                            ],
+                            language: {
+                                search: "🔍 Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                infoEmpty: "No entries found",
+                                infoFiltered: "(filtered from _MAX_ total entries)",
+                                paginate: {
+                                    previous: "← Previous",
+                                    next: "Next →"
+                                },
+                                zeroRecords: "No matching records found"
+                            },
+                            responsive: true,
+                            autoWidth: false
+                        });
+                    } catch (e) {
+                        console.log('History table error:', e);
+                    }
+                }
             }
         });
-
-        // ==================== FORM HANDLERS ====================
-        // Get elements
-        const deductionType = document.getElementById('deductionType');
-        const recurringOptionDiv = document.getElementById('recurringOptionDiv');
-        const recurringMonthsDiv = document.getElementById('recurringMonthsDiv');
-        const isRecurringCheckbox = document.getElementById('isRecurring');
-        const amountInput = document.getElementById('amountInput');
-        const recurringMonthsSelect = document.getElementById('recurringMonthsSelect');
-        const totalAmountPreview = document.getElementById('totalAmountPreview');
-        const amountHelpText = document.getElementById('amountHelpText');
-
-        // Show/hide recurring option based on deduction type (only for loans)
-        function toggleRecurringOption() {
-            if (!deductionType) return;
-
-            if (deductionType.value === 'loan') {
-                if (recurringOptionDiv) recurringOptionDiv.style.display = 'block';
-                if (amountHelpText) {
-                    amountHelpText.innerHTML =
-                        '<strong>Monthly installment amount</strong> - This amount will be deducted each month';
-                }
-            } else {
-                if (recurringOptionDiv) recurringOptionDiv.style.display = 'none';
-                if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
-                if (isRecurringCheckbox) isRecurringCheckbox.checked = false;
-                if (amountHelpText) {
-                    amountHelpText.innerHTML = '<strong>Total amount to deduct</strong> - One-time deduction';
-                }
-            }
-        }
-
-        // Show/hide recurring months field and calculate total
-        function toggleRecurringMonths() {
-            if (!isRecurringCheckbox) return;
-
-            if (isRecurringCheckbox.checked) {
-                if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'block';
-                calculateTotalAmount();
-            } else {
-                if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
-            }
-        }
-
-        // Calculate total amount when amount or months change
-        function calculateTotalAmount() {
-            const amount = parseFloat(amountInput?.value) || 0;
-            const months = parseInt(recurringMonthsSelect?.value) || 0;
-            const total = amount * months;
-
-            if (totalAmountPreview && months > 0) {
-                totalAmountPreview.textContent = total.toLocaleString();
-            } else if (totalAmountPreview) {
-                totalAmountPreview.textContent = '0';
-            }
-        }
-
-        // Event listeners (only if elements exist)
-        if (deductionType) deductionType.addEventListener('change', toggleRecurringOption);
-        if (isRecurringCheckbox) isRecurringCheckbox.addEventListener('change', toggleRecurringMonths);
-        if (amountInput) amountInput.addEventListener('input', calculateTotalAmount);
-        if (recurringMonthsSelect) recurringMonthsSelect.addEventListener('change', calculateTotalAmount);
-
-        // On page load
-        toggleRecurringOption();
-        if (isRecurringCheckbox && isRecurringCheckbox.checked) {
-            toggleRecurringMonths();
-        }
-
-        // ==================== CANCEL DEDUCTION FUNCTION ====================
-        function cancelDeduction(id) {
-            Swal.fire({
-                title: 'Cancel Deduction?',
-                text: 'This will cancel the pending deduction and it will not be processed in payroll.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Yes, Cancel',
-                cancelButtonText: 'No, Keep'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
-                    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
-        }
-
-        // ==================== SWEETALERT NOTIFICATIONS ====================
-        @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'top-end'
-            });
-        @endif
-
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}',
-                confirmButtonText: 'OK'
-            });
-        @endif
-
-        @if ($errors->any())
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                html: '{!! implode('<br>', $errors->all()) !!}',
-                confirmButtonText: 'OK'
-            });
-        @endif
     </script>
 
 @endsection
