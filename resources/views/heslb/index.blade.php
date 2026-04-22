@@ -42,6 +42,11 @@
             font-size: 12px;
             border-radius: 6px;
         }
+
+        /* Make sure tables are properly displayed before DataTable initialization */
+        .dataTable {
+            width: 100% !important;
+        }
     </style>
 
     <div class="py-4">
@@ -64,7 +69,7 @@
                         {{-- Active Deductions Table --}}
                         <h6 class="mb-3">Active Deductions</h6>
                         <div class="table-responsive">
-                            <table class="table table-heslb table-bordered" id="activeTable">
+                            <table class="table table-heslb table-bordered" id="activeTable" width="100%">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -89,10 +94,9 @@
                                             <td>{{ strtoupper($deduction['loan_number'] ?? 'N/A') }}</td>
                                             <td class="text-end">{{ number_format($deduction['monthly_amount'], 0) }}</td>
                                             <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}</td>
-                                            <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'Ongoing' }}
-                                            </td>
+                                            <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'Ongoing' }}</td>
                                             <td class="text-center"><span class="status-active">Active</span></td>
-                                            <td>
+                                            <td class="text-center">
                                                 <div class="action-buttons">
                                                     <button class="btn btn-xs btn-warning"
                                                         onclick="updateAmount({{ $deduction['id'] }}, {{ $deduction['monthly_amount'] }})">
@@ -117,10 +121,10 @@
                         </div>
 
                         {{-- Inactive Deductions Table --}}
-                        @if (count($deductions['inactive'] ?? []) > 0)
+                        @if(count($deductions['inactive'] ?? []) > 0)
                             <h6 class="mb-3 mt-4">Inactive/Stopped Deductions</h6>
                             <div class="table-responsive">
-                                <table class="table table-heslb table-bordered" id="inactiveTable">
+                                <table class="table table-heslb table-bordered" id="inactiveTable" width="100%">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -135,19 +139,16 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($deductions['inactive'] ?? [] as $index => $deduction)
+                                        @foreach($deductions['inactive'] ?? [] as $index => $deduction)
                                             <tr>
                                                 <td class="text-center">{{ $index + 1 }}</td>
                                                 <td><strong>{{ strtoupper($deduction['staff_id']) }}</strong></td>
                                                 <td>{{ ucwords(strtolower($deduction['employee_name'])) }}</td>
                                                 <td>{{ ucwords(strtolower($deduction['staff_type'])) }}</td>
                                                 <td>{{ $deduction['loan_number'] ?? 'N/A' }}</td>
-                                                <td class="text-end">
-                                                    {{ number_format($deduction['monthly_amount'], 0) }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}
-                                                </td>
-                                                <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'N/A' }}
-                                                </td>
+                                                <td class="text-end">{{ number_format($deduction['monthly_amount'], 0) }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}</td>
+                                                <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'N/A' }}</td>
                                                 <td class="text-center"><span class="status-stopped">Stopped</span></td>
                                             </tr>
                                         @endforeach
@@ -195,8 +196,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monthly Amount (TZS) <span class="text-danger">*</span></label>
-                                <input type="number" name="monthly_amount" class="form-control" required min="0"
-                                    step="1000">
+                                <input type="number" name="monthly_amount" class="form-control" required min="0" step="1000">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Start Date <span class="text-danger">*</span></label>
@@ -222,7 +222,7 @@
         </div>
     </div>
 
-    {{-- Scripts zote kwa order sahihi --}}
+    {{-- Scripts kwa order sahihi --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
@@ -235,25 +235,70 @@
         $(document).ready(function() {
             console.log('HESLB page loaded - jQuery ready');
 
-            // Helper function to initialize DataTables
-            function initializeDataTable(tableId, options = {}) {
-                const table = $(tableId);
-                if (!table.length) {
-                    console.log(`Table ${tableId} not found`);
+            // Helper function to validate table structure before initializing
+            function validateTableStructure(tableId) {
+                const table = document.querySelector(tableId);
+                if (!table) {
+                    console.log(`Table ${tableId} not found in DOM`);
                     return false;
                 }
 
-                // Check if table has any rows
-                const hasRows = table.find('tbody tr').length > 0;
-                if (!hasRows) {
-                    console.log(`Table ${tableId} has no data, skipping DataTable initialization`);
+                const theadRow = table.querySelector('thead tr');
+                if (!theadRow) {
+                    console.log(`Table ${tableId} has no thead row`);
                     return false;
                 }
+
+                const headerCount = theadRow.cells.length;
+                console.log(`Table ${tableId} has ${headerCount} columns`);
+
+                // Check if table has any data rows
+                const tbodyRows = table.querySelectorAll('tbody tr');
+                if (tbodyRows.length === 0) {
+                    console.log(`Table ${tableId} has no data rows, skipping DataTable initialization`);
+                    return false;
+                }
+
+                // Check each row for correct number of cells
+                let hasInvalidRow = false;
+                tbodyRows.forEach((row, index) => {
+                    // Skip rows that have colspan attribute (like "No data" row)
+                    const firstCell = row.cells[0];
+                    if (firstCell && firstCell.hasAttribute('colspan')) {
+                        console.log(`Table ${tableId} row ${index} has colspan, skipping validation`);
+                        return;
+                    }
+
+                    if (row.cells.length !== headerCount) {
+                        console.warn(`Table ${tableId} row ${index} has ${row.cells.length} cells but header has ${headerCount}`);
+                        hasInvalidRow = true;
+                    }
+                });
+
+                if (hasInvalidRow) {
+                    console.error(`Table ${tableId} has invalid row structure, cannot initialize DataTable`);
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Helper function to initialize DataTables
+            function initializeDataTable(tableId, options = {}) {
+                // First validate table structure
+                if (!validateTableStructure(tableId)) {
+                    console.log(`Skipping DataTable initialization for ${tableId} due to validation failure`);
+                    return false;
+                }
+
+                const $table = $(tableId);
 
                 // Check if already initialized
                 if ($.fn.DataTable.isDataTable(tableId)) {
                     console.log(`Table ${tableId} already initialized, destroying first`);
-                    $(tableId).DataTable().destroy();
+                    $table.DataTable().destroy();
+                    // Clear the table wrapper that DataTables creates
+                    $table.children('thead, tbody').show();
                 }
 
                 // Default options
@@ -272,39 +317,48 @@
                         },
                         zeroRecords: "No matching records found"
                     },
-                    responsive: true,
-                    autoWidth: false
+                    responsive: false, // Disable responsive temporarily to avoid issues
+                    autoWidth: false,
+                    destroy: true, // Automatically destroy existing instance
+                    retrieve: true // If already initialized, just return the instance
                 };
 
                 // Merge options
                 const finalOptions = { ...defaultOptions, ...options };
 
                 try {
-                    $(tableId).DataTable(finalOptions);
+                    const dataTable = $table.DataTable(finalOptions);
                     console.log(`Table ${tableId} initialized successfully`);
-                    return true;
+                    return dataTable;
                 } catch (error) {
                     console.error(`Error initializing ${tableId}:`, error);
                     return false;
                 }
             }
 
-            // Initialize Active Deductions Table
-            initializeDataTable('#activeTable', {
-                order: [[0, 'asc']],
-                columnDefs: [
-                    { orderable: false, targets: [9] } // Actions column (index 9)
-                ]
-            });
+            // Small delay to ensure DOM is fully ready
+            setTimeout(function() {
+                // Initialize Active Deductions Table
+                if ($('#activeTable').length) {
+                    initializeDataTable('#activeTable', {
+                        order: [[0, 'asc']],
+                        columnDefs: [
+                            { orderable: false, targets: [9] } // Actions column
+                        ]
+                    });
+                } else {
+                    console.log('Active table not found');
+                }
 
-            // Initialize Inactive Deductions Table (if it exists and has data)
-            if ($('#inactiveTable').length && $('#inactiveTable tbody tr').length > 0) {
-                initializeDataTable('#inactiveTable', {
-                    order: [[0, 'asc']]
-                });
-            } else {
-                console.log('Inactive table has no data or does not exist');
-            }
+                // Initialize Inactive Deductions Table (if it exists and has data)
+                if ($('#inactiveTable').length && $('#inactiveTable tbody tr').length > 0) {
+                    initializeDataTable('#inactiveTable', {
+                        order: [[0, 'asc']]
+                    });
+                } else {
+                    console.log('Inactive table has no data or does not exist');
+                }
+            }, 100);
         });
 
         // ==================== HESLB FUNCTIONS ====================
@@ -313,12 +367,7 @@
             if (typeof Swal === 'undefined') {
                 console.error('SweetAlert not loaded');
                 if (confirm('Are you sure you want to stop this HESLB deduction?')) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url('/heslb') }}/' + id + '/stop';
-                    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
-                    document.body.appendChild(form);
-                    form.submit();
+                    submitForm('/heslb/' + id + '/stop');
                 }
                 return;
             }
@@ -333,12 +382,7 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url('/heslb') }}/' + id + '/stop';
-                    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
-                    document.body.appendChild(form);
-                    form.submit();
+                    submitForm('/heslb/' + id + '/stop');
                 }
             });
         }
@@ -347,16 +391,8 @@
             if (typeof Swal === 'undefined') {
                 console.error('SweetAlert not loaded');
                 const newAmount = prompt('Enter new monthly amount (TZS):', currentAmount);
-                if (newAmount && !isNaN(newAmount)) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url('/heslb') }}/' + id + '/update-amount';
-                    form.innerHTML = `
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="monthly_amount" value="${newAmount}">
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
+                if (newAmount && !isNaN(newAmount) && newAmount > 0) {
+                    submitForm('/heslb/' + id + '/update-amount', { monthly_amount: newAmount });
                 }
                 return;
             }
@@ -367,29 +403,42 @@
                 inputLabel: 'New Monthly Amount (TZS)',
                 inputValue: currentAmount,
                 inputAttributes: {
-                    min: 0,
+                    min: 1000,
                     step: 1000
                 },
                 showCancelButton: true,
                 confirmButtonText: 'Update',
-                cancelButtonText: 'Cancel'
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value || value < 1000) {
+                        return 'Amount must be at least 1,000 TZS';
+                    }
+                    return null;
+                }
             }).then((result) => {
                 if (result.isConfirmed && result.value) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url('/heslb') }}/' + id + '/update-amount';
-                    form.innerHTML = `
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="monthly_amount" value="${result.value}">
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
+                    submitForm('/heslb/' + id + '/update-amount', { monthly_amount: result.value });
                 }
             });
         }
 
+        function submitForm(url, data = {}) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url('') }}' + url;
+            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
+
+            // Add additional data
+            for (const [key, value] of Object.entries(data)) {
+                form.innerHTML += `<input type="hidden" name="${key}" value="${value}">`;
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         // ==================== SWEETALERT NOTIFICATIONS ====================
-        @if (session('success'))
+        @if(session('success'))
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
@@ -403,7 +452,7 @@
             }
         @endif
 
-        @if (session('error'))
+        @if(session('error'))
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'error',
@@ -414,7 +463,7 @@
             }
         @endif
 
-        @if ($errors->any())
+        @if($errors->any())
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'error',
