@@ -59,7 +59,7 @@ class OtherStaffsController extends Controller
             return $driver;
         });
 
-         $normalizedStaffs = $otherStaffs->map(function ($staff) {
+        $normalizedStaffs = $otherStaffs->map(function ($staff) {
             $staff->full_name = $staff->first_name;      // from OtherStaffs model
             return $staff;
         });
@@ -75,6 +75,7 @@ class OtherStaffsController extends Controller
 
     public function addStaffInformation(Request $request)
     {
+
         $this->validate(
             $request,
             [
@@ -116,6 +117,13 @@ class OtherStaffsController extends Controller
         );
 
         try {
+
+            $user = Auth::user();
+
+            if (! $user) {
+                Alert()->toast('Unauthorized access detected', 'error');
+                return back();
+            }
 
             if ($request->hasFile('image')) {
                 // Virus scan
@@ -165,7 +173,7 @@ class OtherStaffsController extends Controller
                 'street_address' => $request->street,
                 'joining_year' => $request->joined,
                 'nida' => $nin,
-                'school_id' => Auth::user()->school_id,
+                'school_id' => $user->school_id,
                 // 'profile_image' => $profile_img
             ]);
 
@@ -232,7 +240,7 @@ class OtherStaffsController extends Controller
             'joined'     => 'required|date_format:Y',
             'job_title'  => 'required|string|max:255',
             'image'      => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/jpg', 'max:1024'],
-            'nida'       => ['nullable','string','regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',"unique:{$tableName},nida,{$staff->id},id"]
+            'nida'       => ['nullable', 'string', 'regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/', "unique:{$tableName},nida,{$staff->id},id"]
         ];
 
         $extra = $type === 'driver'
@@ -398,7 +406,7 @@ class OtherStaffsController extends Controller
 
             $hasContract = $this->hasContract($staff);
 
-            if($hasContract) {
+            if ($hasContract) {
                 Alert()->toast('This staff has contract cannot be deleted', 'info');
                 return back();
             }
@@ -913,7 +921,6 @@ class OtherStaffsController extends Controller
     private function hasContract($staff)
     {
         return $contractData = school_constracts::where('applicant_id', $staff->staff_id)->exists();
-
     }
 
     private function hasBusToDrive($staff)
@@ -921,14 +928,13 @@ class OtherStaffsController extends Controller
         return $buserDrive = Transport::where('id', $staff->id)->exists();
     }
 
-    private function isActive ($staff)
+    private function isActive($staff)
     {
         $isActive = false;
         $status = $staff->status;
-        if($status == 1) {
+        if ($status == 1) {
             return $isActive = true;
-        }
-        else {
+        } else {
             return $isActive = false;
         }
 
