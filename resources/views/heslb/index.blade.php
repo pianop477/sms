@@ -42,47 +42,6 @@
             font-size: 12px;
             border-radius: 6px;
         }
-
-        /* DataTables Custom Styling */
-        .dataTables_wrapper {
-            margin-bottom: 20px;
-        }
-
-        .dataTables_wrapper .dataTables_length select {
-            min-width: 60px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            margin-left: 8px;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 6px 12px;
-            margin: 0 2px;
-            border-radius: 6px;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #4e73df;
-            color: white !important;
-            border: none;
-        }
-
-        table.dataTable thead th {
-            border-bottom: 2px solid #e2e8f0;
-            padding: 12px 8px;
-        }
-
-        table.dataTable tbody td {
-            padding: 10px 8px;
-            vertical-align: middle;
-        }
     </style>
 
     <div class="py-4">
@@ -107,16 +66,18 @@
                         <div class="table-responsive">
                             <table class="table table-heslb table-bordered" id="activeTable">
                                 <thead>
-                                    <th>#</th>
-                                    <th>Staff ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Staff Type</th>
-                                    <th>Loan Number</th>
-                                    <th class="text-end">Monthly Amount</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Staff ID</th>
+                                        <th>Employee Name</th>
+                                        <th>Staff Type</th>
+                                        <th>Loan Number</th>
+                                        <th class="text-end">Monthly Amount</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($deductions['active'] ?? [] as $index => $deduction)
@@ -161,16 +122,17 @@
                             <div class="table-responsive">
                                 <table class="table table-heslb table-bordered" id="inactiveTable">
                                     <thead>
-                                        32
-                                        <th>#</th>
-                                        <th>Staff ID</th>
-                                        <th>Employee Name</th>
-                                        <th>Staff Type</th>
-                                        <th>Loan Number</th>
-                                        <th class="text-end">Monthly Amount</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
-                                        <th>Status</th>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Staff ID</th>
+                                            <th>Employee Name</th>
+                                            <th>Staff Type</th>
+                                            <th>Loan Number</th>
+                                            <th class="text-end">Monthly Amount</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($deductions['inactive'] ?? [] as $index => $deduction)
@@ -260,20 +222,44 @@
         </div>
     </div>
 
+    {{-- Scripts zote kwa order sahihi --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).ready(function() {
-            // Initialize DataTable for active deductions
-            if ($('#activeTable').length && $('#activeTable tbody tr').length > 0) {
-                $('#activeTable').DataTable({
+            console.log('HESLB page loaded - jQuery ready');
+
+            // Helper function to initialize DataTables
+            function initializeDataTable(tableId, options = {}) {
+                const table = $(tableId);
+                if (!table.length) {
+                    console.log(`Table ${tableId} not found`);
+                    return false;
+                }
+
+                // Check if table has any rows
+                const hasRows = table.find('tbody tr').length > 0;
+                if (!hasRows) {
+                    console.log(`Table ${tableId} has no data, skipping DataTable initialization`);
+                    return false;
+                }
+
+                // Check if already initialized
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    console.log(`Table ${tableId} already initialized, destroying first`);
+                    $(tableId).DataTable().destroy();
+                }
+
+                // Default options
+                const defaultOptions = {
                     pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    order: [
-                        [0, 'asc']
-                    ],
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                     language: {
                         search: "🔍 Search:",
                         lengthMenu: "Show _MENU_ entries",
@@ -286,46 +272,57 @@
                         },
                         zeroRecords: "No matching records found"
                     },
-                    columnDefs: [{
-                            orderable: false,
-                            targets: [9]
-                        } // Disable sorting on Actions column (index 9)
-                    ],
                     responsive: true,
                     autoWidth: false
-                });
+                };
+
+                // Merge options
+                const finalOptions = { ...defaultOptions, ...options };
+
+                try {
+                    $(tableId).DataTable(finalOptions);
+                    console.log(`Table ${tableId} initialized successfully`);
+                    return true;
+                } catch (error) {
+                    console.error(`Error initializing ${tableId}:`, error);
+                    return false;
+                }
             }
 
-            // Initialize DataTable for inactive deductions
+            // Initialize Active Deductions Table
+            initializeDataTable('#activeTable', {
+                order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [9] } // Actions column (index 9)
+                ]
+            });
+
+            // Initialize Inactive Deductions Table (if it exists and has data)
             if ($('#inactiveTable').length && $('#inactiveTable tbody tr').length > 0) {
-                $('#inactiveTable').DataTable({
-                    pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    order: [
-                        [0, 'asc']
-                    ],
-                    language: {
-                        search: "🔍 Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "No entries found",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        paginate: {
-                            previous: "← Previous",
-                            next: "Next →"
-                        },
-                        zeroRecords: "No matching records found"
-                    },
-                    responsive: true,
-                    autoWidth: false
+                initializeDataTable('#inactiveTable', {
+                    order: [[0, 'asc']]
                 });
+            } else {
+                console.log('Inactive table has no data or does not exist');
             }
         });
 
+        // ==================== HESLB FUNCTIONS ====================
+
         function stopDeduction(id) {
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert not loaded');
+                if (confirm('Are you sure you want to stop this HESLB deduction?')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ url('/heslb') }}/' + id + '/stop';
+                    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+                return;
+            }
+
             Swal.fire({
                 title: 'Stop Deduction?',
                 text: 'This will stop the HESLB deduction from future payrolls.',
@@ -347,6 +344,23 @@
         }
 
         function updateAmount(id, currentAmount) {
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert not loaded');
+                const newAmount = prompt('Enter new monthly amount (TZS):', currentAmount);
+                if (newAmount && !isNaN(newAmount)) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ url('/heslb') }}/' + id + '/update-amount';
+                    form.innerHTML = `
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="monthly_amount" value="${newAmount}">
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+                return;
+            }
+
             Swal.fire({
                 title: 'Update Monthly Amount',
                 input: 'number',
@@ -365,35 +379,50 @@
                     form.method = 'POST';
                     form.action = '{{ url('/heslb') }}/' + id + '/update-amount';
                     form.innerHTML = `
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="monthly_amount" value="${result.value}">
-                `;
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="monthly_amount" value="${result.value}">
+                    `;
                     document.body.appendChild(form);
                     form.submit();
                 }
             });
         }
 
-        // Display success/error messages with SweetAlert
+        // ==================== SWEETALERT NOTIFICATIONS ====================
         @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'top-end'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
         @endif
 
         @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}',
-                confirmButtonText: 'OK'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            }
+        @endif
+
+        @if ($errors->any())
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: '{!! implode('<br>', $errors->all()) !!}',
+                    confirmButtonText: 'OK'
+                });
+            }
         @endif
     </script>
 @endsection
