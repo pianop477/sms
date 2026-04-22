@@ -469,144 +469,6 @@
                                 </div>
                             </div>
 
-                            {{-- ==================== SECTION 4: MANUAL ENTRY MODE ==================== --}}
-                            {{-- <div id="manual_section" class="section-card" style="display: none;">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="mb-0">
-                                        <i class="fas fa-user-plus text-secondary me-1"></i> Add Employees Manually
-                                    </h6>
-                                    <div>
-                                        <button type="button" class="btn btn-sm btn-outline-primary me-2"
-                                            id="showManualFormBtn">
-                                            <i class="fas fa-plus-circle me-1"></i> Add New Employee
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-success" id="searchEmployeeBtn">
-                                            <i class="fas fa-search me-1"></i> Search Employee
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="manualAddForm" class="card border-primary mb-3" style="display: none;">
-                                    <div class="card-header bg-primary text-white py-2">
-                                        <strong><i class="fas fa-user-plus me-1"></i> Add Employee Manually</strong>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-4 mb-2">
-                                                <label class="small fw-bold">Staff ID <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" id="manual_staff_id"
-                                                    class="form-control form-control-sm" placeholder="e.g., TCH001">
-                                            </div>
-                                            <div class="col-md-4 mb-2">
-                                                <label class="small fw-bold">Employee Name <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" id="manual_name"
-                                                    class="form-control form-control-sm" placeholder="Full name">
-                                            </div>
-                                            <div class="col-md-4 mb-2">
-                                                <label class="small fw-bold">Staff Type</label>
-                                                <select id="manual_staff_type" class="form-select form-select-sm">
-                                                    <option value="teacher">Teacher</option>
-                                                    <option value="transport">Transport Staff</option>
-                                                    <option value="other_staff">Other Staff</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <label class="small fw-bold">Basic Salary (TZS)</label>
-                                                <input type="number" id="manual_basic_salary"
-                                                    class="form-control form-control-sm" placeholder="e.g., 800000"
-                                                    value="0">
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <label class="small fw-bold">Allowances (TZS)</label>
-                                                <input type="number" id="manual_allowances"
-                                                    class="form-control form-control-sm" placeholder="e.g., 100000"
-                                                    value="0">
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <label class="small fw-bold">Department</label>
-                                                <input type="text" id="manual_department"
-                                                    class="form-control form-control-sm" placeholder="e.g., Science">
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <label class="small fw-bold">Contract Type</label>
-                                                <select id="manual_contract_type" class="form-select form-select-sm">
-                                                    <option value="new">New</option>
-                                                    <option value="provision">Provision</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2">
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                id="addManualEmployeeBtn">
-                                                <i class="fas fa-plus me-1"></i> Add Employee
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-secondary"
-                                                id="cancelManualFormBtn">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="employeeSearchModal"
-                                    style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;">
-                                    <div
-                                        style="background: white; max-width: 600px; margin: 100px auto; border-radius: 12px; padding: 20px;">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5><i class="fas fa-search text-primary me-1"></i> Search Employee</h5>
-                                            <button type="button" class="btn-close"
-                                                onclick="closeEmployeeSearch()"></button>
-                                        </div>
-                                        <input type="text" id="employeeSearchInput" class="form-control"
-                                            placeholder="Enter Staff ID or Name (min 2 chars)">
-                                        <div id="employeeSearchResults" class="mt-3"
-                                            style="max-height: 300px; overflow-y: auto;"></div>
-                                        <div class="mt-3 text-end">
-                                            <button type="button" class="btn btn-secondary"
-                                                onclick="closeEmployeeSearch()">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="manualEmployeesContainer" class="mt-3">
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        No employees added yet. Use "Add New Employee" or "Search Employee" to add
-                                        employees.
-                                    </div>
-                                </div>
-                                <div id="manualTableContainer" style="display: none;">
-                                    <div class="preview-table-container">
-                                        <table class="preview-table" id="manualPreviewTable">
-                                            <thead>
-                                                <th>#</th>
-                                                <th>Staff ID</th>
-                                                <th>Employee Name</th>
-                                                <th>Staff Type</th>
-                                                <th>Basic Salary</th>
-                                                <th>Allowances</th>
-                                                <th>Gross</th>
-                                                <th>Department</th>
-                                                <th>Contract Type</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </thead>
-                                            </thead>
-                                            <tbody id="manualTableBody"></tbody>
-                                            < </table>
-                                    </div>
-                                    <div class="summary-stats" id="manualSummaryStats"></div>
-                                    <div class="confirm-section">
-                                        <button type="button" class="btn btn-success" id="confirmManualDataBtn">
-                                            <i class="fas fa-check-circle me-1"></i> Confirm & Use Selected Employees
-                                        </button>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="manual_employees" id="manual_employees" value="">
-                            </div> --}}
-
                             {{-- ADVANCED FILTERS --}}
                             <div class="row mt-4">
                                 <div class="col-12">
@@ -656,6 +518,7 @@
         let manualEmployeesList = [];
         let excelDataList = [];
         let selectedScheduleData = null;
+        let isProcessing = false;
 
         // ==================== HELPER FUNCTIONS ====================
         function escapeHtml(str) {
@@ -770,25 +633,24 @@
         function displayContractsData(employees) {
             document.getElementById('contracts_data').value = JSON.stringify(employees);
             let html = `
-                <div class="alert alert-success mb-3">
-                    <i class="fas fa-check-circle me-1"></i>
-                    <strong>${employees.length} employees found</strong> with active contracts.
-                </div>
-                <div class="employee-preview-table">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;"><input type="checkbox" id="selectAllContracts" checked></th>
-                                <th>STAFF ID</th>
-                                <th>EMPLOYEE NAME</th>
-                                <th>STAFF TYPE</th>
-                                <th class="text-end">BASIC SALARY</th>
-                                <th class="text-end">ALLOWANCES</th>
-                                <th>CONTRACT TYPE</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+            <div class="alert alert-success mb-3">
+                <i class="fas fa-check-circle me-1"></i>
+                <strong>${employees.length} employees found</strong> with active contracts.
+            </div>
+            <div class="employee-preview-table">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAllContracts" checked></th>
+                            <th>STAFF ID</th>
+                            <th>EMPLOYEE NAME</th>
+                            <th>STAFF TYPE</th>
+                            <th class="text-end">BASIC SALARY</th>
+                            <th class="text-end">ALLOWANCES</th>
+                            <th>CONTRACT TYPE</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
             employees.forEach((emp, index) => {
                 html += `
@@ -799,29 +661,27 @@
                             <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
                             <td class="text-end">${formatNumber(emp.basic_salary)}</td>
                             <td class="text-end">${formatNumber(emp.allowances)}</td>
-                            <td class="text-capitalize text-white"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
-                        </tr>
-                    `;
+                            <td class="text-capitalize"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
+                        </tr>`;
             });
 
             html += `
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllContracts">Deselect All</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllContractsBtn">Select All</button>
-                        </div>
-                        <button type="button" class="btn btn-success" id="confirmContractsData">
-                            <i class="fas fa-check me-1"></i> Confirm
-                        </button>
-                    </div>
-                `;
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllContracts">Deselect All</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllContractsBtn">Select All</button>
+                </div>
+                <button type="button" class="btn btn-success" id="confirmContractsData">
+                    <i class="fas fa-check me-1"></i> Confirm
+                </button>
+            </div>
+        `;
 
             contractsResultContainer.innerHTML = html;
 
-            // Event listeners
             document.getElementById('selectAllContractsBtn')?.addEventListener('click', () => {
                 document.querySelectorAll('.contract-employee-checkbox').forEach(cb => cb.checked = true);
                 updateContractCount();
@@ -858,11 +718,10 @@
             document.querySelectorAll('.contract-employee-checkbox').forEach(cb => {
                 cb.addEventListener('change', updateContractCount);
             });
-
             updateContractCount();
         }
 
-        // ==================== EXCEL UPLOAD MODE WITH DUPLICATE VALIDATION ====================
+        // ==================== EXCEL UPLOAD MODE - BATCH PROCESSING (EFFICIENT) ====================
 
         const downloadBtn = document.getElementById('downloadTemplateBtn');
         if (downloadBtn) {
@@ -893,201 +752,226 @@
         const excelFileInput = document.getElementById('excel_file');
         const excelPreviewContainer = document.getElementById('excelPreviewContainer');
 
-        // Function to fetch employee details from backend
-        async function fetchEmployeeDetails(staffId) {
+        // BATCH FETCH - ONE API CALL FOR MULTIPLE STAFF IDs
+        async function fetchEmployeeDetailsBatch(staffIds) {
+            if (!staffIds || staffIds.length === 0) return {};
+
             try {
                 const schoolId = {{ Auth::user()->school_id }};
-                const response = await fetch('{{ route('api.employees.search') }}?school_id=' + schoolId + '&q=' +
-                    encodeURIComponent(staffId), {
-                        headers: {
-                            'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
-                            'Accept': 'application/json'
-                        }
-                    });
+
+                // Send staff IDs as-is (don't modify case)
+                const response = await fetch('{{ route('api.employees.batch') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        school_id: schoolId,
+                        staff_ids: staffIds // Send original case
+                    })
+                });
+
                 const data = await response.json();
 
-                if (data.success && data.data && data.data.length > 0) {
-                    // Find exact match by staff_id (case insensitive)
-                    const emp = data.data.find(e => e.staff_id.toUpperCase() === staffId.toUpperCase());
-                    if (emp) {
-                        return {
-                            employee_name: emp.employee_name,
-                            staff_type: emp.staff_type,
-                            basic_salary: emp.basic_salary,
-                            allowances: emp.allowances,
-                            bank_name: emp.bank_name,
-                            bank_account_name: emp.bank_account_name,
-                            bank_account_number: emp.bank_account_number,
-                            phone: emp.phone,
-                            email: emp.email,
-                            exists_in_system: true
-                        };
+                if (data.success && data.data) {
+                    // Create a case-insensitive lookup map
+                    const caseInsensitiveMap = {};
+                    for (const [key, value] of Object.entries(data.data)) {
+                        // Store with both original and lowercase/uppercase versions
+                        caseInsensitiveMap[key] = value;
+                        caseInsensitiveMap[key.toUpperCase()] = value;
+                        caseInsensitiveMap[key.toLowerCase()] = value;
                     }
+
+                    const foundCount = Object.values(data.data).filter(v => v !== null).length;
+                    console.log(`Found ${foundCount} out of ${staffIds.length} employees`);
+
+                    // Return the case-insensitive map
+                    return caseInsensitiveMap;
                 }
-                return null;
+                return {};
             } catch (e) {
-                console.error('Error fetching employee details:', e);
-                return null;
+                console.error('Batch fetch error:', e);
+                return {};
             }
         }
 
-        // Function to check for duplicate staff_id in Excel data
-        function checkDuplicateStaffIds(data) {
-            const staffIds = [];
-            const duplicateRows = [];
+        // PROCESS EXCEL IN BATCHES - FIXED
+        async function processExcelInBatches(excelData, onProgress) {
+            const BATCH_SIZE = 50;
+            const results = [];
 
-            data.forEach((item, index) => {
-                const staffId = item.staff_id;
-                if (staffIds.includes(staffId)) {
-                    duplicateRows.push({
-                        staff_id: staffId,
+            for (let i = 0; i < excelData.length; i += BATCH_SIZE) {
+                const batch = excelData.slice(i, Math.min(i + BATCH_SIZE, excelData.length));
+                const staffIds = batch.map(item => item.staff_id);
+
+                // ONE API call for entire batch
+                const employeeDetailsMap = await fetchEmployeeDetailsBatch(staffIds);
+
+                // Map results - with case-insensitive lookup
+                for (const item of batch) {
+                    // Try multiple case variations to find the employee
+                    let details = employeeDetailsMap[item.staff_id];
+
+                    if (!details) {
+                        details = employeeDetailsMap[item.staff_id.toUpperCase()];
+                    }
+                    if (!details) {
+                        details = employeeDetailsMap[item.staff_id.toLowerCase()];
+                    }
+
+                    results.push({
+                        staff_id: item.staff_id,
+                        employee_name: details?.employee_name || '',
+                        staff_type: details?.staff_type || 'Teacher',
+                        basic_salary: parseFloat(item.basic_salary) || 0,
+                        allowances: parseFloat(item.allowances) || 0,
+                        department: item.department || '',
+                        contract_type: item.contract_type || 'new',
+                        exists_in_system: !!(details && details.exists_in_system !== false),
                         row_number: item.row_number,
-                        index: index
+                        bank_name: details?.bank_name || null,
+                        bank_account_name: details?.bank_account_name || null,
+                        bank_account_number: details?.bank_account_number || null,
+                        phone: details?.phone || null,
+                        email: details?.email || null
                     });
-                } else {
-                    staffIds.push(staffId);
                 }
-            });
 
-            return {
-                hasDuplicates: duplicateRows.length > 0,
-                duplicateRows: duplicateRows,
-                uniqueStaffIds: staffIds
-            };
+                // Update progress
+                if (onProgress) {
+                    onProgress(results.length, excelData.length);
+                }
+
+                // Small delay to prevent UI freeze
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+
+            return results;
         }
 
         function displayExcelPreview(data) {
             // Check for duplicates
-            const duplicateCheck = checkDuplicateStaffIds(data);
+            const staffIds = data.map(item => item.staff_id);
+            const duplicates = staffIds.filter((id, index) => staffIds.indexOf(id) !== index);
+            const uniqueDuplicates = [...new Set(duplicates)];
+            const hasDuplicates = uniqueDuplicates.length > 0;
+
+            // Count found vs not found (based on employee_name existence)
+            const foundCount = data.filter(emp => emp.employee_name && emp.employee_name !== '').length;
+            const notFoundCount = data.length - foundCount;
 
             let html = `
-            <div class="alert alert-${duplicateCheck.hasDuplicates ? 'danger' : 'success'}">
-                <i class="fas ${duplicateCheck.hasDuplicates ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-1"></i>
-                <strong>${data.length} record(s) found.</strong>
-                ${duplicateCheck.hasDuplicates ?
-                    `<br><span class="text-danger"><i class="fas fa-times-circle me-1"></i> Found ${duplicateCheck.duplicateRows.length} duplicate staff ID(s)!</span>` :
-                    '<span class="text-success"><i class="fas fa-check me-1"></i> No duplicates found.</span>'}
-            </div>
-        `;
-
-            // Show duplicate details if any
-            if (duplicateCheck.hasDuplicates) {
-                html += `
-                <div class="alert alert-warning mb-3">
-                    <i class="fas fa-info-circle me-1"></i>
-                    <strong>Duplicate Staff IDs Found:</strong>
-                    <ul class="mb-0 mt-2">
-                        ${duplicateCheck.duplicateRows.map(dup => `<li><strong>${dup.staff_id}</strong> appears at row ${dup.row_number}</li>`).join('')}
-                    </ul>
-                    <hr>
-                    <small class="text-muted">Please remove duplicates from your Excel file and re-upload.</small>
+                <div class="alert alert-${hasDuplicates ? 'danger' : 'success'}">
+                    <i class="fas ${hasDuplicates ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-1"></i>
+                    <strong>${data.length} record(s) found.</strong>
+                    ${hasDuplicates ?
+                        `<br><span class="text-danger"><i class="fas fa-times-circle me-1"></i> Found ${uniqueDuplicates.length} duplicate staff ID(s)!</span>` :
+                        '<span class="text-success"><i class="fas fa-check me-1"></i> No duplicates found.</span>'}
+                </div>
+                <div class="summary-stats mb-3">
+                    <div class="summary-item"><strong>Total Records:</strong> ${data.length}</div>
+                    <div class="summary-item text-success"><strong>✓ Employees Found:</strong> ${foundCount}</div>
+                    <div class="summary-item text-danger"><strong>✗ Not Found:</strong> ${notFoundCount}</div>
                 </div>
             `;
+
+            if (hasDuplicates) {
+                html += `
+                    <div class="alert alert-warning mb-3">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <strong>Duplicate Staff IDs Found:</strong>
+                        <ul class="mb-0 mt-2">
+                            ${uniqueDuplicates.map(id => `<li><strong>${id}</strong> appears multiple times</li>`).join('')}
+                        </ul>
+                        <hr>
+                        <small class="text-muted">Please remove duplicates from your Excel file and re-upload.</small>
+                    </div>
+                `;
             }
 
             html += `
-            <div class="preview-table-container">
-                <table class="preview-table">
-                    <thead>
-
-                            <th style="width: 40px;"><input type="checkbox" id="selectAllExcel" ${!duplicateCheck.hasDuplicates ? 'checked' : ''} ${duplicateCheck.hasDuplicates ? 'disabled' : ''}></th>
-                            <th>STAFF ID</th>
-                            <th>EMPLOYEE NAME</th>
-                            <th>STAFF TYPE</th>
-                            <th class="text-end">BASIC SALARY</th>
-                            <th class="text-end">ALLOWANCES</th>
-                            <th class="text-end">GROSS PAY</th>
-                            <th>DEPARTMENT</th>
-                            <th>CONTRACT TYPE</th>
-                            <th>STATUS</th>
+                <div class="preview-table-container">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="selectAllExcel" ${!hasDuplicates ? 'checked' : ''} ${hasDuplicates ? 'disabled' : ''}></th>
+                                <th>STAFF ID</th>
+                                <th>EMPLOYEE NAME</th>
+                                <th>STAFF TYPE</th>
+                                <th class="text-end">BASIC SALARY (From Excel)</th>
+                                <th class="text-end">ALLOWANCES (From Excel)</th>
+                                <th class="text-end">GROSS PAY</th>
+                                <th>DEPARTMENT</th>
+                                <th>CONTRACT TYPE</th>
+                                <th>STATUS</th>
+                            </tr>
                         </thead>
                         <tbody>
-        `;
+            `;
 
             data.forEach((emp, idx) => {
+                // USE EXCEL VALUES for basic_salary and allowances!
                 const gross = (emp.basic_salary || 0) + (emp.allowances || 0);
                 const statusBadge = emp.exists_in_system ?
-                    '<span class="badge bg-success text-white">✓ Found</span>' :
-                    '<span class="badge bg-danger text-white">✗ Not Found</span>';
-                const isDuplicate = duplicateCheck.duplicateRows.some(dup => dup.index === idx);
-                const rowClass = isDuplicate ?
-                    'style="background-color: #fff3f3; border-left: 3px solid #dc3545;"' : '';
+                    '<span class="badge bg-success text-white">✓ Employee Found</span>' :
+                    '<span class="badge bg-danger text-white">✗ Employee Not Found</span>';
+                const isDuplicate = duplicates.filter((id, i) => id === emp.staff_id && i !== idx).length > 0;
+                const rowClass = isDuplicate ? 'style="background-color: #fff3f3;"' : '';
 
-                // Show employee name with warning if not found
-                const displayName = emp.exists_in_system ? emp.employee_name :
-                    `${emp.staff_id} (EMPLOYEE NOT FOUND IN SYSTEM)`;
+                const displayName = emp.employee_name && emp.employee_name !== '' ?
+                    emp.employee_name :
+                    `<span class="text-danger">⚠️ EMPLOYEE NOT FOUND IN SYSTEM - Check Staff ID</span>`;
 
                 html += `
-                <tr ${rowClass}>
-                    <td class="text-center">
-                        <input type="checkbox" class="excel-checkbox" data-index="${idx}" ${!isDuplicate && !duplicateCheck.hasDuplicates && emp.exists_in_system ? 'checked' : ''} ${isDuplicate || !emp.exists_in_system ? 'disabled' : ''}>
-
-                    <td class="text-uppercase">
-                        <strong>${escapeHtml(emp.staff_id)}</strong>
-                        ${isDuplicate ? '<span class="badge bg-danger ms-1">Duplicate</span>' : ''}
-
-                    <td class="text-uppercase ${!emp.exists_in_system ? 'text-danger fw-bold' : ''}">
-                        ${escapeHtml(displayName)}
-                        ${!emp.exists_in_system ? '<i class="fas fa-exclamation-triangle ms-1" title="Employee not found in system"></i>' : ''}
-
-                    <td class="text-uppercase">${escapeHtml(emp.staff_type)}
-                    <td class="text-end">${formatNumber(emp.basic_salary)}
-                    <td class="text-end">${formatNumber(emp.allowances)}
-                    <td class="text-end"><strong>${formatNumber(gross)}</strong>
-                    <td class="text-capitalize">${escapeHtml(emp.department)}
-                    <td class="text-capitalize text-white"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span>
-                    <td class="text-center text-white">${statusBadge}
-
-            `;
+            <tr ${rowClass}>
+                <td class="text-center">
+                    <input type="checkbox" class="excel-checkbox" data-index="${idx}"
+                        ${!isDuplicate && !hasDuplicates && emp.employee_name && emp.employee_name !== '' ? 'checked' : ''}
+                        ${isDuplicate || !emp.employee_name || emp.employee_name === '' ? 'disabled' : ''}>
+                </td>
+                <td class="text-uppercase">
+                    <strong>${escapeHtml(emp.staff_id)}</strong>
+                    ${isDuplicate ? '<span class="badge bg-danger ms-1">Duplicate</span>' : ''}
+                </td>
+                <td class="text-uppercase ${!emp.employee_name || emp.employee_name === '' ? 'text-danger fw-bold' : ''}">
+                    ${escapeHtml(displayName)}
+                    ${!emp.employee_name || emp.employee_name === '' ? '<i class="fas fa-exclamation-triangle ms-1" title="Employee not found in system"></i>' : ''}
+                </td>
+                <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
+                <td class="text-end"><strong>${formatNumber(emp.basic_salary)}</strong> <small class="text-muted">(Excel)</small></td>
+                <td class="text-end"><strong>${formatNumber(emp.allowances)}</strong> <small class="text-muted">(Excel)</small></td>
+                <td class="text-end"><strong class="text-primary">${formatNumber(gross)}</strong></td>
+                <td class="text-capitalize">${escapeHtml(emp.department)}</td>
+                <td class="text-capitalize"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span></td>
+                <td class="text-center">${statusBadge}</td>
+            </tr>
+        `;
             });
 
             html += `
-                        </tbody>
-
-                </div>
-                <div class="mt-3 d-flex justify-content-between align-items-center">
-                    <div>
-                        <button class="btn btn-sm btn-outline-secondary" id="deselectAllExcel" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Deselect All</button>
-                        <button class="btn btn-sm btn-outline-primary" id="selectAllExcelBtn" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Select All</button>
-                    </div>
-                    <button class="btn btn-${duplicateCheck.hasDuplicates ? 'secondary' : 'success'}" id="confirmExcelData" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>
-                        <i class="fas fa-check me-1"></i> Confirm
-                    </button>
-                </div>
-                <input type="hidden" id="excel_data" name="excel_data" value="">
-        `;
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3 d-flex justify-content-between align-items-center">
+            <div>
+                <button class="btn btn-sm btn-outline-secondary" id="deselectAllExcel" ${hasDuplicates ? 'disabled' : ''}>Deselect All</button>
+                <button class="btn btn-sm btn-outline-primary" id="selectAllExcelBtn" ${hasDuplicates ? 'disabled' : ''}>Select All</button>
+            </div>
+            <button class="btn btn-${hasDuplicates ? 'secondary' : 'success'}" id="confirmExcelData" ${hasDuplicates ? 'disabled' : ''}>
+                <i class="fas fa-check me-1"></i> Confirm (${foundCount} employees available)
+            </button>
+        </div>
+        <input type="hidden" id="excel_data_hidden" name="excel_data" value="">
+    `;
 
             excelPreviewContainer.innerHTML = html;
 
-            // Only attach event listeners if no duplicates
-            if (!duplicateCheck.hasDuplicates) {
-                const selectAllBtn = document.getElementById('selectAllExcelBtn');
-                const deselectAllBtn = document.getElementById('deselectAllExcel');
+            if (!hasDuplicates) {
                 const confirmBtn = document.getElementById('confirmExcelData');
-
-                function updateExcelCount() {
-                    const selectedCount = document.querySelectorAll('.excel-checkbox:checked').length;
-                    if (confirmBtn && !confirmBtn.disabled) {
-                        confirmBtn.innerHTML =
-                            `<i class="fas fa-check me-1"></i> Confirm`;
-                    }
-                }
-
-                if (selectAllBtn) {
-                    selectAllBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
-                            true);
-                        updateExcelCount();
-                    });
-                }
-
-                if (deselectAllBtn) {
-                    deselectAllBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
-                            false);
-                        updateExcelCount();
-                    });
-                }
 
                 if (confirmBtn) {
                     confirmBtn.addEventListener('click', () => {
@@ -1101,19 +985,7 @@
                             return;
                         }
 
-                        // Final duplicate check before confirming
-                        const selectedStaffIds = selected.map(emp => emp.staff_id);
-                        const finalDuplicateCheck = selectedStaffIds.filter((id, index) => selectedStaffIds.indexOf(
-                            id) !== index);
-
-                        if (finalDuplicateCheck.length > 0) {
-                            showToast(
-                                `Duplicate staff IDs found in selection: ${finalDuplicateCheck.join(', ')}. Please fix.`,
-                                'warning');
-                            return;
-                        }
-
-                        document.getElementById('excel_data').value = JSON.stringify(selected);
+                        document.getElementById('excel_data_hidden').value = JSON.stringify(selected);
                         showToast(`${selected.length} employee(s) confirmed for payroll`, 'success');
                         confirmBtn.disabled = true;
                         confirmBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirmed!';
@@ -1121,17 +993,27 @@
                     });
                 }
 
-                document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => {
-                    cb.addEventListener('change', updateExcelCount);
-                });
-                updateExcelCount();
-            } else {
-                showToast('Please fix duplicate staff IDs in your Excel file and re-upload', 'warning');
-                document.getElementById('excel_data').value = '';
-                updateSubmitButtonState();
+                // Select All / Deselect All
+                const selectAllBtn = document.getElementById('selectAllExcelBtn');
+                const deselectAllBtn = document.getElementById('deselectAllExcel');
+
+                if (selectAllBtn) {
+                    selectAllBtn.addEventListener('click', () => {
+                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
+                            true);
+                    });
+                }
+
+                if (deselectAllBtn) {
+                    deselectAllBtn.addEventListener('click', () => {
+                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
+                            false);
+                    });
+                }
             }
         }
 
+        // Excel file handler - FIXED
         if (excelFileInput) {
             excelFileInput.addEventListener('change', async function(e) {
                 const file = e.target.files[0];
@@ -1142,67 +1024,74 @@
 
                 excelPreviewContainer.style.display = 'block';
                 excelPreviewContainer.innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-spinner fa-spin me-1"></i>
-                    Processing "${file.name}"...<br>
-                    <small class="text-muted">Fetching employee details from system...</small>
-                </div>
-            `;
+            <div class="alert alert-info">
+                <i class="fas fa-spinner fa-spin me-1"></i>
+                Reading file "${file.name}"...
+            </div>
+        `;
 
                 try {
+                    // Parse CSV
                     const text = await file.text();
                     const lines = text.split('\n');
-                    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
 
-                    let data = [];
-                    const staffIdMap = new Map();
-
+                    let excelData = [];
                     for (let i = 1; i < lines.length; i++) {
                         if (!lines[i].trim()) continue;
-
                         const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
                         const row = {};
                         headers.forEach((header, idx) => {
-                            row[header] = values[idx];
+                            row[header] = values[idx] || '';
                         });
 
-                        if (!row.staff_id) continue;
-
-                        // Track duplicates
-                        if (staffIdMap.has(row.staff_id)) {
-                            staffIdMap.get(row.staff_id).push(i + 1);
-                        } else {
-                            staffIdMap.set(row.staff_id, [i + 1]);
+                        if (row.staff_id) {
+                            excelData.push({
+                                staff_id: row.staff_id.toUpperCase(),
+                                basic_salary: parseFloat(row.basic_salary) || 0,
+                                allowances: parseFloat(row.allowances) || 0,
+                                department: row.department || '',
+                                contract_type: row.contract_type || 'new',
+                                row_number: i + 1
+                            });
                         }
-
-                        // Fetch employee details from system
-                        const employeeDetails = await fetchEmployeeDetails(row.staff_id);
-
-                        data.push({
-                            staff_id: row.staff_id,
-                            employee_name: employeeDetails?.employee_name || '',
-                            staff_type: employeeDetails?.staff_type || 'Teacher',
-                            basic_salary: parseFloat(row.basic_salary) || 0,
-                            allowances: parseFloat(row.allowances) || 0,
-                            department: row.department || '',
-                            contract_type: row.contract_type || 'new',
-                            exists_in_system: !!employeeDetails,
-                            row_number: i + 1
-                        });
                     }
 
-                    if (data.length === 0) {
+                    if (excelData.length === 0) {
                         excelPreviewContainer.innerHTML =
-                            '<div class="alert alert-warning">No valid data found. Please check the format.</div>';
+                            '<div class="alert alert-warning">No valid data found.</div>';
                         return;
                     }
 
-                    displayExcelPreview(data);
+                    // Get unique staff IDs
+                    const uniqueStaffIds = [...new Set(excelData.map(item => item.staff_id))];
+
+                    // Fetch employee names and types only (not salaries!)
+                    const employeeMap = await fetchEmployeeDetailsBatch(uniqueStaffIds);
+
+                    // Build final data - KEEP EXCEL VALUES for salary!
+                    const finalData = excelData.map(item => {
+                        const details = employeeMap[item.staff_id];
+                        return {
+                            staff_id: item.staff_id,
+                            employee_name: details?.employee_name || '',
+                            staff_type: details?.staff_type || 'Teacher',
+                            // IMPORTANT: USE EXCEL VALUES, NOT DATABASE VALUES!
+                            basic_salary: item.basic_salary, // From Excel
+                            allowances: item.allowances, // From Excel
+                            department: item.department,
+                            contract_type: item.contract_type,
+                            exists_in_system: !!details,
+                            row_number: item.row_number
+                        };
+                    });
+
+                    displayExcelPreview(finalData);
 
                 } catch (error) {
-                    console.error('Error parsing file:', error);
+                    console.error('Error:', error);
                     excelPreviewContainer.innerHTML =
-                        '<div class="alert alert-danger">Failed to parse file. Please use the template format.</div>';
+                        '<div class="alert alert-danger">Failed to process file. Please check format.</div>';
                 }
             });
         }
@@ -1252,52 +1141,51 @@
 
         function displaySchedulePreview(schedule) {
             let html = `
-        <div class="selected-schedule-card">
-            <h6 class="mb-2">📋 ${escapeHtml(schedule.name)} (${escapeHtml(schedule.month_name)})</h6>
-            <div class="summary-stats mb-3">
-                <div class="summary-item"><strong>Employees:</strong> ${schedule.total_employees}</div>
-                <div class="summary-item"><strong>Total Gross:</strong> ${formatNumber(schedule.total_gross)}</div>
-                <div class="summary-item"><strong>Total Net:</strong> ${formatNumber(schedule.total_net)}</div>
-                <div class="summary-item"><strong>Total Tax:</strong> ${formatNumber(schedule.total_tax)}</div>
-            </div>
-            <div class="preview-table-container">
-                <table class="preview-table">
-                    <thead>
-                            <th style="width: 50px;">#</th>
-                            <th>STAFF ID</th>
-                            <th>EMPLOYEE NAME</th>
-                            <th class="text-end">BASIC SALARY</th>
-                            <th class="text-end">ALLOWANCES</th>
-                            <th class="text-end">GROSS PAY</th>
-                            <th class="text-end">NSSF</th>
-                            <th class="text-end">PAYE</th>
-                            <th class="text-end">NET PAY</th>
+            <div class="selected-schedule-card">
+                <h6 class="mb-2">📋 ${escapeHtml(schedule.name)} (${escapeHtml(schedule.month_name)})</h6>
+                <div class="summary-stats mb-3">
+                    <div class="summary-item"><strong>Employees:</strong> ${schedule.total_employees}</div>
+                    <div class="summary-item"><strong>Total Gross:</strong> ${formatNumber(schedule.total_gross)}</div>
+                    <div class="summary-item"><strong>Total Net:</strong> ${formatNumber(schedule.total_net)}</div>
+                    <div class="summary-item"><strong>Total Tax:</strong> ${formatNumber(schedule.total_tax)}</div>
+                </div>
+                <div class="preview-table-container">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>STAFF ID</th>
+                                <th>EMPLOYEE NAME</th>
+                                <th class="text-end">BASIC SALARY</th>
+                                <th class="text-end">ALLOWANCES</th>
+                                <th class="text-end">GROSS PAY</th>
+                                <th class="text-end">NSSF</th>
+                                <th class="text-end">PAYE</th>
+                                <th class="text-end">NET PAY</th>
+                            </tr>
                         </thead>
-                        <tbody>
-    `;
+                        <tbody>`;
 
             (schedule.employees || []).forEach((emp, idx) => {
                 html += `
-            <tr>
-                <td class="text-center">${idx + 1}</td>
-                <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
-                <td class="text-end">${formatNumber(emp.basic_salary)}</td>
-                <td class="text-end">${formatNumber(emp.allowances)}</td>
-                <td class="text-end"><strong>${formatNumber(emp.gross)}</strong></td>
-                <td class="text-end">${formatNumber(emp.nssf)}</td>
-                <td class="text-end">${formatNumber(emp.paye)}</td>
-                <td class="text-end text-success"><strong>${formatNumber(emp.net)}</strong></td>
-            </tr>
-        `;
+                <tr>
+                    <td class="text-center">${idx + 1}</td>
+                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
+                    <td class="text-end">${formatNumber(emp.basic_salary)}</td>
+                    <td class="text-end">${formatNumber(emp.allowances)}</td>
+                    <td class="text-end"><strong>${formatNumber(emp.gross)}</strong></td>
+                    <td class="text-end">${formatNumber(emp.nssf)}</td>
+                    <td class="text-end">${formatNumber(emp.paye)}</td>
+                    <td class="text-end text-success"><strong>${formatNumber(emp.net)}</strong></td>
+                </tr>`;
             });
 
             html += `
                     </tbody>
                 </table>
             </div>
-        </div>
-    `;
+        </div>`;
 
             schedulePreviewContainer.innerHTML = html;
         }
@@ -1350,7 +1238,7 @@
                     isConfirmed = contractsData && contractsData !== '[]';
                     break;
                 case 'excel_upload':
-                    const excelData = document.getElementById('excel_data').value;
+                    const excelData = document.getElementById('excel_data_hidden').value;
                     isConfirmed = excelData && excelData !== '[]';
                     break;
                 case 'previous_batch':
@@ -1410,7 +1298,7 @@
                         }
                         break;
                     case 'excel_upload':
-                        const excelData = document.getElementById('excel_data').value;
+                        const excelData = document.getElementById('excel_data_hidden').value;
                         if (!excelData || excelData === '[]') {
                             showToast('Please load and confirm Excel data first', 'warning');
                             e.preventDefault();

@@ -1083,4 +1083,164 @@ class PayrollController extends Controller
             ], 500);
         }
     }
+
+
+    /**
+     * BATCH SEARCH EMPLOYEES - CASE-INSENSITIVE SEARCH
+     * POST /api/employees/batch
+     */
+    public function batchSearchEmployees(Request $request)
+    {
+        $schoolId = $request->input('school_id', Auth::user()->school_id);
+        $staffIds = $request->input('staff_ids', []);
+
+        if (empty($staffIds)) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        // Remove duplicates and clean staff IDs
+        $staffIds = array_unique($staffIds);
+        $staffIds = array_filter($staffIds);
+
+        if (empty($staffIds)) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        // Create uppercase and lowercase versions for matching
+        $staffIdsUpper = array_map('strtoupper', $staffIds);
+        $staffIdsLower = array_map('strtolower', $staffIds);
+
+        $results = [];
+
+        try {
+            // 1. GET TEACHERS - Case-insensitive search using UPPER()
+            $teachers = DB::table('teachers')
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->where('teachers.school_id', $schoolId)
+                ->where('teachers.status', 1)
+                ->where('users.status', 1)
+                ->where(function ($query) use ($staffIdsUpper, $staffIdsLower) {
+                    $query->whereIn(DB::raw('UPPER(teachers.member_id)'), $staffIdsUpper)
+                        ->orWhereIn(DB::raw('LOWER(teachers.member_id)'), $staffIdsLower);
+                })
+                ->select(
+                    'teachers.member_id as original_staff_id',
+                    DB::raw("CONCAT(users.first_name, ' ', COALESCE(users.last_name, '')) as employee_name"),
+                    DB::raw("'teacher' as staff_type")
+                )
+                ->get();
+
+            foreach ($teachers as $teacher) {
+                // Store with UPPERCASE key for consistent lookup
+                $upperKey = strtoupper($teacher->original_staff_id);
+                $results[$upperKey] = [
+                    'staff_id' => $upperKey,
+                    'employee_name' => $teacher->employee_name,
+                    'staff_type' => $teacher->staff_type,
+                    'exists_in_system' => true
+                ];
+            }
+
+            // 2. GET TRANSPORT - Case-insensitive search
+            $foundIds = array_keys($results);
+            $remainingIds = array_diff($staffIdsUpper, $foundIds);
+
+            if (!empty($remainingIds)) {
+                $transports = DB::table('transports')
+                    ->where('school_id', $schoolId)
+                    ->where('status', 1)
+                    ->where(function ($query) use ($remainingIds) {
+                        foreach ($remainingIds as $id) {
+                            $query->orWhere(DB::raw('UPPER(staff_id)'), $id);
+                        }
+                    })
+                    ->select(
+                        'staff_id as original_staff_id',
+                        'driver_name as employee_name',
+                        DB::raw("'transport' as staff_type")
+                    )
+                    ->get();
+
+                foreach ($transports as $transport) {
+                    $upperKey = strtoupper($transport->original_staff_id);
+                    if (!isset($results[$upperKey])) {
+                        $results[$upperKey] = [
+                            'staff_id' => $upperKey,
+                            'employee_name' => $transport->employee_name,
+                            'staff_type' => $transport->staff_type,
+                            'exists_in_system' => true
+                        ];
+                    }
+                }
+            }
+
+            // 3. GET OTHER STAFF - Case-insensitive search
+            $foundIds = array_keys($results);
+            $stillRemaining = array_diff($staffIdsUpper, $foundIds);
+
+            if (!empty($stillRemaining)) {
+                $otherStaffs = DB::table('other_staffs')
+                    ->where('school_id', $schoolId)
+                    ->where('status', 1)
+                    ->where(function ($query) use ($stillRemaining) {
+                        foreach ($stillRemaining as $id) {
+                            $query->orWhere(DB::raw('UPPER(staff_id)'), $id);
+                        }
+                    })
+                    ->select(
+                        'staff_id as original_staff_id',
+                        DB::raw("CONCAT(first_name, ' ', COALESCE(last_name, '')) as employee_name"),
+                        DB::raw("'other_staff' as staff_type")
+                    )
+                    ->get();
+
+                foreach ($otherStaffs as $staff) {
+                    $upperKey = strtoupper($staff->original_staff_id);
+                    if (!isset($results[$upperKey])) {
+                        $results[$upperKey] = [
+                            'staff_id' => $upperKey,
+                            'employee_name' => $staff->employee_name,
+                            'staff_type' => $staff->staff_type,
+                            'exists_in_system' => true
+                        ];
+                    }
+                }
+            }
+
+            // 4. Log what was found
+
+        } catch (\Exception $e) {
+            Log::error('Batch search failed', [
+                'error' => $e->getMessage(),
+                'staff_ids' => $staffIds
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Database error: ' . $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
+
+        // Mark not found staff IDs (using UPPERCASE keys)
+        $finalResults = [];
+        foreach ($staffIds as $originalStaffId) {
+            $upperKey = strtoupper($originalStaffId);
+            if (isset($results[$upperKey])) {
+                $finalResults[$originalStaffId] = $results[$upperKey];
+            } else {
+                $finalResults[$originalStaffId] = null;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $finalResults,
+            'debug' => [
+                'total' => count($staffIds),
+                'found' => count(array_filter($finalResults)),
+                'not_found' => count($finalResults) - count(array_filter($finalResults))
+            ]
+        ]);
+    }
 }

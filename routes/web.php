@@ -659,6 +659,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::post('/{hash}/recalculate', [PayrollController::class, 'recalculate'])->name('recalculate');
         });
 
+        Route::post('/api/employees/batch', [PayrollController::class, 'batchSearchEmployees'])->name('api.employees.batch');
+
         // ========================================================================
         // HESLB MANAGEMENT ROUTES
         // ========================================================================
