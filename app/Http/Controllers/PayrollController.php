@@ -1086,7 +1086,7 @@ class PayrollController extends Controller
 
 
     /**
-     * BATCH SEARCH EMPLOYEES - CASE-INSENSITIVE SEARCH
+     * BATCH SEARCH EMPLOYEES - STANDARDIZE TO LOWERCASE (Matching Database)
      * POST /api/employees/batch
      */
     public function batchSearchEmployees(Request $request)
@@ -1098,7 +1098,10 @@ class PayrollController extends Controller
             return response()->json(['success' => true, 'data' => []]);
         }
 
-        // Remove duplicates and clean staff IDs
+        // ✅ STANDARDIZE ALL TO LOWERCASE (matching database format)
+        $staffIds = array_map(function ($id) {
+            return strtolower(trim($id));
+        }, $staffIds);
         $staffIds = array_unique($staffIds);
         $staffIds = array_filter($staffIds);
 
@@ -1106,66 +1109,56 @@ class PayrollController extends Controller
             return response()->json(['success' => true, 'data' => []]);
         }
 
-        // Create uppercase and lowercase versions for matching
-        $staffIdsUpper = array_map('strtoupper', $staffIds);
-        $staffIdsLower = array_map('strtolower', $staffIds);
-
         $results = [];
 
         try {
-            // 1. GET TEACHERS - Case-insensitive search using UPPER()
+            // =================================================================
+            // 1. GET TEACHERS - Search by lowercase member_id
+            // =================================================================
             $teachers = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
                 ->where('teachers.school_id', $schoolId)
                 ->where('teachers.status', 1)
                 ->where('users.status', 1)
-                ->where(function ($query) use ($staffIdsUpper, $staffIdsLower) {
-                    $query->whereIn(DB::raw('UPPER(teachers.member_id)'), $staffIdsUpper)
-                        ->orWhereIn(DB::raw('LOWER(teachers.member_id)'), $staffIdsLower);
-                })
+                ->whereIn('teachers.member_id', $staffIds)  // Direct match (lowercase)
                 ->select(
-                    'teachers.member_id as original_staff_id',
+                    'teachers.member_id as staff_id',
                     DB::raw("CONCAT(users.first_name, ' ', COALESCE(users.last_name, '')) as employee_name"),
                     DB::raw("'teacher' as staff_type")
                 )
                 ->get();
 
             foreach ($teachers as $teacher) {
-                // Store with UPPERCASE key for consistent lookup
-                $upperKey = strtoupper($teacher->original_staff_id);
-                $results[$upperKey] = [
-                    'staff_id' => $upperKey,
+                $results[$teacher->staff_id] = [
+                    'staff_id' => $teacher->staff_id,
                     'employee_name' => $teacher->employee_name,
                     'staff_type' => $teacher->staff_type,
                     'exists_in_system' => true
                 ];
             }
 
-            // 2. GET TRANSPORT - Case-insensitive search
+            // =================================================================
+            // 2. GET TRANSPORT - Search by lowercase staff_id
+            // =================================================================
             $foundIds = array_keys($results);
-            $remainingIds = array_diff($staffIdsUpper, $foundIds);
+            $remainingIds = array_diff($staffIds, $foundIds);
 
             if (!empty($remainingIds)) {
                 $transports = DB::table('transports')
                     ->where('school_id', $schoolId)
                     ->where('status', 1)
-                    ->where(function ($query) use ($remainingIds) {
-                        foreach ($remainingIds as $id) {
-                            $query->orWhere(DB::raw('UPPER(staff_id)'), $id);
-                        }
-                    })
+                    ->whereIn('staff_id', $remainingIds)  // Direct match (lowercase)
                     ->select(
-                        'staff_id as original_staff_id',
+                        'staff_id',
                         'driver_name as employee_name',
                         DB::raw("'transport' as staff_type")
                     )
                     ->get();
 
                 foreach ($transports as $transport) {
-                    $upperKey = strtoupper($transport->original_staff_id);
-                    if (!isset($results[$upperKey])) {
-                        $results[$upperKey] = [
-                            'staff_id' => $upperKey,
+                    if (!isset($results[$transport->staff_id])) {
+                        $results[$transport->staff_id] = [
+                            'staff_id' => $transport->staff_id,
                             'employee_name' => $transport->employee_name,
                             'staff_type' => $transport->staff_type,
                             'exists_in_system' => true
@@ -1174,31 +1167,28 @@ class PayrollController extends Controller
                 }
             }
 
-            // 3. GET OTHER STAFF - Case-insensitive search
+            // =================================================================
+            // 3. GET OTHER STAFF - Search by lowercase staff_id
+            // =================================================================
             $foundIds = array_keys($results);
-            $stillRemaining = array_diff($staffIdsUpper, $foundIds);
+            $stillRemaining = array_diff($staffIds, $foundIds);
 
             if (!empty($stillRemaining)) {
                 $otherStaffs = DB::table('other_staffs')
                     ->where('school_id', $schoolId)
                     ->where('status', 1)
-                    ->where(function ($query) use ($stillRemaining) {
-                        foreach ($stillRemaining as $id) {
-                            $query->orWhere(DB::raw('UPPER(staff_id)'), $id);
-                        }
-                    })
+                    ->whereIn('staff_id', $stillRemaining)  // Direct match (lowercase)
                     ->select(
-                        'staff_id as original_staff_id',
+                        'staff_id',
                         DB::raw("CONCAT(first_name, ' ', COALESCE(last_name, '')) as employee_name"),
                         DB::raw("'other_staff' as staff_type")
                     )
                     ->get();
 
                 foreach ($otherStaffs as $staff) {
-                    $upperKey = strtoupper($staff->original_staff_id);
-                    if (!isset($results[$upperKey])) {
-                        $results[$upperKey] = [
-                            'staff_id' => $upperKey,
+                    if (!isset($results[$staff->staff_id])) {
+                        $results[$staff->staff_id] = [
+                            'staff_id' => $staff->staff_id,
                             'employee_name' => $staff->employee_name,
                             'staff_type' => $staff->staff_type,
                             'exists_in_system' => true
@@ -1207,8 +1197,17 @@ class PayrollController extends Controller
                 }
             }
 
-            // 4. Log what was found
+            // Log results
+            $found = array_keys($results);
+            $notFound = array_diff($staffIds, $found);
 
+            // Log::info('Batch search results (lowercase standard)', [
+            //     'total_requested' => count($staffIds),
+            //     'found' => count($found),
+            //     'not_found' => count($notFound),
+            //     'found_ids' => $found,
+            //     'not_found_ids' => $notFound
+            // ]);
         } catch (\Exception $e) {
             Log::error('Batch search failed', [
                 'error' => $e->getMessage(),
@@ -1222,14 +1221,15 @@ class PayrollController extends Controller
             ], 500);
         }
 
-        // Mark not found staff IDs (using UPPERCASE keys)
+        // =================================================================
+        // 4. Build final results - Return with ORIGINAL case from request
+        // =================================================================
         $finalResults = [];
-        foreach ($staffIds as $originalStaffId) {
-            $upperKey = strtoupper($originalStaffId);
-            if (isset($results[$upperKey])) {
-                $finalResults[$originalStaffId] = $results[$upperKey];
+        foreach ($staffIds as $lowercaseStaffId) {
+            if (isset($results[$lowercaseStaffId])) {
+                $finalResults[$lowercaseStaffId] = $results[$lowercaseStaffId];
             } else {
-                $finalResults[$originalStaffId] = null;
+                $finalResults[$lowercaseStaffId] = null;
             }
         }
 

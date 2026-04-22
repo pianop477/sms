@@ -799,32 +799,26 @@
             }
         }
 
-        // PROCESS EXCEL IN BATCHES - FIXED
+        // PROCESS EXCEL IN BATCHES - Convert to lowercase before sending
         async function processExcelInBatches(excelData, onProgress) {
             const BATCH_SIZE = 50;
             const results = [];
 
             for (let i = 0; i < excelData.length; i += BATCH_SIZE) {
                 const batch = excelData.slice(i, Math.min(i + BATCH_SIZE, excelData.length));
-                const staffIds = batch.map(item => item.staff_id);
 
-                // ONE API call for entire batch
+                // ✅ CONVERT TO LOWERCASE before sending (matching database)
+                const staffIds = batch.map(item => item.staff_id.toLowerCase());
+
                 const employeeDetailsMap = await fetchEmployeeDetailsBatch(staffIds);
 
-                // Map results - with case-insensitive lookup
                 for (const item of batch) {
-                    // Try multiple case variations to find the employee
-                    let details = employeeDetailsMap[item.staff_id];
-
-                    if (!details) {
-                        details = employeeDetailsMap[item.staff_id.toUpperCase()];
-                    }
-                    if (!details) {
-                        details = employeeDetailsMap[item.staff_id.toLowerCase()];
-                    }
+                    // ✅ Use lowercase for lookup
+                    const lowerStaffId = item.staff_id.toLowerCase();
+                    let details = employeeDetailsMap[lowerStaffId];
 
                     results.push({
-                        staff_id: item.staff_id,
+                        staff_id: item.staff_id, // Keep original case for display
                         employee_name: details?.employee_name || '',
                         staff_type: details?.staff_type || 'Teacher',
                         basic_salary: parseFloat(item.basic_salary) || 0,
@@ -832,21 +826,14 @@
                         department: item.department || '',
                         contract_type: item.contract_type || 'new',
                         exists_in_system: !!(details && details.exists_in_system !== false),
-                        row_number: item.row_number,
-                        bank_name: details?.bank_name || null,
-                        bank_account_name: details?.bank_account_name || null,
-                        bank_account_number: details?.bank_account_number || null,
-                        phone: details?.phone || null,
-                        email: details?.email || null
+                        row_number: item.row_number
                     });
                 }
 
-                // Update progress
                 if (onProgress) {
                     onProgress(results.length, excelData.length);
                 }
 
-                // Small delay to prevent UI freeze
                 await new Promise(resolve => setTimeout(resolve, 10));
             }
 
