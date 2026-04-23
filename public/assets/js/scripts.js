@@ -265,10 +265,10 @@
     });
 
     /*================================
-     PWA - Dual Banner System
-     Banner 1: Install App (Always visible if not installed)
+     PWA - Dual Banner System (UPDATED)
+     Banner 1: Install App (Always visible if not installed - with 24h cooldown)
      Banner 2: Update Available (Only when update exists, can be ignored)
- =================================*/
+    =================================*/
     (function () {
         // Check if running on Android
         const isAndroid = /android/i.test(navigator.userAgent);
@@ -289,8 +289,11 @@
         let updateToast = null;
         let installBanner = null;
 
+        // App version - make sure this matches your service worker version
+        const APP_VERSION = '2026.04.21';
+
         /* =============================
-           BANNER 1: INSTALL APP (Always visible if not installed)
+           BANNER 1: INSTALL APP (UPDATED - 24h cooldown only)
         ============================= */
         function showInstallBanner() {
             // Don't show if already installed
@@ -304,11 +307,24 @@
                 return;
             }
 
-            // Check if user dismissed banner before (store in localStorage)
+            // Check if user dismissed banner recently (24 hours only)
             const bannerDismissed = localStorage.getItem('pwa_install_banner_dismissed');
-            if (bannerDismissed === 'true') {
-                console.log('User previously dismissed install banner');
-                return;
+            const dismissTime = localStorage.getItem('pwa_install_banner_dismissed_time');
+
+            if (bannerDismissed === 'true' && dismissTime) {
+                const now = Date.now();
+                const timeDiff = now - parseInt(dismissTime);
+                const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+                if (hoursDiff < 24) {
+                    console.log(`User dismissed banner ${hoursDiff.toFixed(1)} hours ago, waiting for 24h cooldown`);
+                    return;
+                } else {
+                    // Clear old dismissal after 24 hours
+                    localStorage.removeItem('pwa_install_banner_dismissed');
+                    localStorage.removeItem('pwa_install_banner_dismissed_time');
+                    console.log('24h cooldown passed, banner can show again');
+                }
             }
 
             installBanner = document.createElement('div');
@@ -325,11 +341,13 @@
                 gap: 15px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 min-width: 280px;
+                max-width: 90vw;
             ">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 28px;">📱</span>
                     <div>
                         <div style="font-weight: bold; font-size: 14px;">Install ShuleApp</div>
+                        <div style="font-size: 11px; opacity: 0.9;">Get better experience</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -342,6 +360,7 @@
                         font-weight: bold;
                         cursor: pointer;
                         font-size: 12px;
+                        transition: transform 0.2s;
                     ">Install</button>
                     <button id="pwa-dismiss-btn" style="
                         background: transparent;
@@ -351,6 +370,7 @@
                         border-radius: 25px;
                         cursor: pointer;
                         font-size: 12px;
+                        transition: transform 0.2s;
                     ">Later</button>
                 </div>
             </div>
@@ -365,7 +385,7 @@
             animation: slideUp 0.3s ease-out;
         `;
 
-            // Add animation styles
+            // Add animation styles if not exists
             if (!document.getElementById('pwa-banner-styles')) {
                 const style = document.createElement('style');
                 style.id = 'pwa-banner-styles';
@@ -400,16 +420,31 @@
                         opacity: 1;
                     }
                 }
+                .pwa-button-hover:hover {
+                    transform: scale(1.05);
+                }
             `;
                 document.head.appendChild(style);
             }
 
             document.body.appendChild(installBanner);
 
+            // Add hover effects
+            const installBtn = document.getElementById('pwa-install-btn');
+            const dismissBtn = document.getElementById('pwa-dismiss-btn');
+            if (installBtn) installBtn.classList.add('pwa-button-hover');
+            if (dismissBtn) dismissBtn.classList.add('pwa-button-hover');
+
             // Install button handler
             document.getElementById('pwa-install-btn').addEventListener('click', async () => {
                 if (!deferredPrompt) {
                     console.log('No install prompt available');
+                    // Fallback for browsers without automatic prompt
+                    const userConfirmed = confirm('Would you like to install ShuleApp? Tap OK and then select "Install App" or "Add to Home Screen" from the browser menu.');
+                    if (userConfirmed) {
+                        console.log('User confirmed installation via fallback');
+                        hideInstallBanner();
+                    }
                     return;
                 }
 
@@ -421,6 +456,9 @@
                     if (outcome === 'accepted') {
                         console.log('User accepted installation');
                         hideInstallBanner();
+                        // Clear any stored dismissal since they installed
+                        localStorage.removeItem('pwa_install_banner_dismissed');
+                        localStorage.removeItem('pwa_install_banner_dismissed_time');
                     }
                     deferredPrompt = null;
                 } catch (error) {
@@ -428,14 +466,13 @@
                 }
             });
 
-            // Dismiss button handler
+            // Dismiss button handler - 24 hour cooldown only
             document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
                 hideInstallBanner();
-                // Store dismissal for 7 days
+                // Store dismissal with timestamp for 24 hours only
                 localStorage.setItem('pwa_install_banner_dismissed', 'true');
-                setTimeout(() => {
-                    localStorage.removeItem('pwa_install_banner_dismissed');
-                }, 7 * 24 * 60 * 60 * 1000); // 7 days
+                localStorage.setItem('pwa_install_banner_dismissed_time', Date.now().toString());
+                console.log('User dismissed banner - will show again after 24 hours');
             });
         }
 
@@ -445,6 +482,7 @@
                 setTimeout(() => {
                     if (installBanner && installBanner.remove) {
                         installBanner.remove();
+                        installBanner = null;
                     }
                 }, 300);
             }
@@ -456,6 +494,13 @@
         function showUpdateBanner(worker) {
             // Don't show if already showing
             if (document.getElementById('pwa-update-banner')) {
+                return;
+            }
+
+            // Check if user dismissed this specific version
+            const updateDismissed = localStorage.getItem('pwa_update_dismissed_' + APP_VERSION);
+            if (updateDismissed === 'true') {
+                console.log('User dismissed this update version');
                 return;
             }
 
@@ -473,6 +518,7 @@
                 gap: 15px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 min-width: 280px;
+                max-width: 90vw;
                 border-left: 4px solid #4CAF50;
             ">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -492,6 +538,7 @@
                         font-weight: bold;
                         cursor: pointer;
                         font-size: 12px;
+                        transition: transform 0.2s;
                     ">Update</button>
                     <button id="pwa-update-dismiss-btn" style="
                         background: transparent;
@@ -501,6 +548,7 @@
                         border-radius: 25px;
                         cursor: pointer;
                         font-size: 12px;
+                        transition: transform 0.2s;
                     ">Later</button>
                 </div>
             </div>
@@ -519,7 +567,10 @@
             // Update button handler
             document.getElementById('pwa-update-btn').addEventListener('click', () => {
                 updateBanner.remove();
-                worker.postMessage({ type: 'SKIP_WAITING' });
+                if (worker) {
+                    worker.postMessage({ type: 'SKIP_WAITING' });
+                    console.log('Update triggered, page will reload');
+                }
             });
 
             // Dismiss button handler
@@ -527,12 +578,15 @@
                 updateBanner.remove();
                 // Store that user dismissed this update version
                 localStorage.setItem('pwa_update_dismissed_' + APP_VERSION, 'true');
+                console.log('User dismissed update for this version');
             });
 
             // Auto-hide after 30 seconds if not interacted
             setTimeout(() => {
-                if (document.getElementById('pwa-update-banner')) {
-                    updateBanner.remove();
+                const banner = document.getElementById('pwa-update-banner');
+                if (banner) {
+                    banner.remove();
+                    console.log('Update banner auto-hidden after 30 seconds');
                 }
             }, 30000);
         }
@@ -542,15 +596,13 @@
         ============================= */
         window.addEventListener('load', async () => {
             try {
-                const reg = await navigator.serviceWorker.register('/service-worker.js?v=2026.04.21');
+                const reg = await navigator.serviceWorker.register('/service-worker.js?v=' + APP_VERSION);
                 console.log('Service Worker registered:', reg.scope);
 
                 // Check for waiting worker (update available)
                 if (reg.waiting) {
-                    const updateDismissed = localStorage.getItem('pwa_update_dismissed_' + APP_VERSION);
-                    if (!updateDismissed) {
-                        showUpdateBanner(reg.waiting);
-                    }
+                    console.log('Found waiting service worker');
+                    showUpdateBanner(reg.waiting);
                 }
 
                 // Listen for new workers
@@ -561,10 +613,7 @@
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                             console.log('Update available');
-                            const updateDismissed = localStorage.getItem('pwa_update_dismissed_' + APP_VERSION);
-                            if (!updateDismissed) {
-                                showUpdateBanner(newWorker);
-                            }
+                            showUpdateBanner(newWorker);
                         }
                     });
                 });
@@ -580,7 +629,9 @@
                 }
 
                 /* CHECK FOR UPDATES every 30 minutes */
-                setInterval(() => reg.update(), 30 * 60 * 1000);
+                setInterval(() => {
+                    reg.update().catch(err => console.log('Update check failed:', err));
+                }, 30 * 60 * 1000);
 
             } catch (error) {
                 console.error('Service worker registration failed:', error);
@@ -618,10 +669,18 @@
             console.log('PWA was installed successfully');
             hideInstallBanner();
             deferredPrompt = null;
+            // Clear any dismissal since they installed
+            localStorage.removeItem('pwa_install_banner_dismissed');
+            localStorage.removeItem('pwa_install_banner_dismissed_time');
 
-            // Show success message
+            // Show success message if toastr exists
             if (typeof toastr !== 'undefined') {
                 toastr.success('ShuleApp installed successfully!');
+            } else {
+                // Fallback alert
+                setTimeout(() => {
+                    alert('Thank you for installing ShuleApp!');
+                }, 500);
             }
         });
 
@@ -630,18 +689,75 @@
         ============================= */
         if (window.matchMedia('(display-mode: standalone)').matches) {
             console.log('App is already installed (standalone mode)');
-            // Banner will not show
+            // Clear any lingering dismissal flags
+            localStorage.removeItem('pwa_install_banner_dismissed');
+            localStorage.removeItem('pwa_install_banner_dismissed_time');
         }
 
         /* =============================
-           RESET BANNER PREFERENCES (For testing)
+           UTILITY FUNCTIONS FOR TESTING & DEBUGGING
         ============================= */
+
+        // Reset all PWA preferences
         window.resetPWA = function () {
             localStorage.removeItem('pwa_install_banner_dismissed');
-            localStorage.removeItem('pwa_update_dismissed_' + APP_VERSION);
-            console.log('PWA preferences reset');
+            localStorage.removeItem('pwa_install_banner_dismissed_time');
+            // Remove all update dismissals
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('pwa_update_dismissed_')) {
+                    localStorage.removeItem(key);
+                }
+            }
+            console.log('PWA preferences reset - banners will show on next load');
             location.reload();
         };
+
+        // Manually show install banner (for testing)
+        window.showInstallBannerManually = function() {
+            localStorage.removeItem('pwa_install_banner_dismissed');
+            localStorage.removeItem('pwa_install_banner_dismissed_time');
+            showInstallBanner();
+            console.log('Install banner manually triggered');
+        };
+
+        // Clear install banner dismissal only
+        window.clearInstallDismissal = function() {
+            localStorage.removeItem('pwa_install_banner_dismissed');
+            localStorage.removeItem('pwa_install_banner_dismissed_time');
+            console.log('Install banner dismissal cleared');
+            location.reload();
+        };
+
+        // Get banner status
+        window.getPWABannerStatus = function() {
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+            const isDismissed = localStorage.getItem('pwa_install_banner_dismissed') === 'true';
+            const dismissTime = localStorage.getItem('pwa_install_banner_dismissed_time');
+            let timeRemaining = null;
+
+            if (dismissTime && isDismissed) {
+                const elapsed = Date.now() - parseInt(dismissTime);
+                const remaining = 24 * 60 * 60 * 1000 - elapsed;
+                if (remaining > 0) {
+                    timeRemaining = Math.ceil(remaining / (1000 * 60 * 60)) + ' hours';
+                }
+            }
+
+            console.log('PWA Status:', {
+                installed: isInstalled,
+                bannerDismissed: isDismissed,
+                timeUntilBannerShowsAgain: timeRemaining || (isDismissed ? '0 hours (should show now)' : 'Not dismissed')
+            });
+
+            return {
+                installed: isInstalled,
+                bannerDismissed: isDismissed,
+                timeRemaining: timeRemaining
+            };
+        };
+
+        console.log('PWA Dual Banner System initialized - Install banner has 24h cooldown only');
     })();
 
 })(); // Remove jQuery dependency
