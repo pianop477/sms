@@ -651,7 +651,7 @@
                                         @endphp
                                         <tr>
                                             <td>
-                                                <span class="fw-semibold">{{ $classData['class_code'] ?? '' }}</span>
+                                                <span class="fw-semibold">{{ $classData['class_code'] ?? '' }}/</span>
                                                 @if (!empty($stream))
                                                     <span class="badge bg-primary bg-opacity-10 text-primary ms-1">
                                                         {{ strtoupper($stream) }}

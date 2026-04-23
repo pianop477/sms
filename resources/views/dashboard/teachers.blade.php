@@ -1030,7 +1030,7 @@
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">Classes</th>
+                                                        <th class="border-0 py-3 ps-4">Class</th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
                                                         </th>
@@ -1145,8 +1145,7 @@
                                                                     <div>
                                                                         @if (!empty($stream))
                                                                             <div class="text-dark small">
-                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}
-                                                                                    -
+                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}/
                                                                                     <span
                                                                                         class="badge {{ $streamBadgeClass }} text-white">
                                                                                         {{ strtoupper($stream) }}
@@ -1679,7 +1678,7 @@
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">Classes</th>
+                                                        <th class="border-0 py-3 ps-4">Class</th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
                                                         </th>
@@ -1794,8 +1793,7 @@
                                                                     <div>
                                                                         @if (!empty($stream))
                                                                             <div class="text-dark small">
-                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}
-                                                                                    -
+                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}/
                                                                                     <span
                                                                                         class="badge {{ $streamBadgeClass }} text-white">
                                                                                         {{ strtoupper($stream) }}
