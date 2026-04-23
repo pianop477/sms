@@ -58,12 +58,12 @@ class BiometricController extends Controller
         }
 
         // Biometric registration limit
-        if (WebAuthnCredential::where('user_id', $user->id)->count() >= 3) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Biometric registration limit reached.'
-            ], 429);
-        }
+        // if (WebAuthnCredential::where('user_id', $user->id)->count() >= 3) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Biometric registration limit reached.'
+        //     ], 429);
+        // }
 
         // Cooldown per user (60s)
         $recentOtp = otps::where('user_id', $user->id)
