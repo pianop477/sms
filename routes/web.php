@@ -148,7 +148,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::resource('Schools', SchoolsController::class);
         Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');
         Route::put('admin/update-password/{user}', [ManagerController::class, 'resetPassword'])
-                ->name('admin.update.password');
+            ->name('admin.update.password');
         Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
         Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
         Route::get('{school}/Invoice/send', [SchoolsController::class, 'sendInvoice'])->name('admin.send.invoice');
@@ -360,7 +360,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::delete('Accountants/delete/{id}', [AccountantsController::class, 'deleteAccountants'])->name('Accountants.delete');
 
         // other staff management
-        Route::prefix('Staffs')->group(function() {
+        Route::prefix('Staffs')->group(function () {
             Route::get('/', [OtherStaffsController::class, 'index'])->name('OtherStaffs.index');
             Route::post('/store', [OtherStaffsController::class, 'addStaffInformation'])->name('OtherStaffs.store');
             Route::get('/profile/type/{type}/{id}', [OtherStaffsController::class, 'staffProfile'])->name('OtherStaffs.profile');
@@ -676,10 +676,11 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // ========================================================================
         Route::prefix('deductions')->name('deductions.')->group(function () {
             Route::get('/staff-loan', [UnofficialDeductionController::class, 'index'])->name('unofficial');
+            Route::get('/staff-loan/{id}', [UnofficialDeductionController::class, 'show'])->name('unofficial.show'); // HII KWANZA
+            Route::put('/staff-loan/{id}', [UnofficialDeductionController::class, 'update'])->name('unofficial.update');
             Route::post('/staff-loan/store', [UnofficialDeductionController::class, 'store'])->name('unofficial.store');
             Route::post('/staff-loan/{id}/cancel', [UnofficialDeductionController::class, 'cancel'])->name('unofficial.cancel');
         });
-
         // ========================================================================
         // PAYROLL REPORTS
         // ========================================================================

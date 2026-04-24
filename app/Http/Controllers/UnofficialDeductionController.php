@@ -245,4 +245,117 @@ class UnofficialDeductionController extends Controller
             return redirect()->back();
         }
     }
+
+    /**
+     * Get a single deduction for editing (via web)
+     */
+    /**
+     * Get a single deduction for editing (via web)
+     */
+    public function show($id)
+    {
+        $token = session('finance_api_token');
+
+        // HII URL INAFAA KUWA SAHIHI - HAKUNA /deductions MARA MBILI
+        $apiUrl = $this->apiBaseUrl . '/deductions/unofficial/' . $id;
+
+        // Log::info('Frontend show method', [
+        //     'deduction_id' => $id,
+        //     'api_url' => $apiUrl,
+        //     'has_token' => !empty($token)
+        // ]);
+
+        try {
+            $response = Http::withToken($token)
+                ->timeout(30)
+                ->get($apiUrl);  // Tumia URL sahihi
+
+            // Log::info('API Response', [
+            //     'status' => $response->status(),
+            //     'body' => $response->body()
+            // ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json($data);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $response->json()['message'] ?? 'Failed to fetch deduction from API',
+                'api_status' => $response->status()
+            ], $response->status());
+        } catch (\Exception $e) {
+            Log::error('Exception fetching deduction', [
+                'deduction_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an unofficial deduction via web
+     */
+    public function update(Request $request, $id)
+    {
+        $token = session('finance_api_token');
+
+        // Log::info('=== UPDATE METHOD START ===', [
+        //     'deduction_id' => $id,
+        //     'request_data' => $request->all()
+        // ]);
+
+        try {
+            $response = Http::withToken($token)
+                ->timeout(30)
+                ->put($this->apiBaseUrl . '/deductions/unofficial/' . $id, $request->all());
+
+            // Log::info('Update API Response', [
+            //     'status' => $response->status(),
+            //     'body' => $response->body(),
+            //     'successful' => $response->successful()
+            // ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Log::info('Update successful', ['response' => $responseData]);
+
+                // Ensure we return proper JSON response
+                return response()->json([
+                    'success' => true,
+                    'message' => $responseData['message'] ?? 'Deduction updated successfully',
+                    'data' => $responseData['data'] ?? null
+                ]);
+            }
+
+            $errorMessage = $response->json()['message'] ?? 'Failed to update deduction';
+
+            Log::error('Update failed', [
+                'status' => $response->status(),
+                'message' => $errorMessage
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessage
+            ], $response->status());
+        } catch (\Exception $e) {
+            Log::error('Exception updating deduction', [
+                'deduction_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

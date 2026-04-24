@@ -141,9 +141,13 @@
                                             <td>{{ \Carbon\Carbon::parse($deduction['created_at'])->format('d/m/Y') }}</td>
                                             <td>
                                                 <div class="action-buttons">
+                                                    <button class="btn btn-xs btn-warning" style="border-radius: 12px"
+                                                        onclick="editDeduction({{ $deduction['id'] }})">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </button>
                                                     <button class="btn btn-xs btn-danger" style="border-radius: 12px"
                                                         onclick="cancelDeduction({{ $deduction['id'] }})">
-                                                        Cancel
+                                                        <i class="fas fa-trash"></i> Cancel
                                                     </button>
                                                 </div>
                                             </td>
@@ -368,6 +372,122 @@
         </div>
     </div>
 
+    {{-- Edit Loan/Advance Modal --}}
+    <div class="modal fade" id="editLoanModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i> Edit Staff Loan/Advances
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editDeductionForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Edit the deduction details below. Only pending deductions can be edited.
+                        </div>
+
+                        <input type="hidden" name="deduction_id" id="edit_deduction_id">
+
+                        <div class="row">
+                            {{-- Staff ID (Read-only) --}}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Staff ID</label>
+                                <input type="text" id="edit_staff_id" class="form-control" readonly>
+                            </div>
+
+                            {{-- Staff Type (Read-only) --}}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Staff Type</label>
+                                <input type="text" id="edit_staff_type" class="form-control" readonly>
+                            </div>
+
+                            {{-- Employee Name (Read-only) --}}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Employee Name</label>
+                                <input type="text" id="edit_employee_name" class="form-control" readonly>
+                            </div>
+
+                            {{-- Deduction Type --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Deduction Type <span class="text-danger">*</span></label>
+                                <select name="deduction_type" id="edit_deductionType" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option value="loan">Loan (Can be recurring)</option>
+                                    <option value="advance">Salary Advance (One-time)</option>
+                                    <option value="penalty">Penalty (One-time)</option>
+                                    <option value="fine">Fine (One-time)</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="invalid-feedback" id="edit_deductionType_error"></div>
+                            </div>
+
+                            {{-- Amount --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Amount (TZS) <span class="text-danger">*</span></label>
+                                <input type="number" name="amount" id="edit_amount" class="form-control" required
+                                    min="1000" step="1000">
+                                <div class="invalid-feedback" id="edit_amount_error"></div>
+                                <div class="help-text" id="edit_amountHelpText">Monthly installment amount</div>
+                            </div>
+
+                            {{-- Description --}}
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea name="description" id="edit_description" class="form-control" rows="2" required></textarea>
+                                <div class="invalid-feedback" id="edit_description_error"></div>
+                            </div>
+
+                            {{-- Recurring Option --}}
+                            <div class="col-md-6 mb-3" id="edit_recurringOptionDiv">
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_recurring" class="form-check-input"
+                                        id="edit_isRecurring" value="1">
+                                    <label class="form-check-label" for="edit_isRecurring">
+                                        Recurring Deduction (Multiple Months)
+                                    </label>
+                                </div>
+                            </div>
+
+                            {{-- Recurring Months --}}
+                            <div class="col-md-6 mb-3" id="edit_recurringMonthsDiv" style="display: none;">
+                                <label class="form-label">Number of Months <span class="text-danger">*</span></label>
+                                <select name="recurring_months" id="edit_recurringMonthsSelect" class="form-select">
+                                    <option value="">Select months</option>
+                                    @for ($i = 1; $i <= 36; $i++)
+                                        <option value="{{ $i }}">{{ $i }}
+                                            month{{ $i > 1 ? 's' : '' }}</option>
+                                    @endfor
+                                </select>
+                                <div class="invalid-feedback" id="edit_recurring_months_error"></div>
+                                <div class="help-text">
+                                    Total will be: <strong id="edit_totalAmountPreview">0</strong> TZS
+                                    (Monthly × Months)
+                                </div>
+                            </div>
+
+                            {{-- Authorization Notes --}}
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Authorization Notes</label>
+                                <textarea name="authorization_notes" id="edit_authorization_notes" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning" id="editSubmitBtn">
+                            <i class="fas fa-save me-1"></i> Update Deduction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{-- REMOVE hizi scripts za zamani na uweke hizi kwa order sahihi --}}
 
     {{-- 1. FIRST: jQuery (from official CDN) --}}
@@ -389,183 +509,9 @@
 
     {{-- 6. SIXTH: Your custom script --}}
     <script>
-        // Wrap everything in $(document).ready to ensure DOM is loaded
-        $(document).ready(function() {
-            console.log('jQuery is loaded and ready!');
+        // ==================== GLOBAL FUNCTIONS ====================
 
-            // ==================== INITIALIZE DATATABLES ====================
-
-            // Helper function to validate table before initializing
-            function initializeDataTable(tableId, options = {}) {
-                const table = $(tableId);
-                if (!table.length) {
-                    console.log(`Table ${tableId} not found`);
-                    return false;
-                }
-
-                // Check if table has any rows
-                const hasRows = table.find('tbody tr').length > 0;
-                if (!hasRows) {
-                    console.log(`Table ${tableId} has no data, skipping DataTable initialization`);
-                    return false;
-                }
-
-                // Check if already initialized
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    console.log(`Table ${tableId} already initialized, destroying first`);
-                    $(tableId).DataTable().destroy();
-                }
-
-                // Default options
-                const defaultOptions = {
-                    pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    language: {
-                        search: "🔍 Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "No entries found",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        paginate: {
-                            previous: "← Previous",
-                            next: "Next →"
-                        },
-                        zeroRecords: "No matching records found"
-                    },
-                    responsive: true,
-                    autoWidth: false,
-                    drawCallback: function() {
-                        console.log(`Table ${tableId} redrawn`);
-                    }
-                };
-
-                // Merge options
-                const finalOptions = {
-                    ...defaultOptions,
-                    ...options
-                };
-
-                try {
-                    $(tableId).DataTable(finalOptions);
-                    console.log(`Table ${tableId} initialized successfully`);
-                    return true;
-                } catch (error) {
-                    console.error(`Error initializing ${tableId}:`, error);
-                    return false;
-                }
-            }
-
-            // Initialize Pending Deductions Table
-            initializeDataTable('#pendingTable', {
-                order: [
-                    [0, 'asc']
-                ],
-                columnDefs: [{
-                        orderable: false,
-                        targets: [9]
-                    } // Actions column (index 9)
-                ]
-            });
-
-            // Initialize History Table (if it exists and has data)
-            if ($('#historyTable').length && $('#historyTable tbody tr').length > 0) {
-                initializeDataTable('#historyTable', {
-                    order: [
-                        [0, 'desc']
-                    ]
-                });
-            } else {
-                console.log('History table has no data or does not exist');
-            }
-        });
-
-        // ==================== FORM HANDLERS ====================
-        // Get elements with null checks
-        document.addEventListener('DOMContentLoaded', function() {
-            const deductionType = document.getElementById('deductionType');
-            const recurringOptionDiv = document.getElementById('recurringOptionDiv');
-            const recurringMonthsDiv = document.getElementById('recurringMonthsDiv');
-            const isRecurringCheckbox = document.getElementById('isRecurring');
-            const amountInput = document.getElementById('amountInput');
-            const recurringMonthsSelect = document.getElementById('recurringMonthsSelect');
-            const totalAmountPreview = document.getElementById('totalAmountPreview');
-            const amountHelpText = document.getElementById('amountHelpText');
-
-            // Show/hide recurring option based on deduction type (only for loans)
-            function toggleRecurringOption() {
-                if (!deductionType) return;
-
-                if (deductionType.value === 'loan') {
-                    if (recurringOptionDiv) recurringOptionDiv.style.display = 'block';
-                    if (amountHelpText) {
-                        amountHelpText.innerHTML =
-                            '<strong>Monthly installment amount</strong> - This amount will be deducted each month';
-                    }
-                } else {
-                    if (recurringOptionDiv) recurringOptionDiv.style.display = 'none';
-                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
-                    if (isRecurringCheckbox) isRecurringCheckbox.checked = false;
-                    if (amountHelpText) {
-                        amountHelpText.innerHTML = '<strong>Total amount to deduct</strong> - One-time deduction';
-                    }
-                }
-            }
-
-            // Show/hide recurring months field and calculate total
-            function toggleRecurringMonths() {
-                if (!isRecurringCheckbox) return;
-
-                if (isRecurringCheckbox.checked) {
-                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'block';
-                    calculateTotalAmount();
-                } else {
-                    if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
-                }
-            }
-
-            // Calculate total amount when amount or months change
-            function calculateTotalAmount() {
-                const amount = parseFloat(amountInput?.value) || 0;
-                const months = parseInt(recurringMonthsSelect?.value) || 0;
-                const total = amount * months;
-
-                if (totalAmountPreview && months > 0) {
-                    totalAmountPreview.textContent = total.toLocaleString();
-                } else if (totalAmountPreview) {
-                    totalAmountPreview.textContent = '0';
-                }
-            }
-
-            // Event listeners (only if elements exist)
-            if (deductionType) deductionType.addEventListener('change', toggleRecurringOption);
-            if (isRecurringCheckbox) isRecurringCheckbox.addEventListener('change', toggleRecurringMonths);
-            if (amountInput) amountInput.addEventListener('input', calculateTotalAmount);
-            if (recurringMonthsSelect) recurringMonthsSelect.addEventListener('change', calculateTotalAmount);
-
-            // On page load
-            toggleRecurringOption();
-            if (isRecurringCheckbox && isRecurringCheckbox.checked) {
-                toggleRecurringMonths();
-            }
-        });
-
-        // ==================== CANCEL DEDUCTION FUNCTION ====================
         function cancelDeduction(id) {
-            if (typeof Swal === 'undefined') {
-                console.error('SweetAlert not loaded');
-                alert('Are you sure you want to cancel this deduction?');
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
-                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
-                document.body.appendChild(form);
-                form.submit();
-                return;
-            }
-
             Swal.fire({
                 title: 'Cancel Deduction?',
                 text: 'This will cancel the pending deduction and it will not be processed in payroll.',
@@ -578,7 +524,7 @@
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
+                    form.action = '/deductions/staff-loan/' + id + '/cancel';
                     form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
                     document.body.appendChild(form);
                     form.submit();
@@ -586,41 +532,345 @@
             });
         }
 
-        // ==================== SWEETALERT NOTIFICATIONS ====================
-        @if (session('success'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    timer: 3000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
+        function editDeduction(id) {
+            console.log('Edit button clicked for ID:', id);
+
+            const url = '/deductions/staff-loan/' + id;
+
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Fetching deduction details...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.close();
+
+                    if (data.success && data.data) {
+                        const deduction = data.data;
+
+                        document.getElementById('edit_deduction_id').value = deduction.id;
+                        document.getElementById('edit_staff_id').value = deduction.staff_id || '';
+                        document.getElementById('edit_staff_type').value = deduction.staff_type || '';
+                        document.getElementById('edit_employee_name').value = deduction.employee_name || '';
+                        document.getElementById('edit_deductionType').value = deduction.deduction_type;
+                        document.getElementById('edit_amount').value = deduction.amount;
+                        document.getElementById('edit_description').value = deduction.description;
+                        document.getElementById('edit_authorization_notes').value = deduction.authorization_notes || '';
+
+                        const isRecurring = deduction.is_recurring == 1;
+                        document.getElementById('edit_isRecurring').checked = isRecurring;
+
+                        if (isRecurring && deduction.recurring_months) {
+                            document.getElementById('edit_recurringMonthsSelect').value = deduction.recurring_months;
+                            document.getElementById('edit_recurringMonthsDiv').style.display = 'block';
+                            const total = (parseFloat(deduction.amount) || 0) * (parseInt(deduction.recurring_months) ||
+                                0);
+                            document.getElementById('edit_totalAmountPreview').textContent = total.toLocaleString();
+                        } else {
+                            document.getElementById('edit_recurringMonthsDiv').style.display = 'none';
+                        }
+
+                        document.getElementById('editDeductionForm').action = '/deductions/staff-loan/' + deduction.id;
+
+                        const event = new Event('change');
+                        document.getElementById('edit_deductionType').dispatchEvent(event);
+
+                        const editModal = new bootstrap.Modal(document.getElementById('editLoanModal'));
+                        editModal.show();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to load deduction details',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Connection Error',
+                        text: error.message,
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
+        // ==================== DOCUMENT READY ====================
+        $(document).ready(function() {
+            console.log('Document ready');
+
+            function initializeDataTable(tableId, options = {}) {
+                const table = $(tableId);
+                if (!table.length) return false;
+                if (table.find('tbody tr').length === 0) return false;
+                if ($.fn.DataTable.isDataTable(tableId)) $(tableId).DataTable().destroy();
+
+                const defaultOptions = {
+                    pageLength: 10,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
+                    language: {
+                        search: "🔍 Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        paginate: {
+                            previous: "← Previous",
+                            next: "Next →"
+                        }
+                    },
+                    responsive: true,
+                    autoWidth: false
+                };
+
+                try {
+                    $(tableId).DataTable($.extend({}, defaultOptions, options));
+                    return true;
+                } catch (error) {
+                    console.error('Error initializing', tableId, error);
+                    return false;
+                }
+            }
+
+            initializeDataTable('#pendingTable', {
+                order: [
+                    [0, 'asc']
+                ],
+                columnDefs: [{
+                    orderable: false,
+                    targets: [9]
+                }]
+            });
+
+            if ($('#historyTable').length && $('#historyTable tbody tr').length > 0) {
+                initializeDataTable('#historyTable', {
+                    order: [
+                        [0, 'desc']
+                    ]
                 });
             }
+
+            // ==================== EDIT FORM SUBMISSION (NO PRELOADER) ====================
+            $('#editDeductionForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this);
+                const url = form.attr('action');
+                const formData = form.serialize();
+                const submitBtn = $('#editSubmitBtn');
+
+                $('.invalid-feedback').html('');
+                $('.is-invalid').removeClass('is-invalid');
+
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-1"></i> Updating...');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    success: function(response) {
+                        const isSuccess = response.success === true || response.success ===
+                            'true';
+
+                        if (isSuccess) {
+                            const editModal = bootstrap.Modal.getInstance(document
+                                .getElementById('editLoanModal'));
+                            if (editModal) editModal.hide();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: response.message ||
+                                    'Deduction updated successfully',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            submitBtn.prop('disabled', false);
+                            submitBtn.html('<i class="fas fa-save me-1"></i> Update Deduction');
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: response.message || 'Failed to update deduction',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false);
+                        submitBtn.html('<i class="fas fa-save me-1"></i> Update Deduction');
+
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            let errorHtml = '<ul style="text-align: left;">';
+                            for (const field in errors) {
+                                $('#edit_' + field).addClass('is-invalid');
+                                $('#edit_' + field + '_error').html(errors[field][0]);
+                                errorHtml += '<li><strong>' + field + ':</strong> ' + errors[
+                                    field][0] + '</li>';
+                            }
+                            errorHtml += '</ul>';
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml,
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                });
+            });
+
+            // ==================== EDIT MODAL RECURRING LOGIC ====================
+            function updateEditTotalAmount() {
+                const amount = parseFloat($('#edit_amount').val()) || 0;
+                const months = parseInt($('#edit_recurringMonthsSelect').val()) || 0;
+                const total = amount * months;
+                $('#edit_totalAmountPreview').text(total.toLocaleString());
+            }
+
+            $(document).on('change', '#edit_deductionType', function() {
+                const type = $(this).val();
+                if (type === 'loan') {
+                    $('#edit_recurringOptionDiv').show();
+                    $('#edit_amountHelpText').html(
+                        '<strong>Monthly installment amount</strong> - This amount will be deducted each month'
+                        );
+                } else {
+                    $('#edit_recurringOptionDiv').hide();
+                    $('#edit_recurringMonthsDiv').hide();
+                    $('#edit_isRecurring').prop('checked', false);
+                    $('#edit_amountHelpText').html(
+                        '<strong>Total amount to deduct</strong> - One-time deduction');
+                }
+            });
+
+            $(document).on('change', '#edit_isRecurring', function() {
+                if ($(this).is(':checked')) {
+                    $('#edit_recurringMonthsDiv').show();
+                    updateEditTotalAmount();
+                } else {
+                    $('#edit_recurringMonthsDiv').hide();
+                }
+            });
+
+            $(document).on('input', '#edit_amount', updateEditTotalAmount);
+            $(document).on('change', '#edit_recurringMonthsSelect', updateEditTotalAmount);
+        });
+
+        // ==================== ADD LOAN FORM HANDLERS ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            const deductionType = document.getElementById('deductionType');
+            const recurringOptionDiv = document.getElementById('recurringOptionDiv');
+            const recurringMonthsDiv = document.getElementById('recurringMonthsDiv');
+            const isRecurringCheckbox = document.getElementById('isRecurring');
+            const amountInput = document.getElementById('amountInput');
+            const recurringMonthsSelect = document.getElementById('recurringMonthsSelect');
+            const totalAmountPreview = document.getElementById('totalAmountPreview');
+            const amountHelpText = document.getElementById('amountHelpText');
+
+            if (deductionType) {
+                function toggleRecurringOption() {
+                    if (deductionType.value === 'loan') {
+                        if (recurringOptionDiv) recurringOptionDiv.style.display = 'block';
+                        if (amountHelpText) {
+                            amountHelpText.innerHTML =
+                                '<strong>Monthly installment amount</strong> - This amount will be deducted each month';
+                        }
+                    } else {
+                        if (recurringOptionDiv) recurringOptionDiv.style.display = 'none';
+                        if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
+                        if (isRecurringCheckbox) isRecurringCheckbox.checked = false;
+                        if (amountHelpText) {
+                            amountHelpText.innerHTML =
+                                '<strong>Total amount to deduct</strong> - One-time deduction';
+                        }
+                    }
+                }
+
+                function toggleRecurringMonths() {
+                    if (isRecurringCheckbox && isRecurringCheckbox.checked) {
+                        if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'block';
+                        calculateTotalAmount();
+                    } else {
+                        if (recurringMonthsDiv) recurringMonthsDiv.style.display = 'none';
+                    }
+                }
+
+                function calculateTotalAmount() {
+                    const amount = parseFloat(amountInput?.value) || 0;
+                    const months = parseInt(recurringMonthsSelect?.value) || 0;
+                    const total = amount * months;
+                    if (totalAmountPreview) {
+                        totalAmountPreview.textContent = months > 0 ? total.toLocaleString() : '0';
+                    }
+                }
+
+                deductionType.addEventListener('change', toggleRecurringOption);
+                if (isRecurringCheckbox) isRecurringCheckbox.addEventListener('change', toggleRecurringMonths);
+                if (amountInput) amountInput.addEventListener('input', calculateTotalAmount);
+                if (recurringMonthsSelect) recurringMonthsSelect.addEventListener('change', calculateTotalAmount);
+
+                toggleRecurringOption();
+                if (isRecurringCheckbox && isRecurringCheckbox.checked) toggleRecurringMonths();
+            }
+        });
+
+        // ==================== SWEETALERT NOTIFICATIONS ====================
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
         @endif
 
         @if (session('error'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'OK'
-                });
-            }
-        @endif
-
-        @if ($errors->any())
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    confirmButtonText: 'OK'
-                });
-            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'OK'
+            });
         @endif
     </script>
 
