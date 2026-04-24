@@ -207,7 +207,7 @@ class EPermitController extends Controller
         $this->sendNotificationsToClassTeachers($allClassTeachers, $ePermit);
 
         // Update message to inform parent that ANY class teacher can handle
-        $message = 'Ombi lako limewasilishwa kwa kikamilifu. Mwalumu wa darasa yeyote atalifanyia kazi.';
+        $message = 'Ombi lako limewasilishwa kwa kikamilifu. Mwalumu wa darasa atalifanyia kazi.';
 
         return response()->json([
             'success' => true,
@@ -225,15 +225,6 @@ class EPermitController extends Controller
             // Database notification
 
             $this->notifyClassTeacherBySms($classTeacher, $ePermit);
-            // $classTeacher->$this->notifyBySms($ePermit);
-
-            // Optional: Log for debugging
-            Log::info('E-Permit notification sent to class teacher', [
-                'teacher_id' => $classTeacher->id,
-                'teacher_name' => $classTeacher->user->name ?? 'Unknown',
-                'permit_number' => $ePermit->permit_number,
-                'student_name' => $ePermit->student->first_name . ' ' . $ePermit->student->last_name
-            ]);
         }
     }
 
@@ -252,9 +243,7 @@ class EPermitController extends Controller
             Log::info("School info not found");
         }
 
-        $message = "Habari, Mwanafunzi {$ePermit->student->first_name} {$ePermit->student->last_name}
-                    ameombewa ruhusa, Ombi Namba {$ePermit->permit_number},
-                    Tafadhali ingia kwenye mfumo kushughulikia ombi hilo. Asante!";
+        $message = "Habari, Ombi la Ruhusa Na. {$ePermit->permit_number} limetumwa kwako kwa ajili ya {$ePermit->student->first_name} {$ePermit->student->last_name}. Tafadhali ingia kwenye mfumo kushughulikia ombi hilo. Asante!";
         $response = $nextSmsService->sendSmsByNext(
             $school->sender_id ?? 'SHULE APP',
             $formattedPhone,
