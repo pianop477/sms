@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -9,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Google Fonts for better typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -206,6 +208,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -213,9 +216,12 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.1);
             }
@@ -257,11 +263,13 @@
                 background: rgba(33, 37, 41, 0.98);
             }
 
-            h1, .tips h3 {
+            h1,
+            .tips h3 {
                 color: #f8f9fa;
             }
 
-            p, .tips li {
+            p,
+            .tips li {
                 color: #adb5bd;
             }
 
@@ -271,10 +279,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="offline-container">
         <div class="connection-status" id="connectionStatus">
-            <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px; color: #e63946;"></i>
+            <i class="fas fa-circle"
+                style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px; color: #e63946;"></i>
             OFFLINE MODE
         </div>
         <i class="fas fa-wifi-slash offline-icon"></i>
@@ -302,14 +312,14 @@
 
     <script>
         // Prevent any errors from affecting the page
-        window.addEventListener('error', function(e) {
+        window.addEventListener('error', function (e) {
             console.warn('Caught error:', e.message);
             e.preventDefault();
             return true;
         });
 
         // Safe console log wrapper
-        const safeLog = function(msg) {
+        const safeLog = function (msg) {
             if (typeof console !== 'undefined' && console.log) {
                 console.log('[Offline Page]', msg);
             }
@@ -374,9 +384,34 @@
         // Call after a short delay
         setTimeout(checkSavedPages, 500);
 
-        // Check connection status with progress bar
+        // ============================================================
+        // FIXED: Connection checking with 30 second delay between retries
+        // ============================================================
         let retryCount = 0;
-        const maxRetries = 3;
+        const maxRetries = 5; // Increased max retries
+        let isChecking = false;
+        let lastCheckTime = 0;
+        let autoCheckInterval = null;
+        let progressInterval = null;
+
+        // Clear any existing interval
+        if (autoCheckInterval) {
+            clearInterval(autoCheckInterval);
+        }
+
+        function stopProgressAnimation() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        function resetProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.getElementById('progressContainer');
+            if (progressBar) progressBar.style.width = '0%';
+            if (progressContainer) progressContainer.style.display = 'none';
+        }
 
         function checkConnection() {
             const progressContainer = document.getElementById('progressContainer');
@@ -387,30 +422,59 @@
 
             if (!progressContainer || !retryBtn) return;
 
+            // Prevent multiple simultaneous checks
+            if (isChecking) {
+                safeLog('Connection check already in progress, skipping...');
+                return;
+            }
+
+            // Check if enough time has passed since last check (30 seconds minimum)
+            const now = Date.now();
+            if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
+                const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
+                safeLog(`Please wait ${secondsLeft} seconds before retrying...`);
+
+                // Update UI to show waiting period
+                if (connectionStatus) {
+                    connectionStatus.innerHTML = `<i class="fas fa-hourglass-half"></i> WAIT ${secondsLeft}s BEFORE RETRY`;
+                }
+                if (mainMessage) {
+                    mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before trying again...`;
+                }
+                return;
+            }
+
+            isChecking = true;
             retryCount++;
+            lastCheckTime = now;
+
             retryBtn.disabled = true;
             progressContainer.style.display = 'block';
+
+            // Stop any existing progress animation
+            stopProgressAnimation();
 
             // Update status message
             if (connectionStatus) {
                 connectionStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CHECKING CONNECTION...';
             }
             if (mainMessage) {
-                mainMessage.innerHTML = 'Attempting to reconnect... Please wait.';
+                mainMessage.innerHTML = `Attempt ${retryCount} of ${maxRetries} - Checking connection... Please wait.`;
             }
 
-            // Animate progress bar
+            // Animate progress bar smoothly over 3 seconds
             let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
+            progressInterval = setInterval(() => {
+                progress += 5;
                 if (progressBar) {
-                    progressBar.style.width = `${progress}%`;
+                    progressBar.style.width = `${Math.min(progress, 100)}%`;
                 }
 
                 if (progress >= 100) {
-                    clearInterval(interval);
+                    clearInterval(progressInterval);
+                    progressInterval = null;
 
-                    // Final connection check
+                    // Final connection check after animation
                     setTimeout(() => {
                         if (navigator.onLine) {
                             safeLog('Connection restored! Redirecting...');
@@ -420,60 +484,163 @@
                         } else {
                             // Still offline
                             progressContainer.style.display = 'none';
+                            resetProgressBar();
                             retryBtn.disabled = false;
-                            if (progressBar) progressBar.style.width = '0';
+                            isChecking = false;
+
                             if (connectionStatus) {
                                 connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
                             }
+
                             if (mainMessage) {
                                 if (retryCount >= maxRetries) {
-                                    mainMessage.innerHTML = 'Still having trouble connecting. Please check your network settings and try again.';
+                                    mainMessage.innerHTML = 'Still having trouble connecting. Please check your network settings and try again later.';
                                 } else {
-                                    mainMessage.innerHTML = 'Unable to connect. Please check your internet connection and try again.';
+                                    const nextRetryIn = 30;
+                                    mainMessage.innerHTML = `Unable to connect. Will retry automatically in ${nextRetryIn} seconds. (Attempt ${retryCount}/${maxRetries})`;
                                 }
                             }
                             safeLog('Still offline after attempt ' + retryCount);
+
+                            // Schedule next auto retry after 30 seconds
+                            if (retryCount < maxRetries) {
+                                safeLog(`Next retry scheduled in 30 seconds...`);
+                                if (connectionStatus) {
+                                    connectionStatus.innerHTML = `<i class="fas fa-clock"></i> NEXT RETRY IN 30s`;
+                                }
+                            }
                         }
                     }, 500);
                 }
-            }, 150);
+            }, 30); // 30ms * 20 = 600ms for 60%, total ~3 seconds
         }
 
-        // Manual retry button handler
+        // New function: Schedule retry with delay
+        let scheduledRetry = null;
+
+        function scheduleRetry(delaySeconds = 30) {
+            if (scheduledRetry) {
+                clearTimeout(scheduledRetry);
+            }
+
+            const retryBtn = document.getElementById('retryBtn');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const mainMessage = document.getElementById('mainMessage');
+
+            let timeLeft = delaySeconds;
+
+            // Update countdown in UI
+            const countdownInterval = setInterval(() => {
+                if (!navigator.onLine && timeLeft > 0) {
+                    if (connectionStatus) {
+                        connectionStatus.innerHTML = `<i class="fas fa-clock"></i> RETRY IN ${timeLeft}s`;
+                    }
+                    if (mainMessage && retryCount < maxRetries) {
+                        mainMessage.innerHTML = `No connection. Auto-retry in ${timeLeft} seconds... (Attempt ${retryCount}/${maxRetries})`;
+                    }
+                    timeLeft--;
+                } else {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+
+            scheduledRetry = setTimeout(() => {
+                clearInterval(countdownInterval);
+                if (!navigator.onLine && retryCount < maxRetries) {
+                    safeLog('Executing scheduled retry...');
+                    checkConnection();
+                }
+                scheduledRetry = null;
+            }, delaySeconds * 1000);
+        }
+
+        // Manual retry button handler (FIXED: respects 30 second cooldown)
         const retryBtn = document.getElementById('retryBtn');
         if (retryBtn) {
-            retryBtn.addEventListener('click', function() {
-                if (retryCount >= maxRetries) {
-                    // Reset retry count after showing message
-                    if (confirm('Still having trouble connecting?\n\nWould you like to try again or go to home page?')) {
-                        retryCount = 0;
-                        checkConnection();
-                    } else {
-                        window.location.href = window.location.origin;
+            retryBtn.addEventListener('click', function () {
+                const now = Date.now();
+                if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
+                    const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
+                    safeLog(`Manual retry blocked: ${secondsLeft}s remaining`);
+
+                    const connectionStatus = document.getElementById('connectionStatus');
+                    const mainMessage = document.getElementById('mainMessage');
+
+                    if (connectionStatus) {
+                        connectionStatus.innerHTML = `<i class="fas fa-hourglass"></i> WAIT ${secondsLeft}s`;
+                        setTimeout(() => {
+                            if (connectionStatus && !navigator.onLine) {
+                                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
+                            }
+                        }, 2000);
+                    }
+                    if (mainMessage) {
+                        mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before trying again.`;
+                        setTimeout(() => {
+                            if (mainMessage && !navigator.onLine && retryCount < maxRetries) {
+                                mainMessage.innerHTML = `Unable to connect. Auto-retry in progress... (Attempt ${retryCount}/${maxRetries})`;
+                            }
+                        }, 3000);
                     }
                 } else {
+                    // Reset retry count if max reached and user manually retries
+                    if (retryCount >= maxRetries) {
+                        retryCount = 0;
+                        safeLog('Retry count reset for manual retry');
+                    }
                     checkConnection();
                 }
             });
         }
 
-        // Auto-check every 15 seconds (but only if not already checking)
-        let isChecking = false;
-        setInterval(() => {
-            if (navigator.onLine && !isChecking) {
-                safeLog('Connection detected, redirecting...');
-                const lastURL = sessionStorage.getItem('offline_lastURL');
-                window.location.href = lastURL || window.location.origin;
-            }
-        }, 15000);
+        // ============================================================
+        // FIXED: Auto-check every 30 seconds (not 15 seconds)
+        // ============================================================
+        let redirectScheduled = false;
 
-        // Listen for online event
+        setInterval(() => {
+            if (navigator.onLine && !redirectScheduled) {
+                safeLog('Connection detected, preparing to redirect...');
+                redirectScheduled = true;
+
+                // Add small delay to ensure stable connection
+                setTimeout(() => {
+                    const lastURL = sessionStorage.getItem('offline_lastURL');
+                    if (navigator.onLine) {
+                        safeLog('Redirecting to: ' + (lastURL || window.location.origin));
+                        window.location.href = lastURL || window.location.origin;
+                    } else {
+                        redirectScheduled = false;
+                    }
+                }, 2000);
+            }
+
+            // Auto retry when offline - after 30 seconds have passed
+            if (!navigator.onLine && !isChecking && retryCount < maxRetries) {
+                const now = Date.now();
+                if (lastCheckTime === 0 || (now - lastCheckTime) >= 30000) {
+                    safeLog('Auto retry triggered by interval (30s passed)');
+                    checkConnection();
+                }
+            }
+        }, 30000); // Changed from 15000 to 30000 (30 seconds)
+
+        // Listen for online event (FIXED: no immediate redirect, small delay)
         window.addEventListener('online', () => {
             safeLog('Online event fired');
-            const lastURL = sessionStorage.getItem('offline_lastURL');
+            const connectionStatus = document.getElementById('connectionStatus');
+            if (connectionStatus) {
+                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #2ecc71;"></i> CONNECTION RESTORED!';
+            }
+
+            // Wait 2 seconds before redirecting to ensure stable connection
             setTimeout(() => {
-                window.location.href = lastURL || window.location.origin;
-            }, 1000);
+                if (navigator.onLine) {
+                    const lastURL = sessionStorage.getItem('offline_lastURL');
+                    safeLog('Redirecting after online event');
+                    window.location.href = lastURL || window.location.origin;
+                }
+            }, 2000);
         });
 
         // Listen for offline event
@@ -483,38 +650,79 @@
             if (connectionStatus) {
                 connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
             }
+
+            // Reset redirect flag
+            redirectScheduled = false;
         });
 
-        // Add keyboard shortcut (press 'r' to retry)
-        document.addEventListener('keydown', function(e) {
+        // Add keyboard shortcut (press 'r' to retry) - but respect 30s cooldown
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'r' || e.key === 'R') {
-                if (!retryBtn.disabled) {
+                const retryBtnElement = document.getElementById('retryBtn');
+                if (retryBtnElement && !retryBtnElement.disabled) {
                     e.preventDefault();
-                    retryBtn.click();
+
+                    // Check cooldown
+                    const now = Date.now();
+                    if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
+                        const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
+                        safeLog(`Keyboard retry blocked: ${secondsLeft}s remaining`);
+                        const mainMessage = document.getElementById('mainMessage');
+                        if (mainMessage) {
+                            mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before retrying.`;
+                            setTimeout(() => {
+                                if (mainMessage && !navigator.onLine) {
+                                    mainMessage.innerHTML = `Unable to connect. Auto-retry in progress... (Attempt ${retryCount}/${maxRetries})`;
+                                }
+                            }, 3000);
+                        }
+                    } else {
+                        retryBtnElement.click();
+                    }
                 }
             }
         });
 
-        // Initial check after page load
+        // ============================================================
+        // FIXED: Initial check - wait 3 seconds before checking
+        // ============================================================
         setTimeout(() => {
             if (navigator.onLine) {
-                safeLog('Already online, redirecting...');
+                safeLog('Already online, redirecting after delay...');
                 const lastURL = sessionStorage.getItem('offline_lastURL');
-                window.location.href = lastURL || window.location.origin;
+                setTimeout(() => {
+                    if (navigator.onLine) {
+                        window.location.href = lastURL || window.location.origin;
+                    }
+                }, 2000);
+            } else {
+                safeLog('Initially offline, will retry in 30 seconds');
+                // Schedule first retry after 30 seconds
+                scheduleRetry(30);
             }
-        }, 1000);
+        }, 3000); // Wait 3 seconds before initial check
 
         // Fix for the error you mentioned - prevent any undefined access
-        // This catches the error from the main page trying to access undefined objects
         if (typeof Object.defineProperty === 'function') {
             try {
-                // Create a safe global object to prevent errors
                 window.recentTransactions = window.recentTransactions || [];
                 window.dashboardData = window.dashboardData || {};
             } catch (e) {
                 safeLog('Error setting globals: ' + e.message);
             }
         }
+
+        // Cleanup function (optional - for SPA navigation)
+        window.addEventListener('beforeunload', function () {
+            if (scheduledRetry) {
+                clearTimeout(scheduledRetry);
+            }
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            stopProgressAnimation();
+        });
     </script>
 </body>
+
 </html>

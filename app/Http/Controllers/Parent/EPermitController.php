@@ -4,15 +4,22 @@ namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
 use App\Models\EPermit;
+use App\Models\school;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Services\EPermitService;
+use App\Services\NextSmsService;
+use App\Traits\formatPhoneTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Vinkla\Hashids\Facades\Hashids;
 
 class EPermitController extends Controller
 {
     protected $ePermitService;
+    use formatPhoneTrait;
 
     public function __construct(EPermitService $ePermitService)
     {
@@ -138,16 +145,19 @@ class EPermitController extends Controller
             'expected_return_date' => 'required|date|after_or_equal:departure_date'
         ]);
 
-        // Get FIRST class teacher for assignment (we store one teacher ID as reference)
-        // ANY class teacher can approve later, but we need one for initial assignment
-        $classTeacher = $this->ePermitService->getFirstClassTeacher($student);
+        // Get ALL class teachers for this student (to check existence and for notifications)
+        $allClassTeachers = $this->ePermitService->getClassTeachers($student);
 
-        if (!$classTeacher) {
+        if ($allClassTeachers->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Hakuna mwalimu wa darasa aliyebainishwa kwa mwanafunzi huyu. Tafadhali wasiliana na ofisi ya shule.'
             ], 422);
         }
+
+        // Get FIRST class teacher for STORAGE REFERENCE only (we store one teacher ID as reference)
+        // ANY class teacher can approve later, but we need one for initial record keeping
+        $firstClassTeacher = $allClassTeachers->first();
 
         // Get first duty teacher for the departure date from tod_roster (for assignment)
         $firstDutyTeacher = $this->ePermitService->getFirstDutyTeacherForDate($validated['departure_date']);
@@ -178,7 +188,7 @@ class EPermitController extends Controller
             'departure_time' => now(),
             'expected_return_date' => $validated['expected_return_date'],
             'status' => $initialStatus,
-            'class_teacher_id' => $classTeacher->id,
+            'class_teacher_id' => $firstClassTeacher->id,
             'duty_teacher_id' => $firstDutyTeacher?->id,
             'academic_teacher_id' => $firstAcademicTeacher?->id,
             'head_teacher_id' => $firstHeadTeacher?->id
@@ -193,12 +203,64 @@ class EPermitController extends Controller
             'Ombi la ruhusa limewasilishwa na mzazi/mlezi'
         );
 
-        $message = 'Ombi lako limewasilishwa kwa kikamilifu.';
+        // ============ SEND NOTIFICATIONS TO ALL CLASS TEACHERS ============
+        $this->sendNotificationsToClassTeachers($allClassTeachers, $ePermit);
+
+        // Update message to inform parent that ANY class teacher can handle
+        $message = 'Ombi lako limewasilishwa kwa kikamilifu. Mwalumu wa darasa yeyote atalifanyia kazi.';
 
         return response()->json([
             'success' => true,
             'message' => $message,
             'permit_number' => $ePermit->permit_number
         ]);
+    }
+
+    /**
+     * Send notifications to all class teachers about new permit request
+     */
+    protected function sendNotificationsToClassTeachers($classTeachers, $ePermit): void
+    {
+        foreach ($classTeachers as $classTeacher) {
+            // Database notification
+
+            $this->notifyClassTeacherBySms($classTeacher, $ePermit);
+            // $classTeacher->$this->notifyBySms($ePermit);
+
+            // Optional: Log for debugging
+            Log::info('E-Permit notification sent to class teacher', [
+                'teacher_id' => $classTeacher->id,
+                'teacher_name' => $classTeacher->user->name ?? 'Unknown',
+                'permit_number' => $ePermit->permit_number,
+                'student_name' => $ePermit->student->first_name . ' ' . $ePermit->student->last_name
+            ]);
+        }
+    }
+
+    private function notifyClassTeacherBySms($classTeacher, $ePermit)
+    {
+        $nextSmsService = new NextSmsService();
+
+        $school = school::find($classTeacher->school_id);
+        $teacher = Teacher::with('User')->find($classTeacher->id);
+
+        $formattedPhone = $this->formatPhoneNumberForSms($teacher->user->phone);
+        // Log::info("Formatted Phone number ". $formattedPhone);
+        // Log::info("School id ". $school);
+
+        if(! $school) {
+            Log::info("School info not found");
+        }
+
+        $message = "Habari, Mwanafunzi {$ePermit->student->first_name} {$ePermit->student->last_name}
+                    ameombewa ruhusa, Ombi Namba {$ePermit->permit_number},
+                    Tafadhali ingia kwenye mfumo kushughulikia ombi hilo. Asante!";
+        $response = $nextSmsService->sendSmsByNext(
+            $school->sender_id ?? 'SHULE APP',
+            $formattedPhone,
+            $message,
+            uniqid(),
+        );
+        // Log::info('Sending Sms to '.$formattedPhone. 'Sms '. $message);
     }
 }
