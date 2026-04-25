@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.04.21';
+const APP_VERSION = '2026.04.25.02';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_CACHE_NAME = 'gatepass-tokens-v1';
 
