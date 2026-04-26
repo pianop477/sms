@@ -657,6 +657,15 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::get('/{batchHash}/employee/{employeeHash}', [PayrollController::class, 'employeeDetail'])->name('employee.detail');
 
             Route::post('/{hash}/recalculate', [PayrollController::class, 'recalculate'])->name('recalculate');
+            Route::post('/{hash}/revert-finalize', [PayrollController::class, 'revertFinalize'])
+                ->name('revert-finalize');
+            Route::post('/{hash}/update-employees', [PayrollController::class, 'updateEmployees'])
+                ->name('update-employees');
+            Route::post('/{hash}/update-employee', [PayrollController::class, 'updateEmployeeField'])->name('update-employee');
+            // Lock/Unlock routes
+            Route::post('/{hash}/lock', [PayrollController::class, 'lock'])->name('lock');
+            Route::post('/{hash}/unlock', [PayrollController::class, 'unlock'])->name('unlock');
+            Route::get('/{hash}/lock-status', [PayrollController::class, 'getLockStatus'])->name('lock-status');
         });
 
         Route::post('/api/employees/batch', [PayrollController::class, 'batchSearchEmployees'])->name('api.employees.batch');

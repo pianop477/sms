@@ -45,10 +45,18 @@ class PayrollController extends Controller
             ->get();
 
         $employees = [];
+        $seenStaffIds = []; // ✅ Prevent duplicates by staff_id
 
         foreach ($contracts as $contract) {
             $staffId = $contract->applicant_id;
             if (!$staffId) continue;
+
+            // ✅ Skip if we already processed this staff_id
+            if (in_array($staffId, $seenStaffIds)) {
+                Log::warning('Duplicate contract skipped', ['staff_id' => $staffId, 'contract_id' => $contract->id]);
+                continue;
+            }
+            $seenStaffIds[] = $staffId;
 
             $staffDetails = $this->resolveApplicantDetails($staffId, $schoolId);
             if ($staffDetails['staff_type'] === 'Unknown') continue;
@@ -56,12 +64,28 @@ class PayrollController extends Controller
             if ($staffTypeFilter && $this->mapStaffType($staffDetails['staff_type']) !== $staffTypeFilter) continue;
             if ($departmentFilter && $contract->job_title !== $departmentFilter) continue;
 
+            // ✅ Convert allowances from array/JSON to float
+            $allowances = 0;
+            if ($contract->allowances) {
+                $decoded = json_decode($contract->allowances, true);
+                if (is_array($decoded)) {
+                    $allowances = array_sum($decoded);
+                } elseif (is_numeric($decoded)) {
+                    $allowances = (float) $decoded;
+                } elseif (is_string($decoded)) {
+                    $allowances = (float) $decoded;
+                } else {
+                    $allowances = (float) $contract->allowances;
+                }
+            }
+
             $employees[] = [
+                'id' => $contract->id,
                 'staff_id' => $staffDetails['staff_id'],
-                'employee_name' => $staffDetails['first_name'] . ' ' . ($staffDetails['last_name'] ?? ''),
+                'employee_name' => trim(($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? '')),
                 'staff_type' => $this->mapStaffType($staffDetails['staff_type']),
                 'basic_salary' => (float) $contract->basic_salary,
-                'allowances' => $contract->allowances ? json_decode($contract->allowances, true) : [],
+                'allowances' => $allowances, // ✅ Now returning number, not array
                 'contract_type' => $contract->contract_type ?? 'new',
                 'department' => $this->mapStaffType($staffDetails['staff_type']),
                 'bank_name' => $staffDetails['bank_name'] ?? null,
@@ -74,6 +98,12 @@ class PayrollController extends Controller
                 'qualification' => $staffDetails['qualification'] ?? null
             ];
         }
+
+        // Log::info('Contracts fetched', [
+        //     'total_contracts' => $contracts->count(),
+        //     'unique_employees' => count($employees),
+        //     'duplicates_removed' => $contracts->count() - count($employees)
+        // ]);
 
         return response()->json([
             'success' => true,
@@ -310,49 +340,38 @@ class PayrollController extends Controller
 
     /**
      * ========================================================================
-     * 3. GENERATE NEW PAYROLL
+     * GENERATE NEW PAYROLL - 100% ACCURATE
      * ========================================================================
-     * POST /payroll/generate
      */
-
     public function generate(Request $request)
     {
+        // Log::info('Payroll Generation Request', [
+        //     'method' => $request->generation_method,
+        //     'has_excel_data_hidden' => $request->has('excel_data_hidden'),
+        //     'has_excel_file' => $request->hasFile('excel_file'),
+        //     'has_contracts_data' => $request->has('contracts_data')
+        // ]);
+
         $rules = [
             'month' => 'required|date_format:Y-m',
             'generation_method' => 'required|in:contracts,excel_upload,previous_batch,manual_entry',
             'previous_batch_id' => 'required_if:generation_method,previous_batch',
-            'excel_file' => 'required_if:generation_method,excel_upload|file'
         ];
+
+        if ($request->generation_method === 'excel_upload') {
+            if (!$request->has('excel_data_hidden') && !$request->hasFile('excel_file')) {
+                $rules['excel_data_hidden'] = 'required';
+            }
+        }
 
         if ($request->generation_method === 'contracts') {
             $rules['contracts_data'] = 'required|json';
-        }
-
-        if (
-            $request->generation_method === 'manual_entry' &&
-            $request->has('manual_employees') &&
-            !is_null($request->manual_employees)
-        ) {
-            $rules['manual_employees'] = 'json';
         }
 
         $validator = validator($request->all(), $rules);
 
         if ($validator->fails()) {
             return back()->with('error', 'Validation failed: ' . implode(', ', $validator->errors()->all()))->withInput();
-        }
-
-        // ✅ STRICT FILE VALIDATION (IMPORTANT FIX)
-        if ($request->generation_method === 'excel_upload' && $request->hasFile('excel_file')) {
-
-            $file = $request->file('excel_file');
-            $extension = strtolower($file->getClientOriginalExtension());
-
-            $allowedExtensions = ['xlsx', 'xls', 'csv'];
-
-            if (!in_array($extension, $allowedExtensions)) {
-                return back()->with('error', 'Invalid file type. Only Excel files (xlsx, xls, csv) are allowed.')->withInput();
-            }
         }
 
         $schoolId = Auth::user()->school_id;
@@ -366,23 +385,61 @@ class PayrollController extends Controller
             'filters' => $request->only(['department', 'staff_type'])
         ];
 
-        // Handle contracts data
+        // Contracts Mode
         if ($request->generation_method === 'contracts' && $request->has('contracts_data')) {
             try {
                 $selectedEmployees = json_decode($request->contracts_data, true);
-                $data['selected_employees'] = $selectedEmployees;
-                $data['use_frontend_selection'] = true;
+                if (is_array($selectedEmployees) && !empty($selectedEmployees)) {
+                    $data['selected_employees'] = $selectedEmployees;
+                    $data['use_frontend_selection'] = true;
+                    // Log::info('Contracts data', ['count' => count($selectedEmployees)]);
+                } else {
+                    return back()->with('error', 'No employees selected from contracts')->withInput();
+                }
             } catch (\Exception $e) {
                 return back()->with('error', 'Invalid contracts data format')->withInput();
             }
         }
 
-        // Handle manual employees
-        if (
-            $request->generation_method === 'manual_entry' &&
-            $request->has('manual_employees') &&
-            !is_null($request->manual_employees)
-        ) {
+        // Excel Mode - PRIORITY TO EDITED DATA
+        if ($request->generation_method === 'excel_upload') {
+            // Priority 1: Use edited data from hidden input
+            if ($request->has('excel_data_hidden') && !empty($request->excel_data_hidden)) {
+                try {
+                    $editedData = json_decode($request->excel_data_hidden, true);
+                    if (is_array($editedData) && !empty($editedData)) {
+                        $data['excel_data'] = $editedData;
+                        // Log::info('Excel data from FRONTEND EDIT (excel_data_hidden)', [
+                        //     'count' => count($editedData),
+                        //     'first_staff_id' => $editedData[0]['staff_id'] ?? 'N/A'
+                        // ]);
+                    } else {
+                        return back()->with('error', 'No employees selected from Excel after editing')->withInput();
+                    }
+                } catch (\Exception $e) {
+                    return back()->with('error', 'Invalid Excel data format: ' . $e->getMessage())->withInput();
+                }
+            }
+            // Priority 2: Parse from uploaded file (fallback)
+            elseif ($request->hasFile('excel_file')) {
+                try {
+                    $fileData = $this->parseExcelFile($request->file('excel_file'));
+                    if (is_array($fileData) && !empty($fileData)) {
+                        $data['excel_data'] = $fileData;
+                        // Log::info('Excel data from FILE (fallback)', ['count' => count($fileData)]);
+                    } else {
+                        return back()->with('error', 'Excel file contains no valid data')->withInput();
+                    }
+                } catch (\Exception $e) {
+                    return back()->with('error', 'Failed to read Excel file: ' . $e->getMessage())->withInput();
+                }
+            } else {
+                return back()->with('error', 'No Excel data provided')->withInput();
+            }
+        }
+
+        // Manual Mode
+        if ($request->generation_method === 'manual_entry' && $request->has('manual_employees')) {
             try {
                 $manualEmployees = json_decode($request->manual_employees, true);
                 $data['manual_employees'] = $manualEmployees;
@@ -391,22 +448,9 @@ class PayrollController extends Controller
             }
         }
 
-        // Handle previous batch
-        if (
-            $request->generation_method === 'previous_batch' &&
-            $request->has('previous_batch_id') &&
-            $request->previous_batch_id
-        ) {
+        // Previous Batch Mode
+        if ($request->generation_method === 'previous_batch' && $request->has('previous_batch_id')) {
             $data['previous_batch_id'] = $request->previous_batch_id;
-        }
-
-        // ✅ Handle Excel file safely
-        if ($request->generation_method === 'excel_upload' && $request->hasFile('excel_file')) {
-            try {
-                $data['excel_data'] = $this->parseExcelFile($request->file('excel_file'));
-            } catch (\Exception $e) {
-                return back()->with('error', 'Failed to read Excel file. Ensure file format is correct.')->withInput();
-            }
         }
 
         $token = session('finance_api_token');
@@ -415,22 +459,21 @@ class PayrollController extends Controller
             return back()->with('error', 'Authentication token missing. Please login again.')->withInput();
         }
 
-        $fullUrl = $this->apiBaseUrl . '/payroll/generate';
-
         try {
             $response = Http::withToken($token)
                 ->timeout(60)
-                ->post($fullUrl, $data);
+                ->post($this->apiBaseUrl . '/payroll/generate', $data);
 
             if (!$response->successful()) {
                 $errorMessage = $response->json()['message'] ?? 'Unknown error';
+                Log::error('API Error', ['status' => $response->status(), 'error' => $errorMessage]);
                 return back()->with('error', 'API Error: ' . $errorMessage)->withInput();
             }
 
             Alert()->toast('Payroll generated successfully', 'success');
             return redirect()->route('payroll.index');
         } catch (ConnectionException $e) {
-            return back()->with('error', 'Cannot connect to Finance API. Please check if the service is running on port 8000.')->withInput();
+            return back()->with('error', 'Cannot connect to Finance API. Please check if the service is running.')->withInput();
         } catch (\Exception $e) {
             return back()->with('error', 'Unexpected error: ' . $e->getMessage())->withInput();
         }
@@ -509,6 +552,7 @@ class PayrollController extends Controller
             return redirect()->route('payroll.index');
         }
 
+        // dd($batch);
         return view('payroll.show', compact('batch', 'summary'));
     }
 
@@ -1242,5 +1286,237 @@ class PayrollController extends Controller
                 'not_found' => count($finalResults) - count(array_filter($finalResults))
             ]
         ]);
+    }
+
+
+    /**
+     * ========================================================================
+     * REVERT FINALIZED PAYROLL (Enable editing)
+     * ========================================================================
+     * POST /payroll/{hash}/revert-finalize
+     */
+    public function revertFinalize(Request $request, $hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid payroll link'
+            ]);
+        }
+
+        $reason = $request->input('reason', 'Edited after finalization');
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(60)
+                ->post($this->apiBaseUrl . '/payroll/batches/' . $id . '/revert-finalize', [
+                    'reason' => $reason
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to revert payroll'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payroll reverted to draft. You can now edit and recalculate.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ========================================================================
+     * UPDATE MULTIPLE EMPLOYEES IN PAYROLL BATCH
+     * ========================================================================
+     * POST /payroll/{hash}/update-employees
+     */
+    public function updateEmployees(Request $request, $hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json(['success' => false, 'message' => 'Invalid payroll link']);
+        }
+
+        $validated = $request->validate([
+            'employees' => 'required|array',
+            'employees.*.payroll_employee_id' => 'required|integer',
+            'employees.*.basic_salary' => 'nullable|numeric|min:0',
+            'employees.*.allowances' => 'nullable|numeric|min:0',
+            'employees.*.contract_type' => 'nullable|in:new,provision',
+            'employees.*.department' => 'nullable|string|max:255',
+            'employees.*.bank_name' => 'nullable|string|max:255',
+            'employees.*.bank_account_name' => 'nullable|string|max:255',
+            'employees.*.bank_account_number' => 'nullable|string|max:100',
+            'employees.*.notes' => 'nullable|string|max:500'
+        ]);
+
+        $token = session('finance_api_token');
+
+        try {
+            $response = Http::withToken($token)
+                ->timeout(60)
+                ->put($this->apiBaseUrl . '/payroll/batches/' . $id . '/employees', [
+                    'employees' => $validated['employees']
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to update employees'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employees updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // app/Http/Controllers/PayrollController.php (Frontend) - Ongeza hizi methods
+
+    /**
+     * ========================================================================
+     * LOCK PAYROLL BATCH
+     * ========================================================================
+     * POST /payroll/{hash}/lock
+     */
+    public function lock(Request $request, $hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid payroll link'
+            ]);
+        }
+
+        $reason = $request->input('reason', 'Batch locked permanently');
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(60)
+                ->post($this->apiBaseUrl . '/payroll/batches/' . $id . '/lock', [
+                    'reason' => $reason
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to lock payroll'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payroll locked successfully',
+                'data' => $response->json()['data'] ?? []
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ========================================================================
+     * UNLOCK PAYROLL BATCH (Admin only)
+     * ========================================================================
+     * POST /payroll/{hash}/unlock
+     */
+    public function unlock(Request $request, $hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid payroll link'
+            ]);
+        }
+
+        $reason = $request->input('reason', 'Unlocked by administrator');
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(60)
+                ->post($this->apiBaseUrl . '/payroll/batches/' . $id . '/unlock', [
+                    'reason' => $reason
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to unlock payroll'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payroll unlocked successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ========================================================================
+     * GET LOCK STATUS
+     * ========================================================================
+     * GET /payroll/{hash}/lock-status
+     */
+    public function getLockStatus($hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid payroll link'
+            ]);
+        }
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(30)
+                ->get($this->apiBaseUrl . '/payroll/batches/' . $id . '/lock-status');
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to get lock status'
+                ]);
+            }
+
+            return response()->json($response->json());
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
