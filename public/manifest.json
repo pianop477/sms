@@ -2,14 +2,17 @@
     "name": "ShuleApp - School Management System",
     "short_name": "ShuleApp",
     "description": "Digital platform for School Management System",
-    "start_url": "/?utm_source=pwa",
+    "start_url": "/?v=2026.04.25.02",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2C3E50",
     "orientation": "portrait",
     "scope": "/",
     "lang": "sw",
-    "categories": ["education", "productivity"],
+    "categories": [
+        "education",
+        "productivity"
+    ],
     "icons": [
         {
             "src": "/icons/new_icon1.png",
@@ -38,7 +41,13 @@
             "short_name": "Home",
             "description": "Go to Dashboard",
             "url": "/",
-            "icons": [{ "src": "/icons/new_icon2.png", "sizes": "192x192" }]
+            "icons": [
+                {
+                    "src": "/icons/new_icon2.png",
+                    "sizes": "192x192"
+                }
+            ]
         }
-    ]
+    ],
+    "id": "shuleapp-2026.04.25.02"
 }
