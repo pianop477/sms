@@ -842,11 +842,13 @@ Route::post('/bank/modal-closed', function () {
 // ========================================================================
 // SALARY SLIP VERIFICATION ROUTES (Public - Hakuna authentication)
 // ========================================================================
-Route::get('/verify-slip', [SalarySlipVerificationController::class, 'verifyWeb'])
-    ->name('salary-slip.verify.web');
-Route::get('/scan-qr', function () {
-    return view('payroll.scan-qr');
-})->name('scan.qr');
+Route::get('/verify-slip/{token}', [SalarySlipVerificationController::class, 'verifyWeb'])
+    ->name('verify-slip');
+
+// Optional: Route for scanner page (if user manually goes to /verify-slip)
+Route::get('/verify-slip', function() {
+    return redirect()->route('scan.qr');
+});
 
 // Parent routes (no authentication required for submission)
 Route::prefix('e-permit')->name('parent.e-permit.')->group(function () {

@@ -17,38 +17,90 @@ class SalarySlipVerificationController extends Controller
     }
 
     /**
-     * Verify salary slip - Called from QR scan or manual token entry
-     * GET /verify-slip?token=abc123xyz
+     * ========================================================================
+     * VERIFY SALARY SLIP - Frontend handles UI, Backend handles data
+     * ========================================================================
+     * GET /verify-slip/{token}
      */
-    public function verifyWeb(Request $request)
+
+    // app/Http/Controllers/SalarySlipVerificationController.php (Frontend)
+
+    public function verifyWeb($token)
     {
-        $token = $request->query('token');
+        // Log::info('Frontend verification started', [
+        //     'token' => $token,
+        //     'backend_url' => $this->apiBaseUrl . '/salary-slip/verify/' . $token
+        // ]);
 
         if (!$token) {
-            // Redirect to scanner page if no token
-            return redirect()->route('scan.qr');
+            return view('payroll.verification-failed', [
+                'message' => 'No verification token provided.',
+                'token' => null
+            ]);
         }
 
         try {
-            $response = Http::timeout(30)
+            // ✅ Remove the token requirement for public verification
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ])
                 ->get($this->apiBaseUrl . '/salary-slip/verify/' . $token);
 
+            // Log::info('Backend response', [
+            //     'status' => $response->status(),
+            //     'body' => $response->body()
+            // ]);
+
             if (!$response->successful()) {
+                $errorData = $response->json();
                 return view('payroll.verification-failed', [
-                    'message' => $response->json()['message'] ?? 'Invalid verification token',
+                    'message' => $errorData['message'] ?? 'Invalid verification token',
                     'token' => $token
                 ]);
             }
 
-            $data = $response->json()['data'];
+            $result = $response->json();
+
+            if (!$result['success']) {
+                return view('payroll.verification-failed', [
+                    'message' => $result['message'] ?? 'Verification failed',
+                    'token' => $token
+                ]);
+            }
+
+            $data = $result['data'];
 
             return view('payroll.verification-success', [
-                'data' => $data,
+                'data' => [
+                    'slip_number' => $data['slip_number'] ?? 'N/A',
+                    'employee_name' => $data['employee_name'] ?? 'N/A',
+                    'staff_id' => $data['staff_id'] ?? 'N/A',
+                    'staff_type' => $data['staff_type'] ?? 'N/A',
+                    'department' => $data['department'] ?? 'N/A',
+                    'month' => $data['month'] ?? 'N/A',
+                    'basic_salary' => $data['basic_salary'] ?? 0,
+                    'total_allowances' => $data['total_allowances'] ?? 0,
+                    'gross_salary' => $data['gross_salary'] ?? 0,
+                    'nssf' => $data['nssf'] ?? 0,
+                    'paye' => $data['paye'] ?? 0,
+                    'heslb' => $data['heslb'] ?? 0,
+                    'other_deductions' => $data['other_deductions'] ?? 0,
+                    'net_salary' => $data['net_salary'] ?? 0,
+                    'verification_time' => $data['verification_time'] ?? now()->format('d/m/Y H:i:s'),
+                    'verification_count' => $data['verification_count'] ?? 1
+                ],
                 'token' => $token
             ]);
         } catch (\Exception $e) {
+            Log::error('Verification error', [
+                'token' => $token,
+                'error' => $e->getMessage()
+            ]);
+
             return view('payroll.verification-failed', [
-                'message' => 'Could not connect to verification service. Please try again later.',
+                'message' => 'An error occurred during verification. Please try again later.',
                 'token' => $token
             ]);
         }
