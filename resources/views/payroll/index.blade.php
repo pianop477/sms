@@ -121,9 +121,14 @@
             color: #2e7d32;
         }
 
+        .bg-locked {
+            background: #ffebee;
+            color:#c62828;
+        }
+
         .status-cancelled {
             background: #ffebee;
-            color: #c62828;
+            color: #dcb21bfa;
         }
 
         .table-payroll th {
@@ -559,6 +564,10 @@
                     'cancelled': 'status-cancelled'
                 } [batch.status] || 'status-draft';
 
+                const isLocked = batch.is_locked == 0 ? 'Open' : 'Closed';
+                const LockedClass = batch.is_locked ==  0 ? 'bg-success-custom' : 'bg-locked';
+                const lockedIcon = batch.is_locked == 0 ? 'fa-lock-open' : 'fa-lock';
+
                 const statusIcon = batch.status == 'finalized' ? 'fa-check-circle' :
                     (batch.status == 'calculated' ? 'fa-calculator' :
                         (batch.status == 'draft' ? 'fa-pen' : 'fa-times-circle'));
@@ -581,6 +590,10 @@
                         <span class="status-badge ${statusClass}">
                             <i class="fas ${statusIcon} mr-1"></i> ${ucfirst(batch.status)}
                         </span>
+                        <span class="badge ${LockedClass}">
+                            <i class="fas ${lockedIcon}"></i>
+                                ${isLocked}
+                        </span>
                     </td>
                     <td>${ucwords(batch.generated_by || 'System')}</td>
                     <td class="text-center">
@@ -588,7 +601,7 @@
                             <a href="${viewUrl}" class="action-btn btn-view" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-            `;
+                `;
 
                 // Draft status buttons
                 if (batch.status == 'draft') {

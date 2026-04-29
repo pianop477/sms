@@ -442,11 +442,11 @@
                             </button>
                         @endif
                         <a href="{{ route('payroll.download-slips', $batch['hash']) }}"
-                            class="btn btn-action btn-download">
+                            class="btn btn-action btn-download btn-primary">
                             <i class="fas fa-download mr-1"></i> Download Slips
                         </a>
                         <a href="{{ route('payroll.download-summary', $batch['hash']) }}"
-                            class="btn btn-action btn-export">
+                            class="btn btn-action btn-export btn-secondary">
                             <i class="fas fa-file-excel mr-1"></i> Download Payroll
                         </a>
                     @endif
