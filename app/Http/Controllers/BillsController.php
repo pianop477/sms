@@ -1113,7 +1113,7 @@ class BillsController extends Controller
             // Get ALL payment history for this bill
             $paymentHistory = school_fees_payment::query()
                 ->where('student_fee_id', $bill->id)
-                ->orderBy('installment', 'asc')
+                // ->orderBy('installment', 'asc')
                 ->orderBy('approved_at', 'asc')
                 ->get();
 
