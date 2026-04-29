@@ -64,14 +64,14 @@
                         </button>
                         @else
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="ti-eye"> SCHOOL BUS DETAILS</i>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"><i class="ti-eye"> SCHOOL BUS DETAILS</i>
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title">SCHOOL BUS DETAILS</h5>
-                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                            <button type="button" class="close" data-bs-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
                                             <div class="col-md-12 mt-5">
@@ -97,7 +97,7 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                                         </div>
                                     </div>
                                 </form>

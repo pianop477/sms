@@ -58,14 +58,14 @@
                     <div class="card-header p-1">
                         <ul class="nav nav-pills flex-column flex-sm-row">
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link active" title="Profile" href="#student" data-toggle="tab"><i class="fas fa-user-graduate"></i> Student Information</a>
+                                <a class="nav-link active" title="Profile" href="#student" data-bs-toggle="tab"><i class="fas fa-user-graduate"></i> Student Information</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link" href="#parents" title="Parents" data-toggle="tab"><i class="fas fa-user-shield"></i> Parents Information</a>
+                                <a class="nav-link" href="#parents" title="Parents" data-bs-toggle="tab"><i class="fas fa-user-shield"></i> Parents Information</a>
                             </li>
                             @if ($students->transport_id != Null)
                                 <li class="flex-sm-fill text-sm-center nav-item">
-                                    <a class="nav-link" href="#transport" title="Transport" data-toggle="tab"><i class="fas fa-bus"></i> Transport Information</a>
+                                    <a class="nav-link" href="#transport" title="Transport" data-bs-toggle="tab"><i class="fas fa-bus"></i> Transport Information</a>
                                 </li>
                             @endif
                         </ul>

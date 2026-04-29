@@ -457,8 +457,8 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <button class="btn-view-contract" data-toggle="modal"
-                                                    data-target="#contractModal{{ $contractId }}">
+                                                <button class="btn-view-contract" data-bs-toggle="modal"
+                                                    data-bs-target="#contractModal{{ $contractId }}">
                                                     <i class="fas fa-eye mr-2"></i> View
                                                 </button>
                                             </td>
@@ -567,7 +567,7 @@
                                     {{ $currentStatus }}
                                 </small> --}}
 
-                                <button type="button" class="btn btn-xs btn-danger float-right" data-dismiss="modal" aria-label="Close">
+                                <button type="button" class="btn btn-xs btn-danger float-right" data-bs-dismiss="modal" aria-label="Close">
                                     <i class="fas fa-close"></i>
                                 </button>
                             </div>
@@ -577,21 +577,21 @@
                         <div class="px-4 pt-4" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                             <ul class="nav nav-tabs" id="tab-{{ $contractId }}" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="{{ $overviewTab }}-tab" data-toggle="tab"
+                                    <a class="nav-link active" id="{{ $overviewTab }}-tab" data-bs-toggle="tab"
                                         href="#{{ $overviewTab }}" role="tab" aria-controls="{{ $overviewTab }}"
                                         aria-selected="true">
                                         <i class="fas fa-info-circle mr-2"></i> Overview
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="{{ $financialTab }}-tab" data-toggle="tab"
+                                    <a class="nav-link" id="{{ $financialTab }}-tab" data-bs-toggle="tab"
                                         href="#{{ $financialTab }}" role="tab" aria-controls="{{ $financialTab }}"
                                         aria-selected="false">
                                         <i class="fas fa-coins mr-2"></i> Financial
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="{{ $documentsTab }}-tab" data-toggle="tab"
+                                    <a class="nav-link" id="{{ $documentsTab }}-tab" data-bs-toggle="tab"
                                         href="#{{ $documentsTab }}" role="tab" aria-controls="{{ $documentsTab }}"
                                         aria-selected="false">
                                         <i class="fas fa-file-alt mr-2"></i> Attachments
@@ -603,7 +603,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="{{ $timelineTab }}-tab" data-toggle="tab"
+                                    <a class="nav-link" id="{{ $timelineTab }}-tab" data-bs-toggle="tab"
                                         href="#{{ $timelineTab }}" role="tab" aria-controls="{{ $timelineTab }}"
                                         aria-selected="false">
                                         <i class="fas fa-history mr-2"></i> Timeline
@@ -613,7 +613,7 @@
                                 @if (auth()->user()->usertype == 1 || auth()->user()->usertype == 2)
                                     <!-- Assuming 1=Admin, 2=Manager -->
                                     <li class="nav-item">
-                                        <a class="nav-link" id="{{ $terminationTab }}-tab" data-toggle="tab"
+                                        <a class="nav-link" id="{{ $terminationTab }}-tab" data-bs-toggle="tab"
                                             href="#{{ $terminationTab }}" role="tab"
                                             aria-controls="{{ $terminationTab }}" aria-selected="false">
                                             <i class="fas fa-ban mr-2"></i> Termination
@@ -1261,7 +1261,7 @@
                                                     <!-- Action Buttons -->
                                                     <div class="d-flex gap-3 justify-content-end mt-4">
                                                         <button type="button" class="btn btn-outline-secondary px-5 py-2"
-                                                            data-dismiss="modal">
+                                                            data-bs-dismiss="modal">
                                                             <i class="fas fa-times me-2"></i> Cancel
                                                         </button>
                                                         <button type="submit" class="btn btn-danger px-5 py-2"
@@ -1460,7 +1460,7 @@
 
                         <!-- Modal Footer -->
                         <div class="modal-footer-custom">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times mr-2"></i>Close
                             </button>
                         </div>

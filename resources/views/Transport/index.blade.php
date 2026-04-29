@@ -484,7 +484,7 @@
                         <p class="mb-0 text-white">Manage bus routes and driver assignments</p>
                     </div>
                     <div class="col-md-2 text-end">
-                        <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target="#busModal">
+                        <button type="button" class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#busModal">
                             <i class="fas fa-plus-circle me-2"></i> New Route
                         </button>
                     </div>
@@ -607,7 +607,7 @@
                     <h5 class="modal-title">
                         <i class="fas fa-bus me-2"></i> Bus Registration Form
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -693,7 +693,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" id="saveButton" class="btn btn-success-custom">
                                 <i class="fas fa-save me-2"></i> Save Route
                             </button>

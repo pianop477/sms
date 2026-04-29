@@ -349,7 +349,7 @@
             <i class="fas fa-file-contract"></i>
             My Contracts Catalog
         </h4>
-        <button type="button" class="btn btn-create" data-toggle="modal" data-target=".bd-example-modal-lg">
+        <button type="button" class="btn btn-create" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg">
             <i class="fas fa-plus-circle mr-2"></i>
             Apply New Contract
         </button>
@@ -368,7 +368,7 @@
                                         <i class="fas fa-pen-fancy"></i>
                                         Contract Application Form
                                     </h5>
-                                    <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                                         <i class="fas fa-close"></i>
                                     </button>
                                 </div>
@@ -411,7 +411,7 @@
                                         </div>
 
                                         <div class="modal-footer px-0 pb-0">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                 <i class="fas fa-times-circle mr-2"></i>
                                                 Cancel
                                             </button>
@@ -506,8 +506,8 @@
                                                 {{-- Actions --}}
                                                 <td>
                                                     <div class="action-buttons">
-                                                        <button class="btn btn-manage" data-toggle="modal"
-                                                            data-target="#contractModal{{ $row->id }}">
+                                                        <button class="btn btn-manage" data-bs-toggle="modal"
+                                                            data-bs-target="#contractModal{{ $row->id }}">
                                                             <i class="fas fa-wrench"></i> Manage
                                                         </button>
                                                     </div>
@@ -543,7 +543,7 @@
                                 <i class="fas fa-clock"></i>
                                 Contract Details - Pending Review
                             </h5>
-                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="fas fa-close"></i>
                             </button>
                         </div>
@@ -609,7 +609,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Close
                             </button>
                             <form action="{{ route('contract.delete', ['id' => Hashids::encode($contract->id)]) }}"
@@ -638,7 +638,7 @@
                                 <i class="fas fa-times-circle"></i>
                                 Contract Details - Rejected
                             </h5>
-                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="fas fa-close"></i>
                             </button>
                         </div>
@@ -732,7 +732,7 @@
                                 class="btn btn-primary">
                                 <i class="fas fa-redo-alt"></i> Re-apply
                             </a>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Close
                             </button>
                         </div>
@@ -765,7 +765,7 @@
                                 <i class="fas {{ $contract->status == 'terminated' ? 'fa-ban' : 'fa-check-circle' }}"></i>
                                 Contract Details - {{ ucfirst($contract->status) }}
                             </h5>
-                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="fas fa-close"></i>
                             </button>
                         </div>
@@ -773,20 +773,20 @@
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs mb-4" id="contractTab{{ $contract->id }}" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="details-tab{{ $contract->id }}" data-toggle="tab"
+                                    <a class="nav-link active" id="details-tab{{ $contract->id }}" data-bs-toggle="tab"
                                         href="#details{{ $contract->id }}" role="tab">
                                         <i class="fas fa-info-circle mr-2"></i> Details
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="documents-tab{{ $contract->id }}" data-toggle="tab"
+                                    <a class="nav-link" id="documents-tab{{ $contract->id }}" data-bs-toggle="tab"
                                         href="#documents{{ $contract->id }}" role="tab">
                                         <i class="fas fa-file-alt mr-2"></i> Attachments
                                     </a>
                                 </li>
                                 @if ($contract->status == 'terminated' || isset($contract->terminated_at))
                                     <li class="nav-item">
-                                        <a class="nav-link" id="termination-tab{{ $contract->id }}" data-toggle="tab"
+                                        <a class="nav-link" id="termination-tab{{ $contract->id }}" data-bs-toggle="tab"
                                             href="#termination{{ $contract->id }}" role="tab">
                                             <i class="fas fa-ban mr-2"></i> Termination
                                         </a>
@@ -1011,7 +1011,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Close
                             </button>
                         </div>
@@ -1031,7 +1031,7 @@
                                 <i class="fas fa-file-contract"></i>
                                 Contract Details - {{ ucfirst($contract->status) }}
                             </h5>
-                            <button type="button" class="btn btn-danger btn-xs" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="fas fa-close"></i>
                             </button>
                         </div>
@@ -1127,7 +1127,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Close
                             </button>
                         </div>
@@ -1145,7 +1145,7 @@
                         <i class="fas fa-redo-alt"></i>
                         Re-apply Contract Form
                     </h5>
-                    <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fas fa-close"></i>
                     </button>
                 </div>
@@ -1185,7 +1185,7 @@
                         </div>
 
                         <div class="modal-footer px-0 pb-0">
-                            <button type="button" class="btn btn-light" data-dismiss="modal">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                                 <i class="fas fa-times-circle mr-2"></i>
                                 Cancel
                             </button>

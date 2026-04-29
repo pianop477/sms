@@ -636,12 +636,12 @@
                                                     months</small>
                                             </td>
                                             <td class="align-middle">
-                                                <button type="button" class="btn-upload-signed btn-sm" data-toggle="modal"
+                                                <button type="button" class="btn-upload-signed btn-sm" data-bs-toggle="modal"
                                                     data-target="#uploadSignedModal{{ $contract->id }}">
                                                     <i class="fas fa-upload me-1"></i> Upload
                                                 </button>
-                                                <button type="button" class="btn-view btn-sm mt-1" data-toggle="modal"
-                                                    data-target="#viewApprovedModal{{ $contract->id }}">
+                                                <button type="button" class="btn-view btn-sm mt-1" data-bs-toggle="modal"
+                                                    data-bs-target="#viewApprovedModal{{ $contract->id }}">
                                                     <i class="fas fa-eye me-1"></i> View
                                                 </button>
                                             </td>
@@ -704,8 +704,8 @@
                                                 </span>
                                             </td>
                                             <td class="align-middle">
-                                                <button type="button" class="btn-manage" data-toggle="modal"
-                                                    data-target="#manageModal{{ $row->id }}">
+                                                <button type="button" class="btn-manage" data-bs-toggle="modal"
+                                                    data-bs-target="#manageModal{{ $row->id }}">
                                                     <i class="fas fa-tasks me-1"></i> MANAGE
                                                 </button>
                                             </td>
@@ -732,7 +732,7 @@
                             <i class="fas fa-file-contract me-2"></i>
                             APPROVED CONTRACT DETAILS
                         </h5>
-                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal">
+                        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal">
                             <i class="fas fa-close"></i>
                         </button>
                     </div>
@@ -823,9 +823,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn-upload-signed" data-toggle="modal"
-                            data-target="#uploadSignedModal{{ $contract->id }}" data-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn-upload-signed" data-bs-toggle="modal"
+                            data-bs-target="#uploadSignedModal{{ $contract->id }}" data-bs-dismiss="modal">
                             <i class="fas fa-upload me-2"></i> Upload Signed Contract
                         </button>
                     </div>
@@ -842,7 +842,7 @@
                             <i class="fas fa-file-signature me-2"></i>
                             UPLOAD SIGNED CONTRACT
                         </h5>
-                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal">
+                        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal">
                             <i class="fas fa-close"></i>
                         </button>
                     </div>
@@ -873,7 +873,7 @@
                             </div>
 
                             <div class="modal-footer px-0 pb-0">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                     <i class="fas fa-times me-2"></i> Cancel
                                 </button>
                                 <button type="submit" class="btn btn-info">
@@ -899,7 +899,7 @@
                             MANAGE CONTRACT: {{ ucwords(strtolower($row->first_name ?? 'Unknown')) }}
                             {{ ucwords(strtolower($row->last_name ?? 'Staff')) }}
                         </h5>
-                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                            <i class="fas fa-close"></i>
                         </button>
                     </div>
@@ -973,13 +973,13 @@
                         <!-- Action Tabs -->
                         <ul class="nav nav-tabs mb-4" id="actionTabs{{ $row->id }}" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="approve-tab{{ $row->id }}" data-toggle="tab"
+                                <a class="nav-link active" id="approve-tab{{ $row->id }}" data-bs-toggle="tab"
                                     href="#approve{{ $row->id }}" role="tab">
                                     <i class="fas fa-check-circle text-success me-2"></i> APPROVE CONTRACT
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="reject-tab{{ $row->id }}" data-toggle="tab"
+                                <a class="nav-link" id="reject-tab{{ $row->id }}" data-bs-toggle="tab"
                                     href="#reject{{ $row->id }}" role="tab">
                                     <i class="fas fa-times-circle text-danger me-2"></i> REJECT APPLICATION
                                 </a>
@@ -1062,7 +1062,7 @@
                                     </div>
 
                                     <div class="modal-footer px-0 pb-0">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                             <i class="fas fa-times me-2"></i> Cancel
                                         </button>
                                         <button type="submit" class="btn btn-success"
@@ -1098,7 +1098,7 @@
                                     </div>
 
                                     <div class="modal-footer px-0 pb-0">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                             <i class="fas fa-times me-2"></i> Cancel
                                         </button>
                                         <button type="submit" class="btn btn-danger">

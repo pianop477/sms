@@ -685,7 +685,7 @@
                                    placeholder="Enter current password"
                                    value="{{old('current_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-target="currentPassword">
+                            <span class="input-group-text-modern toggle-password" data-bs-target="currentPassword">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>
@@ -717,7 +717,7 @@
                                    placeholder="Enter new password"
                                    value="{{old('new_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-target="newPassword">
+                            <span class="input-group-text-modern toggle-password" data-bs-target="newPassword">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>
@@ -744,7 +744,7 @@
                                    placeholder="Confirm new password"
                                    value="{{old('confirm_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-target="confirmPassword">
+                            <span class="input-group-text-modern toggle-password" data-bs-target="confirmPassword">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>

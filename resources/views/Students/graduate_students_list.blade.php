@@ -324,7 +324,7 @@
                 @else
                     @foreach ($graduationYears as $gradYear)
                         <div class="batch-item mb-4">
-                            <div class="batch-header collapsed" data-toggle="collapse" data-target="#batch-{{ $gradYear }}" aria-expanded="false">
+                            <div class="batch-header collapsed" data-bs-toggle="collapse" data-bs-target="#batch-{{ $gradYear }}" aria-expanded="false">
                                 <h5 class="batch-title">
                                     <i class="fas fa-graduation-cap batch-icon"></i>
                                     Graduation Batch {{ $gradYear }}

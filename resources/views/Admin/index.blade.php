@@ -364,7 +364,7 @@
                     <h4 class="text-primary mb-0">
                         <i class="fas fa-user-shield me-2"></i>Administrator Accounts
                     </h4>
-                    <button class="btn-modern" data-toggle="modal" data-target=".bd-example-modal-lg">
+                    <button class="btn-modern" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg">
                         <i class="fas fa-user-plus me-2"></i>New Admin
                     </button>
                 </div>
@@ -481,7 +481,7 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus me-2"></i>Admin Registration Form
                         </h5>
-                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                     </div>
                     <div class="modal-body p-4">
                         <form class="needs-validation" novalidate action="{{ route('admin.accounts.registration') }}" method="POST">
@@ -552,7 +552,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
                                     <i class="fas fa-times me-2"></i> Close
                                 </button>
                                 <button type="submit" id="saveButton" class="btn btn-success">

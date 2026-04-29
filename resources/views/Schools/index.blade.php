@@ -644,13 +644,13 @@
                                 <td>
                                     <div class="action-buttons">
                                         @if ($school->status == 2 || $school->status == 0)
-                                            <button class="btn-icon bg-success text-white" data-toggle="modal"
-                                                data-target="#approveModal{{ $school->id }}" title="Approve School">
+                                            <button class="btn-icon bg-success text-white" data-bs-toggle="modal"
+                                                data-bs-target="#approveModal{{ $school->id }}" title="Approve School">
                                                 <i class="fas fa-cog"></i>
                                             </button>
                                         @else
-                                            <button class="btn-icon bg-info text-white" data-toggle="modal"
-                                                data-target="#viewModal{{ $school->id }}" title="View Details">
+                                            <button class="btn-icon bg-info text-white" data-bs-toggle="modal"
+                                                data-bs-target="#viewModal{{ $school->id }}" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                         @endif
@@ -675,7 +675,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title" id="approveModalLabel{{ $school->id }}">Add Service Time Duration
                             </h5>
-                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal"
+                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"
                                 aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -729,7 +729,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-success"
                                         onclick="return confirm('Are you sure you want to send this request?')">Save
                                         Changes</button>
@@ -747,7 +747,7 @@
                     <div class="modal-content modal-glass">
                         <div class="modal-header">
                             <h5 class="modal-title" id="viewModalLabel{{ $school->id }}">Payment Status</h5>
-                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal"
+                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"
                                 aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -789,14 +789,14 @@
                             </div>
                             <hr class="my-4">
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary" data-toggle="modal"
-                                    data-target="#updatePackage{{ $school->id }}">
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#updatePackage{{ $school->id }}">
                                     Change Package
                                 </button>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -809,7 +809,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="updatePackage{{ $school->id }}"> Change Subscription Package
                         </h5>
-                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -884,7 +884,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure?')">
                                     Subscribe </button>
                             </div>
@@ -901,7 +901,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="updatePackage{{ $school->id }}"> Change Subscription Package
                     </h5>
-                    <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -952,7 +952,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-success"
                                 onclick="return confirm('Are you sure you want to send this request?')">Save
                                 Changes</button>

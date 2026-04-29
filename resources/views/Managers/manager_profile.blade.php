@@ -431,14 +431,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userPhotoModalLabel">Profile Photo</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body text-center">
                     <h6 class="text-primary mb-3">{{strtoupper($user->first_name .' '. $user->last_name)}}</h6>
                     <img id="user-photo" src="" alt="User Photo" class="photo-modal img-fluid">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-close btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-close btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

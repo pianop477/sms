@@ -1,7 +1,6 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
@@ -478,8 +477,8 @@
             <a href="{{ route('roster.by.year') }}" class="btn btn-info-custom">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
-            <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target="#assignRosterModal">
-                <i class="fas fa-plus me-2"></i> Assign Duty Roster
+            <button type="button" class="btn btn-primary-custom" data-bs-toggle="modal"
+                data-bs-target="#assignRosterModal"></i> Add Roster
             </button>
         </div>
 
@@ -555,8 +554,8 @@
                                                     @if ($firstRoster->status == 'active')
                                                         <li>
                                                             <button type="button" class="btn btn-info-custom"
-                                                                data-toggle="modal"
-                                                                data-target="#rosterModal{{ $key }}">
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#rosterModal{{ $key }}">
                                                                 <i class="fas fa-eye me-1"></i> View
                                                             </button>
                                                         </li>
@@ -577,8 +576,8 @@
                                                     @if ($firstRoster->status == 'pending')
                                                         <li>
                                                             <button type="button" class="btn btn-info-custom"
-                                                                data-toggle="modal"
-                                                                data-target="#rosterModal{{ $key }}">
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#rosterModal{{ $key }}">
                                                                 <i class="fas fa-eye me-1"></i> View
                                                             </button>
                                                         </li>
@@ -612,8 +611,8 @@
                                                     @if ($firstRoster->status == 'completed')
                                                         <li>
                                                             <button type="button" class="btn btn-info-custom"
-                                                                data-toggle="modal"
-                                                                data-target="#rosterModal{{ $key }}">
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#rosterModal{{ $key }}">
                                                                 <i class="fas fa-eye me-1"></i> View
                                                             </button>
                                                         </li>
@@ -641,9 +640,6 @@
                     <h5 class="modal-title text-white">
                         <i class="fas fa-user-plus me-2"></i> Assign Teacher(s) Duty Roster
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{ route('tod.roster.store', ['year' => $year]) }}"
@@ -716,7 +712,9 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary-custom" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"> Close</span>
+                            </button>
                             <button class="btn btn-success-custom" id="saveButton" type="submit">
                                 <i class="fas fa-check me-2"></i> Assign Duty
                             </button>
@@ -741,7 +739,7 @@
                             <i class="fas fa-info-circle me-2"></i> Roster #{{ strtoupper($firstRoster->roster_id) }}
                             Details
                         </h5>
-                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -799,7 +797,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         @if ($firstRoster->status == 'pending')
                             <form action="{{ route('tod.roster.activate', ['id' => $firstRoster->id, 'year' => $year]) }}"
                                 class="d-inline" method="POST">

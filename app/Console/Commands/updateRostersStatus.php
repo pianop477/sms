@@ -427,9 +427,11 @@ class updateRostersStatus extends Command
                     'teachers.school_id',
                     'users.first_name',
                     'users.last_name',
-                    'users.phone'
+                    'users.phone',
+                    'teachers.status'
                 )
                 ->where('teachers.id', $roster->teacher_id)
+                ->where('teachers.status', 1)
                 ->first();
 
             if (!$teacher || empty($teacher->phone)) {

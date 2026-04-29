@@ -382,7 +382,7 @@
                                 </h4>
                             </div>
                             <div class="col-3 text-end">
-                                <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target=".packageModal">
+                                <button type="button" class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target=".packageModal">
                                     <i class="fas fa-upload me-1"></i> Upload Package
                                 </button>
                             </div>
@@ -510,7 +510,7 @@
                     <h5 class="modal-title">
                         <i class="fas fa-upload me-2"></i> Upload New Package
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -580,7 +580,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary-custom">Upload Package</button>
                         </div>
                     </form>
