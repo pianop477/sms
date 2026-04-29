@@ -436,12 +436,11 @@
                                 onclick="lockPayroll('{{ $batch['hash'] }}')">
                                 <i class="fas fa-lock mr-1"></i> Lock Batch
                             </button>
+                            <button type="button" class="btn btn-action btn-generate-slips"
+                                onclick="generateSlips('{{ $batch['hash'] }}')">
+                                <i class="fas fa-file-pdf mr-1"></i> Generate Slips
+                            </button>
                         @endif
-
-                        <button type="button" class="btn btn-action btn-generate-slips"
-                            onclick="generateSlips('{{ $batch['hash'] }}')">
-                            <i class="fas fa-file-pdf mr-1"></i> Generate Slips
-                        </button>
                         <a href="{{ route('payroll.download-slips', $batch['hash']) }}"
                             class="btn btn-action btn-download">
                             <i class="fas fa-download mr-1"></i> Download Slips
