@@ -1081,8 +1081,6 @@ class PayrollController extends Controller
         }
     }
 
-    // app/Http/Controllers/PayrollController.php
-
     /**
      * Recalculate payroll batch
      * POST /payroll/{hash}/recalculate
