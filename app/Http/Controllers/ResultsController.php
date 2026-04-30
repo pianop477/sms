@@ -19,6 +19,7 @@ use App\Models\temporary_results;
 use App\Models\User;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -461,7 +462,7 @@ class ResultsController extends Controller
         $qrPng = base64_encode($resultQr->getString());
 
         // Generate the PDF
-        $pdf = \PDF::loadView('Results.parent_results', compact(
+        $pdf = Pdf::loadView('Results.parent_results', compact(
             'results',
             'year',
             'qrPng',
@@ -1152,7 +1153,7 @@ class ResultsController extends Controller
         $firstTeacherCourses = $teachers->isNotEmpty() ? $teachers->first()['courses'] : [];
 
         // Generate the PDF
-        $pdf = \PDF::loadView('Results.results_by_month', compact(
+        $pdf = Pdf::loadView('Results.results_by_month', compact(
             'school',
             'year',
             'class',
@@ -2092,7 +2093,7 @@ class ResultsController extends Controller
         $qrPng = base64_encode($resultQr->getString());
 
         // Pass the calculated data to the view
-        $pdf = \PDF::loadView('Results.parent_results', compact(
+        $pdf = Pdf::loadView('Results.parent_results', compact(
             'results',
             'year',
             'date',
@@ -3574,7 +3575,7 @@ class ResultsController extends Controller
 
         $qrPng = base64_encode($result->getString());
 
-        $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
+        $pdf = Pdf::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
             'studentGeneralAverage',
@@ -4104,7 +4105,7 @@ class ResultsController extends Controller
         $classInfo = Grade::find($classId);
 
         // 11. GENERATE PDF
-        $pdf = \PDF::loadView('generated_reports.general_combine_report', compact(
+        $pdf = Pdf::loadView('generated_reports.general_combine_report', compact(
             'rankedStudents',
             'subjectCodes',
             'subjectPositions',
@@ -4404,7 +4405,7 @@ class ResultsController extends Controller
 
         $qrPng = base64_encode($result->getString());
 
-        $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
+        $pdf = Pdf::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
             'studentGeneralAverage',
