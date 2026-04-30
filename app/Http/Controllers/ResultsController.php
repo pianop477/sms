@@ -1523,8 +1523,7 @@ class ResultsController extends Controller
                             $message .= "Jumla ya Pointi: {$student['aggregate_points']}\n";
                             $message .= "Divisheni: {$student['division']}\n";
                             $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
-                            $message .= "Pakua ripoti hapa: {$url}\n";
-                            $message .= "Asante kwa kuchagua " . strtoupper($schools->school_name);
+                            $message .= "Pakua ripoti hapa: {$url}";
                         } else {
                             // Message for Standard Grades (Styles 1 & 2)
                             $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
@@ -1539,8 +1538,7 @@ class ResultsController extends Controller
                             $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
                             $message .= "Daraja: {$student['grade']}\n";
                             $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
-                            $message .= "Pakua ripoti hapa: {$url}\n";
-                            $message .= "Asante kwa kuchagua " . strtoupper($schools->school_name);
+                            $message .= "Pakua ripoti hapa: {$url}";
                         }
 
                         $message = $this->cleanSmsText($message);
@@ -2361,8 +2359,7 @@ class ResultsController extends Controller
                 } else {
                     $messageContent .= "\n";
                 }
-                $messageContent .= "Pakua ripoti hapa: {$url}\n";
-                $messageContent .= "Asante kwa kuchagua . {$schoolName}";
+                $messageContent .= "Pakua ripoti hapa: {$url}";
             } else {
                 $messageContent = "Habari, Matokeo ya " . strtoupper($fullName) . "\n";
                 $messageContent .= "Mtihani wa: " . strtoupper($examination) . "\n";
@@ -2382,8 +2379,7 @@ class ResultsController extends Controller
                 } else {
                     $messageContent .= "\n";
                 }
-                $messageContent .= "Pakua ripoti hapa: {$url}\n";
-                $messageContent .= "Asante kwa kuchagua " . $schoolName;
+                $messageContent .= "Pakua ripoti hapa: {$url}";
             }
 
             $messageContent = $this->cleanSmsText($messageContent);

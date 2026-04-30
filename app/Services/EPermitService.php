@@ -468,12 +468,13 @@ class EPermitService
             default => ucfirst($request->reason)
         };
 
-        $message = "Habari {$parent_info->user->first_name} ";
-        $message .= "Mtoto wako {$student->first_name} {$student->last_name} ";
-        $message .= "Amepewa kibali Na.{$request->permit_number} cha ruhusa kuanzia " . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y');
-        $message .= ". Ruhusa imeombwa na {$request->guardian_name}, Sababu ya ruhusa ni {$reasonText} ";
-        $message .= "Kibali kimetolewa na {$headTeacher->user->first_name} {$headTeacher->user->last_name[0]} ";
-        $message .= "Kama hutambui ombi hili tafadhali piga {$school->school_phone} /fika shuleni. Asante";
+        $message = "Habari ". strtoupper($parent_info->user->first_name)."\n";
+        $message .= "Mtoto wako ".strtoupper($student->first_name. ' ' .$student->last_name)."\n";
+        $message .= "Amepewa Ruhusa yenye Kibali Na.{$request->permit_number} \n";
+        $message .= "Inayoanza " . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y');
+        $message .= "Ruhusa imeombwa na ". strtoupper($request->guardian_name)."\n";
+        $message .= "Sababu ya Ruhusa ". strtoupper($reasonText)."\n";
+        $message .= "Kama hutambui ombi hili Tafadhali Piga {$school->school_phone}. Asante";
 
         $payload = [
             'from' => $school->sender_id ?? 'SHULE APP',
