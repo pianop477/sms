@@ -38,9 +38,7 @@ class EPermitController extends Controller
         return Teacher::with('user')->where('user_id', $user->id)->first();
     }
 
-    /**
-     * Display teacher dashboard
-     */
+    // Ongeza parameter ya year kwenye dashboard function
     public function dashboard(Request $request): View
     {
         $teacher = $this->getTeacher();
@@ -51,42 +49,91 @@ class EPermitController extends Controller
 
         // Only role_id 2 (Head), 3 (Academic), 4 (Class Teacher) can access
         if (!in_array($teacher->role_id, [2, 3, 4])) {
-            // abort(403, 'Unauthorized. You do not have permission to access e-Permit system.');
             return redirect()->to_route('error.page');
         }
 
-        // Get pending permits based on role
-        $pendingPermits = $this->getPendingPermits($teacher);
-        $historyPermits = $this->getHistoryPermits($teacher);
+        // Get selected year from request, default to current year
+        $selectedYear = $request->get('year', date('Y'));
+
+        // Get pending permits based on role and year
+        $pendingPermits = $this->getPendingPermits($teacher, $selectedYear);
+        $historyPermits = $this->getHistoryPermits($teacher, $selectedYear);
 
         // Get stats
-        $stats = $this->getDashboardStats($teacher);
+        $stats = $this->getDashboardStats($teacher, $selectedYear);
+
+        // Get available years for filter dropdown
+        $availableYears = $this->getAvailableYears($teacher);
 
         return view('teacher.e-permit.dashboard', [
             'pendingPermits' => $pendingPermits,
             'historyPermits' => $historyPermits,
             'stats' => $stats,
-            'teacher' => $teacher
+            'teacher' => $teacher,
+            'selectedYear' => $selectedYear,
+            'availableYears' => $availableYears
         ]);
     }
 
     /**
-     * Get pending permits based on teacher role
-     * ANY assigned class teacher, ANY academic teacher, ANY head teacher can see relevant permits
+     * Get available years for filter based on teacher role
      */
-    protected function getPendingPermits($teacher)
+    protected function getAvailableYears($teacher): array
+    {
+        $query = EPermit::query();
+
+        switch ($teacher->role_id) {
+            case 4: // Class Teacher - only permits where teacher is class teacher
+                $allPermits = EPermit::all();
+                $filtered = $allPermits->filter(function ($permit) use ($teacher) {
+                    return $this->ePermitService->isClassTeacher($permit->student, $teacher);
+                });
+                $years = $filtered->pluck('created_at')->map(function ($date) {
+                    return $date->year;
+                })->unique()->sortDesc()->values()->toArray();
+                break;
+
+            case 3: // Academic Teacher - all permits
+                $years = EPermit::selectRaw('DISTINCT YEAR(created_at) as year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
+                break;
+
+            case 2: // Head Teacher - all permits
+                $years = EPermit::selectRaw('DISTINCT YEAR(created_at) as year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
+                break;
+
+            default:
+                $years = [];
+        }
+
+        // If no years found, use current year
+        if (empty($years)) {
+            $years = [date('Y')];
+        }
+
+        return $years;
+    }
+
+    /**
+     * Get pending permits based on teacher role and year
+     */
+    protected function getPendingPermits($teacher, $year)
     {
         switch ($teacher->role_id) {
             case 4: // Class Teacher
-                // Get all pending_class_teacher permits
-                $allPending = EPermit::where('status', 'pending_class_teacher')->get();
+                $allPending = EPermit::where('status', 'pending_class_teacher')
+                    ->whereYear('created_at', $year)
+                    ->get();
 
-                // Filter to only those where this teacher is a class teacher for that student
                 $filtered = $allPending->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
                 });
 
-                // Paginate manually
                 $page = request()->get('page', 1);
                 $perPage = 15;
                 return new \Illuminate\Pagination\LengthAwarePaginator(
@@ -94,21 +141,25 @@ class EPermitController extends Controller
                     $filtered->count(),
                     $perPage,
                     $page,
-                    ['path' => request()->url()]
+                    ['path' => request()->url(), 'query' => ['year' => $year]]
                 );
 
             case 3: // Academic Teacher
-                // ANY academic teacher can see pending academic and duty teacher permits
                 return EPermit::where(function ($q) {
                     $q->where('status', 'pending_academic')
                         ->orWhere('status', 'pending_duty_teacher');
-                })->orderBy('created_at', 'desc')->paginate(15);
+                })
+                    ->whereYear('created_at', $year)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(15)
+                    ->appends(['year' => $year]);
 
             case 2: // Head Teacher
-                // ANY head teacher can see pending head permits
                 return EPermit::where('status', 'pending_head')
+                    ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15);
+                    ->paginate(15)
+                    ->appends(['year' => $year]);
 
             default:
                 return collect();
@@ -116,14 +167,15 @@ class EPermitController extends Controller
     }
 
     /**
-     * Get history permits based on teacher role
+     * Get history permits based on teacher role and year
      */
-    protected function getHistoryPermits($teacher)
+    protected function getHistoryPermits($teacher, $year)
     {
         switch ($teacher->role_id) {
             case 4: // Class Teacher
-                // Get all history permits where this teacher is a class teacher
-                $allHistory = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])->get();
+                $allHistory = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
+                    ->whereYear('created_at', $year)
+                    ->get();
 
                 $filtered = $allHistory->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
@@ -136,20 +188,22 @@ class EPermitController extends Controller
                     $filtered->count(),
                     $perPage,
                     $page,
-                    ['path' => request()->url()]
+                    ['path' => request()->url(), 'query' => ['year' => $year]]
                 );
 
             case 3: // Academic Teacher
-                // ANY academic teacher can see all history
                 return EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
+                    ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15);
+                    ->paginate(15)
+                    ->appends(['year' => $year]);
 
             case 2: // Head Teacher
-                // ANY head teacher can see all history
                 return EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
+                    ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15);
+                    ->paginate(15)
+                    ->appends(['year' => $year]);
 
             default:
                 return collect();
@@ -157,9 +211,9 @@ class EPermitController extends Controller
     }
 
     /**
-     * Get dashboard statistics
+     * Get dashboard statistics based on role and year
      */
-    protected function getDashboardStats($teacher): array
+    protected function getDashboardStats($teacher, $year): array
     {
         $stats = [
             'pending' => 0,
@@ -171,39 +225,63 @@ class EPermitController extends Controller
 
         switch ($teacher->role_id) {
             case 4: // Class Teacher
-                $allPending = EPermit::where('status', 'pending_class_teacher')->get();
+                $allPending = EPermit::where('status', 'pending_class_teacher')
+                    ->whereYear('created_at', $year)
+                    ->get();
                 $stats['pending'] = $allPending->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
                 })->count();
 
-                $allApproved = EPermit::where('status', 'approved')->get();
+                $allApproved = EPermit::where('status', 'approved')
+                    ->whereYear('created_at', $year)
+                    ->get();
                 $stats['approved'] = $allApproved->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
                 })->count();
 
-                $allRejected = EPermit::where('status', 'rejected')->get();
+                $allRejected = EPermit::where('status', 'rejected')
+                    ->whereYear('created_at', $year)
+                    ->get();
                 $stats['rejected'] = $allRejected->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
                 })->count();
 
-                $allCompleted = EPermit::where('status', 'completed')->get();
+                $allCompleted = EPermit::where('status', 'completed')
+                    ->whereYear('created_at', $year)
+                    ->get();
                 $stats['completed'] = $allCompleted->filter(function ($permit) use ($teacher) {
                     return $this->ePermitService->isClassTeacher($permit->student, $teacher);
                 })->count();
                 break;
 
             case 3: // Academic Teacher
-                $stats['pending'] = EPermit::whereIn('status', ['pending_academic', 'pending_duty_teacher'])->count();
-                $stats['approved'] = EPermit::where('status', 'approved')->count();
-                $stats['rejected'] = EPermit::where('status', 'rejected')->count();
-                $stats['completed'] = EPermit::where('status', 'completed')->count();
+                $stats['pending'] = EPermit::whereIn('status', ['pending_academic', 'pending_duty_teacher'])
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['approved'] = EPermit::where('status', 'approved')
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['rejected'] = EPermit::where('status', 'rejected')
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['completed'] = EPermit::where('status', 'completed')
+                    ->whereYear('created_at', $year)
+                    ->count();
                 break;
 
             case 2: // Head Teacher
-                $stats['pending'] = EPermit::where('status', 'pending_head')->count();
-                $stats['approved'] = EPermit::where('status', 'approved')->count();
-                $stats['rejected'] = EPermit::where('status', 'rejected')->count();
-                $stats['completed'] = EPermit::where('status', 'completed')->count();
+                $stats['pending'] = EPermit::where('status', 'pending_head')
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['approved'] = EPermit::where('status', 'approved')
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['rejected'] = EPermit::where('status', 'rejected')
+                    ->whereYear('created_at', $year)
+                    ->count();
+                $stats['completed'] = EPermit::where('status', 'completed')
+                    ->whereYear('created_at', $year)
+                    ->count();
                 break;
         }
 

@@ -41,6 +41,39 @@
             letter-spacing: 0.5px;
         }
 
+        /* Add to your existing styles */
+        #yearFilter {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #yearFilter:hover {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        #yearFilter:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+        }
+
+        .filter-section {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .filter-section:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
         .stat-number {
             font-size: 1.8rem;
             font-weight: 700;
@@ -312,6 +345,32 @@
                                 au mwalimu wa zamu hayupo. Pia una access ya kuripoti.
                             </div>
                         @endif
+                        {{-- Baada ya stats cards, ongeza hii year filter section --}}
+                        <div class="filter-section mb-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold mb-1">
+                                        <i class="fas fa-calendar-alt me-1"></i> Filter by Year
+                                    </label>
+                                    <select id="yearFilter" class="form-select form-select-sm"
+                                        onchange="filterByYear(this.value)">
+                                        @foreach ($availableYears as $year)
+                                            <option value="{{ $year }}"
+                                                {{ $selectedYear == $year ? 'selected' : '' }}>
+                                                {{ $year }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="alert alert-info mb-0 py-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <small>Showing permit requests for year:
+                                            <strong>{{ $selectedYear }}</strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Role-based Navigation Tabs - ALL as buttons -->
                         <ul class="nav nav-pills nav-pills-custom mb-4 flex-wrap" id="ePermitTab" role="tablist">
@@ -369,7 +428,8 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label fw-bold small">Date To</label>
-                                            <input type="date" id="dateToPending" class="form-control form-control-sm">
+                                            <input type="date" id="dateToPending"
+                                                class="form-control form-control-sm">
                                         </div>
                                         <div class="col-md-2">
                                             <button id="resetPendingFilters" class="btn btn-secondary btn-sm w-100">
@@ -1274,6 +1334,87 @@
         // Load reports when reports tab is shown
         $('#ePermitTab button[data-bs-target="#reports"]').on('shown.bs.tab', function() {
             loadReports();
+        });
+
+        // Year filter function - real-time update
+        function filterByYear(year) {
+            // Show loading indicator
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Fetching data for year ' + year,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Get current URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentUrl = window.location.pathname;
+
+            // Update year parameter
+            urlParams.set('year', year);
+
+            // Redirect to new URL with year filter
+            window.location.href = currentUrl + '?' + urlParams.toString();
+        }
+
+        // Alternative: AJAX-based real-time update without page reload (if you prefer)
+        function filterByYearAjax(year) {
+            // Show loading
+            $('#pending').html(
+                '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
+                );
+            $('#history').html(
+                '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
+                );
+
+            // Update stats via AJAX
+            $.ajax({
+                url: '{{ url('teacher/e-permit/dashboard/stats') }}',
+                type: 'GET',
+                data: {
+                    year: year
+                },
+                success: function(response) {
+                    // Update stats cards
+                    $('.stat-card.pending .stat-number').text(response.stats.pending);
+                    $('.stat-card.approved .stat-number').text(response.stats.approved);
+                    $('.stat-card.rejected .stat-number').text(response.stats.rejected);
+                    $('.stat-card.completed .stat-number').text(response.stats.completed);
+
+                    // Update pending permits table
+                    $('#pending').html(response.pendingHtml);
+
+                    // Update history table
+                    $('#history').html(response.historyHtml);
+
+                    // Update URL without reload
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('year', year);
+                    window.history.pushState({}, '', url);
+
+                    Swal.close();
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to load data for year ' + year, 'error');
+                }
+            });
+        }
+
+        // Optional: Add event listener for when tabs are shown to refresh data with current year
+        document.addEventListener('DOMContentLoaded', function() {
+            // When pending tab is shown
+            $('#ePermitTab button[data-bs-target="#pending"]').on('shown.bs.tab', function() {
+                const currentYear = document.getElementById('yearFilter').value;
+                // Optional: refresh pending data with current year
+            });
+
+            // When history tab is shown
+            $('#ePermitTab button[data-bs-target="#history"]').on('shown.bs.tab', function() {
+                const currentYear = document.getElementById('yearFilter').value;
+                // Optional: refresh history data with current year
+            });
         });
     </script>
 @endsection

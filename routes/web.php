@@ -763,7 +763,12 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         // Print Gatepass
         Route::get('/print/{id}', [TeacherEPermitController::class, 'printGatepass'])->name('print');
+        // Route for year filter - hii itasaidia kushughulikia year changes kwa real-time
+        Route::get('/dashboard/filter/{year}', [TeacherEPermitController::class, 'dashboard'])
+            ->name('teacher.e-permit.dashboard.filter')
+            ->where('year', '[0-9]{4}');
     });
+
 
     // end of auth
 });
@@ -846,7 +851,7 @@ Route::get('/verify-slip/{token}', [SalarySlipVerificationController::class, 've
     ->name('verify-slip');
 
 // Optional: Route for scanner page (if user manually goes to /verify-slip)
-Route::get('/verify-slip', function() {
+Route::get('/verify-slip', function () {
     return redirect()->route('scan.qr');
 });
 
