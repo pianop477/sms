@@ -23,20 +23,23 @@ class HeslbController extends Controller
     /**
      * Display HESLB deductions list
      */
+    // HeslbDeductionController.php
     public function index(Request $request)
     {
         $schoolId = Auth::user()->school_id;
+        $selectedYear = $request->get('year', date('Y'));
 
         try {
             $response = Http::withToken(session('finance_api_token'))
                 ->timeout(30)
                 ->get($this->apiBaseUrl . '/heslb/deductions', [
-                    'school_id' => $schoolId
+                    'school_id' => $schoolId,
+                    'year' => $selectedYear
                 ]);
 
             $deductionsData = $response->successful() ? $response->json()['data'] : [];
+            $availableYears = $deductionsData['available_years'] ?? [date('Y')];
 
-            // ✅ Enrich deductions with employee details using trait
             $deductions = [
                 'active' => [],
                 'inactive' => []
@@ -44,7 +47,6 @@ class HeslbController extends Controller
 
             // Process active deductions
             foreach ($deductionsData['active'] ?? [] as $deduction) {
-                // Get employee details using staff_id
                 $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
 
                 $deductions['active'][] = [
@@ -80,19 +82,98 @@ class HeslbController extends Controller
                     'created_by' => $deduction['created_by']
                 ];
             }
-
-            // Log for debugging
-            // Log::info('HESLB Deductions processed', [
-            //     'active_count' => count($deductions['active']),
-            //     'inactive_count' => count($deductions['inactive'])
-            // ]);
-
         } catch (\Exception $e) {
             $deductions = ['active' => [], 'inactive' => []];
-            // Log::error('Failed to fetch HESLB deductions', ['error' => $e->getMessage()]);
+            $availableYears = [date('Y')];
+            Log::error('Failed to fetch HESLB deductions', ['error' => $e->getMessage()]);
         }
 
-        return view('heslb.index', compact('deductions'));
+        return view('heslb.index', compact('deductions', 'availableYears', 'selectedYear'));
+    }
+
+    /**
+     * Filter HESLB deductions by year (AJAX endpoint)
+     */
+    public function filterByYear(Request $request)
+    {
+        $schoolId = Auth::user()->school_id;
+        $year = $request->get('year', date('Y'));
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(30)
+                ->get($this->apiBaseUrl . '/heslb/deductions', [
+                    'school_id' => $schoolId,
+                    'year' => $year
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch data from API'
+                ], 500);
+            }
+
+            $deductionsData = $response->json()['data'] ?? [];
+
+            // Process active deductions
+            $active = [];
+            foreach ($deductionsData['active'] ?? [] as $deduction) {
+                $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
+                $active[] = [
+                    'id' => $deduction['id'],
+                    'staff_id' => $deduction['staff_id'],
+                    'employee_name' => ($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? ''),
+                    'staff_type' => $staffDetails['staff_type'] ?? $deduction['staff_type'],
+                    'loan_number' => $deduction['loan_number'],
+                    'monthly_amount' => $deduction['monthly_amount'],
+                    'start_date' => $deduction['start_date'],
+                    'end_date' => $deduction['end_date'],
+                    'is_active' => $deduction['is_active'],
+                    'created_at' => $deduction['created_at'],
+                    'created_by' => $deduction['created_by']
+                ];
+            }
+
+            // Process inactive deductions
+            $inactive = [];
+            foreach ($deductionsData['inactive'] ?? [] as $deduction) {
+                $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
+                $inactive[] = [
+                    'id' => $deduction['id'],
+                    'staff_id' => $deduction['staff_id'],
+                    'employee_name' => ($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? ''),
+                    'staff_type' => $staffDetails['staff_type'] ?? $deduction['staff_type'],
+                    'loan_number' => $deduction['loan_number'],
+                    'monthly_amount' => $deduction['monthly_amount'],
+                    'start_date' => $deduction['start_date'],
+                    'end_date' => $deduction['end_date'],
+                    'is_active' => $deduction['is_active'],
+                    'created_at' => $deduction['created_at'],
+                    'created_by' => $deduction['created_by']
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'active' => $active,
+                    'inactive' => $inactive,
+                    'active_count' => count($active),
+                    'inactive_count' => count($inactive)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('HESLB filter by year failed', [
+                'error' => $e->getMessage(),
+                'year' => $year
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -139,12 +220,11 @@ class HeslbController extends Controller
             if (!$response->successful()) {
                 $errorMsg = $response->json()['message'] ?? 'Failed to add HESLB deduction';
                 Alert()->toast($errorMsg, 'error')->withInput();
-                return back()->with('error', );
+                return back()->with('error',);
             }
 
             Alert()->toast('HESLB deduction added successfully', 'success');
             return redirect()->route('heslb.index');
-
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error')->withInput();
             return back();
@@ -167,7 +247,6 @@ class HeslbController extends Controller
             }
 
             return back();
-
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
@@ -197,7 +276,6 @@ class HeslbController extends Controller
 
             Alert()->toast('Monthly amount updated successfully', 'success');
             return back();
-
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();

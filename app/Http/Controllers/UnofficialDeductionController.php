@@ -21,21 +21,25 @@ class UnofficialDeductionController extends Controller
         $this->apiBaseUrl = config('app.finance_api_base_url', 'http://localhost:8000/api/v1.0');
     }
 
+    // FinanceDeductionController.php - Ongeza method hizi
     public function index(Request $request)
     {
         $schoolId = Auth::user()->school_id;
         $token = session('finance_api_token');
+        $selectedYear = $request->get('year', date('Y'));
+        $viewType = $request->get('view', 'full'); // For AJAX partial loads
 
         try {
             $response = Http::withToken($token)
                 ->timeout(30)
                 ->get($this->apiBaseUrl . '/deductions/unofficial', [
-                    'school_id' => $schoolId
+                    'school_id' => $schoolId,
+                    'year' => $selectedYear
                 ]);
 
             $deductionsData = $response->successful() ? $response->json()['data'] : [];
+            $availableYears = $deductionsData['available_years'] ?? [date('Y')];
 
-            // Enrich deductions with employee details using trait
             $deductions = [
                 'pending' => [],
                 'history' => []
@@ -43,14 +47,13 @@ class UnofficialDeductionController extends Controller
 
             // Process pending deductions
             foreach ($deductionsData['pending'] ?? [] as $deduction) {
-                // Get employee details using staff_id
                 $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
 
                 $deductions['pending'][] = [
                     'id' => $deduction['id'],
                     'staff_id' => $deduction['staff_id'],
                     'employee_name' => ($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? ''),
-                    'staff_type' => $staffDetails['staff_type'] ?? $deduction['staff_type'],
+                    'staff_type' => $staffDetails['staff_type'] ?? $deduction['staff_type'] ?? 'N/A',
                     'deduction_type' => $deduction['deduction_type'],
                     'description' => $deduction['description'],
                     'amount' => $deduction['amount'],
@@ -63,7 +66,7 @@ class UnofficialDeductionController extends Controller
                 ];
             }
 
-            // Process history deductions (already deducted)
+            // Process history deductions
             foreach ($deductionsData['history'] ?? [] as $deduction) {
                 $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
 
@@ -80,20 +83,129 @@ class UnofficialDeductionController extends Controller
                 ];
             }
 
-            // Log for debugging
-            // Log::info('Unofficial Deductions processed', [
-            //     'pending_count' => count($deductions['pending']),
-            //     'history_count' => count($deductions['history'])
-            // ]);
+            // If AJAX request, return JSON
+            if ($request->ajax() || $viewType === 'ajax') {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'pending' => $deductions['pending'],
+                        'history' => $deductions['history'],
+                        'available_years' => $availableYears,
+                        'selected_year' => $selectedYear,
+                        'pending_count' => count($deductions['pending']),
+                        'history_count' => count($deductions['history'])
+                    ]
+                ]);
+            }
         } catch (\Exception $e) {
             Log::error('Failed to fetch unofficial deductions', [
                 'error' => $e->getMessage()
             ]);
             $deductions = ['pending' => [], 'history' => []];
+            $availableYears = [date('Y')];
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not connect to finance system'
+                ], 500);
+            }
+
             session()->flash('error', 'Could not connect to finance system');
         }
 
-        return view('staff-loans.index', compact('deductions'));
+        return view('staff-loans.index', compact('deductions', 'availableYears', 'selectedYear'));
+    }
+
+    /**
+     * Filter deductions by year (AJAX endpoint)
+     */
+    // FinanceDeductionController.php
+    /**
+     * Filter deductions by year (AJAX endpoint - Frontend)
+     */
+    public function filterByYear(Request $request)
+    {
+        $schoolId = Auth::user()->school_id;
+        $token = session('finance_api_token');
+        $year = $request->get('year', date('Y'));
+
+        try {
+            // CALL THE API WITH TOKEN
+            $response = Http::withToken($token)
+                ->timeout(30)
+                ->get($this->apiBaseUrl . '/deductions/unofficial', [
+                    'school_id' => $schoolId,
+                    'year' => $year
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch data from API'
+                ], 500);
+            }
+
+            $deductionsData = $response->json()['data'] ?? [];
+
+            // Process pending deductions
+            $pending = [];
+            foreach ($deductionsData['pending'] ?? [] as $deduction) {
+                $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
+                $pending[] = [
+                    'id' => $deduction['id'],
+                    'staff_id' => $deduction['staff_id'],
+                    'employee_name' => ($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? ''),
+                    'staff_type' => $staffDetails['staff_type'] ?? 'N/A',
+                    'deduction_type' => $deduction['deduction_type'],
+                    'description' => $deduction['description'],
+                    'amount' => $deduction['amount'],
+                    'is_recurring' => $deduction['is_recurring'],
+                    'recurring_months' => $deduction['recurring_months'],
+                    'remaining_months' => $deduction['remaining_months'],
+                    'reference_number' => $deduction['reference_number'],
+                    'created_at' => $deduction['created_at'],
+                    'created_by' => $deduction['created_by']
+                ];
+            }
+
+            // Process history deductions
+            $history = [];
+            foreach ($deductionsData['history'] ?? [] as $deduction) {
+                $staffDetails = $this->resolveApplicantDetails($deduction['staff_id'], $schoolId);
+                $history[] = [
+                    'id' => $deduction['id'],
+                    'staff_id' => $deduction['staff_id'],
+                    'employee_name' => ($staffDetails['first_name'] ?? '') . ' ' . ($staffDetails['last_name'] ?? ''),
+                    'staff_type' => $staffDetails['staff_type'] ?? 'N/A',
+                    'deduction_type' => $deduction['deduction_type'],
+                    'description' => $deduction['description'],
+                    'amount' => $deduction['amount'],
+                    'deducted_at' => $deduction['deducted_at'],
+                    'payroll_month' => $deduction['payroll_month']
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'pending' => $pending,
+                    'history' => $history,
+                    'pending_count' => count($pending),
+                    'history_count' => count($history)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Filter by year failed', [
+                'error' => $e->getMessage(),
+                'year' => $year
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

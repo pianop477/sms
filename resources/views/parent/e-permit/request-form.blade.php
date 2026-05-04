@@ -786,7 +786,7 @@
                             html: `
                                 <p>${data.message}</p>
                                 <p><strong>Namba ya Ombi:</strong> ${data.permit_number}</p>
-                                <p>Utapata taarifa mara ombi litakapothibitishwa.</p>
+                                <p>Utapata taarifa kwa SMS mara ombi litakapothibitishwa.</p>
                             `,
                             confirmButtonColor: '#22c55e',
                             confirmButtonText: 'Sawa'

@@ -207,7 +207,7 @@ class EPermitController extends Controller
         $this->sendNotificationsToClassTeachers($allClassTeachers, $ePermit);
 
         // Update message to inform parent that ANY class teacher can handle
-        $message = 'Ombi lako limewasilishwa kwa kikamilifu. Mwalumu wa darasa atalifanyia kazi.';
+        $message = 'Ombi lako limewasilishwa kikamilifu';
 
         return response()->json([
             'success' => true,
@@ -224,7 +224,7 @@ class EPermitController extends Controller
         foreach ($classTeachers as $classTeacher) {
             // Database notification
 
-            $this->notifyClassTeacherBySms($classTeacher, $ePermit);
+            // $this->notifyClassTeacherBySms($classTeacher, $ePermit);
         }
     }
 

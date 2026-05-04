@@ -75,14 +75,32 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header text-white">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 class="mb-0">
                                 <i class="fas fa-hand-holding-usd me-2"></i> Staff Loans & Advances
                             </h5>
-                            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
-                                data-bs-target="#addLoanModal">
-                                <i class="fas fa-plus me-1"></i> Add Loan/Advance
-                            </button>
+                            <div class="d-flex gap-2 mt-2 mt-sm-0">
+                                {{-- Year Filter Dropdown --}}
+                                <div class="d-flex align-items-center">
+                                    <label class="me-2 text-white mb-0" style="font-size: 14px;">
+                                        <i class="fas fa-calendar-alt me-1"></i> Year:
+                                    </label>
+                                    <select id="yearFilter" class="form-select form-select-sm bg-white"
+                                        style="width: auto;">
+                                        @foreach ($availableYears ?? [date('Y')] as $year)
+                                            <option value="{{ $year }}"
+                                                {{ ($selectedYear ?? date('Y')) == $year ? 'selected' : '' }}>
+                                                {{ $year }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
+                                    data-bs-target="#addLoanModal">
+                                    <i class="fas fa-plus me-1"></i> Add Loan/Advance
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -90,87 +108,13 @@
                         {{-- Pending Deductions Table --}}
                         <h6 class="mb-3">
                             <i class="fas fa-clock me-1 text-warning"></i> Pending Deductions
-                            <span class="badge bg-secondary ms-2">{{ count($deductions['pending']) }}</span>
+                            <span class="badge bg-secondary ms-2"
+                                id="pendingCount">{{ count($deductions['pending'] ?? []) }}</span>
                         </h6>
                         <div class="table-responsive">
                             <table class="table table-deductions table-bordered" id="pendingTable">
                                 <thead>
-                                    <th>#</th>
-                                    <th>Staff ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Staff Type</th>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Amount (TZS)</th>
-                                    <th>Duration</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </thead>
-                                <tbody>
-                                    @forelse($deductions['pending'] as $index => $deduction)
-                                        <tr>
-                                            <td class="text-center">{{ $index + 1 }}</td>
-                                            <td><strong>{{ strtoupper($deduction['staff_id']) }}</strong></td>
-                                            <td>{{ ucwords(strtolower($deduction['employee_name'])) }}</td>
-                                            <td>{{ $deduction['staff_type'] }}</td>
-                                            <td>
-                                                <span class="deduction-type type-{{ $deduction['deduction_type'] }}">
-                                                    <i
-                                                        class="fas
-                                                @if ($deduction['deduction_type'] == 'loan') fa-hand-holding-usd
-                                                @elseif($deduction['deduction_type'] == 'advance') fa-money-bill-wave
-                                                @elseif($deduction['deduction_type'] == 'penalty') fa-gavel
-                                                @elseif($deduction['deduction_type'] == 'fine') fa-exclamation-triangle
-                                                @else fa-tag @endif me-1"></i>
-                                                    {{ ucfirst($deduction['deduction_type']) }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $deduction['description'] }}</td>
-                                            <td class="text-end fw-bold">{{ number_format($deduction['amount'], 0) }}</td>
-                                            <td class="text-center">
-                                                @if ($deduction['is_recurring'])
-                                                    <span class="badge bg-info">
-                                                        <i class="fas fa-sync-alt me-1"></i>
-                                                        {{ $deduction['remaining_months'] }}/{{ $deduction['recurring_months'] }}
-                                                        months
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-secondary">One-time</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ \Carbon\Carbon::parse($deduction['created_at'])->format('d/m/Y') }}</td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="btn btn-xs btn-warning" style="border-radius: 12px"
-                                                        onclick="editDeduction({{ $deduction['id'] }})">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </button>
-                                                    <button class="btn btn-xs btn-danger" style="border-radius: 12px"
-                                                        onclick="cancelDeduction({{ $deduction['id'] }})">
-                                                        <i class="fas fa-trash"></i> Cancel
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="11" class="text-center text-muted py-4">
-                                                <i class="fas fa-check-circle me-1"></i> No pending deductions
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {{-- History/Deducted Table --}}
-                        @if (count($deductions['history']) > 0)
-                            <h6 class="mb-3 mt-4">
-                                <i class="fas fa-history me-1 text-muted"></i> Deduction History
-                            </h6>
-                            <div class="table-responsive">
-                                <table class="table table-deductions table-bordered" id="historyTable">
-                                    <thead>
+                                    <tr>
                                         <th>#</th>
                                         <th>Staff ID</th>
                                         <th>Employee Name</th>
@@ -178,30 +122,50 @@
                                         <th>Type</th>
                                         <th>Description</th>
                                         <th class="text-end">Amount (TZS)</th>
-                                        <th>Deducted On</th>
-                                        <th>Payroll Month</th>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($deductions['history'] as $index => $deduction)
+                                        <th>Duration</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTableBody">
+                                    @include('staff-loans.partials.pending_rows', [
+                                        'deductions' => $deductions['pending'] ?? [],
+                                    ])
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- History/Deducted Table --}}
+                        @if (count($deductions['history']) > 0)
+                            {{-- History/Deducted Table --}}
+                            <div id="historySection" @if (count($deductions['history'] ?? []) == 0) style="display: none;" @endif>
+                                <h6 class="mb-3 mt-4">
+                                    <i class="fas fa-history me-1 text-muted"></i> Deduction History
+                                    <span class="badge bg-secondary ms-2"
+                                        id="historyCount">{{ count($deductions['history'] ?? []) }}</span>
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-deductions table-bordered" id="historyTable">
+                                        <thead>
                                             <tr>
-                                                <td class="text-center">{{ $index + 1 }}</td>
-                                                <td><strong>{{ strtoupper($deduction['staff_id']) }}</strong></td>
-                                                <td>{{ ucwords(strtolower($deduction['employee_name'])) }}</td>
-                                                <td>{{ $deduction['staff_type'] }}</td>
-                                                <td>
-                                                    <span class="deduction-type type-{{ $deduction['deduction_type'] }}">
-                                                        {{ ucfirst($deduction['deduction_type']) }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ $deduction['description'] }}</td>
-                                                <td class="text-end">{{ number_format($deduction['amount'], 0) }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($deduction['deducted_at'])->format('d/m/Y') }}
-                                                </td>
-                                                <td>{{ $deduction['payroll_month'] }}</td>
+                                                <th>#</th>
+                                                <th>Staff ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Staff Type</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                <th class="text-end">Amount (TZS)</th>
+                                                <th>Deducted On</th>
+                                                <th>Payroll Month</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody id="historyTableBody">
+                                            @include('staff-loans.partials.history_rows', [
+                                                'deductions' => $deductions['history'] ?? [],
+                                            ])
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -286,9 +250,8 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Amount (TZS) <span class="text-danger">*</span></label>
                                 <input type="number" name="amount" id="amountInput"
-                                    class="form-control @error('amount') is-invalid @enderror"
-                                    value="{{ old('amount') }}" required min="1000" step="1000"
-                                    placeholder="500000">
+                                    class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}"
+                                    required min="1000" step="1000" placeholder="500000">
                                 @error('amount')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -494,7 +457,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     {{-- 2. SECOND: Bootstrap JS (depends on jQuery) --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     {{-- 3. THIRD: DataTables CSS --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
@@ -612,17 +575,25 @@
                 });
         }
 
-        // ==================== DOCUMENT READY ====================
-        $(document).ready(function() {
-            console.log('Document ready');
+        // ==================== DATATABLES INITIALIZATION ====================
+        let pendingDataTable = null;
+        let historyDataTable = null;
 
-            function initializeDataTable(tableId, options = {}) {
-                const table = $(tableId);
-                if (!table.length) return false;
-                if (table.find('tbody tr').length === 0) return false;
-                if ($.fn.DataTable.isDataTable(tableId)) $(tableId).DataTable().destroy();
+        function destroyDataTables() {
+            if ($.fn.DataTable.isDataTable('#pendingTable')) {
+                $('#pendingTable').DataTable().destroy();
+            }
+            if ($.fn.DataTable.isDataTable('#historyTable')) {
+                $('#historyTable').DataTable().destroy();
+            }
+        }
 
-                const defaultOptions = {
+        function initializeDataTables() {
+            destroyDataTables();
+
+            // Initialize Pending Table
+            if ($('#pendingTable tbody tr').length > 0) {
+                pendingDataTable = $('#pendingTable').DataTable({
                     pageLength: 10,
                     lengthMenu: [
                         [5, 10, 25, 50, -1],
@@ -638,37 +609,189 @@
                         }
                     },
                     responsive: true,
-                    autoWidth: false
-                };
-
-                try {
-                    $(tableId).DataTable($.extend({}, defaultOptions, options));
-                    return true;
-                } catch (error) {
-                    console.error('Error initializing', tableId, error);
-                    return false;
-                }
+                    autoWidth: false,
+                    order: [
+                        [0, 'asc']
+                    ],
+                    columnDefs: [{
+                        orderable: false,
+                        targets: [9]
+                    }]
+                });
             }
 
-            initializeDataTable('#pendingTable', {
-                order: [
-                    [0, 'asc']
-                ],
-                columnDefs: [{
-                    orderable: false,
-                    targets: [9]
-                }]
-            });
-
-            if ($('#historyTable').length && $('#historyTable tbody tr').length > 0) {
-                initializeDataTable('#historyTable', {
+            // Initialize History Table
+            if ($('#historyTable tbody tr').length > 0) {
+                historyDataTable = $('#historyTable').DataTable({
+                    pageLength: 10,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
+                    language: {
+                        search: "🔍 Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        paginate: {
+                            previous: "← Previous",
+                            next: "Next →"
+                        }
+                    },
+                    responsive: true,
+                    autoWidth: false,
                     order: [
                         [0, 'desc']
                     ]
                 });
             }
+        }
 
-            // ==================== EDIT FORM SUBMISSION (NO PRELOADER) ====================
+        // Function to update tables based on selected year
+        function filterByYear(year) {
+            if (!year) return;
+
+            // Show loading state
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Fetching data for year ' + year,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '{{ route('deductions.unofficial.filter') }}?year=' + year,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
+
+                        // Update pending table body
+                        if (data.pending && data.pending.length > 0) {
+                            let pendingHtml = '';
+                            data.pending.forEach((deduction, index) => {
+                                pendingHtml += `
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td><strong>${deduction.staff_id.toUpperCase()}</strong></td>
+                                <td>${deduction.employee_name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}</td>
+                                <td>${deduction.staff_type}</td>
+                                <td>
+                                    <span class="deduction-type type-${deduction.deduction_type}">
+                                        <i class="fas ${deduction.deduction_type == 'loan' ? 'fa-hand-holding-usd' : (deduction.deduction_type == 'advance' ? 'fa-money-bill-wave' : (deduction.deduction_type == 'penalty' ? 'fa-gavel' : (deduction.deduction_type == 'fine' ? 'fa-exclamation-triangle' : 'fa-tag')))} me-1"></i>
+                                        ${deduction.deduction_type.charAt(0).toUpperCase() + deduction.deduction_type.slice(1)}
+                                    </span>
+                                </td>
+                                <td>${deduction.description}</td>
+                                <td class="text-end fw-bold">${parseInt(deduction.amount).toLocaleString()}</td>
+                                <td class="text-center">
+                                    ${deduction.is_recurring ?
+                                        `<span class="badge bg-info"><i class="fas fa-sync-alt me-1"></i> ${deduction.remaining_months}/${deduction.recurring_months} months</span>` :
+                                        `<span class="badge bg-secondary">One-time</span>`}
+                                </td>
+                                <td>${new Date(deduction.created_at).toLocaleDateString('en-GB')}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-xs btn-warning" style="border-radius: 12px" onclick="editDeduction(${deduction.id})">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-xs btn-danger" style="border-radius: 12px" onclick="cancelDeduction(${deduction.id})">
+                                            <i class="fas fa-trash"></i> Cancel
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            });
+                            $('#pendingTableBody').html(pendingHtml);
+                            $('#pendingCount').text(data.pending.length);
+                        } else {
+                            $('#pendingTableBody').html(`
+                            <tr>
+                                <td colspan="11" class="text-center text-muted py-4">
+                                    <i class="fas fa-check-circle me-1"></i> No pending deductions for this year
+                                </td>
+                            </tr>
+                        `);
+                            $('#pendingCount').text('0');
+                        }
+
+                        // Update history table body
+                        if (data.history && data.history.length > 0) {
+                            let historyHtml = '';
+                            data.history.forEach((deduction, index) => {
+                                historyHtml += `
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td><strong>${deduction.staff_id.toUpperCase()}</strong></td>
+                                <td>${deduction.employee_name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}</td>
+                                <td>${deduction.staff_type}</td>
+                                <td>
+                                    <span class="deduction-type type-${deduction.deduction_type}">
+                                        ${deduction.deduction_type.charAt(0).toUpperCase() + deduction.deduction_type.slice(1)}
+                                    </span>
+                                </td>
+                                <td>${deduction.description}</td>
+                                <td class="text-end">${parseInt(deduction.amount).toLocaleString()}</td>
+                                <td>${new Date(deduction.deducted_at).toLocaleDateString('en-GB')}</td>
+                                <td>${deduction.payroll_month}</td>
+                            </tr>`;
+                            });
+                            $('#historyTableBody').html(historyHtml);
+                            $('#historyCount').text(data.history.length);
+                            $('#historySection').show();
+                        } else {
+                            $('#historyTableBody').html(`
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fas fa-history me-1"></i> No deduction history for this year
+                                </td>
+                            </tr>
+                        `);
+                            $('#historyCount').text('0');
+                            $('#historySection').show();
+                        }
+
+                        // Reinitialize DataTables after updating content
+                        initializeDataTables();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated!',
+                            text: `Showing data for year ${year}`,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to load data', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX Error:', xhr);
+                    Swal.close();
+                    Swal.fire('Error', 'Failed to fetch data. Please try again.', 'error');
+                }
+            });
+        }
+
+        // ==================== DOCUMENT READY - SINGLE ENTRY POINT ====================
+        $(document).ready(function() {
+            console.log('Document ready - Initializing...');
+
+            // Initialize DataTables
+            initializeDataTables();
+
+            // Year filter change event
+            $('#yearFilter').on('change', function() {
+                const year = $(this).val();
+                filterByYear(year);
+            });
+
+            // ==================== EDIT FORM SUBMISSION ====================
             $('#editDeductionForm').on('submit', function(e) {
                 e.preventDefault();
 
@@ -873,5 +996,4 @@
             });
         @endif
     </script>
-
 @endsection

@@ -54,14 +54,32 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header text-white">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 class="mb-0">
                                 <i class="fas fa-graduation-cap me-2"></i> HESLB Loan Deductions
                             </h5>
-                            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
-                                data-bs-target="#addHeslbModal">
-                                <i class="fas fa-plus me-1"></i> Add Beneficiary
-                            </button>
+                            <div class="d-flex gap-2 mt-2 mt-sm-0">
+                                {{-- Year Filter Dropdown --}}
+                                <div class="d-flex align-items-center">
+                                    <label class="me-2 text-white mb-0" style="font-size: 14px;">
+                                        <i class="fas fa-calendar-alt me-1"></i>Year:
+                                    </label>
+                                    <select id="yearFilter" class="form-select form-select-sm bg-white"
+                                        style="width: auto;">
+                                        @foreach ($availableYears ?? [date('Y')] as $year)
+                                            <option value="{{ $year }}"
+                                                {{ ($selectedYear ?? date('Y')) == $year ? 'selected' : '' }}>
+                                                {{ $year }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
+                                    data-bs-target="#addHeslbModal">
+                                    <i class="fas fa-plus me-1"></i> Add Beneficiary
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -94,7 +112,8 @@
                                             <td>{{ strtoupper($deduction['loan_number'] ?? 'N/A') }}</td>
                                             <td class="text-end">{{ number_format($deduction['monthly_amount'], 0) }}</td>
                                             <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}</td>
-                                            <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'Ongoing' }}</td>
+                                            <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'Ongoing' }}
+                                            </td>
                                             <td class="text-center"><span class="status-active">Active</span></td>
                                             <td class="text-center">
                                                 <div class="action-buttons">
@@ -121,7 +140,7 @@
                         </div>
 
                         {{-- Inactive Deductions Table --}}
-                        @if(count($deductions['inactive'] ?? []) > 0)
+                        @if (count($deductions['inactive'] ?? []) > 0)
                             <h6 class="mb-3 mt-4">Inactive/Stopped Deductions</h6>
                             <div class="table-responsive">
                                 <table class="table table-heslb table-bordered" id="inactiveTable" width="100%">
@@ -139,16 +158,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($deductions['inactive'] ?? [] as $index => $deduction)
+                                        @foreach ($deductions['inactive'] ?? [] as $index => $deduction)
                                             <tr>
                                                 <td class="text-center">{{ $index + 1 }}</td>
                                                 <td><strong>{{ strtoupper($deduction['staff_id']) }}</strong></td>
                                                 <td>{{ ucwords(strtolower($deduction['employee_name'])) }}</td>
                                                 <td>{{ ucwords(strtolower($deduction['staff_type'])) }}</td>
                                                 <td>{{ $deduction['loan_number'] ?? 'N/A' }}</td>
-                                                <td class="text-end">{{ number_format($deduction['monthly_amount'], 0) }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}</td>
-                                                <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'N/A' }}</td>
+                                                <td class="text-end">{{ number_format($deduction['monthly_amount'], 0) }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($deduction['start_date'])->format('d/m/Y') }}
+                                                </td>
+                                                <td>{{ $deduction['end_date'] ? \Carbon\Carbon::parse($deduction['end_date'])->format('d/m/Y') : 'N/A' }}
+                                                </td>
                                                 <td class="text-center"><span class="status-stopped">Stopped</span></td>
                                             </tr>
                                         @endforeach
@@ -196,7 +218,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monthly Amount (TZS) <span class="text-danger">*</span></label>
-                                <input type="number" name="monthly_amount" class="form-control" required min="0" step="1000">
+                                <input type="number" name="monthly_amount" class="form-control" required min="0"
+                                    step="1000">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Start Date <span class="text-danger">*</span></label>
@@ -224,7 +247,7 @@
 
     {{-- Scripts kwa order sahihi --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -232,79 +255,32 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).ready(function() {
-            console.log('HESLB page loaded - jQuery ready');
+        // ==================== GLOBAL VARIABLES ====================
+        let activeDataTable = null;
+        let inactiveDataTable = null;
 
-            // Helper function to validate table structure before initializing
-            function validateTableStructure(tableId) {
-                const table = document.querySelector(tableId);
-                if (!table) {
-                    console.log(`Table ${tableId} not found in DOM`);
-                    return false;
-                }
+        // ==================== HELPER FUNCTIONS ====================
 
-                const theadRow = table.querySelector('thead tr');
-                if (!theadRow) {
-                    console.log(`Table ${tableId} has no thead row`);
-                    return false;
-                }
-
-                const headerCount = theadRow.cells.length;
-                console.log(`Table ${tableId} has ${headerCount} columns`);
-
-                // Check if table has any data rows
-                const tbodyRows = table.querySelectorAll('tbody tr');
-                if (tbodyRows.length === 0) {
-                    console.log(`Table ${tableId} has no data rows, skipping DataTable initialization`);
-                    return false;
-                }
-
-                // Check each row for correct number of cells
-                let hasInvalidRow = false;
-                tbodyRows.forEach((row, index) => {
-                    // Skip rows that have colspan attribute (like "No data" row)
-                    const firstCell = row.cells[0];
-                    if (firstCell && firstCell.hasAttribute('colspan')) {
-                        console.log(`Table ${tableId} row ${index} has colspan, skipping validation`);
-                        return;
-                    }
-
-                    if (row.cells.length !== headerCount) {
-                        console.warn(`Table ${tableId} row ${index} has ${row.cells.length} cells but header has ${headerCount}`);
-                        hasInvalidRow = true;
-                    }
-                });
-
-                if (hasInvalidRow) {
-                    console.error(`Table ${tableId} has invalid row structure, cannot initialize DataTable`);
-                    return false;
-                }
-
-                return true;
+        function destroyDataTables() {
+            if ($.fn.DataTable.isDataTable('#activeTable')) {
+                $('#activeTable').DataTable().destroy();
             }
+            if ($.fn.DataTable.isDataTable('#inactiveTable')) {
+                $('#inactiveTable').DataTable().destroy();
+            }
+        }
 
-            // Helper function to initialize DataTables
-            function initializeDataTable(tableId, options = {}) {
-                // First validate table structure
-                if (!validateTableStructure(tableId)) {
-                    console.log(`Skipping DataTable initialization for ${tableId} due to validation failure`);
-                    return false;
-                }
+        function initializeDataTables() {
+            destroyDataTables();
 
-                const $table = $(tableId);
-
-                // Check if already initialized
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    console.log(`Table ${tableId} already initialized, destroying first`);
-                    $table.DataTable().destroy();
-                    // Clear the table wrapper that DataTables creates
-                    $table.children('thead, tbody').show();
-                }
-
-                // Default options
-                const defaultOptions = {
+            // Initialize Active Table
+            if ($('#activeTable tbody tr').length > 0) {
+                activeDataTable = $('#activeTable').DataTable({
                     pageLength: 10,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
                     language: {
                         search: "🔍 Search:",
                         lengthMenu: "Show _MENU_ entries",
@@ -317,61 +293,173 @@
                         },
                         zeroRecords: "No matching records found"
                     },
-                    responsive: false, // Disable responsive temporarily to avoid issues
                     autoWidth: false,
-                    destroy: true, // Automatically destroy existing instance
-                    retrieve: true // If already initialized, just return the instance
-                };
-
-                // Merge options
-                const finalOptions = { ...defaultOptions, ...options };
-
-                try {
-                    const dataTable = $table.DataTable(finalOptions);
-                    console.log(`Table ${tableId} initialized successfully`);
-                    return dataTable;
-                } catch (error) {
-                    console.error(`Error initializing ${tableId}:`, error);
-                    return false;
-                }
+                    order: [
+                        [0, 'asc']
+                    ],
+                    columnDefs: [{
+                            orderable: false,
+                            targets: [9]
+                        } // Actions column
+                    ]
+                });
             }
 
-            // Small delay to ensure DOM is fully ready
-            setTimeout(function() {
-                // Initialize Active Deductions Table
-                if ($('#activeTable').length) {
-                    initializeDataTable('#activeTable', {
-                        order: [[0, 'asc']],
-                        columnDefs: [
-                            { orderable: false, targets: [9] } // Actions column
-                        ]
-                    });
-                } else {
-                    console.log('Active table not found');
-                }
+            // Initialize Inactive Table
+            if ($('#inactiveTable').length && $('#inactiveTable tbody tr').length > 0) {
+                inactiveDataTable = $('#inactiveTable').DataTable({
+                    pageLength: 10,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
+                    language: {
+                        search: "🔍 Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "No entries found",
+                        infoFiltered: "(filtered from _MAX_ total entries)",
+                        paginate: {
+                            previous: "← Previous",
+                            next: "Next →"
+                        },
+                        zeroRecords: "No matching records found"
+                    },
+                    autoWidth: false,
+                    order: [
+                        [0, 'asc']
+                    ]
+                });
+            }
+        }
 
-                // Initialize Inactive Deductions Table (if it exists and has data)
-                if ($('#inactiveTable').length && $('#inactiveTable tbody tr').length > 0) {
-                    initializeDataTable('#inactiveTable', {
-                        order: [[0, 'asc']]
-                    });
-                } else {
-                    console.log('Inactive table has no data or does not exist');
+        // ==================== YEAR FILTER FUNCTION ====================
+        function filterByYear(year) {
+            if (!year) return;
+
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Fetching data for year ' + year,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-            }, 100);
-        });
+            });
+
+            $.ajax({
+                url: '{{ route('heslb.filter') }}?year=' + year,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
+
+                        // Update Active Table
+                        if (data.active && data.active.length > 0) {
+                            let activeHtml = '';
+                            data.active.forEach((deduction, index) => {
+                                const startDate = deduction.start_date ? new Date(deduction.start_date)
+                                    .toLocaleDateString('en-GB') : 'N/A';
+                                const endDate = deduction.end_date ? new Date(deduction.end_date)
+                                    .toLocaleDateString('en-GB') : 'Ongoing';
+
+                                activeHtml += `
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td><strong>${deduction.staff_id.toUpperCase()}</strong></td>
+                                <td>${deduction.employee_name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}</td>
+                                <td>${deduction.staff_type}</td>
+                                <td>${deduction.loan_number || 'N/A'}</td>
+                                <td class="text-end">${parseInt(deduction.monthly_amount).toLocaleString()}</td>
+                                <td>${startDate}</td>
+                                <td>${endDate}</td>
+                                <td class="text-center"><span class="status-active">Active</span></td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <button class="btn btn-xs btn-warning" onclick="updateAmount(${deduction.id}, ${deduction.monthly_amount})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-danger" onclick="stopDeduction(${deduction.id})">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            });
+                            $('#activeTable tbody').html(activeHtml);
+                        } else {
+                            $('#activeTable tbody').html(`
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle me-1"></i> No active HESLB deductions for this year
+                                </td>
+                            </tr>
+                        `);
+                        }
+
+                        // Update Inactive Table
+                        if (data.inactive && data.inactive.length > 0) {
+                            let inactiveHtml = '';
+                            data.inactive.forEach((deduction, index) => {
+                                const startDate = deduction.start_date ? new Date(deduction.start_date)
+                                    .toLocaleDateString('en-GB') : 'N/A';
+                                const endDate = deduction.end_date ? new Date(deduction.end_date)
+                                    .toLocaleDateString('en-GB') : 'N/A';
+
+                                inactiveHtml += `
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td><strong>${deduction.staff_id.toUpperCase()}</strong></td>
+                                <td>${deduction.employee_name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}</td>
+                                <td>${deduction.staff_type}</td>
+                                <td>${deduction.loan_number || 'N/A'}</td>
+                                <td class="text-end">${parseInt(deduction.monthly_amount).toLocaleString()}</td>
+                                <td>${startDate}</td>
+                                <td>${endDate}</td>
+                                <td class="text-center"><span class="status-stopped">Stopped</span></td>
+                            </tr>`;
+                            });
+                            $('#inactiveTable tbody').html(inactiveHtml);
+                            $('#inactiveTable').parent().parent().show(); // Show the inactive section
+                        } else {
+                            $('#inactiveTable tbody').html(`
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle me-1"></i> No inactive HESLB deductions for this year
+                                </td>
+                            </tr>
+                        `);
+                            $('#inactiveTable').parent().parent().hide(); // Hide section if no data
+                        }
+
+                        // Reinitialize DataTables
+                        initializeDataTables();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated!',
+                            text: `Showing data for year ${year}`,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to load data', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX Error:', xhr);
+                    Swal.close();
+                    Swal.fire('Error', 'Failed to fetch data. Please try again.', 'error');
+                }
+            });
+        }
 
         // ==================== HESLB FUNCTIONS ====================
 
         function stopDeduction(id) {
-            if (typeof Swal === 'undefined') {
-                console.error('SweetAlert not loaded');
-                if (confirm('Are you sure you want to stop this HESLB deduction?')) {
-                    submitForm('/heslb/' + id + '/stop');
-                }
-                return;
-            }
-
             Swal.fire({
                 title: 'Stop Deduction?',
                 text: 'This will stop the HESLB deduction from future payrolls.',
@@ -388,15 +476,6 @@
         }
 
         function updateAmount(id, currentAmount) {
-            if (typeof Swal === 'undefined') {
-                console.error('SweetAlert not loaded');
-                const newAmount = prompt('Enter new monthly amount (TZS):', currentAmount);
-                if (newAmount && !isNaN(newAmount) && newAmount > 0) {
-                    submitForm('/heslb/' + id + '/update-amount', { monthly_amount: newAmount });
-                }
-                return;
-            }
-
             Swal.fire({
                 title: 'Update Monthly Amount',
                 input: 'number',
@@ -417,7 +496,9 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed && result.value) {
-                    submitForm('/heslb/' + id + '/update-amount', { monthly_amount: result.value });
+                    submitForm('/heslb/' + id + '/update-amount', {
+                        monthly_amount: result.value
+                    });
                 }
             });
         }
@@ -428,7 +509,6 @@
             form.action = '{{ url('') }}' + url;
             form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
 
-            // Add additional data
             for (const [key, value] of Object.entries(data)) {
                 form.innerHTML += `<input type="hidden" name="${key}" value="${value}">`;
             }
@@ -437,41 +517,51 @@
             form.submit();
         }
 
+        // ==================== DOCUMENT READY ====================
+        $(document).ready(function() {
+            console.log('HESLB page loaded - Initializing...');
+
+            // Initial delay to ensure DOM is ready
+            setTimeout(function() {
+                initializeDataTables();
+            }, 100);
+
+            // Year filter change event
+            $('#yearFilter').on('change', function() {
+                const year = $(this).val();
+                filterByYear(year);
+            });
+        });
+
         // ==================== SWEETALERT NOTIFICATIONS ====================
-        @if(session('success'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    timer: 3000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
-                });
-            }
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
         @endif
 
-        @if(session('error'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'OK'
-                });
-            }
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'OK'
+            });
         @endif
 
-        @if($errors->any())
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    confirmButtonText: 'OK'
-                });
-            }
+        @if ($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '{!! implode('<br>', $errors->all()) !!}',
+                confirmButtonText: 'OK'
+            });
         @endif
     </script>
 @endsection

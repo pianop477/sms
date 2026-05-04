@@ -674,6 +674,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // HESLB MANAGEMENT ROUTES
         // ========================================================================
         Route::prefix('heslb')->name('heslb.')->group(function () {
+            Route::get('/filter', [HeslbController::class, 'filterByYear'])
+                ->name('filter');
             Route::get('/', [HeslbController::class, 'index'])->name('index');
             Route::post('/store', [HeslbController::class, 'store'])->name('store');
             Route::post('/{id}/stop', [HeslbController::class, 'stop'])->name('stop');
@@ -689,6 +691,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::put('/staff-loan/{id}', [UnofficialDeductionController::class, 'update'])->name('unofficial.update');
             Route::post('/staff-loan/store', [UnofficialDeductionController::class, 'store'])->name('unofficial.store');
             Route::post('/staff-loan/{id}/cancel', [UnofficialDeductionController::class, 'cancel'])->name('unofficial.cancel');
+            Route::get('/unofficial/filter', [UnofficialDeductionController::class, 'filterByYear'])
+                ->name('unofficial.filter');
         });
         // ========================================================================
         // PAYROLL REPORTS

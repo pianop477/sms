@@ -86,7 +86,11 @@ class Kernel extends ConsoleKernel
 
         // Sync tokens after payment corrections - run every hour
         $schedule->command('tokens:sync-after-correction')
-            ->everyFiveSeconds()
+            ->everyMinute()
+            ->withoutOverlapping();
+
+        $schedule->command('e-permit:auto-approve')
+            ->everyFiveMinutes()
             ->withoutOverlapping();
     }
 

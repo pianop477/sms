@@ -240,15 +240,13 @@ class EPermitService
 
     /**
      * Approve request at different stages
-     * ANY assigned class teacher, ANY academic teacher, ANY head teacher can approve
      */
-    public function approveRequest(EPermit $request, Teacher $teacher, $comment = null)
+    public function approveRequest(EPermit $request, Teacher $teacher, $comment = null, $isAutoApproval = false)
     {
         DB::beginTransaction();
 
         try {
             $currentStatus = $request->status;
-            $parent_id = $request->parent_id;
             $nextStatus = $this->getNextStatus($request);
             $stage = null;
             $fieldToUpdate = null;
@@ -258,7 +256,6 @@ class EPermitService
 
             switch ($currentStatus) {
                 case 'pending_class_teacher':
-                    // ANY class teacher assigned to this student's class can approve
                     if (!$this->isClassTeacher($request->student, $teacher)) {
                         throw new \Exception('Only class teachers assigned to this student can approve.');
                     }
@@ -270,7 +267,6 @@ class EPermitService
                     break;
 
                 case 'pending_duty_teacher':
-                    // Check if teacher is on duty OR is an academic teacher (can act as backup)
                     $isDutyTeacher = $this->isDutyTeacherForDate($teacher, $request->departure_date);
 
                     if (!$isDutyTeacher && !$this->isAcademicTeacher($teacher)) {
@@ -284,7 +280,6 @@ class EPermitService
                     break;
 
                 case 'pending_academic':
-                    // ANY academic teacher can approve
                     if (!$this->isAcademicTeacher($teacher)) {
                         throw new \Exception('Only academic teachers can approve at this stage.');
                     }
@@ -292,11 +287,10 @@ class EPermitService
                     $timeField = 'academic_teacher_approved_at';
                     $actionField = 'academic_teacher_action';
                     $commentField = 'academic_teacher_comment';
-                    $stage = 'academic';
+                    $stage = 'academic';  // ← MUST BE SET!
                     break;
 
                 case 'pending_head':
-                    // ANY head teacher can approve
                     if (!$this->isHeadTeacher($teacher)) {
                         throw new \Exception('Only head teachers can approve at this stage.');
                     }
@@ -304,11 +298,16 @@ class EPermitService
                     $timeField = 'head_teacher_approved_at';
                     $actionField = 'head_teacher_action';
                     $commentField = 'head_teacher_comment';
-                    $stage = 'head';
+                    $stage = 'head';  // ← MUST BE SET!
                     break;
 
                 default:
                     throw new \Exception('Cannot approve request in current status: ' . $currentStatus);
+            }
+
+            // Make sure stage is not null
+            if ($stage === null) {
+                throw new \Exception('Stage cannot be null for status: ' . $currentStatus);
             }
 
             $request->update([
@@ -319,20 +318,31 @@ class EPermitService
                 'status' => $nextStatus
             ]);
 
-            $this->logTracking($request, $teacher->id, 'approved', $stage, $comment);
+            // Log tracking with auto-approval flag
+            $metadata = [];
+            if ($isAutoApproval) {
+                $metadata['auto_approved'] = true;
+                $metadata['auto_approved_at'] = now()->toDateTimeString();
+            }
+
+            $this->logTracking($request, $teacher->id, 'approved', $stage, $comment, $metadata);
 
             // If final approval, generate PDF
             if ($nextStatus === 'approved') {
-                // $this->generateEPermitPDF($request);
-                $parent_info = Parents::with('User')->findOrFail($parent_id);
-                $this->NotifyParentofTheStudentBySms($request, $schoolId = $parent_info->school_id, $parent_info);
+                $this->generateEPermitPDF($request);
+
+                // Send notification to parent
+                $parent = Parents::find($request->parent_id);
+                if ($parent) {
+                    $this->NotifyParentofTheStudentBySms($request, $request->student->school_id, $parent);
+                }
             }
 
             DB::commit();
 
             return [
                 'success' => true,
-                'message' => 'Request approved successfully',
+                'message' => $isAutoApproval ? 'Request auto-approved successfully' : 'Request approved successfully',
                 'next_status' => $nextStatus
             ];
         } catch (\Exception $e) {
@@ -468,12 +478,12 @@ class EPermitService
             default => ucfirst($request->reason)
         };
 
-        $message = "Habari ". strtoupper($parent_info->user->first_name)."\n";
-        $message .= "Mtoto wako ".strtoupper($student->first_name. ' ' .$student->last_name)."\n";
+        $message = "Habari " . strtoupper($parent_info->user->first_name) . "\n";
+        $message .= "Mtoto wako " . strtoupper($student->first_name . ' ' . $student->last_name) . "\n";
         $message .= "Amepewa Ruhusa yenye Kibali Na.{$request->permit_number} \n";
         $message .= "Inayoanza " . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y');
-        $message .= "Ruhusa imeombwa na ". strtoupper($request->guardian_name)."\n";
-        $message .= "Sababu ya Ruhusa ". strtoupper($reasonText)."\n";
+        $message .= "Ruhusa imeombwa na " . strtoupper($request->guardian_name) . "\n";
+        $message .= "Sababu ya Ruhusa " . strtoupper($reasonText) . "\n";
         $message .= "Kama hutambui ombi hili Tafadhali Piga {$school->school_phone}. Asante";
 
         $payload = [
@@ -520,5 +530,32 @@ class EPermitService
             Log::error('Return confirmation failed: ' . $e->getMessage());
             return ['success' => false, 'message' => 'Failed to confirm return'];
         }
+    }
+
+    /**
+     * Find class teacher for a student (for auto-approval)
+     */
+    public function findClassTeacher(Student $student): ?Teacher
+    {
+        $classTeacherRecord = DB::table('class_teachers')
+            ->where('class_id', $student->class_id)
+            ->where('group', $student->group)
+            ->first();
+
+        if ($classTeacherRecord && $classTeacherRecord->teacher_id) {
+            return Teacher::with('user')->find($classTeacherRecord->teacher_id);
+        }
+
+        // Fallback without group
+        $classTeacherRecord = DB::table('class_teachers')
+            ->where('class_id', $student->class_id)
+            ->whereNull('group')
+            ->first();
+
+        if ($classTeacherRecord && $classTeacherRecord->teacher_id) {
+            return Teacher::with('user')->find($classTeacherRecord->teacher_id);
+        }
+
+        return null;
     }
 }
