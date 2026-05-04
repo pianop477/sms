@@ -1091,8 +1091,8 @@
                 '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Kwa Wakati</span>';
 
             // Student image path
-            const studentImage = permit.student_image ?
-                `/storage/students/${permit.student_image}` :
+            const studentImage = permit.student.image ?
+                `/storage/students/${permit.student.image}` :
                 '{{ asset('storage/students/student.jpg') }}';
 
             container.innerHTML = `
