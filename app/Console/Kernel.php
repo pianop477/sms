@@ -90,7 +90,7 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('e-permit:auto-approve')
-            ->everyFiveMinutes()
+            ->everySecond()
             ->withoutOverlapping();
     }
 
