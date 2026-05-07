@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="author" content="Piano">
     <meta name="description" content="ShuleApp is a digital platform for School Management System">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- ============ PWA META TAGS ============ -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">

@@ -117,8 +117,8 @@
         }
 
         .status-approved {
-            background: #dcfce7;
-            color: #166534;
+            background: #e0e7ff;
+            color: #3730a3;
         }
 
         .status-rejected {
@@ -177,6 +177,11 @@
 
         .btn-view {
             background: #3b82f6;
+            color: white;
+        }
+
+        .btn-print {
+            background: #22c55e;
             color: white;
         }
 
@@ -455,13 +460,13 @@
                                         <tbody>
                                             @forelse($pendingPermits as $permit)
                                                 <tr>
-                                                    <td><strong>{{ $permit->permit_number }}</strong><br>
+                                                    <td><strong>{{ strtoupper($permit->permit_number) }}</strong><br>
                                                         <small
                                                             class="text-muted">{{ $permit->created_at->format('d/m/Y H:i') }}</small>
                                                     </td>
                                                     <td>
-                                                        {{ ucfirst($permit->student->first_name) }}
-                                                        {{ ucfirst($permit->student->last_name) }}<br>
+                                                        {{ ucwords(strtolower($permit->student->first_name)) }}
+                                                        {{ ucwords(strtolower($permit->student->last_name)) }}<br>
                                                         <small
                                                             class="text-muted">{{ strtoupper($permit->student->admission_number) }}</small>
                                                     </td>
@@ -613,12 +618,12 @@
                                         <tbody>
                                             @forelse($historyPermits as $permit)
                                                 <tr>
-                                                    <td><strong>{{ $permit->permit_number }}</strong><br>
+                                                    <td><strong>{{ strtoupper($permit->permit_number )}}</strong><br>
                                                         <small>{{ $permit->created_at->format('d/m/Y') }}</small>
                                                     </td>
                                                     <td>
-                                                        {{ ucfirst($permit->student->first_name) }}
-                                                        {{ ucfirst($permit->student->last_name) }}<br>
+                                                        {{ ucwords(strtolower($permit->student->first_name)) }}
+                                                        {{ ucwords(strtolower($permit->student->last_name)) }}<br>
                                                         <small
                                                             class="text-muted">{{ strtoupper($permit->student->admission_number) }}</small>
                                                     </td>
@@ -661,7 +666,7 @@
                                                         </a>
                                                         @if ($permit->status == 'approved' && $permit->pdf_path)
                                                             <a href="{{ route('teacher.e-permit.print', ['id' => Hashids::encode($permit->id)]) }}"
-                                                                class="btn-action btn-view mt-1">
+                                                                class="btn-action btn-print mt-1">
                                                                 <i class="fas fa-print"></i> Print
                                                             </a>
                                                         @endif
@@ -963,8 +968,8 @@
                     if (data.data && data.data.length > 0) {
                         tbody.innerHTML = data.data.map(permit => `
                     <tr>
-                        <td><strong>${permit.permit_number}</strong></td>
-                        <td>${permit.student_name}<br><small class="text-muted">${permit.admission_number}</small></td>
+                        <td><strong>${permit.permit_number.toUpperCase()}</strong></td>
+                        <td>${permit.student_name}<br><small class="text-muted">${permit.admission_number.toUpperCase()}</small></td>
                         <td>${permit.class_name}</td>
                         <td>${permit.guardian_name}<br><small>${permit.guardian_phone}</small></td>
                         <td>${permit.departure_date}</td>
@@ -1123,19 +1128,19 @@
                             <div class="col-md-6">
                                 <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
                                     <small class="text-muted text-uppercase"><i class="fas fa-user-graduate me-1"></i> Jina Kamili</small>
-                                    <h6 class="mb-0 text-capitalize">${permit.student.name}</h6>
+                                    <h6 class="mb-0 text-capitalize">${permit.student.name.toUpperCase()}</h6>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
                                     <small class="text-muted text-uppercase"><i class="fas fa-id-card me-1"></i> Student ID</small>
-                                    <h6 class="mb-0 text-uppercase">${permit.student.admission_number}</h6>
+                                    <h6 class="mb-0 text-uppercase">${permit.student.admission_number.toUpperCase()}</h6>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
                                     <small class="text-muted text-uppercase"><i class="fas fa-chalkboard-user me-1"></i> Darasa</small>
-                                    <h6 class="mb-0 text-uppercase">${permit.student.class}</h6>
+                                    <h6 class="mb-0 text-uppercase">${permit.student.class.toUpperCase()}</h6>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -1153,7 +1158,7 @@
                             <div class="col-md-6">
                                 <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
                                     <small class="text-muted text-uppercase"><i class="fas fa-user-friends me-1"></i> Mzazi/Mlezi</small>
-                                    <h6 class="mb-0 text-capitalize">${permit.guardian_name}</h6>
+                                    <h6 class="mb-0 text-capitalize">${permit.guardian_name.toUpperCase()}</h6>
                                     <small class="text-muted">${permit.guardian_phone}</small>
                                 </div>
                             </div>

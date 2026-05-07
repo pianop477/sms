@@ -45,7 +45,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             transform: rotate(30deg);
         }
 
@@ -277,9 +277,11 @@
             0% {
                 box-shadow: 0 0 0 0 rgba(78, 84, 200, 0.4);
             }
+
             70% {
                 box-shadow: 0 0 0 10px rgba(78, 84, 200, 0);
             }
+
             100% {
                 box-shadow: 0 0 0 0 rgba(78, 84, 200, 0);
             }
@@ -304,7 +306,8 @@
                 <i class="fas fa-graduation-cap floating-icons"></i>
             </div>
             <div class="card-body">
-                <form class="needs-validation" novalidate action="{{ route('score.captured.values', ['id' => $id]) }}" method="POST">
+                <form class="needs-validation" novalidate action="{{ route('score.captured.values', ['id' => $id]) }}"
+                    method="POST">
                     @csrf
 
                     <!-- Hidden Fields -->
@@ -321,10 +324,12 @@
                                     <i class="fas fa-file-alt text-primary"></i>
                                     Examination Type <span class="required-star">*</span>
                                 </label>
-                                <select name="exam_type" id="exam_type" class="form-control-custom text-capitalize" required>
+                                <select name="exam_type" id="exam_type" class="form-control-custom text-capitalize"
+                                    required>
                                     <option value="" disabled selected>-- Select Exam type --</option>
                                     @foreach ($exams as $exam)
-                                        <option value="{{ $exam->id }}" class="text-capitalize" {{ old('exam_type') == $exam->id ? 'selected' : '' }}>
+                                        <option value="{{ $exam->id }}" class="text-capitalize"
+                                            {{ old('exam_type') == $exam->id ? 'selected' : '' }}>
                                             {{ $exam->exam_type }}
                                         </option>
                                     @endforeach
@@ -333,7 +338,7 @@
                                     Please select an examination type
                                 </div>
                                 @error('exam_type')
-                                <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -344,14 +349,14 @@
                                     Upload Date <span class="required-star">*</span>
                                 </label>
                                 <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
-                                       value="{{ old('exam_date') }}"
-                                       min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
-                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" placeholder="YYYY-MM-DD">
+                                    value="{{ old('exam_date') }}"
+                                    min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
+                                    max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" placeholder="YYYY-MM-DD">
                                 <div class="invalid-feedback">
                                     Please provide a valid exam date
                                 </div>
                                 @error('exam_date')
-                                <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -370,7 +375,7 @@
                                     Please select an academic term
                                 </div>
                                 @error('term')
-                                <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -382,15 +387,18 @@
                                 </label>
                                 <select name="marking_style" id="marking_style" class="form-control-custom" required>
                                     <option value="" selected>-- Select Grading System --</option>
-                                    <option value="2" {{ old('marking_style') == '2' ? 'selected' : '' }}>Percentage (0-100%)</option>
-                                    <option value="1" {{ old('marking_style') == '1' ? 'selected': '' }}>Points (0-50)</option>
-                                    <option value="3" {{ old('marking_style') == '3' ? 'selected' : '' }}>Division system</option>
+                                    <option value="2" {{ old('marking_style') == '2' ? 'selected' : '' }}>Percentage
+                                        (0-100%)</option>
+                                    <option value="1" {{ old('marking_style') == '1' ? 'selected' : '' }}>Points (0-50)
+                                    </option>
+                                    <option value="3" {{ old('marking_style') == '3' ? 'selected' : '' }}>Division
+                                        system</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     Please select a grading system
                                 </div>
                                 @error('marking_style')
-                                <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -411,12 +419,13 @@
 
                                     <div class="expiry-badge">
                                         <i class="fas fa-clock"></i>
-                                        Expires: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d M Y H:i')}}
+                                        Expires:
+                                        {{ \Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d M Y H:i') }}
                                     </div>
                                 </div>
 
                                 <div class="draft-actions">
-                                    <a href="{{route('form.saved.values', [
+                                    <a href="{{ route('form.saved.values', [
                                         'course' => Hashids::encode($class_course->course_id),
                                         'teacher' => Hashids::encode($class_course->teacher_id),
                                         'school' => Hashids::encode($class_course->school_id),
@@ -425,21 +434,22 @@
                                         'date' => $saved_results->first()->exam_date,
                                         'term' => $saved_results->first()->exam_term,
                                         'style' => $saved_results->first()->marking_style,
-                                        'id' => $id
-                                    ])}}" class="btn btn-warning-custom">
+                                        'id' => $id,
+                                    ]) }}"
+                                        class="btn btn-warning-custom">
                                         <i class="fas fa-edit"></i> Edit Pending Results
                                     </a>
 
-                                    <a href="{{route('results.draft.delete', [
+                                    <a href="{{ route('results.draft.delete', [
                                         'course' => Hashids::encode($class_course->course_id),
                                         'teacher' => Hashids::encode($class_course->teacher_id),
                                         'type' => $saved_results->first()->exam_type_id,
                                         'class' => Hashids::encode($class_course->class_id),
                                         'date' => $saved_results->first()->exam_date,
-                                        'id' => $id
-                                    ])}}"
-                                    onclick="return confirm('Are you sure you want to permanently delete these pending results? This action cannot be undone.')"
-                                    class="btn btn-danger-custom">
+                                        'id' => $id,
+                                    ]) }}"
+                                        onclick="return confirm('Are you sure you want to permanently delete these pending results? This action cannot be undone.')"
+                                        class="btn btn-danger-custom">
                                         <i class="fas fa-trash-alt"></i> Delete Draft
                                     </a>
                                 </div>
@@ -451,6 +461,84 @@
         </div>
     </div>
     <script>
+        // ============================================
+        // FUNCTION TO CLEAR LOCALSTORAGE SCORES
+        // ============================================
+        function clearAllScoreLocalStorage() {
+            let keysRemoved = [];
+
+            // Loop through all localStorage keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                // Remove any keys related to score storage
+                if (key && (key.startsWith('register_scores_') || key.startsWith('edit_scores_') || key.startsWith(
+                        'auto_save_'))) {
+                    localStorage.removeItem(key);
+                    keysRemoved.push(key);
+                }
+            }
+
+            if (keysRemoved.length > 0) {
+                console.log('Cleared localStorage keys:', keysRemoved);
+            }
+            return keysRemoved;
+        }
+
+        // ============================================
+        // OVERRIDE DELETE CONFIRMATION TO CLEAR STORAGE
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find all delete draft buttons/links
+            const deleteLinks = document.querySelectorAll('.btn-danger-custom, a[onclick*="confirm"]');
+
+            deleteLinks.forEach(link => {
+                // Store original onclick if exists
+                const originalOnclick = link.getAttribute('onclick');
+
+                // Remove original onclick to handle ourselves
+                if (originalOnclick) {
+                    link.removeAttribute('onclick');
+                }
+
+                // Add click event listener
+                link.addEventListener('click', function(e) {
+                    // Show confirmation dialog
+                    const confirmMessage =
+                        'Are you sure you want to permanently delete these pending results? This action cannot be undone.';
+
+                    if (confirm(confirmMessage)) {
+                        // Clear localStorage before deletion
+                        clearAllScoreLocalStorage();
+
+                        // Show loading state
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                        this.style.opacity = '0.7';
+
+                        // If there was original onclick, execute it
+                        if (originalOnclick) {
+                            // Execute the original onclick (which likely does the redirect)
+                            // We need to extract the URL from the onclick
+                            const urlMatch = originalOnclick.match(
+                                /window\.location\.href='([^']+)'/);
+                            if (urlMatch && urlMatch[1]) {
+                                window.location.href = urlMatch[1];
+                            } else if (this.href) {
+                                window.location.href = this.href;
+                            }
+                        } else if (this.href) {
+                            window.location.href = this.href;
+                        }
+                    }
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        });
+
+        // ============================================
+        // ORIGINAL SCRIPT (Preserved)
+        // ============================================
         $(document).ready(function() {
             // Initialize select2
             $('.select2').select2({
@@ -481,6 +569,14 @@
                     });
                 }, false);
             })();
+
+            // ============================================
+            // CHECK FOR CLEAR STORAGE FLAG FROM SERVER
+            // ============================================
+            @if (session('clear_local_storage'))
+                clearAllScoreLocalStorage();
+                console.log('Local storage cleared after delete operation');
+            @endif
         });
     </script>
 @endsection

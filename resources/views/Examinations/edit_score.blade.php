@@ -434,6 +434,7 @@
                     <input type="hidden" name="school_id" value="{{ $schoolId }}">
                     <input type="hidden" name="term" value="{{ $draftResults->first()->exam_term }}">
                     <input type="hidden" name="marking_style" value="{{ $marking_style }}">
+                    <input type="hidden" name="submission_token" value="{{ md5(uniqid(rand(), true)) }}">
 
                     <div class="instruction-text">
                         <i class="fas fa-info-circle me-2"></i>Enter score from 0 to
@@ -533,8 +534,8 @@
                         </button>
 
                         <!-- Submit Final Results -->
-                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action" value="submit"
-                            id="submitButton">
+                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action"
+                            value="submit" id="submitButton">
                             <i class="fas fa-check"></i> Submit Final Results
                         </button>
                     </div>
@@ -545,7 +546,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Form validation
+            // ============================================
+            // FORM VALIDATION (Original - No changes)
+            // ============================================
             (function() {
                 'use strict';
                 window.addEventListener('load', function() {
@@ -556,7 +559,6 @@
                                 event.preventDefault();
                                 event.stopPropagation();
 
-                                // Scroll to first invalid field
                                 var invalidElements = form.querySelectorAll(':invalid');
                                 if (invalidElements.length > 0) {
                                     invalidElements[0].scrollIntoView({
@@ -571,13 +573,10 @@
                 }, false);
             })();
 
-            // Score input validation and grade calculation
-            const scoreInputs = document.querySelectorAll('.score-input');
-            const gradeInputs = document.querySelectorAll('.grade-input');
-            const markingStyle = {{ $marking_style }}; // Store marking style in variable
-
-            // Function to calculate grade based on score
-            function calculateGrade(score) {
+            // ============================================
+            // GRADE CALCULATION (Original - No changes)
+            // ============================================
+            function calculateGrade(score, markingStyle) {
                 let grade = '';
                 let bgColor = '';
 
@@ -645,51 +644,157 @@
                         bgColor = 'red';
                     }
                 }
-
                 return {
                     grade,
                     bgColor
                 };
             }
 
-            // Function to update grade for specific input
+            // ============================================
+            // SCORE INPUT HANDLERS (Original + Auto-save)
+            // ============================================
+            const scoreInputs = document.querySelectorAll('.score-input');
+            const gradeInputs = document.querySelectorAll('.grade-input');
+            const markingStyle = {{ $marking_style }};
+
+            // Generate unique storage key for this form
+            function getStorageKey() {
+                const courseId = document.querySelector('input[name="course_id"]')?.value || 'unknown';
+                const classId = document.querySelector('input[name="class_id"]')?.value || 'unknown';
+                const examTypeId = document.querySelector('select[name="exam_type_id"]')?.value || 'unknown';
+                const examDate = document.querySelector('input[name="exam_date"]')?.value || 'unknown';
+                return `edit_scores_${courseId}_${classId}_${examTypeId}_${examDate}`;
+            }
+
+            // Save individual score to localStorage when user leaves input
+            function saveScoreToLocalStorage(studentId, score) {
+                const storageKey = getStorageKey();
+                let savedData = {};
+
+                const existing = localStorage.getItem(storageKey);
+                if (existing) {
+                    savedData = JSON.parse(existing);
+                }
+
+                savedData[studentId] = {
+                    score: score,
+                    timestamp: Date.now()
+                };
+
+                localStorage.setItem(storageKey, JSON.stringify(savedData));
+            }
+
+            // Load all saved scores from localStorage
+            function loadScoresFromLocalStorage() {
+                const storageKey = getStorageKey();
+                const saved = localStorage.getItem(storageKey);
+                if (!saved) return false;
+
+                try {
+                    const savedData = JSON.parse(saved);
+                    let restoredCount = 0;
+                    const now = Date.now();
+
+                    for (const [studentId, data] of Object.entries(savedData)) {
+                        if (now - data.timestamp < 86400000) {
+                            const input = document.querySelector(`input[name="scores[${studentId}]"]`);
+                            if (input && !input.value) {
+                                input.value = data.score;
+                                restoredCount++;
+
+                                const index = Array.from(scoreInputs).indexOf(input);
+                                if (index !== -1) {
+                                    updateGrade(input, index, markingStyle);
+                                }
+                            }
+                        }
+                    }
+
+                    if (restoredCount > 0) {
+                        showToast(`Restored ${restoredCount} unsaved score(s) from previous session`, 'info');
+                    }
+                    return restoredCount > 0;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // Clear localStorage for this form
+            function clearLocalStorage() {
+                const storageKey = getStorageKey();
+                localStorage.removeItem(storageKey);
+                console.log('Local storage cleared for edit form');
+            }
+
+            // Show toast message
+            function showToast(message, type = 'info') {
+                let toastDiv = document.getElementById('autoSaveToast');
+                if (!toastDiv) {
+                    toastDiv = document.createElement('div');
+                    toastDiv.id = 'autoSaveToast';
+                    toastDiv.style.cssText =
+                        'position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: none;';
+                    document.body.appendChild(toastDiv);
+                }
+
+                const colors = {
+                    success: '#28a745',
+                    error: '#dc3545',
+                    info: '#17a2b8',
+                    warning: '#ffc107'
+                };
+                toastDiv.style.backgroundColor = colors[type] || colors.info;
+                toastDiv.innerHTML = message;
+                toastDiv.style.display = 'block';
+
+                setTimeout(() => {
+                    toastDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // Update grade function
             function updateGrade(input, index) {
                 const score = parseFloat(input.value);
                 const {
                     grade,
                     bgColor
-                } = calculateGrade(score);
-
-                gradeInputs[index].value = grade;
-                gradeInputs[index].style.backgroundColor = bgColor;
+                } = calculateGrade(score, markingStyle);
+                if (gradeInputs[index]) {
+                    gradeInputs[index].value = grade;
+                    gradeInputs[index].style.backgroundColor = bgColor;
+                }
             }
 
-            // Process all score inputs
+            // Initialize grades and add auto-save on blur
             scoreInputs.forEach((input, index) => {
-                // Initialize grade on page load if score exists
                 if (input.value.trim() !== '') {
                     updateGrade(input, index);
                 }
 
-                // Add realtime input event (updates as you type)
                 input.addEventListener('input', () => {
                     updateGrade(input, index);
-
-                    // Optional: Enforce max value based on marking style
                     const maxValue = markingStyle == 1 ? 50 : 100;
-                    if (input.value > maxValue) {
-                        input.value = maxValue;
-                        updateGrade(input, index);
-                    }
+                    if (input.value > maxValue) input.value = maxValue;
+                    if (input.value < 0) input.value = 0;
+                    updateGrade(input, index);
                 });
 
-                // Also update on blur (for when user leaves field)
                 input.addEventListener('blur', () => {
                     updateGrade(input, index);
+
+                    // Auto-save to localStorage when user leaves the field
+                    const studentIdMatch = input.name.match(/scores\[(\d+)\]/);
+                    if (studentIdMatch && input.value) {
+                        saveScoreToLocalStorage(studentIdMatch[1], input.value);
+                        console.log(
+                            `Auto-saved score for student ${studentIdMatch[1]}: ${input.value}`);
+                    }
                 });
             });
 
-            // Add confirmation dialogs with null checks
+            // ============================================
+            // CONFIRMATION DIALOGS (Original + Clear storage)
+            // ============================================
             const saveButton = document.querySelector('button[name="action"][value="save"]');
             const submitButton = document.querySelector('button[name="action"][value="submit"]');
 
@@ -697,6 +802,8 @@
                 saveButton.addEventListener('click', function(e) {
                     if (!confirm('Are you sure you want to save results to draft?')) {
                         e.preventDefault();
+                    } else {
+                        setTimeout(clearLocalStorage, 1000);
                     }
                 });
             }
@@ -707,9 +814,16 @@
                             'Are you sure you want to submit final results? No editing will be allowed after submission.'
                             )) {
                         e.preventDefault();
+                    } else {
+                        setTimeout(clearLocalStorage, 1000);
                     }
                 });
             }
+
+            // ============================================
+            // LOAD SAVED SCORES ON PAGE LOAD
+            // ============================================
+            loadScoresFromLocalStorage();
         });
     </script>
 @endsection

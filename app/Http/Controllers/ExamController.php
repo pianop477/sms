@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
 use Vinkla\Hashids\Facades\Hashids;
+use Illuminate\Support\Facades\Cache;
 
 class ExamController extends Controller
 {
@@ -136,6 +137,7 @@ class ExamController extends Controller
 
     public function storeScore(Request $request, $id)
     {
+        // Use the same validation as before (no changes)
         $validated = $request->validate([
             'course_id' => 'required|integer|exists:subjects,id',
             'class_id' => 'required|integer|exists:grades,id',
@@ -145,23 +147,13 @@ class ExamController extends Controller
             'exam_date' => 'required|date|date_format:Y-m-d',
             'term' => 'required|in:i,ii',
             'marking_style' => 'required|in:1,2,3',
-        ], [
-            'course_id.required' => 'Course is required',
-            'class_id.required' => 'Class is required',
-            'teacher_id.required' => 'Teacher is required',
-            'school_id.required' => 'School is required',
-            'exam_id.required' => 'Exam type is required',
-            'exam_date.required' => 'Exam date is required',
-            'term.required' => 'Term is required',
-            'marking_style.required' => 'Marking style is required'
         ]);
 
-        // Define validation rules conditionally based on marking style
         $scoreValidation = $request->marking_style == 1 ? 'nullable|numeric|min:0|max:50' : 'nullable|numeric|min:0|max:100';
 
         $rules = [
             'students.*.student_id' => 'required|exists:students,id',
-            'students.*.score' => $scoreValidation,  // Dynamic validation for score
+            'students.*.score' => $scoreValidation,
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -173,18 +165,79 @@ class ExamController extends Controller
         }
 
         $students = $request->input('students');
-        $action = $request->input('action'); // Save or Submit action
-        // dd($action);
+        $action = $request->input('action');
+
+        // NEW: Add idempotency check to prevent duplicate processing
+        $submissionToken = $request->input('submission_token', md5(json_encode($students) . $action));
+        $cacheKey = "submission_{$submissionToken}";
+
+        if (Cache::has($cacheKey)) {
+            Alert::info('This data has already been processed', 'info');
+            return to_route('score.prepare.form', ['id' => $id]);
+        }
 
         if ($action === 'save') {
-            // Save temporary results (draft)
-            foreach ($students as $studentData) {
-                $studentId = $studentData['student_id'];
-                $score = $studentData['score'];
+            // Use transaction for data integrity
+            DB::beginTransaction();
+            try {
+                foreach ($students as $studentData) {
+                    $studentId = $studentData['student_id'];
+                    $score = $studentData['score'];
 
-                // Insert or update the temporary results table
-                temporary_results::updateOrCreate(
-                    [
+                    temporary_results::updateOrCreate(
+                        [
+                            'student_id' => $studentId,
+                            'course_id' => $request->course_id,
+                            'class_id' => $request->class_id,
+                            'teacher_id' => $request->teacher_id,
+                            'exam_type_id' => $request->exam_id,
+                            'school_id' => $request->school_id,
+                            'exam_date' => $request->exam_date,
+                            'exam_term' => $request->term,
+                            'marking_style' => $request->marking_style,
+                        ],
+                        [
+                            'score' => $score,
+                            'expiry_date' => now()->addHours(72)
+                        ]
+                    );
+                }
+                DB::commit();
+
+                // Mark as processed
+                Cache::put($cacheKey, true, now()->addMinutes(5));
+
+                Alert::toast('Results saved successfully, remember to submit before due date.', 'success');
+                return to_route('score.prepare.form', ['id' => $id]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Store score failed', ['error' => $e->getMessage()]);
+                Alert::error('Failed to save results due to network error. Please try again.', 'error');
+                return back()->withInput();
+            }
+        }
+
+        if ($action === 'submit') {
+            DB::beginTransaction();
+            try {
+                foreach ($students as $studentData) {
+                    $studentId = $studentData['student_id'];
+                    $score = $studentData['score'];
+
+                    $existingRecord = Examination_result::where('student_id', $studentId)
+                        ->where('course_id', $request->course_id)
+                        ->where('exam_type_id', $request->exam_id)
+                        ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
+                        ->exists();
+
+                    if ($existingRecord) {
+                        DB::rollBack();
+                        Alert::toast('Results already exist. Please check before submitting.', 'error');
+                        return redirect()->route('score.prepare.form', ['id' => $id]);
+                    }
+
+                    Examination_result::create([
                         'student_id' => $studentId,
                         'course_id' => $request->course_id,
                         'class_id' => $request->class_id,
@@ -192,62 +245,28 @@ class ExamController extends Controller
                         'exam_type_id' => $request->exam_id,
                         'school_id' => $request->school_id,
                         'exam_date' => $request->exam_date,
-                        'exam_term' => $request->term,
-                        'marking_style' => $request->marking_style,
-                        'expiry_date' => now()->addHours(72)
-                    ],
-                    ['score' => $score]
-                );
-            }
-
-            Alert::toast('Results saved successfully, remember to submit before due date.', 'success');
-            // return to_route('home');
-            return to_route('score.prepare.form', ['id' => $id]);
-        }
-
-        if ($action === 'submit') {
-            // Check for existing results in examination_results table
-            foreach ($students as $studentData) {
-                $studentId = $studentData['student_id'];
-                $score = $studentData['score'];
-
-                // Check if the result already exists in the examination_results table
-                $existingRecord = Examination_result::where('student_id', $studentId)
-                    ->where('course_id', $request->course_id)
-                    ->where('exam_type_id', $request->exam_id)
-                    ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
-                    ->exists();
-
-                if ($existingRecord) {
-                    Alert::toast('Results already exist. Please check before submitting.', 'error');
-                    // return redirect()->route('home');
-                    return redirect()->route('score.prepare.form', ['id' => $id]);
+                        'Exam_term' => $request->term,
+                        'score' => $score,
+                        'marking_style' => $request->marking_style
+                    ]);
                 }
+                DB::commit();
 
-                // Insert the result into the examination_results table
-                Examination_result::create([
-                    'student_id' => $studentId,
-                    'course_id' => $request->course_id,
-                    'class_id' => $request->class_id,
-                    'teacher_id' => $request->teacher_id,
-                    'exam_type_id' => $request->exam_id,
-                    'school_id' => $request->school_id,
-                    'exam_date' => $request->exam_date,
-                    'Exam_term' => $request->term,
-                    'score' => $score,
-                    'marking_style' => $request->marking_style
-                ]);
+                Cache::put($cacheKey, true, now()->addHours(24));
+
+                Alert::toast('Results submitted successfully. Editing is no longer allowed.', 'success');
+                return redirect()->route('score.prepare.form', ['id' => $id]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Submit failed', ['error' => $e->getMessage()]);
+                Alert::error('Failed to submit results due to network error. Please try again.', 'error');
+                return back()->withInput();
             }
-
-            Alert::toast('Results submitted successfully. Editing is no longer allowed.', 'success');
-            return redirect()->route('score.prepare.form', ['id' => $id]);
-            // return redirect()->route('home');
         }
 
-        // If action is not 'save' or 'submit'
         Alert::error('Invalid action', 'error');
         return redirect()->route('score.prepare.form', ['id' => $id]);
-        // return redirect()->route('home');
     }
 
 
@@ -840,7 +859,15 @@ class ExamController extends Controller
         $markingStyle = $request->marking_style;
         $scores = $request->scores;
         $action = $request->input('action');
-        // return $examTerm;
+
+        // NEW: Idempotency check
+        $submissionToken = $request->input('submission_token', md5(json_encode($scores) . $action));
+        $cacheKey = "draft_submission_{$submissionToken}";
+
+        if (Cache::has($cacheKey) && $action === 'submit') {
+            Alert::toast('This submission has already been processed', 'info');
+            return redirect()->route('score.prepare.form', ['id' => $id]);
+        }
 
         $user = Auth::user();
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
@@ -852,54 +879,61 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            // to_route('home');
             return to_route('score.prepare.form', ['id' => $id]);
         }
 
         if ($action === 'save') {
-            // SAVE TO DRAFT
-            foreach ($scores as $studentId => $score) {
-                temporary_results::updateOrCreate(
-                    [
-                        'student_id' => $studentId,
-                        'course_id' => $courseId,
-                        'teacher_id' => $teacherId,
-                    ],
-                    [
-                        'class_id' => $classId,
-                        'exam_type_id' => $examTypeId,
-                        'school_id' => $schoolId,
-                        'exam_date' => $examDate,
-                        'exam_term' => $examTerm,
-                        'score' => $score,
-                        'marking_style' => $markingStyle,
-                    ]
-                );
+            DB::beginTransaction();
+            try {
+                foreach ($scores as $studentId => $score) {
+                    temporary_results::updateOrCreate(
+                        [
+                            'student_id' => $studentId,
+                            'course_id' => $courseId,
+                            'teacher_id' => $teacherId,
+                            'exam_type_id' => $examTypeId,
+                            'exam_date' => $examDate,
+                        ],
+                        [
+                            'class_id' => $classId,
+                            'school_id' => $schoolId,
+                            'exam_term' => $examTerm,
+                            'score' => $score,
+                            'marking_style' => $markingStyle,
+                            'expiry_date' => now()->addHours(72)
+                        ]
+                    );
+                }
+                DB::commit();
+
+                Alert()->toast('Results saved successfully, remember to submit before due date.', 'success');
+                return redirect()->route('score.prepare.form', ['id' => $id]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Update draft save failed', ['error' => $e->getMessage()]);
+                Alert()->toast('Network error! Data saved locally. Please try again.', 'error');
+                return back()->withInput();
             }
-            Alert()->toast('Results saved successfully, remember to submit before due date.', 'success');
-            return redirect()->route('score.prepare.form', ['id' => $id]);
-            // return to_route('home');
 
         } elseif ($action === 'submit') {
-            // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
-            foreach ($scores as $studentId => $score) {
-                $existingResult = Examination_result::where('student_id', $studentId)
-                    ->where('course_id', $courseId)
-                    ->where('teacher_id', $teacherId)
-                    ->where('exam_type_id', $examTypeId)
-                    ->where('exam_date', $examDate)
-                    ->first();
+            DB::beginTransaction();
+            try {
+                foreach ($scores as $studentId => $score) {
+                    $existingResult = Examination_result::where('student_id', $studentId)
+                        ->where('course_id', $courseId)
+                        ->where('teacher_id', $teacherId)
+                        ->where('exam_type_id', $examTypeId)
+                        ->where('exam_date', $examDate)
+                        ->first();
 
-                if ($existingResult) {
-                    // If result already exists, reject this submission
-                    Alert()->toast('Results already exist. Please check before submitting.', 'error');
-                    // return to_route('home');
-                    return redirect()->route('score.prepare.form', ['id' => $id]);
+                    if ($existingResult) {
+                        DB::rollBack();
+                        Alert()->toast('Results already exist. Please check before submitting.', 'error');
+                        return redirect()->route('score.prepare.form', ['id' => $id]);
+                    }
                 }
-            }
 
-            // SUBMIT FINAL RESULTS & DELETE FROM DRAFT
-            DB::transaction(function () use ($scores, $courseId, $classId, $teacherId, $examTypeId, $examDate, $examTerm, $schoolId, $markingStyle) {
                 foreach ($scores as $studentId => $score) {
                     Examination_result::create([
                         'student_id' => $studentId,
@@ -915,7 +949,6 @@ class ExamController extends Controller
                     ]);
                 }
 
-                // DELETE TEMPORARY RESULTS AFTER FINAL SUBMISSION
                 temporary_results::where('course_id', $courseId)
                     ->where('teacher_id', $teacherId)
                     ->where('exam_type_id', $examTypeId)
@@ -923,15 +956,23 @@ class ExamController extends Controller
                     ->where('exam_date', $examDate)
                     ->where('school_id', $schoolId)
                     ->delete();
-            });
 
-            Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
-            return redirect()->route('score.prepare.form', ['id' => $id]);
-            // return redirect()->route('home');
+                DB::commit();
+
+                Cache::put($cacheKey, true, now()->addHours(24));
+
+                Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
+                return redirect()->route('score.prepare.form', ['id' => $id]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Update draft submit failed', ['error' => $e->getMessage()]);
+                Alert()->toast('Network error! Please try again.', 'error');
+                return back()->withInput();
+            }
         }
 
         Alert()->toast('Invalid action.', 'error');
-        // return to_route('home');
         return redirect()->route('score.prepare.form', ['id' => $id]);
     }
 

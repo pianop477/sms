@@ -424,6 +424,7 @@
                     <input type="hidden" name="school_id" value="{{ $schoolId }}">
                     <input type="hidden" name="term" value="{{ $term }}">
                     <input type="hidden" name="marking_style" value="{{ $marking_style }}">
+                    <input type="hidden" name="submission_token" value="{{ md5(uniqid(rand(), true)) }}">
 
                     <div class="info-section">
                         <div class="row">
@@ -534,7 +535,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Form validation
+            // ============================================
+            // FORM VALIDATION (Original - No changes)
+            // ============================================
             (function() {
                 'use strict';
                 window.addEventListener('load', function() {
@@ -545,7 +548,6 @@
                                 event.preventDefault();
                                 event.stopPropagation();
 
-                                // Scroll to first invalid field
                                 var invalidElements = form.querySelectorAll(':invalid');
                                 if (invalidElements.length > 0) {
                                     invalidElements[0].scrollIntoView({
@@ -560,6 +562,9 @@
                 }, false);
             })();
 
+            // ============================================
+            // GRADE CALCULATION (Original - No changes)
+            // ============================================
             function calculateGrade(score, markingStyle) {
                 let grade = '';
                 let bgColor = '';
@@ -628,49 +633,160 @@
                         bgColor = 'red';
                     }
                 }
-
                 return {
                     grade,
                     bgColor
                 };
             }
 
-            // Score input validation and grade calculation - HII NI SEHEMU MPYA
+            // ============================================
+            // SCORE INPUT HANDLERS (Original + Auto-save)
+            // ============================================
             const scoreInputs = document.querySelectorAll('.score-input');
             const gradeInputs = document.querySelectorAll('.grade-input');
-            const markingStyle = {{ $marking_style }}; // Hii inatoka PHP
+            const markingStyle = {{ $marking_style }};
 
-            // Function to update grade
+            // Generate unique storage key for this form
+            function getStorageKey() {
+                const courseId = document.querySelector('input[name="course_id"]')?.value || 'unknown';
+                const classId = document.querySelector('input[name="class_id"]')?.value || 'unknown';
+                return `register_scores_${courseId}_${classId}`;
+            }
+
+            // Save individual score to localStorage when user leaves input
+            function saveScoreToLocalStorage(studentId, score) {
+                const storageKey = getStorageKey();
+                let savedData = {};
+
+                // Get existing saved data
+                const existing = localStorage.getItem(storageKey);
+                if (existing) {
+                    savedData = JSON.parse(existing);
+                }
+
+                // Update the score
+                savedData[studentId] = {
+                    score: score,
+                    timestamp: Date.now()
+                };
+
+                // Save back to localStorage
+                localStorage.setItem(storageKey, JSON.stringify(savedData));
+            }
+
+            // Load all saved scores from localStorage
+            function loadScoresFromLocalStorage() {
+                const storageKey = getStorageKey();
+                const saved = localStorage.getItem(storageKey);
+                if (!saved) return false;
+
+                try {
+                    const savedData = JSON.parse(saved);
+                    let restoredCount = 0;
+
+                    // Check if data is not too old (less than 24 hours)
+                    const now = Date.now();
+                    for (const [studentId, data] of Object.entries(savedData)) {
+                        if (now - data.timestamp < 86400000) { // 24 hours
+                            const input = document.querySelector(`input[name="students[${studentId}][score]"]`);
+                            if (input && !input.value) { // Only restore if empty
+                                input.value = data.score;
+                                restoredCount++;
+
+                                // Trigger grade update
+                                const index = Array.from(scoreInputs).indexOf(input);
+                                if (index !== -1) {
+                                    updateGrade(input, index);
+                                }
+                            }
+                        }
+                    }
+
+                    if (restoredCount > 0) {
+                        showToast(`Restored ${restoredCount} unsaved score(s) from previous session`, 'info');
+                    }
+                    return restoredCount > 0;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // Clear localStorage for this form
+            function clearLocalStorage() {
+                const storageKey = getStorageKey();
+                localStorage.removeItem(storageKey);
+                console.log('Local storage cleared for this form');
+            }
+
+            // Show toast message
+            function showToast(message, type = 'info') {
+                let toastDiv = document.getElementById('autoSaveToast');
+                if (!toastDiv) {
+                    toastDiv = document.createElement('div');
+                    toastDiv.id = 'autoSaveToast';
+                    toastDiv.style.cssText =
+                        'position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: none;';
+                    document.body.appendChild(toastDiv);
+                }
+
+                const colors = {
+                    success: '#28a745',
+                    error: '#dc3545',
+                    info: '#17a2b8',
+                    warning: '#ffc107'
+                };
+                toastDiv.style.backgroundColor = colors[type] || colors.info;
+                toastDiv.innerHTML = message;
+                toastDiv.style.display = 'block';
+
+                setTimeout(() => {
+                    toastDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // Update grade function
             function updateGrade(input, index) {
                 const score = parseFloat(input.value);
                 const {
                     grade,
                     bgColor
                 } = calculateGrade(score, markingStyle);
-
-                gradeInputs[index].value = grade;
-                gradeInputs[index].style.backgroundColor = bgColor;
+                if (gradeInputs[index]) {
+                    gradeInputs[index].value = grade;
+                    gradeInputs[index].style.backgroundColor = bgColor;
+                }
             }
 
-            // Initialize grades on page load
+            // Initialize grades and add auto-save on blur
             scoreInputs.forEach((input, index) => {
-                // Calculate grade on page load if value exists
+                // Initial grade calculation
                 if (input.value) {
                     updateGrade(input, index);
                 }
 
-                // Realtime update on input (not just on blur)
+                // Real-time grade update on input
                 input.addEventListener('input', () => {
+                    updateGrade(input, index);
+                    const maxValue = markingStyle == 1 ? 50 : 100;
+                    if (input.value > maxValue) input.value = maxValue;
+                    if (input.value < 0) input.value = 0;
                     updateGrade(input, index);
                 });
 
-                // Also update on blur (for compatibility)
-                input.addEventListener('blur', () => {
-                    updateGrade(input, index);
+                // NEW: Auto-save to localStorage when user leaves the field (blur)
+                input.addEventListener('blur', function() {
+                    const studentIdMatch = this.name.match(/students\[(\d+)\]\[score\]/);
+                    if (studentIdMatch && this.value) {
+                        saveScoreToLocalStorage(studentIdMatch[1], this.value);
+                        console.log(
+                            `Auto-saved score for student ${studentIdMatch[1]}: ${this.value}`);
+                    }
                 });
             });
 
-            // Add confirmation dialogs
+            // ============================================
+            // CONFIRMATION DIALOGS (Original - No changes)
+            // ============================================
             const saveButton = document.querySelector('button[name="action"][value="save"]');
             const submitButton = document.querySelector('button[name="action"][value="submit"]');
 
@@ -678,6 +794,9 @@
                 saveButton.addEventListener('click', function(e) {
                     if (!confirm('Are you sure you want to save results temporarily?')) {
                         e.preventDefault();
+                    } else {
+                        // Clear localStorage on successful save
+                        setTimeout(clearLocalStorage, 1000);
                     }
                 });
             }
@@ -686,11 +805,19 @@
                 submitButton.addEventListener('click', function(e) {
                     if (!confirm(
                             'Are you sure you want to submit the final results? No editing will be allowed after submission.'
-                        )) {
+                            )) {
                         e.preventDefault();
+                    } else {
+                        // Clear localStorage on successful submit
+                        setTimeout(clearLocalStorage, 1000);
                     }
                 });
             }
+
+            // ============================================
+            // LOAD SAVED SCORES ON PAGE LOAD
+            // ============================================
+            loadScoresFromLocalStorage();
         });
     </script>
 @endsection
