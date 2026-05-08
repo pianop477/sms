@@ -553,10 +553,10 @@
             border: 1px solid rgba(253, 203, 110, 0.2);
         }
 
-        .status-failed {
-            background: rgba(225, 112, 85, 0.1);
-            color: #e17055;
-            border: 1px solid rgba(225, 112, 85, 0.2);
+        .status-sent {
+            background: rgba(115, 196, 233, 0.1);
+            color: #55a2e1;
+            border: 1px solid rgba(75, 172, 207, 0.2);
         }
 
         /* Submit Button */
@@ -887,17 +887,17 @@
                                             </div>
                                         </div>
                                         <div class="sms-status">
-                                            @if ($sms['delivery'] == 'DELIVERED')
+                                            @if ($sms['status']['groupName'] == 'DELIVERED')
                                                 <span class="status-badge status-delivered">
                                                     <i class="fas fa-check-circle"></i>
                                                 </span>
-                                            @elseif ($sms['delivery'] == 'PENDING')
+                                            @elseif ($sms['status']['groupName'] == 'PENDING')
                                                 <span class="status-badge status-pending">
                                                     <i class="fas fa-clock"></i>
                                                 </span>
                                             @else
-                                                <span class="status-badge status-failed">
-                                                    <i class="fas fa-times-circle"></i>
+                                                <span class="status-badge status-sent">
+                                                    <i class="fas fa-exclamation-circle"></i>
                                                 </span>
                                             @endif
                                         </div>
@@ -958,7 +958,7 @@
                                                             data-full-text="{{ htmlspecialchars($sms['text']) }}"
                                                             data-to="{{ $sms['to'] }}"
                                                             data-from="{{ $sms['from'] }}"
-                                                            data-status="{{ $sms['delivery'] }}"
+                                                            data-status="{{ $sms['status']['groupName'] }}"
                                                             data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
                                                             data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
                                                             {{ \Illuminate\Support\Str::limit($sms['text'], 30) }}
@@ -968,17 +968,17 @@
                                             </td>
                                             <td style="text-align: center;">{{ $sms['smsCount'] }}</td>
                                             <td>
-                                                @if ($sms['delivery'] == 'DELIVERED')
+                                                @if ($sms['status']['groupName'] == 'DELIVERED')
                                                     <span class="status-badge status-delivered">
                                                         <i class="fas fa-check-circle"></i> Delivered
                                                     </span>
-                                                @elseif ($sms['delivery'] == 'PENDING')
+                                                @elseif ($sms['status']['groupName'] == 'PENDING')
                                                     <span class="status-badge status-pending">
                                                         <i class="fas fa-clock"></i> Pending
                                                     </span>
                                                 @else
-                                                    <span class="status-badge status-failed">
-                                                        <i class="fas fa-times-circle"></i> Failed
+                                                    <span class="status-badge status-sent">
+                                                        <i class="fas fa-exclamation-circle"></i> Sent
                                                     </span>
                                                 @endif
                                             </td>
