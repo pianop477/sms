@@ -505,7 +505,8 @@ class EPermitService
         DB::beginTransaction();
 
         try {
-            $isLate = $returnData['actual_return_date'] > $request->expected_return_date;
+            // Linganisha kwa tarehe (siku) tu, si muda
+            $isLate = $returnData['actual_return_date']->startOfDay() > $request->expected_return_date->startOfDay();
 
             $request->update([
                 'actual_return_date' => $returnData['actual_return_date'],

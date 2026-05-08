@@ -494,7 +494,7 @@ class EPermitController extends Controller
                 ]);
             }
 
-            $isLate = now()->startOfDay() > $permit->expected_return_date;
+            $isLate = now()->startOfDay()->gt($permit->expected_return_date->startOfDay());
 
             return response()->json([
                 'success' => true,
