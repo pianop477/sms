@@ -568,8 +568,8 @@
                                 </div>
 
                                 @if (method_exists($pendingPermits, 'links'))
-                                    <div class="mt-3 d-flex justify-content-center">
-                                        {{ $pendingPermits->links() }}
+                                    <div class="mt-3 d-flex justify-content-end">
+                                        {{ $pendingPermits->links('vendor.pagination.bootstrap-5') }}
                                     </div>
                                 @endif
                             </div>
@@ -685,8 +685,8 @@
                                 </div>
 
                                 @if (method_exists($historyPermits, 'links'))
-                                    <div class="mt-3 d-flex justify-content-center">
-                                        {{ $historyPermits->links() }}
+                                    <div class="mt-3 d-flex justify-content-end">
+                                        {{ $historyPermits->links('vendor.pagination.bootstrap-5') }}
                                     </div>
                                 @endif
                             </div>
