@@ -618,7 +618,7 @@
                                         <tbody>
                                             @forelse($historyPermits as $permit)
                                                 <tr>
-                                                    <td><strong>{{ strtoupper($permit->permit_number )}}</strong><br>
+                                                    <td><strong>{{ strtoupper($permit->permit_number) }}</strong><br>
                                                         <small>{{ $permit->created_at->format('d/m/Y') }}</small>
                                                     </td>
                                                     <td>
@@ -817,263 +817,384 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-    // ============================================
-    // TAB AND PAGINATION PERSISTENCE
-    // ============================================
+        // ============================================
+        // TAB AND PAGINATION PERSISTENCE
+        // ============================================
 
-    // Function to save current tab and page states before page reload/unload
-    function saveCurrentState() {
-        // Get active tab
-        const activeTab = document.querySelector('#ePermitTab .nav-link.active');
-        if (activeTab) {
-            const targetId = activeTab.getAttribute('data-bs-target');
-            localStorage.setItem('activePermitTab', targetId);
-        }
-
-        // Save current page for pending pagination if exists
-        const pendingPagination = document.querySelector('#pending .pagination .active');
-        if (pendingPagination) {
-            const currentPage = pendingPagination.textContent;
-            localStorage.setItem('pendingPage', currentPage);
-        }
-
-        // Save current page for history pagination if exists
-        const historyPagination = document.querySelector('#history .pagination .active');
-        if (historyPagination) {
-            const currentPage = historyPagination.textContent;
-            localStorage.setItem('historyPage', currentPage);
-        }
-    }
-
-    // Function to restore pagination to specific page
-    function restorePagination(tableId, pageNumber) {
-        const paginationLinks = document.querySelectorAll(`${tableId} .pagination .page-link`);
-        paginationLinks.forEach(link => {
-            if (link.textContent.trim() === pageNumber) {
-                link.click();
-                return;
-            }
-        });
-    }
-
-    // Save state before page unload
-    window.addEventListener('beforeunload', function() {
-        saveCurrentState();
-    });
-
-    // Restore state when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        // Restore active tab
-        const lastActiveTab = localStorage.getItem('activePermitTab');
-        if (lastActiveTab && lastActiveTab !== '#reports') {
-            const tabToActivate = document.querySelector(`#ePermitTab button[data-bs-target="${lastActiveTab}"]`);
-            if (tabToActivate) {
-                // Use Bootstrap tab API if available, otherwise click
-                const bsTab = new bootstrap.Tab(tabToActivate);
-                bsTab.show();
-            }
-        }
-
-        // Restore pending page after a short delay (allow table to render)
-        const savedPendingPage = localStorage.getItem('pendingPage');
-        if (savedPendingPage && document.querySelector('#pending .pagination')) {
-            setTimeout(() => {
-                restorePagination('#pending', savedPendingPage);
-                // Clear saved page after restoration to avoid conflicts
-                localStorage.removeItem('pendingPage');
-            }, 200);
-        }
-
-        // Restore history page after a short delay
-        const savedHistoryPage = localStorage.getItem('historyPage');
-        if (savedHistoryPage && document.querySelector('#history .pagination')) {
-            setTimeout(() => {
-                restorePagination('#history', savedHistoryPage);
-                localStorage.removeItem('historyPage');
-            }, 200);
-        }
-
-        // Clear reports tab from storage if needed (don't restore reports tab automatically)
-        if (lastActiveTab === '#reports') {
-            localStorage.removeItem('activePermitTab');
-        }
-    });
-
-    // Save active tab when user clicks on any tab
-    document.querySelectorAll('#ePermitTab button').forEach(tab => {
-        tab.addEventListener('shown.bs.tab', function(event) {
-            const targetId = event.target.getAttribute('data-bs-target');
-            // Don't save reports tab
-            if (targetId !== '#reports') {
+        // Function to save current tab and page states before page reload/unload
+        function saveCurrentState() {
+            // Get active tab
+            const activeTab = document.querySelector('#ePermitTab .nav-link.active');
+            if (activeTab) {
+                const targetId = activeTab.getAttribute('data-bs-target');
                 localStorage.setItem('activePermitTab', targetId);
             }
-        });
-    });
 
-    // ============================================
-    // QUICK APPROVE FUNCTION (UNAFFECTED)
-    // ============================================
-    function quickApprove(permitId) {
-        // Save current state before action
-        saveCurrentState();
-
-        Swal.fire({
-            title: 'Thibitisha Ombi',
-            text: 'Je, una uhakika unataka kukubali ombi hili la ruhusa?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#22c55e',
-            cancelButtonColor: '#ef4444',
-            confirmButtonText: 'Ndiyo, Kubali',
-            cancelButtonText: 'Hapana',
-            input: 'textarea',
-            inputPlaceholder: 'Andika maoni (si lazima)...'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Inachakata...',
-                    text: 'Tafadhali subiri',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                fetch(`{{ url('teacher/e-permit') }}/${permitId}/approve`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            comment: result.value
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Imefanikiwa!', data.message, 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Hitilafu!', data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
-                    });
+            // Get current page from URL for pending tab
+            const pendingUrlParams = new URLSearchParams(window.location.search);
+            const pendingPage = pendingUrlParams.get('pending_page') || pendingUrlParams.get('page');
+            if (pendingPage && document.querySelector('#pending.active, #pending.show')) {
+                localStorage.setItem('pendingPage', pendingPage);
             }
-        });
-    }
 
-    // ============================================
-    // QUICK REJECT FUNCTION (UNAFFECTED)
-    // ============================================
-    function quickReject(permitId) {
-        // Save current state before action
-        saveCurrentState();
-
-        Swal.fire({
-            title: 'Kataa Ombi',
-            text: 'Je, una uhakika unataka kukataa ombi hili la ruhusa?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ndiyo, Kataa',
-            cancelButtonText: 'Hapana',
-            input: 'textarea',
-            inputPlaceholder: 'Tafadhali andika sababu ya kukataa...',
-            inputValidator: (value) => {
-                if (!value) return 'Sababu ya kukataa inahitajika!';
+            // Get current page from URL for history tab
+            const historyUrlParams = new URLSearchParams(window.location.search);
+            const historyPage = historyUrlParams.get('history_page');
+            if (historyPage && document.querySelector('#history.active, #history.show')) {
+                localStorage.setItem('historyPage', historyPage);
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Inachakata...',
-                    text: 'Tafadhali subiri',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
 
-                fetch(`{{ url('teacher/e-permit') }}/${permitId}/reject`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            reason: result.value
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Imefanikiwa!', data.message, 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Hitilafu!', data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
-                    });
+            // Also store which tab's pagination we were using
+            if (document.querySelector('#pending.active, #pending.show')) {
+                localStorage.setItem('activePaginationTab', 'pending');
+            } else if (document.querySelector('#history.active, #history.show')) {
+                localStorage.setItem('activePaginationTab', 'history');
             }
-        });
-    }
+        }
 
-    // ============================================
-    // FILTER FUNCTIONS (UNAFFECTED)
-    // ============================================
-    function filterTable(tableId, searchText) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const rows = table.querySelectorAll('tbody tr');
-        if (!rows.length) return;
-        const search = searchText.toLowerCase();
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(search) ? '' : 'none';
-        });
-    }
+        // Function to restore pagination after page load
+        function restorePaginationState() {
+            const activePaginationTab = localStorage.getItem('activePaginationTab');
 
-    // Event Listeners for Pending and History
-    document.getElementById('searchPending')?.addEventListener('keyup', function() {
-        filterTable('pendingTable', this.value);
-    });
-    document.getElementById('searchHistory')?.addEventListener('keyup', function() {
-        filterTable('historyTable', this.value);
-    });
-    document.getElementById('resetPendingFilters')?.addEventListener('click', function() {
-        document.getElementById('searchPending').value = '';
-        document.getElementById('dateFromPending').value = '';
-        document.getElementById('dateToPending').value = '';
-        filterTable('pendingTable', '');
-    });
-    document.getElementById('resetHistoryFilters')?.addEventListener('click', function() {
-        document.getElementById('searchHistory').value = '';
-        document.getElementById('dateFromHistory').value = '';
-        document.getElementById('dateToHistory').value = '';
-        filterTable('historyTable', '');
-    });
+            if (activePaginationTab === 'pending') {
+                const savedPage = localStorage.getItem('pendingPage');
+                if (savedPage && savedPage !== '1') {
+                    // Update URL without reloading the whole page
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('pending_page', savedPage);
+                    url.searchParams.delete('page'); // Remove default page param
+                    window.history.replaceState({}, '', url);
 
-    // ============================================
-    // REPORTS FUNCTIONS (UNAFFECTED)
-    // ============================================
-    function loadReports() {
-        const dateFrom = document.getElementById('reportDateFrom')?.value || '';
-        const dateTo = document.getElementById('reportDateTo')?.value || '';
-        const status = document.getElementById('reportStatus')?.value || 'all';
-
-        fetch(`{{ url('teacher/e-permit/reports/data') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    // Find and click the pagination link for the saved page
+                    setTimeout(() => {
+                        const paginationLinks = document.querySelectorAll('#pending .pagination .page-link');
+                        paginationLinks.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href && href.includes(`page=${savedPage}`)) {
+                                link.click();
+                                return;
+                            }
+                        });
+                        localStorage.removeItem('pendingPage');
+                    }, 100);
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.querySelector('#reportsTable tbody');
-                if (data.data && data.data.length > 0) {
-                    tbody.innerHTML = data.data.map(permit => `
+                localStorage.removeItem('activePaginationTab');
+            } else if (activePaginationTab === 'history') {
+                const savedPage = localStorage.getItem('historyPage');
+                if (savedPage && savedPage !== '1') {
+                    // Update URL without reloading
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('history_page', savedPage);
+                    window.history.replaceState({}, '', url);
+
+                    setTimeout(() => {
+                        const paginationLinks = document.querySelectorAll('#history .pagination .page-link');
+                        paginationLinks.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href && href.includes(`history_page=${savedPage}`)) {
+                                link.click();
+                                return;
+                            }
+                        });
+                        localStorage.removeItem('historyPage');
+                    }, 100);
+                }
+                localStorage.removeItem('activePaginationTab');
+            }
+        }
+
+        // Intercept pagination clicks to save state BEFORE navigation
+        function interceptPaginationClicks() {
+            // For pending table pagination
+            const pendingPaginationContainer = document.querySelector('#pending .pagination');
+            if (pendingPaginationContainer) {
+                pendingPaginationContainer.addEventListener('click', function(e) {
+                    const link = e.target.closest('.page-link');
+                    if (link && link.getAttribute('href')) {
+                        const href = link.getAttribute('href');
+                        const pageMatch = href.match(/[?&]page=(\d+)/);
+                        const pendingPageMatch = href.match(/[?&]pending_page=(\d+)/);
+                        const page = pageMatch ? pageMatch[1] : (pendingPageMatch ? pendingPageMatch[1] : null);
+
+                        if (page) {
+                            // Save current tab and page before navigation
+                            localStorage.setItem('activePermitTab', '#pending');
+                            localStorage.setItem('pendingPage', page);
+                            localStorage.setItem('activePaginationTab', 'pending');
+                        }
+                    }
+                });
+            }
+
+            // For history table pagination
+            const historyPaginationContainer = document.querySelector('#history .pagination');
+            if (historyPaginationContainer) {
+                historyPaginationContainer.addEventListener('click', function(e) {
+                    const link = e.target.closest('.page-link');
+                    if (link && link.getAttribute('href')) {
+                        const href = link.getAttribute('href');
+                        const pageMatch = href.match(/[?&]history_page=(\d+)/);
+                        const page = pageMatch ? pageMatch[1] : null;
+
+                        if (page) {
+                            // Save current tab and page before navigation
+                            localStorage.setItem('activePermitTab', '#history');
+                            localStorage.setItem('historyPage', page);
+                            localStorage.setItem('activePaginationTab', 'history');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Save state before page unload
+        window.addEventListener('beforeunload', function() {
+            saveCurrentState();
+        });
+
+        // Restore state when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // First, modify pagination links to preserve tab information
+            modifyPaginationLinks();
+
+            // Restore active tab
+            const lastActiveTab = localStorage.getItem('activePermitTab');
+            if (lastActiveTab && lastActiveTab !== '#reports') {
+                const tabToActivate = document.querySelector(
+                    `#ePermitTab button[data-bs-target="${lastActiveTab}"]`);
+                if (tabToActivate) {
+                    const bsTab = new bootstrap.Tab(tabToActivate);
+                    bsTab.show();
+                }
+                // Don't clear the tab yet, we need it for pagination
+            }
+
+            // Intercept pagination clicks
+            setTimeout(() => {
+                interceptPaginationClicks();
+            }, 100);
+
+            // Restore pagination after a delay (only if we have saved page)
+            setTimeout(() => {
+                restorePaginationState();
+                // Clear saved tab after restoration to avoid conflicts on next reload
+                setTimeout(() => {
+                    if (!window.location.search.includes('page=') && !window.location.search
+                        .includes('pending_page=') && !window.location.search.includes(
+                            'history_page=')) {
+                        localStorage.removeItem('activePermitTab');
+                    }
+                }, 500);
+            }, 200);
+        });
+
+        // Function to modify pagination links to include tab context
+        function modifyPaginationLinks() {
+            // Modify pending pagination links
+            const pendingLinks = document.querySelectorAll('#pending .pagination .page-link');
+            pendingLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.includes('page=')) {
+                    // Convert ?page=X to ?pending_page=X
+                    let newHref = href.replace(/[?&]page=/, '?pending_page=');
+                    // Also remove any existing page parameter
+                    newHref = newHref.replace(/&page=\d+/, '');
+                    link.setAttribute('href', newHref);
+                }
+            });
+
+            // Modify history pagination links
+            const historyLinks = document.querySelectorAll('#history .pagination .page-link');
+            historyLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.includes('page=')) {
+                    let newHref = href.replace(/[?&]page=/, '?history_page=');
+                    newHref = newHref.replace(/&page=\d+/, '');
+                    link.setAttribute('href', newHref);
+                }
+            });
+        }
+
+        // Save active tab when user clicks on any tab
+        document.querySelectorAll('#ePermitTab button').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function(event) {
+                const targetId = event.target.getAttribute('data-bs-target');
+                if (targetId !== '#reports') {
+                    localStorage.setItem('activePermitTab', targetId);
+                    // Clear page states when switching tabs
+                    if (targetId === '#pending') {
+                        localStorage.removeItem('historyPage');
+                    } else if (targetId === '#history') {
+                        localStorage.removeItem('pendingPage');
+                    }
+                }
+            });
+        });
+
+        // ============================================
+        // QUICK APPROVE FUNCTION (UNAFFECTED)
+        // ============================================
+        function quickApprove(permitId) {
+            // Save current state before action
+            saveCurrentState();
+
+            Swal.fire({
+                title: 'Thibitisha Ombi',
+                text: 'Je, una uhakika unataka kukubali ombi hili la ruhusa?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ndiyo, Kubali',
+                cancelButtonText: 'Hapana',
+                input: 'textarea',
+                inputPlaceholder: 'Andika maoni (si lazima)...'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Inachakata...',
+                        text: 'Tafadhali subiri',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    fetch(`{{ url('teacher/e-permit') }}/${permitId}/approve`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                comment: result.value
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Imefanikiwa!', data.message, 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Hitilafu!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
+                        });
+                }
+            });
+        }
+
+        // ============================================
+        // QUICK REJECT FUNCTION (UNAFFECTED)
+        // ============================================
+        function quickReject(permitId) {
+            // Save current state before action
+            saveCurrentState();
+
+            Swal.fire({
+                title: 'Kataa Ombi',
+                text: 'Je, una uhakika unataka kukataa ombi hili la ruhusa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ndiyo, Kataa',
+                cancelButtonText: 'Hapana',
+                input: 'textarea',
+                inputPlaceholder: 'Tafadhali andika sababu ya kukataa...',
+                inputValidator: (value) => {
+                    if (!value) return 'Sababu ya kukataa inahitajika!';
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Inachakata...',
+                        text: 'Tafadhali subiri',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    fetch(`{{ url('teacher/e-permit') }}/${permitId}/reject`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                reason: result.value
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Imefanikiwa!', data.message, 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Hitilafu!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
+                        });
+                }
+            });
+        }
+
+        // ============================================
+        // FILTER FUNCTIONS (UNAFFECTED)
+        // ============================================
+        function filterTable(tableId, searchText) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            const rows = table.querySelectorAll('tbody tr');
+            if (!rows.length) return;
+            const search = searchText.toLowerCase();
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Event Listeners for Pending and History
+        document.getElementById('searchPending')?.addEventListener('keyup', function() {
+            filterTable('pendingTable', this.value);
+        });
+        document.getElementById('searchHistory')?.addEventListener('keyup', function() {
+            filterTable('historyTable', this.value);
+        });
+        document.getElementById('resetPendingFilters')?.addEventListener('click', function() {
+            document.getElementById('searchPending').value = '';
+            document.getElementById('dateFromPending').value = '';
+            document.getElementById('dateToPending').value = '';
+            filterTable('pendingTable', '');
+        });
+        document.getElementById('resetHistoryFilters')?.addEventListener('click', function() {
+            document.getElementById('searchHistory').value = '';
+            document.getElementById('dateFromHistory').value = '';
+            document.getElementById('dateToHistory').value = '';
+            filterTable('historyTable', '');
+        });
+
+        // ============================================
+        // REPORTS FUNCTIONS (UNAFFECTED)
+        // ============================================
+        function loadReports() {
+            const dateFrom = document.getElementById('reportDateFrom')?.value || '';
+            const dateTo = document.getElementById('reportDateTo')?.value || '';
+            const status = document.getElementById('reportStatus')?.value || 'all';
+
+            fetch(`{{ url('teacher/e-permit/reports/data') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#reportsTable tbody');
+                    if (data.data && data.data.length > 0) {
+                        tbody.innerHTML = data.data.map(permit => `
                 <tr>
                     <td><strong>${permit.permit_number.toUpperCase()}</strong></td>
                     <td>${permit.student_name}<br><small class="text-muted">${permit.admission_number.toUpperCase()}</small></td>
@@ -1085,134 +1206,134 @@
                     <td>${permit.created_date}</td>
                 </tr>
                 `).join('');
-                } else {
-                    tbody.innerHTML =
-                        '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
-    document.getElementById('filterReportsBtn')?.addEventListener('click', loadReports);
-    document.getElementById('resetReportsBtn')?.addEventListener('click', function() {
-        document.getElementById('reportDateFrom').value = '';
-        document.getElementById('reportDateTo').value = '';
-        document.getElementById('reportStatus').value = 'all';
-        loadReports();
-    });
-    document.getElementById('exportPdfBtn')?.addEventListener('click', function() {
-        const dateFrom = document.getElementById('reportDateFrom')?.value || '';
-        const dateTo = document.getElementById('reportDateTo')?.value || '';
-        const status = document.getElementById('reportStatus')?.value || 'all';
-        window.open(
-            `{{ url('teacher/e-permit/reports/export-pdf') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`,
-            '_blank');
-    });
-    document.getElementById('exportExcelBtn')?.addEventListener('click', function() {
-        const dateFrom = document.getElementById('reportDateFrom')?.value || '';
-        const dateTo = document.getElementById('reportDateTo')?.value || '';
-        const status = document.getElementById('reportStatus')?.value || 'all';
-        window.open(
-            `{{ url('teacher/e-permit/reports/export-excel') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`,
-            '_blank');
-    });
-
-    // ============================================
-    // STUDENT RETURN FUNCTIONS (UNAFFECTED)
-    // ============================================
-    document.getElementById('searchReturnBtn')?.addEventListener('click', function() {
-        // Save current state before search
-        saveCurrentState();
-
-        const search = document.getElementById('returnSearchInput').value.trim();
-        if (!search) {
-            Swal.fire('Taarifa', 'Tafadhali ingiza Permit number au Student ID', 'warning');
-            return;
+                    } else {
+                        tbody.innerHTML =
+                            '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
 
-        Swal.fire({
-            title: 'Inatafuta...',
-            text: 'Tafadhali subiri',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
+        document.getElementById('filterReportsBtn')?.addEventListener('click', loadReports);
+        document.getElementById('resetReportsBtn')?.addEventListener('click', function() {
+            document.getElementById('reportDateFrom').value = '';
+            document.getElementById('reportDateTo').value = '';
+            document.getElementById('reportStatus').value = 'all';
+            loadReports();
+        });
+        document.getElementById('exportPdfBtn')?.addEventListener('click', function() {
+            const dateFrom = document.getElementById('reportDateFrom')?.value || '';
+            const dateTo = document.getElementById('reportDateTo')?.value || '';
+            const status = document.getElementById('reportStatus')?.value || 'all';
+            window.open(
+                `{{ url('teacher/e-permit/reports/export-pdf') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`,
+                '_blank');
+        });
+        document.getElementById('exportExcelBtn')?.addEventListener('click', function() {
+            const dateFrom = document.getElementById('reportDateFrom')?.value || '';
+            const dateTo = document.getElementById('reportDateTo')?.value || '';
+            const status = document.getElementById('reportStatus')?.value || 'all';
+            window.open(
+                `{{ url('teacher/e-permit/reports/export-excel') }}?date_from=${dateFrom}&date_to=${dateTo}&status=${status}`,
+                '_blank');
         });
 
-        fetch(`{{ url('teacher/e-permit/return/search') }}?search=${encodeURIComponent(search)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close();
-                if (data.success) {
-                    displayReturnInfo(data.permit);
-                } else {
-                    Swal.fire('Taarifa', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                Swal.close();
-                Swal.fire('Hitilafu', 'Tafadhali jaribu tena', 'error');
+        // ============================================
+        // STUDENT RETURN FUNCTIONS (UNAFFECTED)
+        // ============================================
+        document.getElementById('searchReturnBtn')?.addEventListener('click', function() {
+            // Save current state before search
+            saveCurrentState();
+
+            const search = document.getElementById('returnSearchInput').value.trim();
+            if (!search) {
+                Swal.fire('Taarifa', 'Tafadhali ingiza Permit number au Student ID', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Inatafuta...',
+                text: 'Tafadhali subiri',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
             });
-    });
 
-    // Function to populate relationship options dynamically
-    function populateReturnRelationships() {
-        const guardianType = document.getElementById('returnGuardianType');
-        const relationship = document.getElementById('returnRelationship');
+            fetch(`{{ url('teacher/e-permit/return/search') }}?search=${encodeURIComponent(search)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    if (data.success) {
+                        displayReturnInfo(data.permit);
+                    } else {
+                        Swal.fire('Taarifa', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire('Hitilafu', 'Tafadhali jaribu tena', 'error');
+                });
+        });
 
-        const parentRelationships = ['Baba', 'Mama'];
-        const guardianRelationships = ['Dada', 'Kaka', 'Shangazi', 'Mjomba', 'Babu', 'Bibi'];
+        // Function to populate relationship options dynamically
+        function populateReturnRelationships() {
+            const guardianType = document.getElementById('returnGuardianType');
+            const relationship = document.getElementById('returnRelationship');
 
-        const selectedType = guardianType.value;
-        let options = '<option value="">-- Chagua Uhusiano --</option>';
+            const parentRelationships = ['Baba', 'Mama'];
+            const guardianRelationships = ['Dada', 'Kaka', 'Shangazi', 'Mjomba', 'Babu', 'Bibi'];
 
-        if (selectedType === 'parent') {
-            parentRelationships.forEach(rel => {
-                options += `<option value="${rel.toLowerCase()}">${rel}</option>`;
-            });
-        } else if (selectedType === 'guardian') {
-            guardianRelationships.forEach(rel => {
-                options += `<option value="${rel.toLowerCase()}">${rel}</option>`;
-            });
+            const selectedType = guardianType.value;
+            let options = '<option value="">-- Chagua Uhusiano --</option>';
+
+            if (selectedType === 'parent') {
+                parentRelationships.forEach(rel => {
+                    options += `<option value="${rel.toLowerCase()}">${rel}</option>`;
+                });
+            } else if (selectedType === 'guardian') {
+                guardianRelationships.forEach(rel => {
+                    options += `<option value="${rel.toLowerCase()}">${rel}</option>`;
+                });
+            }
+
+            relationship.innerHTML = options;
         }
 
-        relationship.innerHTML = options;
-    }
+        function displayReturnInfo(permit) {
+            const container = document.getElementById('returnResultContainer');
+            const tableContainer = document.getElementById('returnTableContainer');
 
-    function displayReturnInfo(permit) {
-        const container = document.getElementById('returnResultContainer');
-        const tableContainer = document.getElementById('returnTableContainer');
+            // Format dates nicely
+            const departureDate = new Date(permit.departure_date);
+            const expectedReturnDate = new Date(permit.expected_return_date);
+            const formattedDeparture = departureDate.toLocaleDateString('sw-TZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            const formattedReturn = expectedReturnDate.toLocaleDateString('sw-TZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
 
-        // Format dates nicely
-        const departureDate = new Date(permit.departure_date);
-        const expectedReturnDate = new Date(permit.expected_return_date);
-        const formattedDeparture = departureDate.toLocaleDateString('sw-TZ', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-        const formattedReturn = expectedReturnDate.toLocaleDateString('sw-TZ', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
+            const isLateHtml = permit.is_late ?
+                '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Amechelewa</span>' :
+                '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Kwa Wakati</span>';
 
-        const isLateHtml = permit.is_late ?
-            '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Amechelewa</span>' :
-            '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Kwa Wakati</span>';
+            // Student image path
+            const studentImage = permit.student.image ?
+                `/storage/students/${permit.student.image}` :
+                '{{ asset('storage/students/student.jpg') }}';
 
-        // Student image path
-        const studentImage = permit.student.image ?
-            `/storage/students/${permit.student.image}` :
-            '{{ asset('storage/students/student.jpg') }}';
-
-        container.innerHTML = `
+            container.innerHTML = `
         <div class="student-info-card" style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: -20px -20px 20px -20px; padding: 15px 20px; border-radius: 16px 16px 0 0;">
                 <h5 class="mb-0 text-white"><i class="fas fa-undo-alt me-2"></i> Thibitisha Kurudi kwa Mwanafunzi</h5>
@@ -1348,211 +1469,205 @@
         </div>
         `;
 
-        container.style.display = 'block';
-        tableContainer.style.display = 'none';
+            container.style.display = 'block';
+            tableContainer.style.display = 'none';
 
-        // Setup dynamic relationship fields
-        const guardianTypeSelect = document.getElementById('returnGuardianType');
-        if (guardianTypeSelect) {
-            guardianTypeSelect.addEventListener('change', populateReturnRelationships);
-            populateReturnRelationships();
+            // Setup dynamic relationship fields
+            const guardianTypeSelect = document.getElementById('returnGuardianType');
+            if (guardianTypeSelect) {
+                guardianTypeSelect.addEventListener('change', populateReturnRelationships);
+                populateReturnRelationships();
+            }
+
+            // Cancel button
+            document.getElementById('cancelReturnBtn').addEventListener('click', () => {
+                container.style.display = 'none';
+                tableContainer.style.display = 'block';
+                document.getElementById('returnSearchInput').value = '';
+            });
+
+            // Handle accompanied fields toggle
+            const aloneYes = document.getElementById('return_alone_yes');
+            const aloneNo = document.getElementById('return_alone_no');
+            const accompaniedFields = document.getElementById('returnAccompaniedFields');
+
+            aloneYes.addEventListener('change', () => accompaniedFields.style.display = 'none');
+            aloneNo.addEventListener('change', () => accompaniedFields.style.display = 'block');
+
+            // Form submission
+            document.getElementById('returnConfirmForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Save current state before submission
+                saveCurrentState();
+
+                const returnedAlone = document.querySelector('input[name="returned_alone"]:checked').value;
+
+                // Validate accompanied person fields if not returned alone
+                if (returnedAlone === '0') {
+                    const accompaniedByName = document.querySelector('input[name="accompanied_by_name"]').value
+                        .trim();
+                    const guardianType = document.querySelector('select[name="guardian_type"]').value;
+                    const relationship = document.querySelector('select[name="relationship"]').value;
+
+                    if (!accompaniedByName) {
+                        Swal.fire('Taarifa', 'Tafadhali ingiza jina la aliyemrudisha', 'warning');
+                        return;
+                    }
+                    if (!guardianType) {
+                        Swal.fire('Taarifa', 'Tafadhali chagua undugu', 'warning');
+                        return;
+                    }
+                    if (!relationship) {
+                        Swal.fire('Taarifa', 'Tafadhali chagua uhusiano', 'warning');
+                        return;
+                    }
+                }
+
+                const formData = new FormData(this);
+                const permitId = formData.get('permit_id');
+
+                Swal.fire({
+                    title: 'Thibitisha Kurudi',
+                    text: 'Je, una hakika mwanafunzi amerudi shuleni?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#22c55e',
+                    confirmButtonText: 'Ndiyo, Thibitisha',
+                    cancelButtonText: 'Hapana'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Inachakata...',
+                            text: 'Tafadhali subiri',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        fetch(`{{ url('teacher/e-permit/return') }}/${permitId}/confirm`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify(Object.fromEntries(formData))
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Imefanikiwa!', data.message, 'success').then(() => {
+                                        container.style.display = 'none';
+                                        tableContainer.style.display = 'block';
+                                        document.getElementById('returnSearchInput').value = '';
+                                        // Save state before reload
+                                        saveCurrentState();
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Hitilafu!', data.message, 'error');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
+                            });
+                    }
+                });
+            });
         }
 
-        // Cancel button
-        document.getElementById('cancelReturnBtn').addEventListener('click', () => {
-            container.style.display = 'none';
-            tableContainer.style.display = 'block';
-            document.getElementById('returnSearchInput').value = '';
+        // ============================================
+        // TAB EVENT LISTENERS (UNAFFECTED)
+        // ============================================
+        // Load reports when reports tab is shown
+        $('#ePermitTab button[data-bs-target="#reports"]').on('shown.bs.tab', function() {
+            loadReports();
         });
 
-        // Handle accompanied fields toggle
-        const aloneYes = document.getElementById('return_alone_yes');
-        const aloneNo = document.getElementById('return_alone_no');
-        const accompaniedFields = document.getElementById('returnAccompaniedFields');
-
-        aloneYes.addEventListener('change', () => accompaniedFields.style.display = 'none');
-        aloneNo.addEventListener('change', () => accompaniedFields.style.display = 'block');
-
-        // Form submission
-        document.getElementById('returnConfirmForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Save current state before submission
+        // ============================================
+        // YEAR FILTER FUNCTION (UNAFFECTED)
+        // ============================================
+        function filterByYear(year) {
+            // Save current state before year change
             saveCurrentState();
 
-            const returnedAlone = document.querySelector('input[name="returned_alone"]:checked').value;
-
-            // Validate accompanied person fields if not returned alone
-            if (returnedAlone === '0') {
-                const accompaniedByName = document.querySelector('input[name="accompanied_by_name"]').value
-                    .trim();
-                const guardianType = document.querySelector('select[name="guardian_type"]').value;
-                const relationship = document.querySelector('select[name="relationship"]').value;
-
-                if (!accompaniedByName) {
-                    Swal.fire('Taarifa', 'Tafadhali ingiza jina la aliyemrudisha', 'warning');
-                    return;
-                }
-                if (!guardianType) {
-                    Swal.fire('Taarifa', 'Tafadhali chagua undugu', 'warning');
-                    return;
-                }
-                if (!relationship) {
-                    Swal.fire('Taarifa', 'Tafadhali chagua uhusiano', 'warning');
-                    return;
-                }
-            }
-
-            const formData = new FormData(this);
-            const permitId = formData.get('permit_id');
-
+            // Show loading indicator
             Swal.fire({
-                title: 'Thibitisha Kurudi',
-                text: 'Je, una hakika mwanafunzi amerudi shuleni?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#22c55e',
-                confirmButtonText: 'Ndiyo, Thibitisha',
-                cancelButtonText: 'Hapana'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Inachakata...',
-                        text: 'Tafadhali subiri',
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading()
-                    });
-
-                    fetch(`{{ url('teacher/e-permit/return') }}/${permitId}/confirm`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify(Object.fromEntries(formData))
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Imefanikiwa!', data.message, 'success').then(() => {
-                                    container.style.display = 'none';
-                                    tableContainer.style.display = 'block';
-                                    document.getElementById('returnSearchInput').value = '';
-                                    // Save state before reload
-                                    saveCurrentState();
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Hitilafu!', data.message, 'error');
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire('Hitilafu!', 'Tafadhali jaribu tena', 'error');
-                        });
+                title: 'Loading...',
+                text: 'Fetching data for year ' + year,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
-        });
-    }
 
-    // ============================================
-    // TAB EVENT LISTENERS (UNAFFECTED - using jQuery)
-    // ============================================
-    // Load reports when reports tab is shown
-    $('#ePermitTab button[data-bs-target="#reports"]').on('shown.bs.tab', function() {
-        loadReports();
-    });
+            // Get current URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentUrl = window.location.pathname;
 
-    // ============================================
-    // YEAR FILTER FUNCTION (UNAFFECTED)
-    // ============================================
-    function filterByYear(year) {
-        // Save current state before year change
-        saveCurrentState();
+            // Update year parameter
+            urlParams.set('year', year);
 
-        // Show loading indicator
-        Swal.fire({
-            title: 'Loading...',
-            text: 'Fetching data for year ' + year,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+            // Preserve pagination parameters if they exist
+            const pendingPage = localStorage.getItem('pendingPage');
+            const historyPage = localStorage.getItem('historyPage');
+
+            if (pendingPage && document.querySelector('#pending.active, #pending.show')) {
+                urlParams.set('pending_page', pendingPage);
             }
-        });
-
-        // Get current URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentUrl = window.location.pathname;
-
-        // Update year parameter
-        urlParams.set('year', year);
-
-        // Redirect to new URL with year filter
-        window.location.href = currentUrl + '?' + urlParams.toString();
-    }
-
-    // ============================================
-    // ALTERNATIVE AJAX YEAR FILTER (PRESERVED)
-    // ============================================
-    function filterByYearAjax(year) {
-        // Save current state before AJAX update
-        saveCurrentState();
-
-        // Show loading
-        $('#pending').html(
-            '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
-        );
-        $('#history').html(
-            '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
-        );
-
-        // Update stats via AJAX
-        $.ajax({
-            url: '{{ url('teacher/e-permit/dashboard/stats') }}',
-            type: 'GET',
-            data: {
-                year: year
-            },
-            success: function(response) {
-                // Update stats cards
-                $('.stat-card.pending .stat-number').text(response.stats.pending);
-                $('.stat-card.approved .stat-number').text(response.stats.approved);
-                $('.stat-card.rejected .stat-number').text(response.stats.rejected);
-                $('.stat-card.completed .stat-number').text(response.stats.completed);
-
-                // Update pending permits table
-                $('#pending').html(response.pendingHtml);
-
-                // Update history table
-                $('#history').html(response.historyHtml);
-
-                // Update URL without reload
-                const url = new URL(window.location.href);
-                url.searchParams.set('year', year);
-                window.history.pushState({}, '', url);
-
-                Swal.close();
-            },
-            error: function() {
-                Swal.fire('Error', 'Failed to load data for year ' + year, 'error');
+            if (historyPage && document.querySelector('#history.active, #history.show')) {
+                urlParams.set('history_page', historyPage);
             }
-        });
-    }
 
-    // ============================================
-    // DOM CONTENT LOADED EVENT (UNAFFECTED)
-    // ============================================
-    document.addEventListener('DOMContentLoaded', function() {
-        // When pending tab is shown
-        $('#ePermitTab button[data-bs-target="#pending"]').on('shown.bs.tab', function() {
-            const currentYear = document.getElementById('yearFilter').value;
-            // Optional: refresh pending data with current year
-        });
+            // Redirect to new URL with year filter
+            window.location.href = currentUrl + '?' + urlParams.toString();
+        }
 
-        // When history tab is shown
-        $('#ePermitTab button[data-bs-target="#history"]').on('shown.bs.tab', function() {
-            const currentYear = document.getElementById('yearFilter').value;
-            // Optional: refresh history data with current year
-        });
-    });
-</script>
+        // ============================================
+        // ALTERNATIVE AJAX YEAR FILTER (PRESERVED)
+        // ============================================
+        function filterByYearAjax(year) {
+            // Save current state before AJAX update
+            saveCurrentState();
+
+            // Show loading
+            $('#pending').html(
+                '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
+            );
+            $('#history').html(
+                '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading data...</p></div>'
+            );
+
+            // Update stats via AJAX
+            $.ajax({
+                url: '{{ url('teacher/e-permit/dashboard/stats') }}',
+                type: 'GET',
+                data: {
+                    year: year
+                },
+                success: function(response) {
+                    // Update stats cards
+                    $('.stat-card.pending .stat-number').text(response.stats.pending);
+                    $('.stat-card.approved .stat-number').text(response.stats.approved);
+                    $('.stat-card.rejected .stat-number').text(response.stats.rejected);
+                    $('.stat-card.completed .stat-number').text(response.stats.completed);
+
+                    // Update pending permits table
+                    $('#pending').html(response.pendingHtml);
+
+                    // Update history table
+                    $('#history').html(response.historyHtml);
+
+                    // Update URL without reload
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('year', year);
+                    window.history.pushState({}, '', url);
+
+                    Swal.close();
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to load data for year ' + year, 'error');
+                }
+            });
+        }
+    </script>
 @endsection
