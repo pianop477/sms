@@ -449,98 +449,147 @@ class EPermitController extends Controller
      */
     public function searchReturn(Request $request): JsonResponse
     {
-        $request->validate([
-            'search' => 'required|string'
-        ]);
+        // Remove strict AJAX check temporarily
+        // if (!$request->ajax()) {
+        //     return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        // }
 
-        $search = $request->search;
+        try {
+            $request->validate([
+                'search' => 'required|string|min:3'
+            ]);
 
-        $permit = EPermit::with(['student', 'student.class'])
-            ->where('permit_number', 'like', "%{$search}%")
-            ->orWhereHas('student', function ($q) use ($search) {
-                $q->where('admission_number', 'like', "%{$search}%")
-                    ->orWhere('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%");
-            })
-            ->where('status', 'approved')
-            ->whereNull('verified_at')
-            ->first();
+            $search = $request->search;
+            $teacher = $this->getTeacher();
 
-        if (!$permit) {
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            // Only academic and head teacher can check return
+            if (!in_array($teacher->role_id, [2, 3])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized. Only Academic and Head Teacher can check returns.'], 403);
+            }
+
+            $permit = EPermit::with(['student', 'student.class'])
+                ->where(function($q) use ($search) {
+                    $q->where('permit_number', 'like', "%{$search}%")
+                        ->orWhereHas('student', function ($sq) use ($search) {
+                            $sq->where('admission_number', 'like', "%{$search}%")
+                                ->orWhere('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                })
+                ->where('status', 'approved')
+                ->whereNull('verified_at')
+                ->first();
+
+            if (!$permit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No approved permit found for this student. Please check the permit number or student ID and try again.'
+                ]);
+            }
+
+            $isLate = now()->startOfDay() > $permit->expected_return_date;
+
+            return response()->json([
+                'success' => true,
+                'permit' => [
+                    'id' => $permit->id,
+                    'permit_number' => $permit->permit_number,
+                    'student' => [
+                        'id' => $permit->student->id,
+                        'name' => ucwords(strtolower($permit->student->first_name . ' ' . $permit->student->last_name)),
+                        'admission_number' => strtoupper($permit->student->admission_number),
+                        'class' => strtoupper($permit->student->class->class_name ?? 'N/A'),
+                        'image' => $permit->student->image
+                    ],
+                    'guardian_name' => ucwords(strtolower($permit->guardian_name)),
+                    'guardian_phone' => $permit->guardian_phone,
+                    'departure_date' => $permit->departure_date->format('Y-m-d'),
+                    'expected_return_date' => $permit->expected_return_date->format('Y-m-d'),
+                    'is_late' => $isLate
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'No approved permit found for this student. Please check and try again.'
-            ]);
+                'message' => 'Search term must be at least 3 characters'
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('searchReturn error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error. Please try again.'
+            ], 500);
         }
-
-        // Check if return date has passed
-        $isLate = now()->startOfDay() > $permit->expected_return_date;
-
-        return response()->json([
-            'success' => true,
-            'permit' => [
-                'id' => $permit->id,
-                'permit_number' => $permit->permit_number,
-                'student' => [
-                    'id' => $permit->student->id,
-                    'name' => ucwords(strtolower($permit->student->first_name . ' ' . $permit->student->last_name)),
-                    'admission_number' => strtoupper($permit->student->admission_number),
-                    'class' => strtoupper($permit->student->class->class_name ?? 'N/A'),
-                    'image' => $permit->student->image
-                ],
-                'guardian_name' => ucwords(strtolower($permit->guardian_name)),
-                'guardian_phone' => $permit->guardian_phone,
-                'departure_date' => $permit->departure_date->format('Y-m-d'),
-                'expected_return_date' => $permit->expected_return_date->format('Y-m-d'),
-                'is_late' => $isLate
-            ]
-        ]);
     }
 
-    /**
-     * Confirm student return
-     */
+
     public function confirmReturn(Request $request, $id): JsonResponse
     {
-        $request->validate([
-            'returned_alone' => 'required|boolean',
-            'accompanied_by_name' => 'required_if:returned_alone,0|nullable|string|max:255',
-            'guardian_type' => 'required_if:returned_alone,0|nullable|string|in:parent,guardian',
-            'relationship' => 'required_if:returned_alone,0|nullable|string|max:50',
-            'late_reason' => 'required_if:is_late,1|nullable|string|max:500'
-        ]);
+        // Remove strict AJAX check
+        // if (!$request->ajax()) {
+        //     return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        // }
 
-        $teacher = $this->getTeacher();
-        $permit = EPermit::findOrFail($id);
+        try {
+            $request->validate([
+                'returned_alone' => 'required|boolean',
+                'accompanied_by_name' => 'required_if:returned_alone,0|nullable|string|max:255',
+                'guardian_type' => 'required_if:returned_alone,0|nullable|string|in:parent,guardian',
+                'relationship' => 'required_if:returned_alone,0|nullable|string|max:50',
+                'late_reason' => 'required_if:is_late,1|nullable|string|max:500'
+            ]);
 
-        // Verify permit is approved and not yet verified
-        if ($permit->status !== 'approved') {
+            $teacher = $this->getTeacher();
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            // Only academic and head teacher can confirm return
+            if (!in_array($teacher->role_id, [2, 3])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            $permit = EPermit::findOrFail($id);
+
+            if ($permit->status !== 'approved') {
+                return response()->json(['success' => false, 'message' => 'Only approved permits can be verified for return.'], 422);
+            }
+
+            if ($permit->verified_at) {
+                return response()->json(['success' => false, 'message' => 'This permit has already been verified for return.'], 422);
+            }
+
+            $returnData = [
+                'actual_return_date' => now(),
+                'returned_alone' => $request->returned_alone,
+                'accompanied_by_name' => $request->returned_alone ? null : $request->accompanied_by_name,
+                'guardian_type' => $request->returned_alone ? null : $request->guardian_type,
+                'relationship' => $request->returned_alone ? null : $request->relationship,
+                'late_reason' => $request->late_reason ?? null,
+                'is_late' => $request->is_late ?? false
+            ];
+
+            $result = $this->ePermitService->completeReturn($permit, $teacher, $returnData);
+
+            return response()->json($result);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only approved permits can be verified for return.'
+                'message' => 'Validation failed: ' . implode(', ', $e->errors())
             ], 422);
-        }
-
-        if ($permit->verified_at) {
+        } catch (\Exception $e) {
+            \Log::error('confirmReturn error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'This permit has already been verified for return.'
-            ], 422);
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
         }
-
-        $returnData = [
-            'actual_return_date' => now(),
-            'returned_alone' => $request->returned_alone,
-            'accompanied_by_name' => $request->returned_alone ? null : $request->accompanied_by_name,
-            'guardian_type' => $request->returned_alone ? null : $request->guardian_type,
-            'relationship' => $request->returned_alone ? null : $request->relationship,
-            'late_reason' => $request->late_reason ?? null,
-            'is_late' => $request->is_late ?? false
-        ];
-
-        $result = $this->ePermitService->completeReturn($permit, $teacher, $returnData);
-
-        return response()->json($result);
     }
 
     /**
@@ -711,39 +760,71 @@ class EPermitController extends Controller
      */
     public function getReportsData(Request $request): JsonResponse
     {
-        $teacher = $this->getTeacher();
-        if (!in_array($teacher->role_id, [2, 3])) {
-            return response()->json(['data' => []]);
-        }
+        // Remove the AJAX check temporarily for debugging
+        // if (!$request->ajax()) {
+        //     return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        // }
 
-        $query = EPermit::with(['student', 'student.class']);
+        try {
+            $teacher = $this->getTeacher();
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
 
-        if ($request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        if ($request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-        if ($request->status && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
+            // Only academic and head teacher can access
+            if (!in_array($teacher->role_id, [2, 3])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
 
-        $permits = $query->orderBy('created_at', 'desc')->get()->map(function ($permit) {
-            return [
-                'permit_number' => $permit->permit_number,
-                'student_name' => $permit->student->first_name . ' ' . $permit->student->last_name,
-                'admission_number' => $permit->student->admission_number,
-                'class_name' => $permit->student->class->class_name ?? 'N/A',
-                'guardian_name' => $permit->guardian_name,
-                'guardian_phone' => $permit->guardian_phone,
-                'departure_date' => $permit->departure_date->format('d/m/Y'),
-                'expected_return_date' => $permit->expected_return_date->format('d/m/Y'),
-                'status' => $permit->status,
-                'created_date' => $permit->created_at->format('d/m/Y')
-            ];
-        });
+            $dateFrom = $request->get('date_from', '');
+            $dateTo = $request->get('date_to', '');
+            $status = $request->get('status', 'all');
 
-        return response()->json(['data' => $permits]);
+            $query = EPermit::with(['student', 'student.class'])
+                ->orderBy('created_at', 'desc');
+
+            if ($dateFrom) {
+                $query->whereDate('departure_date', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->whereDate('departure_date', '<=', $dateTo);
+            }
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+
+            $permits = $query->get();
+
+            $data = [];
+            foreach ($permits as $permit) {
+                $data[] = [
+                    'permit_number' => $permit->permit_number,
+                    'student_name' => ucwords(strtolower($permit->student->first_name . ' ' . $permit->student->last_name)),
+                    'admission_number' => strtoupper($permit->student->admission_number),
+                    'class_name' => $permit->student->class->class_name ?? 'N/A',
+                    'guardian_name' => ucwords(strtolower($permit->guardian_name)),
+                    'guardian_phone' => $permit->guardian_phone,
+                    'departure_date' => $permit->departure_date->format('d/m/Y'),
+                    'expected_return_date' => $permit->expected_return_date->format('d/m/Y'),
+                    'status' => $permit->status,
+                    'created_date' => $permit->created_at->format('d/m/Y H:i')
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'count' => count($data)
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('getReportsData error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
     }
 
     /**
@@ -847,5 +928,236 @@ class EPermitController extends Controller
         }
 
         return $timeline;
+    }
+
+    /**
+     * Get pending permits data via AJAX
+     */
+    public function getPendingData(Request $request): JsonResponse
+    {
+        // Always return JSON for this route
+        if (!$request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        }
+
+        try {
+            $teacher = $this->getTeacher();
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            $year = $request->get('year', date('Y'));
+            $search = $request->get('search', '');
+            $dateFrom = $request->get('date_from', '');
+            $dateTo = $request->get('date_to', '');
+            $page = $request->get('page', 1);
+            $perPage = 15;
+
+            switch ($teacher->role_id) {
+                case 4: // Class Teacher
+                    $allPending = EPermit::where('status', 'pending_class_teacher')
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function($q) use ($search) {
+                            $q->where(function($sq) use ($search) {
+                                $sq->where('permit_number', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('admission_number', 'LIKE', "%{$search}%"));
+                            });
+                        })
+                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->get();
+
+                    $filtered = $allPending->filter(function ($permit) use ($teacher) {
+                        return $this->ePermitService->isClassTeacher($permit->student, $teacher);
+                    });
+
+                    $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+                        $filtered->forPage($page, $perPage),
+                        $filtered->count(),
+                        $perPage,
+                        $page,
+                        ['path' => $request->url(), 'query' => ['year' => $year]]
+                    );
+                    break;
+
+                case 3: // Academic Teacher
+                    $paginated = EPermit::where(function ($q) {
+                            $q->where('status', 'pending_academic')
+                                ->orWhere('status', 'pending_duty_teacher');
+                        })
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function($q) use ($search) {
+                            $q->where(function($sq) use ($search) {
+                                $sq->where('permit_number', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('admission_number', 'LIKE', "%{$search}%"));
+                            });
+                        })
+                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->orderBy('created_at', 'desc')
+                        ->paginate($perPage, ['*'], 'page', $page);
+                    break;
+
+                case 2: // Head Teacher
+                    $paginated = EPermit::where('status', 'pending_head')
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function($q) use ($search) {
+                            $q->where(function($sq) use ($search) {
+                                $sq->where('permit_number', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('admission_number', 'LIKE', "%{$search}%"));
+                            });
+                        })
+                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->orderBy('created_at', 'desc')
+                        ->paginate($perPage, ['*'], 'page', $page);
+                    break;
+
+                default:
+                    return response()->json(['success' => false, 'message' => 'Unauthorized role'], 403);
+            }
+
+            $html = view('teacher.e-permit.partials.pending_table', [
+                'pendingPermits' => $paginated,
+                'teacher' => $teacher
+            ])->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'count' => $paginated->total(),
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage()
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('getPendingData error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get history permits data via AJAX
+     */
+    public function getHistoryData(Request $request): JsonResponse
+    {
+        if (!$request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        }
+
+        try {
+            $teacher = $this->getTeacher();
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            $year = $request->get('year', date('Y'));
+            $search = $request->get('search', '');
+            $dateFrom = $request->get('date_from', '');
+            $dateTo = $request->get('date_to', '');
+            $page = $request->get('page', 1);
+            $perPage = 15;
+
+            switch ($teacher->role_id) {
+                case 4: // Class Teacher
+                    $allHistory = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function($q) use ($search) {
+                            $q->where(function($sq) use ($search) {
+                                $sq->where('permit_number', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('admission_number', 'LIKE', "%{$search}%"));
+                            });
+                        })
+                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->get();
+
+                    $filtered = $allHistory->filter(function ($permit) use ($teacher) {
+                        return $this->ePermitService->isClassTeacher($permit->student, $teacher);
+                    });
+
+                    $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+                        $filtered->forPage($page, $perPage),
+                        $filtered->count(),
+                        $perPage,
+                        $page,
+                        ['path' => $request->url(), 'query' => ['year' => $year]]
+                    );
+                    break;
+
+                case 3: // Academic Teacher
+                case 2: // Head Teacher
+                    $paginated = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function($q) use ($search) {
+                            $q->where(function($sq) use ($search) {
+                                $sq->where('permit_number', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                                        ->orWhere('admission_number', 'LIKE', "%{$search}%"));
+                            });
+                        })
+                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->orderBy('created_at', 'desc')
+                        ->paginate($perPage, ['*'], 'page', $page);
+                    break;
+
+                default:
+                    return response()->json(['success' => false, 'message' => 'Unauthorized role'], 403);
+            }
+
+            $html = view('teacher.e-permit.partials.history_table', [
+                'historyPermits' => $paginated,
+                'teacher' => $teacher
+            ])->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage()
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('getHistoryData error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error'], 500);
+        }
+    }
+
+    /**
+     * Get dashboard statistics via AJAX
+     */
+    public function getStatsData(Request $request): JsonResponse
+    {
+        if (!$request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+        }
+
+        try {
+            $teacher = $this->getTeacher();
+            if (!$teacher) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            $year = $request->get('year', date('Y'));
+            $stats = $this->getDashboardStats($teacher, $year);
+
+            return response()->json([
+                'success' => true,
+                'stats' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Server error'], 500);
+        }
     }
 }

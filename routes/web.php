@@ -744,33 +744,23 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     Route::get('/api/employees/with-contracts', [PayrollController::class, 'getEmployeesWithContracts'])->name('api.employees.with-contracts');
     Route::get('/api/employees/search', [PayrollController::class, 'searchEmployees'])->name('api.employees.search');
 
-    // Teacher E-Permit Routes (require authentication)
     Route::prefix('teacher/e-permit')->name('teacher.e-permit.')->group(function () {
-        // Dashboard & Listing
-        Route::get('/dashboard', [TeacherEPermitController::class, 'dashboard'])->name('dashboard');
-        Route::get('/{id}', [TeacherEPermitController::class, 'show'])->name('show');
-
-        // Approval Actions
-        Route::post('/{id}/approve', [TeacherEPermitController::class, 'approve'])->name('approve');
-        Route::post('/{id}/reject', [TeacherEPermitController::class, 'reject'])->name('reject');
-
-        // Return Check-in
-        Route::get('/return', [TeacherEPermitController::class, 'returnForm'])->name('return-form');
+        // AJAX endpoints - MUST come first
+        Route::get('/reports/data', [TeacherEPermitController::class, 'getReportsData'])->name('reports.data');
+        Route::get('/pending/data', [TeacherEPermitController::class, 'getPendingData'])->name('pending.data');
+        Route::get('/history/data', [TeacherEPermitController::class, 'getHistoryData'])->name('history.data');
+        Route::get('/stats/data', [TeacherEPermitController::class, 'getStatsData'])->name('stats.data');
         Route::get('/return/search', [TeacherEPermitController::class, 'searchReturn'])->name('return-search');
         Route::post('/return/{id}/confirm', [TeacherEPermitController::class, 'confirmReturn'])->name('return-confirm');
-        Route::get('/reports/data', [TeacherEPermitController::class, 'getReportsData'])->name('reports.data');
 
-        // Reports
-        Route::get('/reports', [TeacherEPermitController::class, 'reports'])->name('reports');
+        // Non-AJAX routes
+        Route::get('/dashboard', [TeacherEPermitController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{id}', [TeacherEPermitController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [TeacherEPermitController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [TeacherEPermitController::class, 'reject'])->name('reject');
         Route::get('/reports/export-pdf', [TeacherEPermitController::class, 'exportPDF'])->name('export-pdf');
         Route::get('/reports/export-excel', [TeacherEPermitController::class, 'exportExcel'])->name('export-excel');
-
-        // Print Gatepass
         Route::get('/print/{id}', [TeacherEPermitController::class, 'printGatepass'])->name('print');
-        // Route for year filter - hii itasaidia kushughulikia year changes kwa real-time
-        Route::get('/dashboard/filter/{year}', [TeacherEPermitController::class, 'dashboard'])
-            ->name('teacher.e-permit.dashboard.filter')
-            ->where('year', '[0-9]{4}');
     });
 
 
