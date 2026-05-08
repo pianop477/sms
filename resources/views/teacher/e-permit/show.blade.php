@@ -751,7 +751,7 @@
                                                 <div>
                                                     <div class="info-label">Hali ya Kurejea</div>
                                                     <div class="info-value"><span
-                                                            class="badge bg-warning text-dark">Imechelewa</span></div>
+                                                            class="badge bg-warning text-dark">Amechelewa</span></div>
                                                 </div>
                                             </div>
                                             @if ($permit->late_return_reason)
