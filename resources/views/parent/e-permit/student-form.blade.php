@@ -657,7 +657,6 @@
                     <div class="student-card">
                         <div class="student-header">
                             <div>
-                                <i class="fas fa-user-check"></i>
                                 <h3>TAARIFA ZA MWANAFUNZI</h3>
                                 <p>Tafadhali hakikisha taarifa kama ni sahihi</p>
                             </div>
@@ -762,7 +761,7 @@
                             showWarning(data.message);
                             resetForm();
                         } else {
-                            showSuccess('Mwanafunzi amepatikana!');
+                            // showSuccess('Mwanafunzi amepatikana!');
                             displayStudentInfo(data.student);
                         }
                     } else {

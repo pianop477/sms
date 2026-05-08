@@ -599,10 +599,76 @@ function loadPendingTable(page = 1) {
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
     }
 
-    fetch(`/teacher/e-permit/pending/data?year=${currentYear}&search=${encodeURIComponent(search)}&date_from=${dateFrom}&date_to=${dateTo}&page=${page}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+    // Build URL with proper parameters
+    let url = `/teacher/e-permit/pending/data?year=${currentYear}&page=${page}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (dateFrom) url += `&date_from=${dateFrom}`;
+    if (dateTo) url += `&date_to=${dateTo}`;
+
+    fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success && container) {
+            container.innerHTML = data.html;
+            // Re-attach pagination handlers after table is updated
+            attachPendingPaginationHandlers();
+        }
+    })
+    .catch(error => {
+        console.error('Error loading pending table:', error);
+        if (container) {
+            container.innerHTML = '<div class="alert alert-danger text-center">Error loading data. Please refresh the page and try again.</div>';
+        }
+    });
+}
+
+function loadPendingTableWithUrl(url) {
+    const container = document.getElementById('pendingTableContainer');
+    if (container) {
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
+    }
+
+    // Ensure URL uses AJAX-friendly parameters
+    let fetchUrl = url;
+    if (!fetchUrl.includes('pending/data')) {
+        // Extract page number from Laravel pagination URL
+        const pageMatch = url.match(/[?&]page=(\d+)/);
+        if (pageMatch) {
+            const page = pageMatch[1];
+            const search = document.getElementById('searchPendingInput')?.value || '';
+            const dateFrom = document.getElementById('dateFromPendingInput')?.value || '';
+            const dateTo = document.getElementById('dateToPendingInput')?.value || '';
+            fetchUrl = `/teacher/e-permit/pending/data?year=${currentYear}&page=${page}`;
+            if (search) fetchUrl += `&search=${encodeURIComponent(search)}`;
+            if (dateFrom) fetchUrl += `&date_from=${dateFrom}`;
+            if (dateTo) fetchUrl += `&date_to=${dateTo}`;
+        }
+    }
+
+    fetch(fetchUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success && container) {
             container.innerHTML = data.html;
@@ -611,23 +677,33 @@ function loadPendingTable(page = 1) {
     })
     .catch(error => {
         console.error('Error:', error);
-        if (container) container.innerHTML = '<div class="alert alert-danger">Error loading data. Please try again.</div>';
+        if (container) {
+            container.innerHTML = '<div class="alert alert-danger text-center">Error loading data. Please refresh the page.</div>';
+        }
     });
 }
 
-function loadPendingTableWithUrl(url) {
-    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
-    .then(response => response.json())
-    .then(data => { if (data.success) document.getElementById('pendingTableContainer').innerHTML = data.html; attachPendingPaginationHandlers(); })
-    .catch(error => console.error('Error:', error));
-}
-
 function attachPendingPaginationHandlers() {
-    document.querySelectorAll('#pendingTableContainer .pagination a').forEach(link => {
-        link.addEventListener('click', function(e) {
+    const paginationLinks = document.querySelectorAll('#pendingTableContainer .pagination a');
+    paginationLinks.forEach(link => {
+        // Remove existing event listeners by cloning and replacing
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+
+        newLink.addEventListener('click', function(e) {
             e.preventDefault();
-            const url = this.getAttribute('href');
-            if (url) loadPendingTableWithUrl(url);
+            e.stopPropagation();
+            const href = this.getAttribute('href');
+            if (href && !href.includes('javascript:void')) {
+                // Extract page number
+                const pageMatch = href.match(/[?&]page=(\d+)/);
+                if (pageMatch) {
+                    const page = pageMatch[1];
+                    loadPendingTable(page);
+                } else {
+                    loadPendingTableWithUrl(href);
+                }
+            }
         });
     });
 }
@@ -645,10 +721,72 @@ function loadHistoryTable(page = 1) {
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
     }
 
-    fetch(`/teacher/e-permit/history/data?year=${currentYear}&search=${encodeURIComponent(search)}&date_from=${dateFrom}&date_to=${dateTo}&page=${page}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+    let url = `/teacher/e-permit/history/data?year=${currentYear}&page=${page}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (dateFrom) url += `&date_from=${dateFrom}`;
+    if (dateTo) url += `&date_to=${dateTo}`;
+
+    fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success && container) {
+            container.innerHTML = data.html;
+            attachHistoryPaginationHandlers();
+        }
+    })
+    .catch(error => {
+        console.error('Error loading history table:', error);
+        if (container) {
+            container.innerHTML = '<div class="alert alert-danger text-center">Error loading data. Please refresh the page and try again.</div>';
+        }
+    });
+}
+
+function loadHistoryTableWithUrl(url) {
+    const container = document.getElementById('historyTableContainer');
+    if (container) {
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
+    }
+
+    let fetchUrl = url;
+    if (!fetchUrl.includes('history/data')) {
+        const pageMatch = url.match(/[?&]page=(\d+)/);
+        if (pageMatch) {
+            const page = pageMatch[1];
+            const search = document.getElementById('searchHistoryInput')?.value || '';
+            const dateFrom = document.getElementById('dateFromHistoryInput')?.value || '';
+            const dateTo = document.getElementById('dateToHistoryInput')?.value || '';
+            fetchUrl = `/teacher/e-permit/history/data?year=${currentYear}&page=${page}`;
+            if (search) fetchUrl += `&search=${encodeURIComponent(search)}`;
+            if (dateFrom) fetchUrl += `&date_from=${dateFrom}`;
+            if (dateTo) fetchUrl += `&date_to=${dateTo}`;
+        }
+    }
+
+    fetch(fetchUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success && container) {
             container.innerHTML = data.html;
@@ -657,10 +795,11 @@ function loadHistoryTable(page = 1) {
     })
     .catch(error => {
         console.error('Error:', error);
-        if (container) container.innerHTML = '<div class="alert alert-danger">Error loading data. Please try again.</div>';
+        if (container) {
+            container.innerHTML = '<div class="alert alert-danger text-center">Error loading data. Please refresh the page.</div>';
+        }
     });
 }
-
 function loadHistoryTableWithUrl(url) {
     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
     .then(response => response.json())
@@ -669,11 +808,25 @@ function loadHistoryTableWithUrl(url) {
 }
 
 function attachHistoryPaginationHandlers() {
-    document.querySelectorAll('#historyTableContainer .pagination a').forEach(link => {
-        link.addEventListener('click', function(e) {
+    const paginationLinks = document.querySelectorAll('#historyTableContainer .pagination a');
+    paginationLinks.forEach(link => {
+        // Remove existing event listeners by cloning and replacing
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+
+        newLink.addEventListener('click', function(e) {
             e.preventDefault();
-            const url = this.getAttribute('href');
-            if (url) loadHistoryTableWithUrl(url);
+            e.stopPropagation();
+            const href = this.getAttribute('href');
+            if (href && !href.includes('javascript:void')) {
+                const pageMatch = href.match(/[?&]page=(\d+)/);
+                if (pageMatch) {
+                    const page = pageMatch[1];
+                    loadHistoryTable(page);
+                } else {
+                    loadHistoryTableWithUrl(href);
+                }
+            }
         });
     });
 }
