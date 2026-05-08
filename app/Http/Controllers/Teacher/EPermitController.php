@@ -1,4 +1,5 @@
 <?php
+
 // app/Http/Controllers/Teacher/EPermitController.php
 
 namespace App\Http\Controllers\Teacher;
@@ -9,13 +10,12 @@ use App\Models\EPermit;
 use App\Models\school;
 use App\Models\Student;
 use App\Models\Teacher;
-use App\Models\TodRoster;
 use App\Services\EPermitService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -35,6 +35,7 @@ class EPermitController extends Controller
     protected function getTeacher()
     {
         $user = Auth::user();
+
         return Teacher::with('user')->where('user_id', $user->id)->first();
     }
 
@@ -43,12 +44,12 @@ class EPermitController extends Controller
     {
         $teacher = $this->getTeacher();
 
-        if (!$teacher) {
+        if (! $teacher) {
             abort(403, 'Unauthorized. Teacher record not found.');
         }
 
         // Only role_id 2 (Head), 3 (Academic), 4 (Class Teacher) can access
-        if (!in_array($teacher->role_id, [2, 3, 4])) {
+        if (! in_array($teacher->role_id, [2, 3, 4])) {
             return redirect()->to_route('error.page');
         }
 
@@ -71,7 +72,7 @@ class EPermitController extends Controller
             'stats' => $stats,
             'teacher' => $teacher,
             'selectedYear' => $selectedYear,
-            'availableYears' => $availableYears
+            'availableYears' => $availableYears,
         ]);
     }
 
@@ -135,7 +136,8 @@ class EPermitController extends Controller
                 });
 
                 $page = request()->get('page', 1);
-                $perPage = 15;
+                $perPage = 10;
+
                 return new \Illuminate\Pagination\LengthAwarePaginator(
                     $filtered->forPage($page, $perPage),
                     $filtered->count(),
@@ -151,14 +153,14 @@ class EPermitController extends Controller
                 })
                     ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15)
+                    ->paginate(10)
                     ->appends(['year' => $year]);
 
             case 2: // Head Teacher
                 return EPermit::where('status', 'pending_head')
                     ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15)
+                    ->paginate(10)
                     ->appends(['year' => $year]);
 
             default:
@@ -182,7 +184,8 @@ class EPermitController extends Controller
                 });
 
                 $page = request()->get('page', 1);
-                $perPage = 15;
+                $perPage = 10;
+
                 return new \Illuminate\Pagination\LengthAwarePaginator(
                     $filtered->forPage($page, $perPage),
                     $filtered->count(),
@@ -195,14 +198,14 @@ class EPermitController extends Controller
                 return EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
                     ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15)
+                    ->paginate(10)
                     ->appends(['year' => $year]);
 
             case 2: // Head Teacher
                 return EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
                     ->whereYear('created_at', $year)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(15)
+                    ->paginate(10)
                     ->appends(['year' => $year]);
 
             default:
@@ -220,7 +223,7 @@ class EPermitController extends Controller
             'approved' => 0,
             'rejected' => 0,
             'completed' => 0,
-            'total' => 0
+            'total' => 0,
         ];
 
         switch ($teacher->role_id) {
@@ -297,13 +300,13 @@ class EPermitController extends Controller
     {
         // Decode the hashed ID
         $decoded = Hashids::decode($id);
-        $permitId = is_array($decoded) && !empty($decoded) ? $decoded[0] : $id;
+        $permitId = is_array($decoded) && ! empty($decoded) ? $decoded[0] : $id;
 
         $teacher = $this->getTeacher();
         $permit = EPermit::with(['student', 'student.class', 'parent', 'classTeacher.user', 'dutyTeacher.user', 'academicTeacher.user', 'headTeacher.user', 'trackingLogs.teacher.user'])
             ->findOrFail($permitId);
 
-        if (!$this->canAccessPermit($teacher, $permit)) {
+        if (! $this->canAccessPermit($teacher, $permit)) {
             // abort(403, 'Unauthorized access to this permit.');
             return redirect()->to_route('error.page');
         }
@@ -312,7 +315,7 @@ class EPermitController extends Controller
 
         // Check if duty teacher exists for this permit's departure date
         $dutyTeachers = $this->ePermitService->findDutyTeachersForDate($permit->departure_date);
-        $hasDutyTeacher = !empty($dutyTeachers);
+        $hasDutyTeacher = ! empty($dutyTeachers);
 
         // Check if current user can approve
         $canApprove = $this->canApprovePermit($teacher, $permit);
@@ -322,7 +325,7 @@ class EPermitController extends Controller
             'timeline' => $timeline,
             'teacher' => $teacher,
             'canApprove' => $canApprove,
-            'hasDutyTeacher' => $hasDutyTeacher
+            'hasDutyTeacher' => $hasDutyTeacher,
         ]);
     }
 
@@ -363,10 +366,10 @@ class EPermitController extends Controller
         $teacher = $this->getTeacher();
         $permit = EPermit::findOrFail($id);
 
-        if (!$this->canApprovePermit($teacher, $permit)) {
+        if (! $this->canApprovePermit($teacher, $permit)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to approve this permit.'
+                'message' => 'Unauthorized to approve this permit.',
             ], 403);
         }
 
@@ -385,16 +388,16 @@ class EPermitController extends Controller
     public function reject(Request $request, $id): JsonResponse
     {
         $request->validate([
-            'reason' => 'required|string|min:5|max:500'
+            'reason' => 'required|string|min:5|max:500',
         ]);
 
         $teacher = $this->getTeacher();
         $permit = EPermit::findOrFail($id);
 
-        if (!$this->canApprovePermit($teacher, $permit)) {
+        if (! $this->canApprovePermit($teacher, $permit)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to reject this permit.'
+                'message' => 'Unauthorized to reject this permit.',
             ], 403);
         }
 
@@ -434,13 +437,13 @@ class EPermitController extends Controller
         $teacher = $this->getTeacher();
 
         // Only academic teachers (role_id=3) and head teachers (role_id=2) can check-in returning students
-        if (!in_array($teacher->role_id, [2, 3])) {
+        if (! in_array($teacher->role_id, [2, 3])) {
             // abort(403, 'Unauthorized. Only Academic Teacher and Head Teacher can check-in returning students.');
             return redirect()->to_route('error.page');
         }
 
         return view('teacher.e-permit.return-form', [
-            'teacher' => $teacher
+            'teacher' => $teacher,
         ]);
     }
 
@@ -456,23 +459,23 @@ class EPermitController extends Controller
 
         try {
             $request->validate([
-                'search' => 'required|string|min:3'
+                'search' => 'required|string|min:3',
             ]);
 
             $search = $request->search;
             $teacher = $this->getTeacher();
 
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
             // Only academic and head teacher can check return
-            if (!in_array($teacher->role_id, [2, 3])) {
+            if (! in_array($teacher->role_id, [2, 3])) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized. Only Academic and Head Teacher can check returns.'], 403);
             }
 
             $permit = EPermit::with(['student', 'student.class'])
-                ->where(function($q) use ($search) {
+                ->where(function ($q) use ($search) {
                     $q->where('permit_number', 'like', "%{$search}%")
                         ->orWhereHas('student', function ($sq) use ($search) {
                             $sq->where('admission_number', 'like', "%{$search}%")
@@ -484,10 +487,10 @@ class EPermitController extends Controller
                 ->whereNull('verified_at')
                 ->first();
 
-            if (!$permit) {
+            if (! $permit) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No approved permit found for this student. Please check the permit number or student ID and try again.'
+                    'message' => 'No approved permit found for this student. Please check the permit number or student ID and try again.',
                 ]);
             }
 
@@ -500,33 +503,33 @@ class EPermitController extends Controller
                     'permit_number' => $permit->permit_number,
                     'student' => [
                         'id' => $permit->student->id,
-                        'name' => ucwords(strtolower($permit->student->first_name . ' ' . $permit->student->last_name)),
+                        'name' => ucwords(strtolower($permit->student->first_name.' '.$permit->student->last_name)),
                         'admission_number' => strtoupper($permit->student->admission_number),
                         'class' => strtoupper($permit->student->class->class_name ?? 'N/A'),
-                        'image' => $permit->student->image
+                        'image' => $permit->student->image,
                     ],
                     'guardian_name' => ucwords(strtolower($permit->guardian_name)),
                     'guardian_phone' => $permit->guardian_phone,
                     'departure_date' => $permit->departure_date->format('Y-m-d'),
                     'expected_return_date' => $permit->expected_return_date->format('Y-m-d'),
-                    'is_late' => $isLate
-                ]
+                    'is_late' => $isLate,
+                ],
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Search term must be at least 3 characters'
+                'message' => 'Search term must be at least 3 characters',
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('searchReturn error: ' . $e->getMessage());
+            \Log::error('searchReturn error: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Server error. Please try again.'
+                'message' => 'Server error. Please try again.',
             ], 500);
         }
     }
-
 
     public function confirmReturn(Request $request, $id): JsonResponse
     {
@@ -541,16 +544,16 @@ class EPermitController extends Controller
                 'accompanied_by_name' => 'required_if:returned_alone,0|nullable|string|max:255',
                 'guardian_type' => 'required_if:returned_alone,0|nullable|string|in:parent,guardian',
                 'relationship' => 'required_if:returned_alone,0|nullable|string|max:50',
-                'late_reason' => 'required_if:is_late,1|nullable|string|max:500'
+                'late_reason' => 'required_if:is_late,1|nullable|string|max:500',
             ]);
 
             $teacher = $this->getTeacher();
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
             // Only academic and head teacher can confirm return
-            if (!in_array($teacher->role_id, [2, 3])) {
+            if (! in_array($teacher->role_id, [2, 3])) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
             }
 
@@ -571,7 +574,7 @@ class EPermitController extends Controller
                 'guardian_type' => $request->returned_alone ? null : $request->guardian_type,
                 'relationship' => $request->returned_alone ? null : $request->relationship,
                 'late_reason' => $request->late_reason ?? null,
-                'is_late' => $request->is_late ?? false
+                'is_late' => $request->is_late ?? false,
             ];
 
             $result = $this->ePermitService->completeReturn($permit, $teacher, $returnData);
@@ -581,13 +584,14 @@ class EPermitController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(', ', $e->errors())
+                'message' => 'Validation failed: '.implode(', ', $e->errors()),
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('confirmReturn error: ' . $e->getMessage());
+            \Log::error('confirmReturn error: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage()
+                'message' => 'Server error: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -600,7 +604,7 @@ class EPermitController extends Controller
         $teacher = $this->getTeacher();
 
         // Only academic teacher and head teacher can view reports
-        if (!in_array($teacher->role_id, [2, 3])) {
+        if (! in_array($teacher->role_id, [2, 3])) {
             // abort(403, 'Unauthorized. Only Academic Teacher and Head Teacher can view reports.');
             return redirect()->to_route('error.page');
         }
@@ -623,7 +627,7 @@ class EPermitController extends Controller
             });
         }
 
-        $permits = $query->orderBy('created_at', 'desc')->paginate(20);
+        $permits = $query->orderBy('created_at', 'desc')->paginate(10);
 
         // Statistics
         $stats = [
@@ -631,14 +635,14 @@ class EPermitController extends Controller
             'approved' => EPermit::where('status', 'approved')->count(),
             'rejected' => EPermit::where('status', 'rejected')->count(),
             'completed' => EPermit::where('status', 'completed')->count(),
-            'pending' => EPermit::whereIn('status', ['pending_class_teacher', 'pending_duty_teacher', 'pending_academic', 'pending_head'])->count()
+            'pending' => EPermit::whereIn('status', ['pending_class_teacher', 'pending_duty_teacher', 'pending_academic', 'pending_head'])->count(),
         ];
 
         return view('teacher.e-permit.reports', [
             'permits' => $permits,
             'stats' => $stats,
             'filters' => $request->all(),
-            'teacher' => $teacher
+            'teacher' => $teacher,
         ]);
     }
 
@@ -650,7 +654,7 @@ class EPermitController extends Controller
         $teacher = $this->getTeacher();
 
         // Only academic teacher and head teacher can export reports
-        if (!in_array($teacher->role_id, [2, 3])) {
+        if (! in_array($teacher->role_id, [2, 3])) {
             return redirect()->back()->with('error', 'Unauthorized. Only Academic Teacher and Head Teacher can export reports.');
         }
 
@@ -675,24 +679,24 @@ class EPermitController extends Controller
             'approved' => $permits->where('head_teacher_action', 'approved')->count(),
             'rejected' => $permits->where('status', 'rejected')->count(),
             'completed' => $permits->where('status', 'completed')->count(),
-            'pending' => $permits->whereIn('status', ['pending_class_teacher', 'pending_duty_teacher', 'pending_academic', 'pending_head'])->count()
+            'pending' => $permits->whereIn('status', ['pending_class_teacher', 'pending_duty_teacher', 'pending_academic', 'pending_head'])->count(),
         ];
 
         $filters = [
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
-            'status' => $request->status ?? 'all'
+            'status' => $request->status ?? 'all',
         ];
 
         $pdf = Pdf::loadView('teacher.e-permit.reports-pdf', [
             'permits' => $permits,
             'stats' => $stats,
-            'filters' => $filters
+            'filters' => $filters,
         ]);
 
         $pdf->setPaper('A4', 'landscape');
 
-        return $pdf->download('e-permit-report-' . now()->format('Y-m-d-H-i-s') . '.pdf');
+        return $pdf->download('e-permit-report-'.now()->format('Y-m-d-H-i-s').'.pdf');
     }
 
     /**
@@ -703,7 +707,7 @@ class EPermitController extends Controller
         $teacher = $this->getTeacher();
 
         // Only academic teacher and head teacher can export reports
-        if (!in_array($teacher->role_id, [2, 3])) {
+        if (! in_array($teacher->role_id, [2, 3])) {
             return redirect()->back()->with('error', 'Unauthorized. Only Academic Teacher and Head Teacher can export reports.');
         }
 
@@ -725,10 +729,10 @@ class EPermitController extends Controller
         $filters = [
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
-            'status' => $request->status ?? 'all'
+            'status' => $request->status ?? 'all',
         ];
 
-        return Excel::download(new EPermitReportExport($permits, $filters), 'e-permit-report-' . now()->format('Y-m-d-H-i-s') . '.xlsx');
+        return Excel::download(new EPermitReportExport($permits, $filters), 'e-permit-report-'.now()->format('Y-m-d-H-i-s').'.xlsx');
     }
 
     /**
@@ -751,55 +755,86 @@ class EPermitController extends Controller
         return view('teacher.e-permit.print', [
             'permit' => $permit,
             'teacher' => $teacher,
-            'school' => $school
+            'school' => $school,
         ]);
     }
 
     /**
      * Get reports data as JSON
      */
+    /**
+     * Get reports data as JSON with pagination
+     */
     public function getReportsData(Request $request): JsonResponse
     {
-        // Remove the AJAX check temporarily for debugging
-        // if (!$request->ajax()) {
-        //     return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
-        // }
-
         try {
             $teacher = $this->getTeacher();
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
             // Only academic and head teacher can access
-            if (!in_array($teacher->role_id, [2, 3])) {
+            if (! in_array($teacher->role_id, [2, 3])) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
             }
 
             $dateFrom = $request->get('date_from', '');
             $dateTo = $request->get('date_to', '');
             $status = $request->get('status', 'all');
+            $page = $request->get('page', 1);
+            $perPage = 10; // Number of records per page
 
-            $query = EPermit::with(['student', 'student.class'])
-                ->orderBy('created_at', 'desc');
-
-            if ($dateFrom) {
-                $query->whereDate('departure_date', '>=', $dateFrom);
+            // IF NO FILTERS PROVIDED, RETURN EMPTY DATA (don't load automatically)
+            if (empty($dateFrom) && empty($dateTo) && $status === 'all') {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'count' => 0,
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => $perPage,
+                    'total' => 0,
+                    'message' => 'Please apply filters to load data',
+                ]);
             }
-            if ($dateTo) {
+
+            $query = EPermit::with(['student', 'student.class']);
+
+            // Apply date filters ONLY if they are provided
+            if ($dateFrom && $dateTo) {
+                // Both dates provided - range between
+                $query->whereBetween('departure_date', [$dateFrom, $dateTo]);
+            } elseif ($dateFrom) {
+                // Only from date provided
+                $query->whereDate('departure_date', '>=', $dateFrom);
+            } elseif ($dateTo) {
+                // Only to date provided
                 $query->whereDate('departure_date', '<=', $dateTo);
             }
+
+            // Apply status filter ONLY if not 'all'
             if ($status !== 'all') {
                 $query->where('status', $status);
             }
 
-            $permits = $query->get();
+            // Apply role-based filtering for class teacher (role_id = 4)
+            if ($teacher->role_id == 4) {
+                $query->whereHas('student', function ($q) use ($teacher) {
+                    $q->where('class_id', $teacher->class_id);
+                });
+            }
+
+            $query->orderBy('created_at', 'desc');
+
+            // Use paginate instead of get
+            $permits = $query->paginate($perPage, ['*'], 'page', $page);
 
             $data = [];
             foreach ($permits as $permit) {
                 $data[] = [
+                    'id' => $permit->id,
                     'permit_number' => $permit->permit_number,
-                    'student_name' => ucwords(strtolower($permit->student->first_name . ' ' . $permit->student->last_name)),
+                    'student_name' => ucwords(strtolower($permit->student->first_name.' '.$permit->student->last_name)),
                     'admission_number' => strtoupper($permit->student->admission_number),
                     'class_name' => $permit->student->class->class_name ?? 'N/A',
                     'guardian_name' => ucwords(strtolower($permit->guardian_name)),
@@ -807,22 +842,29 @@ class EPermitController extends Controller
                     'departure_date' => $permit->departure_date->format('d/m/Y'),
                     'expected_return_date' => $permit->expected_return_date->format('d/m/Y'),
                     'status' => $permit->status,
-                    'created_date' => $permit->created_at->format('d/m/Y H:i')
+                    'created_date' => $permit->created_at->format('d/m/Y H:i'),
                 ];
             }
 
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'count' => count($data)
+                'count' => $permits->total(),
+                'current_page' => $permits->currentPage(),
+                'last_page' => $permits->lastPage(),
+                'per_page' => $permits->perPage(),
+                'total' => $permits->total(),
+                'from' => $permits->firstItem(),
+                'to' => $permits->lastItem(),
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('getReportsData error: ' . $e->getMessage());
+            \Log::error('getReportsData error: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage(),
-                'data' => []
+                'message' => 'Server error: '.$e->getMessage(),
+                'data' => [],
             ], 500);
         }
     }
@@ -841,7 +883,7 @@ class EPermitController extends Controller
             'person' => ucwords(strtolower($permit->guardian_name)),
             'time' => $permit->created_at,
             'icon' => 'fa-paper-plane',
-            'color' => 'blue'
+            'color' => 'blue',
         ];
 
         // Class Teacher
@@ -850,11 +892,11 @@ class EPermitController extends Controller
             $timeline[] = [
                 'stage' => 'Mwalimu wa Darasa',
                 'status' => $isRejected ? 'rejected' : $permit->class_teacher_action,
-                'person' => ucwords(strtolower($permit->classTeacher?->user?->first_name . ' ' . $permit->classTeacher?->user?->last_name)),
+                'person' => ucwords(strtolower($permit->classTeacher?->user?->first_name.' '.$permit->classTeacher?->user?->last_name)),
                 'time' => $permit->class_teacher_approved_at,
                 'comment' => ucfirst($permit->class_teacher_comment),
                 'icon' => 'fa-chalkboard-user',
-                'color' => $isRejected ? 'red' : ($permit->class_teacher_action === 'approved' ? 'green' : 'orange')
+                'color' => $isRejected ? 'red' : ($permit->class_teacher_action === 'approved' ? 'green' : 'orange'),
             ];
         }
 
@@ -864,13 +906,13 @@ class EPermitController extends Controller
             $timeline[] = [
                 'stage' => 'Mwalimu wa Zamu',
                 'status' => $isRejected ? 'rejected' : $permit->duty_teacher_action,
-                'person' => ucwords(strtolower($permit->dutyTeacher?->user?->first_name . ' ' . $permit->dutyTeacher?->user?->last_name)),
+                'person' => ucwords(strtolower($permit->dutyTeacher?->user?->first_name.' '.$permit->dutyTeacher?->user?->last_name)),
                 'time' => $permit->duty_teacher_approved_at,
                 'comment' => ucfirst($permit->duty_teacher_comment),
                 'icon' => 'fa-clock',
-                'color' => $isRejected ? 'red' : ($permit->duty_teacher_action === 'approved' ? 'green' : 'orange')
+                'color' => $isRejected ? 'red' : ($permit->duty_teacher_action === 'approved' ? 'green' : 'orange'),
             ];
-        } elseif ($permit->status === 'pending_academic' && !$permit->duty_teacher_approved_at && $permit->class_teacher_approved_at) {
+        } elseif ($permit->status === 'pending_academic' && ! $permit->duty_teacher_approved_at && $permit->class_teacher_approved_at) {
             // If no duty teacher was assigned, show as skipped
             $timeline[] = [
                 'stage' => 'Mwalimu wa Zamu',
@@ -879,7 +921,7 @@ class EPermitController extends Controller
                 'time' => $permit->class_teacher_approved_at,
                 'comment' => 'Ombi limeenda moja kwa moja kwa Mwalimu wa Taaluma.',
                 'icon' => 'fa-forward',
-                'color' => 'orange'
+                'color' => 'orange',
             ];
         }
 
@@ -889,11 +931,11 @@ class EPermitController extends Controller
             $timeline[] = [
                 'stage' => 'Mwalimu wa Taaluma',
                 'status' => $isRejected ? 'rejected' : $permit->academic_teacher_action,
-                'person' => ucwords(strtolower($permit->academicTeacher?->user?->first_name . ' ' . $permit->academicTeacher?->user?->last_name)),
+                'person' => ucwords(strtolower($permit->academicTeacher?->user?->first_name.' '.$permit->academicTeacher?->user?->last_name)),
                 'time' => $permit->academic_teacher_approved_at,
                 'comment' => ucfirst($permit->academic_teacher_comment),
                 'icon' => 'fa-book',
-                'color' => $isRejected ? 'red' : ($permit->academic_teacher_action === 'approved' ? 'green' : 'orange')
+                'color' => $isRejected ? 'red' : ($permit->academic_teacher_action === 'approved' ? 'green' : 'orange'),
             ];
         }
 
@@ -903,11 +945,11 @@ class EPermitController extends Controller
             $timeline[] = [
                 'stage' => 'Mwalimu Mkuu',
                 'status' => $isRejected ? 'rejected' : $permit->head_teacher_action,
-                'person' => ucwords(strtolower($permit->headTeacher?->user?->first_name . ' ' . $permit->headTeacher?->user?->last_name)),
+                'person' => ucwords(strtolower($permit->headTeacher?->user?->first_name.' '.$permit->headTeacher?->user?->last_name)),
                 'time' => $permit->head_teacher_approved_at,
                 'comment' => ucfirst($permit->head_teacher_comment),
                 'icon' => 'fa-user-tie',
-                'color' => $isRejected ? 'red' : ($permit->head_teacher_action === 'approved' ? 'green' : 'orange')
+                'color' => $isRejected ? 'red' : ($permit->head_teacher_action === 'approved' ? 'green' : 'orange'),
             ];
         }
 
@@ -920,10 +962,10 @@ class EPermitController extends Controller
             $timeline[] = [
                 'stage' => 'Kurudi Shuleni',
                 'status' => 'completed',
-                'person' => ucwords(strtolower($permit->verifier?->user?->first_name . ' ' . $permit->verifier?->user?->last_name)),
+                'person' => ucwords(strtolower($permit->verifier?->user?->first_name.' '.$permit->verifier?->user?->last_name)),
                 'time' => $permit->verified_at,
                 'icon' => 'fa-check-double',
-                'color' => 'green'
+                'color' => 'green',
             ];
         }
 
@@ -936,13 +978,13 @@ class EPermitController extends Controller
     public function getPendingData(Request $request): JsonResponse
     {
         // Always return JSON for this route
-        if (!$request->ajax()) {
+        if (! $request->ajax()) {
             return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
         }
 
         try {
             $teacher = $this->getTeacher();
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
@@ -951,22 +993,22 @@ class EPermitController extends Controller
             $dateFrom = $request->get('date_from', '');
             $dateTo = $request->get('date_to', '');
             $page = $request->get('page', 1);
-            $perPage = 15;
+            $perPage = 10;
 
             switch ($teacher->role_id) {
                 case 4: // Class Teacher
                     $allPending = EPermit::where('status', 'pending_class_teacher')
-                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                        ->when($search, function($q) use ($search) {
-                            $q->where(function($sq) use ($search) {
+                        ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
                                 $sq->where('permit_number', 'LIKE', "%{$search}%")
-                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn ($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
                                         ->orWhere('last_name', 'LIKE', "%{$search}%")
                                         ->orWhere('admission_number', 'LIKE', "%{$search}%"));
                             });
                         })
-                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
-                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->when($dateFrom, fn ($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn ($q) => $q->whereDate('departure_date', '<=', $dateTo))
                         ->get();
 
                     $filtered = $allPending->filter(function ($permit) use ($teacher) {
@@ -984,37 +1026,37 @@ class EPermitController extends Controller
 
                 case 3: // Academic Teacher
                     $paginated = EPermit::where(function ($q) {
-                            $q->where('status', 'pending_academic')
-                                ->orWhere('status', 'pending_duty_teacher');
-                        })
-                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                        ->when($search, function($q) use ($search) {
-                            $q->where(function($sq) use ($search) {
+                        $q->where('status', 'pending_academic')
+                            ->orWhere('status', 'pending_duty_teacher');
+                    })
+                        ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
                                 $sq->where('permit_number', 'LIKE', "%{$search}%")
-                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn ($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
                                         ->orWhere('last_name', 'LIKE', "%{$search}%")
                                         ->orWhere('admission_number', 'LIKE', "%{$search}%"));
                             });
                         })
-                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
-                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->when($dateFrom, fn ($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn ($q) => $q->whereDate('departure_date', '<=', $dateTo))
                         ->orderBy('created_at', 'desc')
                         ->paginate($perPage, ['*'], 'page', $page);
                     break;
 
                 case 2: // Head Teacher
                     $paginated = EPermit::where('status', 'pending_head')
-                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                        ->when($search, function($q) use ($search) {
-                            $q->where(function($sq) use ($search) {
+                        ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
                                 $sq->where('permit_number', 'LIKE', "%{$search}%")
-                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn ($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
                                         ->orWhere('last_name', 'LIKE', "%{$search}%")
                                         ->orWhere('admission_number', 'LIKE', "%{$search}%"));
                             });
                         })
-                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
-                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->when($dateFrom, fn ($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn ($q) => $q->whereDate('departure_date', '<=', $dateTo))
                         ->orderBy('created_at', 'desc')
                         ->paginate($perPage, ['*'], 'page', $page);
                     break;
@@ -1025,7 +1067,7 @@ class EPermitController extends Controller
 
             $html = view('teacher.e-permit.partials.pending_table', [
                 'pendingPermits' => $paginated,
-                'teacher' => $teacher
+                'teacher' => $teacher,
             ])->render();
 
             return response()->json([
@@ -1033,12 +1075,13 @@ class EPermitController extends Controller
                 'html' => $html,
                 'count' => $paginated->total(),
                 'current_page' => $paginated->currentPage(),
-                'last_page' => $paginated->lastPage()
+                'last_page' => $paginated->lastPage(),
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('getPendingData error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Server error: ' . $e->getMessage()], 500);
+            \Log::error('getPendingData error: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Server error: '.$e->getMessage()], 500);
         }
     }
 
@@ -1047,13 +1090,13 @@ class EPermitController extends Controller
      */
     public function getHistoryData(Request $request): JsonResponse
     {
-        if (!$request->ajax()) {
+        if (! $request->ajax()) {
             return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
         }
 
         try {
             $teacher = $this->getTeacher();
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
@@ -1062,22 +1105,22 @@ class EPermitController extends Controller
             $dateFrom = $request->get('date_from', '');
             $dateTo = $request->get('date_to', '');
             $page = $request->get('page', 1);
-            $perPage = 15;
+            $perPage = 10;
 
             switch ($teacher->role_id) {
                 case 4: // Class Teacher
                     $allHistory = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
-                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                        ->when($search, function($q) use ($search) {
-                            $q->where(function($sq) use ($search) {
+                        ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
                                 $sq->where('permit_number', 'LIKE', "%{$search}%")
-                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn ($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
                                         ->orWhere('last_name', 'LIKE', "%{$search}%")
                                         ->orWhere('admission_number', 'LIKE', "%{$search}%"));
                             });
                         })
-                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
-                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->when($dateFrom, fn ($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn ($q) => $q->whereDate('departure_date', '<=', $dateTo))
                         ->get();
 
                     $filtered = $allHistory->filter(function ($permit) use ($teacher) {
@@ -1096,17 +1139,17 @@ class EPermitController extends Controller
                 case 3: // Academic Teacher
                 case 2: // Head Teacher
                     $paginated = EPermit::whereIn('status', ['approved', 'rejected', 'completed'])
-                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                        ->when($search, function($q) use ($search) {
-                            $q->where(function($sq) use ($search) {
+                        ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+                        ->when($search, function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
                                 $sq->where('permit_number', 'LIKE', "%{$search}%")
-                                    ->orWhereHas('student', fn($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
+                                    ->orWhereHas('student', fn ($ssq) => $ssq->where('first_name', 'LIKE', "%{$search}%")
                                         ->orWhere('last_name', 'LIKE', "%{$search}%")
                                         ->orWhere('admission_number', 'LIKE', "%{$search}%"));
                             });
                         })
-                        ->when($dateFrom, fn($q) => $q->whereDate('departure_date', '>=', $dateFrom))
-                        ->when($dateTo, fn($q) => $q->whereDate('departure_date', '<=', $dateTo))
+                        ->when($dateFrom, fn ($q) => $q->whereDate('departure_date', '>=', $dateFrom))
+                        ->when($dateTo, fn ($q) => $q->whereDate('departure_date', '<=', $dateTo))
                         ->orderBy('created_at', 'desc')
                         ->paginate($perPage, ['*'], 'page', $page);
                     break;
@@ -1117,18 +1160,19 @@ class EPermitController extends Controller
 
             $html = view('teacher.e-permit.partials.history_table', [
                 'historyPermits' => $paginated,
-                'teacher' => $teacher
+                'teacher' => $teacher,
             ])->render();
 
             return response()->json([
                 'success' => true,
                 'html' => $html,
                 'current_page' => $paginated->currentPage(),
-                'last_page' => $paginated->lastPage()
+                'last_page' => $paginated->lastPage(),
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('getHistoryData error: ' . $e->getMessage());
+            \Log::error('getHistoryData error: '.$e->getMessage());
+
             return response()->json(['success' => false, 'message' => 'Server error'], 500);
         }
     }
@@ -1138,13 +1182,13 @@ class EPermitController extends Controller
      */
     public function getStatsData(Request $request): JsonResponse
     {
-        if (!$request->ajax()) {
+        if (! $request->ajax()) {
             return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
         }
 
         try {
             $teacher = $this->getTeacher();
-            if (!$teacher) {
+            if (! $teacher) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
             }
 
@@ -1153,7 +1197,7 @@ class EPermitController extends Controller
 
             return response()->json([
                 'success' => true,
-                'stats' => $stats
+                'stats' => $stats,
             ]);
 
         } catch (\Exception $e) {
