@@ -116,43 +116,43 @@
 
     /* Card Body - REDUCED PADDING */
     .card-body {
-        padding: 1rem; /* REDUCED from 1.5rem */
+        padding: 1rem;
     }
 
     @media (min-width: 576px) {
         .card-body {
-            padding: 1.2rem; /* REDUCED from 2rem */
+            padding: 1.2rem;
         }
     }
 
     @media (min-width: 768px) {
         .card-body {
-            padding: 1.5rem; /* REDUCED from 2.5rem */
+            padding: 1.5rem;
         }
     }
 
     /* ============= FIXED REQUIREMENTS CARD - MORE COMPACT ============= */
     .requirements-card {
         background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        border-radius: 12px; /* REDUCED from 15px */
-        padding: 0.8rem; /* REDUCED from 1.2rem */
-        margin-bottom: 1rem; /* REDUCED from 1.8rem */
-        border-left: 4px solid var(--primary); /* REDUCED from 5px */
+        border-radius: 12px;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary);
         position: relative;
         overflow: hidden;
     }
 
     @media (min-width: 768px) {
         .requirements-card {
-            border-radius: 15px; /* REDUCED from 20px */
-            padding: 1rem; /* REDUCED from 1.8rem */
-            margin-bottom: 1.2rem; /* REDUCED from 2.5rem */
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
         }
     }
 
     .requirements-card::after {
         content: '⚡';
-        font-size: 2.5rem; /* REDUCED from 3rem */
+        font-size: 2.5rem;
         position: absolute;
         right: 10px;
         top: 50%;
@@ -162,32 +162,32 @@
 
     @media (min-width: 768px) {
         .requirements-card::after {
-            font-size: 3rem; /* REDUCED from 4rem */
-            right: 15px; /* REDUCED from 20px */
+            font-size: 3rem;
+            right: 15px;
         }
     }
 
     .requirements-title {
         display: flex;
         align-items: center;
-        gap: 6px; /* REDUCED from 8px */
-        font-size: 0.9rem; /* REDUCED from 1.1rem */
+        gap: 6px;
+        font-size: 0.9rem;
         font-weight: 600;
         color: var(--dark);
-        margin-bottom: 0.6rem; /* REDUCED from 1rem */
+        margin-bottom: 0.6rem;
         flex-wrap: wrap;
     }
 
     @media (min-width: 768px) {
         .requirements-title {
-            gap: 8px; /* REDUCED from 10px */
-            font-size: 1rem; /* REDUCED from 1.3rem */
-            margin-bottom: 0.8rem; /* REDUCED from 1.2rem */
+            gap: 8px;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
         }
     }
 
     .requirements-title i {
-        font-size: 1.2rem; /* REDUCED from 1.5rem */
+        font-size: 1.2rem;
         color: var(--primary);
     }
 
@@ -198,14 +198,14 @@
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.4rem; /* REDUCED from 0.8rem */
+        gap: 0.4rem;
     }
 
     @media (min-width: 480px) {
         .requirements-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.6rem; /* REDUCED from 1rem */
+            gap: 0.6rem;
         }
     }
 
@@ -214,36 +214,36 @@
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            gap: 0.6rem; /* REDUCED from 1rem */
+            gap: 0.6rem;
         }
     }
 
     .requirements-list li {
         flex: 1 1 auto;
-        padding: 0.5rem 0.8rem; /* REDUCED from 0.8rem 1rem */
+        padding: 0.5rem 0.8rem;
         background: white;
-        border-radius: 8px; /* REDUCED from 10px */
+        border-radius: 8px;
         display: flex;
         align-items: center;
-        gap: 6px; /* REDUCED from 8px */
-        font-size: 0.8rem; /* REDUCED from 0.9rem */
+        gap: 6px;
+        font-size: 0.8rem;
         color: var(--dark);
-        box-shadow: 0 3px 8px rgba(0,0,0,0.05); /* REDUCED shadow */
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
         border: 1px solid rgba(67, 97, 238, 0.1);
         width: 100%;
     }
 
     @media (min-width: 768px) {
         .requirements-list li {
-            min-width: 200px; /* REDUCED from 250px */
-            padding: 0.6rem 1rem; /* REDUCED from 0.8rem 1.2rem */
-            font-size: 0.85rem; /* REDUCED from 1rem */
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
         }
     }
 
     .requirements-list li i {
-        font-size: 0.9rem; /* REDUCED from 1.1rem */
-        min-width: 16px; /* REDUCED from 20px */
+        font-size: 0.9rem;
+        min-width: 16px;
     }
 
     .requirements-list li.valid {
@@ -253,18 +253,18 @@
 
     /* Password Strength Meter - MORE COMPACT */
     .password-strength-meter {
-        margin: 0.8rem 0 0.4rem 0; /* REDUCED from 1.2rem 0 */
+        margin: 0.8rem 0 0.4rem 0;
         background: #e9ecef;
         border-radius: 30px;
-        height: 6px; /* REDUCED from 8px */
+        height: 6px;
         overflow: hidden;
         position: relative;
     }
 
     @media (min-width: 768px) {
         .password-strength-meter {
-            margin: 1rem 0 0.5rem 0; /* REDUCED from 1.5rem 0 */
-            height: 8px; /* REDUCED from 10px */
+            margin: 1rem 0 0.5rem 0;
+            height: 8px;
         }
     }
 
@@ -272,25 +272,25 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 0.2rem; /* REDUCED from 0.5rem */
-        font-size: 0.75rem; /* REDUCED from 0.85rem */
+        margin-top: 0.2rem;
+        font-size: 0.75rem;
         color: #6c757d;
         flex-wrap: wrap;
         gap: 5px;
     }
 
     .strength-badge {
-        padding: 0.15rem 0.6rem; /* REDUCED from 0.2rem 0.8rem */
+        padding: 0.15rem 0.6rem;
         border-radius: 30px;
         font-weight: 600;
-        font-size: 0.7rem; /* REDUCED from 0.8rem */
+        font-size: 0.7rem;
         white-space: nowrap;
     }
 
     @media (min-width: 768px) {
         .strength-badge {
-            padding: 0.2rem 0.8rem; /* REDUCED from 0.3rem 1rem */
-            font-size: 0.75rem; /* REDUCED from 0.85rem */
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
         }
     }
 
@@ -298,57 +298,57 @@
     .row-custom {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.8rem; /* REDUCED from 1.2rem */
-        margin-bottom: 1rem; /* REDUCED from 1.5rem */
+        gap: 0.8rem;
+        margin-bottom: 1rem;
     }
 
     @media (min-width: 576px) {
         .row-custom {
-            gap: 1rem; /* REDUCED from 1.5rem */
+            gap: 1rem;
         }
     }
 
     @media (min-width: 992px) {
         .row-custom {
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem; /* REDUCED from 1.5rem */
+            gap: 1rem;
         }
     }
 
     /* Form Groups - MORE COMPACT */
     .form-group-modern {
-        margin-bottom: 0.8rem; /* REDUCED from 1.5rem */
+        margin-bottom: 0.8rem;
         position: relative;
         width: 100%;
     }
 
     @media (min-width: 992px) {
         .form-group-modern {
-            margin-bottom: 1rem; /* REDUCED from 2rem */
+            margin-bottom: 1rem;
         }
     }
 
     .form-label-modern {
         display: block;
-        margin-bottom: 0.3rem; /* REDUCED from 0.5rem */
+        margin-bottom: 0.3rem;
         font-weight: 600;
         color: var(--dark);
-        font-size: 0.75rem; /* REDUCED from 0.85rem */
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     @media (min-width: 768px) {
         .form-label-modern {
-            margin-bottom: 0.4rem; /* REDUCED from 0.8rem */
-            font-size: 0.8rem; /* REDUCED from 0.95rem */
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
         }
     }
 
     .form-label-modern i {
         margin-right: 5px;
         color: var(--primary);
-        font-size: 0.9rem; /* REDUCED from 1rem */
+        font-size: 0.9rem;
     }
 
     /* Input Group - FIXED */
@@ -364,10 +364,10 @@
         flex: 1 1 0;
         min-width: 0;
         width: auto;
-        padding: 0.6rem 0.8rem; /* REDUCED from 0.8rem 1rem */
-        font-size: 0.85rem; /* REDUCED from 0.9rem */
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
         border: 2px solid #eef2f6;
-        border-radius: 8px 0 0 8px; /* REDUCED from 10px 0 0 10px */
+        border-radius: 8px 0 0 8px;
         background-color: #fafbfc;
         transition: all 0.3s ease;
         color: var(--dark);
@@ -377,9 +377,9 @@
 
     @media (min-width: 768px) {
         .input-group-modern .form-control-modern {
-            padding: 0.8rem 1rem; /* REDUCED from 1rem 1.2rem */
-            font-size: 0.9rem; /* REDUCED from 1rem */
-            letter-spacing: 1.5px; /* REDUCED from 2px */
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
         }
     }
 
@@ -387,17 +387,17 @@
         outline: none;
         border-color: var(--primary);
         background-color: white;
-        box-shadow: 0 3px 12px rgba(67, 97, 238, 0.1); /* REDUCED shadow */
+        box-shadow: 0 3px 12px rgba(67, 97, 238, 0.1);
     }
 
     .input-group-modern .input-group-text-modern {
         flex: 0 0 auto;
         width: auto;
-        padding: 0 0.8rem; /* REDUCED from 0 1rem */
+        padding: 0 0.8rem;
         background: white;
         border: 2px solid #eef2f6;
         border-left: none;
-        border-radius: 0 8px 8px 0; /* REDUCED from 0 10px 10px 0 */
+        border-radius: 0 8px 8px 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -409,7 +409,7 @@
 
     @media (min-width: 768px) {
         .input-group-modern .input-group-text-modern {
-            padding: 0 1rem; /* REDUCED from 0 1.5rem */
+            padding: 0 1rem;
         }
     }
 
@@ -420,12 +420,12 @@
     }
 
     .input-group-modern .input-group-text-modern i {
-        font-size: 0.9rem; /* REDUCED from 1rem */
+        font-size: 0.9rem;
     }
 
     @media (min-width: 768px) {
         .input-group-modern .input-group-text-modern i {
-            font-size: 1rem; /* REDUCED from 1.2rem */
+            font-size: 1rem;
         }
     }
 
@@ -452,18 +452,18 @@
 
     /* Password Feedback - MORE COMPACT */
     .password-feedback {
-        margin-top: 0.2rem; /* REDUCED from 0.5rem */
-        font-size: 0.7rem; /* REDUCED from 0.8rem */
+        margin-top: 0.2rem;
+        font-size: 0.7rem;
         display: flex;
         align-items: center;
-        gap: 4px; /* REDUCED from 5px */
+        gap: 4px;
         word-wrap: break-word;
     }
 
     @media (min-width: 768px) {
         .password-feedback {
-            margin-top: 0.3rem; /* REDUCED from 0.5rem */
-            font-size: 0.75rem; /* REDUCED from 0.85rem */
+            margin-top: 0.3rem;
+            font-size: 0.75rem;
         }
     }
 
@@ -471,24 +471,24 @@
     .d-flex.justify-content-end.gap-3.mt-5 {
         display: flex;
         flex-direction: column;
-        gap: 0.6rem !important; /* REDUCED from 0.8rem */
-        margin-top: 1rem !important; /* REDUCED from 2rem */
+        gap: 0.6rem !important;
+        margin-top: 1rem !important;
     }
 
     @media (min-width: 480px) {
         .d-flex.justify-content-end.gap-3.mt-5 {
             flex-direction: row;
             justify-content: flex-end;
-            gap: 0.8rem !important; /* REDUCED from 1rem */
-            margin-top: 1.2rem !important; /* REDUCED from 2rem */
+            gap: 0.8rem !important;
+            margin-top: 1.2rem !important;
         }
     }
 
     .btn-modern {
-        padding: 0.6rem 1.2rem; /* REDUCED from 0.8rem 1.5rem */
-        border-radius: 8px; /* REDUCED from 10px */
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 0.8rem; /* REDUCED from 0.9rem */
+        font-size: 0.8rem;
         letter-spacing: 0.5px;
         text-transform: uppercase;
         transition: all 0.3s ease;
@@ -497,7 +497,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px; /* REDUCED from 8px */
+        gap: 6px;
         position: relative;
         overflow: hidden;
         width: 100%;
@@ -507,15 +507,15 @@
     @media (min-width: 480px) {
         .btn-modern {
             width: auto;
-            padding: 0.7rem 1.5rem; /* REDUCED from 1rem 2rem */
-            font-size: 0.85rem; /* REDUCED from 1rem */
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
         }
     }
 
     @media (min-width: 768px) {
         .btn-modern {
-            padding: 0.8rem 2rem; /* REDUCED from 1rem 2.5rem */
-            border-radius: 10px; /* REDUCED from 15px */
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
         }
     }
 
@@ -533,14 +533,19 @@
     }
 
     .btn-modern:hover::before {
-        width: 250px; /* REDUCED from 300px */
-        height: 250px; /* REDUCED from 300px */
+        width: 250px;
+        height: 250px;
     }
 
     .btn-success-modern {
         background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
         color: white;
-        box-shadow: 0 8px 16px rgba(76, 201, 240, 0.3); /* REDUCED shadow */
+        box-shadow: 0 8px 16px rgba(76, 201, 240, 0.3);
+    }
+
+    .btn-modern:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     /* Error Toast */
@@ -550,9 +555,9 @@
         right: 10px;
         left: 10px;
         background: white;
-        border-radius: 8px; /* REDUCED from 10px */
-        box-shadow: 0 10px 30px rgba(247, 37, 133, 0.15); /* REDUCED shadow */
-        padding: 0.6rem 0.8rem; /* REDUCED from 0.8rem 1rem */
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(247, 37, 133, 0.15);
+        padding: 0.6rem 0.8rem;
         border-left: 4px solid var(--danger);
         z-index: 9999;
         animation: slideIn 0.3s ease;
@@ -564,9 +569,9 @@
             top: 20px;
             right: 20px;
             left: auto;
-            border-radius: 10px; /* REDUCED from 15px */
-            padding: 0.8rem 1.2rem; /* REDUCED from 1rem 1.5rem */
-            max-width: 320px; /* REDUCED from 350px */
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            max-width: 320px;
         }
     }
 
@@ -616,7 +621,6 @@
     }
 </style>
 
-<!-- HTML imebaki sawa kabisa -->
 <div class="container-fluid px-2 px-sm-3 px-md-4 py-3 py-md-4">
     <!-- Page Header -->
     <div class="password-page-header d-flex justify-content-between align-items-center">
@@ -685,7 +689,7 @@
                                    placeholder="Enter current password"
                                    value="{{old('current_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-bs-target="currentPassword">
+                            <span class="input-group-text-modern" onclick="togglePasswordField('currentPassword', this)">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>
@@ -717,7 +721,7 @@
                                    placeholder="Enter new password"
                                    value="{{old('new_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-bs-target="newPassword">
+                            <span class="input-group-text-modern" onclick="togglePasswordField('newPassword', this)">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>
@@ -744,7 +748,7 @@
                                    placeholder="Confirm new password"
                                    value="{{old('confirm_password')}}"
                                    required>
-                            <span class="input-group-text-modern toggle-password" data-bs-target="confirmPassword">
+                            <span class="input-group-text-modern" onclick="togglePasswordField('confirmPassword', this)">
                                 <i class="fas fa-eye"></i>
                             </span>
                         </div>
@@ -775,15 +779,50 @@
     </div>
 </div>
 
-<!-- JavaScript imebaki sawa kabisa -->
 <script>
+// Global toggle password function
+window.togglePasswordField = function(inputId, element) {
+    try {
+        let input = document.getElementById(inputId);
+        if (!input) {
+            console.warn('Input element not found:', inputId);
+            return;
+        }
+
+        let icon = element.querySelector('i');
+        if (!icon) {
+            icon = element.children[0];
+        }
+
+        if (input.type === "password") {
+            input.type = "text";
+            if (icon) {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        } else {
+            input.type = "password";
+            if (icon) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    } catch (e) {
+        console.error('Toggle password error:', e);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById("passwordForm");
     const submitButton = document.getElementById("saveButton");
 
+    // IMPORTANT: Flag to prevent multiple submissions
+    let isSubmitting = false;
+
     // Password fields
     const newPassword = document.getElementById('newPassword');
     const confirmPassword = document.getElementById('confirmPassword');
+    const currentPassword = document.getElementById('currentPassword');
 
     // Requirement elements
     const reqLength = document.getElementById('reqLength');
@@ -801,25 +840,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!form || !submitButton) return;
 
-    // Toggle password visibility
-    document.querySelectorAll(".toggle-password").forEach(item => {
-        item.addEventListener("click", function() {
-            let input = document.getElementById(this.getAttribute("data-target"));
-            let icon = this.querySelector('i');
-
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = "password";
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    });
-
-    // Password validation function
+    // Password validation function - RETURNS OBJECT with status and message
     function validatePassword() {
         const password = newPassword.value;
         const confirm = confirmPassword.value;
@@ -829,6 +850,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const hasLetter = /[A-Za-z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
         const hasMatch = password === confirm && password !== '';
+
+        // Check if new password is empty
+        const isNewPasswordEmpty = password === '';
 
         // Update requirement icons
         updateRequirement(reqLength, hasLength);
@@ -851,9 +875,11 @@ document.addEventListener('DOMContentLoaded', function () {
         strengthFill.style.width = strength + '%';
 
         // Update strength badge
-        if (strength === 0) {
+        if (strength === 0 || isNewPasswordEmpty) {
             strengthBadge.textContent = 'Not entered';
             strengthBadge.className = 'strength-badge';
+            strengthBadge.style.backgroundColor = '';
+            strengthBadge.style.color = '';
         } else if (strength < 40) {
             strengthBadge.textContent = 'Weak';
             strengthBadge.className = 'strength-badge';
@@ -877,13 +903,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update feedback
-        if (password.length > 0) {
+        if (!isNewPasswordEmpty) {
             if (!hasLength) {
-                newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password too short';
+                newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password too short (minimum 8 characters)';
                 newPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
                 newPasswordFeedback.style.color = '#f72585';
-            } else if (!hasLetter || !hasNumber) {
-                newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Must contain letters and numbers';
+            } else if (!hasLetter) {
+                newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Must contain at least one letter';
+                newPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
+                newPasswordFeedback.style.color = '#f72585';
+            } else if (!hasNumber) {
+                newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Must contain at least one number';
                 newPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
                 newPasswordFeedback.style.color = '#f72585';
             } else {
@@ -910,49 +940,114 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmPasswordFeedback.innerHTML = '';
         }
 
-        return hasLength && hasLetter && hasNumber && hasMatch;
+        // Return validation result
+        const isValid = !isNewPasswordEmpty && hasLength && hasLetter && hasNumber && hasMatch;
+
+        return {
+            isValid: isValid,
+            errors: {
+                hasLength: hasLength,
+                hasLetter: hasLetter,
+                hasNumber: hasNumber,
+                hasMatch: hasMatch,
+                isEmpty: isNewPasswordEmpty
+            }
+        };
     }
 
     function updateRequirement(element, isValid) {
         const icon = element.querySelector('i');
         if (isValid) {
             element.classList.add('valid');
-            icon.classList.remove('fa-circle');
-            icon.classList.add('fa-check-circle');
-            icon.style.color = '#28a745';
+            if (icon) {
+                icon.classList.remove('fa-circle');
+                icon.classList.add('fa-check-circle');
+                icon.style.color = '#28a745';
+            }
         } else {
             element.classList.remove('valid');
-            icon.classList.remove('fa-check-circle');
-            icon.classList.add('fa-circle');
-            icon.style.color = '#6c757d';
+            if (icon) {
+                icon.classList.remove('fa-check-circle');
+                icon.classList.add('fa-circle');
+                icon.style.color = '#6c757d';
+            }
         }
     }
 
-    // Add input event listeners
-    newPassword.addEventListener('input', validatePassword);
-    confirmPassword.addEventListener('input', validatePassword);
+    // Function to get user-friendly error message
+    function getErrorMessage(validationResult) {
+        const errors = validationResult.errors;
 
-    // Form submission handling
+        if (errors.isEmpty) {
+            return 'Please enter a new password';
+        }
+        if (!errors.hasLength) {
+            return 'Password must be at least 8 characters long';
+        }
+        if (!errors.hasLetter) {
+            return 'Password must contain at least one letter';
+        }
+        if (!errors.hasNumber) {
+            return 'Password must contain at least one number';
+        }
+        if (!errors.hasMatch) {
+            return 'Passwords do not match';
+        }
+        return 'Please meet all password requirements';
+    }
+
+    // Add input event listeners
+    if (newPassword) newPassword.addEventListener('input', validatePassword);
+    if (confirmPassword) confirmPassword.addEventListener('input', validatePassword);
+
+    // Form submission handling - FIXED: Prevents submission when validation fails
     form.addEventListener("submit", function (e) {
+        // ALWAYS prevent default first
         e.preventDefault();
 
-        // Validate all fields
-        const isValid = validatePassword();
-
-        if (!isValid) {
-            // Show error toast
-            showErrorToast('Please meet all password requirements');
-
-            // Scroll to requirements
-            document.querySelector('.requirements-card').scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-
-            return;
+        // Check if already submitting
+        if (isSubmitting) {
+            console.log('Already submitting, ignoring...');
+            return false;
         }
 
-        // Check if form is valid
+        // Check current password
+        if (!currentPassword || !currentPassword.value.trim()) {
+            showErrorToast('Please enter your current password');
+            if (currentPassword) {
+                currentPassword.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                currentPassword.focus();
+            }
+            return false;
+        }
+
+        // Validate new password
+        const validation = validatePassword();
+
+        // If validation fails, show error and STOP submission
+        if (!validation.isValid) {
+            const errorMessage = getErrorMessage(validation);
+            showErrorToast(errorMessage);
+
+            // Scroll to requirements card
+            const requirementsCard = document.querySelector('.requirements-card');
+            if (requirementsCard) {
+                requirementsCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+            // Focus on new password field
+            if (newPassword) {
+                newPassword.focus();
+            }
+
+            // CRITICAL: Return false to prevent submission
+            return false;
+        }
+
+        // Check HTML5 validation
         if (!form.checkValidity()) {
             form.classList.add("was-validated");
 
@@ -963,20 +1058,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 firstInvalid.focus();
             }
 
-            return;
+            return false;
         }
 
-        // Disable button and submit
+        // If we get here, validation passed - proceed with submission
+        isSubmitting = true;
+
+        // Disable button and show loading state
         submitButton.disabled = true;
         submitButton.innerHTML = `
             <span class="spinner-border spinner-border-sm text-white me-2" role="status"></span>
             <span>Updating Password...</span>
         `;
 
-        // Submit the form
+        // Use setTimeout to ensure loading state is shown
         setTimeout(() => {
-            form.submit();
-        }, 500);
+            try {
+                form.submit();
+            } catch (error) {
+                console.error('Form submission error:', error);
+                // Re-enable button if submission fails
+                submitButton.disabled = false;
+                submitButton.innerHTML = `
+                    <i class="fas fa-save me-2"></i>
+                    <span>Update Password</span>
+                    <i class="fas fa-arrow-right ms-2 floating-effect"></i>
+                `;
+                isSubmitting = false;
+                showErrorToast('An error occurred. Please try again.');
+            }
+        }, 100);
+
+        return true;
     });
 
     // Error toast function
@@ -997,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div style="flex: 1;">
                     <strong style="color: #1e1e2f; font-size: 0.9rem;">Validation Error</strong>
-                    <div style="color: #6c757d; font-size: 0.8rem; margin-top: 2px;">${message}</div>
+                    <div style="color: #6c757d; font-size: 0.8rem; margin-top: 2px;">${escapeHtml(message)}</div>
                 </div>
                 <div onclick="this.parentElement.parentElement.remove()" style="cursor: pointer; color: #6c757d;">
                     <i class="fas fa-times"></i>
@@ -1015,8 +1128,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // Initial validation if fields have values
-    if (newPassword.value || confirmPassword.value) {
+    if (newPassword && (newPassword.value || (confirmPassword && confirmPassword.value))) {
         validatePassword();
     }
 
