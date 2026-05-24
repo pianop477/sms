@@ -34,6 +34,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Endroid\QrCode\Builder\Builder;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\SendResultSmsJob;
 
 class ResultsController extends Controller
 {
@@ -1483,105 +1484,59 @@ class ResultsController extends Controller
 
                 // Loop through ranked students and send SMS
                 foreach ($rankedStudents as $student) {
-                    try {
-                        $parent = Parents::find($student['parent_id']);
 
-                        if (!$parent) {
-                            $failCount++;
-                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
-                            continue;
+                    $fullname = $student['first_name'] . ' ' . $student['last_name'];
+
+                    if ($marking_style == 3) {
+
+                        $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
+                        $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                        $message .= "wa Tarehe: {$dateFormat} ni:\n";
+
+                        $coursesArray = explode("\n", $student['courses']);
+
+                        foreach ($coursesArray as $course) {
+                            $message .= strtoupper($course) . "\n";
                         }
 
-                        $user = User::find($parent->user_id);
+                        $message .= "Jumla ya Pointi: {$student['aggregate_points']}\n";
+                        $message .= "Divisheni: {$student['division']}\n";
+                        $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
+                        $message .= "Pakua ripoti hapa: {$url}";
 
-                        if (!$user || empty($user->phone)) {
-                            $failCount++;
-                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
-                            continue;
+                    } else {
+
+                        $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
+                        $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                        $message .= "wa Tarehe: {$dateFormat} ni:\n";
+
+                        $coursesArray = explode("\n", $student['courses']);
+
+                        foreach ($coursesArray as $course) {
+                            $message .= strtoupper($course) . "\n";
                         }
 
-                        $phoneNumber = $this->formatPhoneNumber($user->phone);
-
-                        if (!$phoneNumber) {
-                            $failCount++;
-                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
-                            continue;
-                        }
-
-                        // ==== REKEDISHA: Create message based on marking style ====
-                        $fullname = $student['first_name'] . ' ' . $student['last_name'];
-
-                        if ($marking_style == 3) {
-                            // Message for Division Style (Style 3)
-                            $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
-                            $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
-                            $message .= "wa Tarehe: {$dateFormat} ni:\n";
-                            // Parse courses string
-                            $coursesArray = explode("\n", $student['courses']);
-                            foreach ($coursesArray as $course) {
-                                $message .= strtoupper($course) . "\n";
-                            }
-                            $message .= "Jumla ya Pointi: {$student['aggregate_points']}\n";
-                            $message .= "Divisheni: {$student['division']}\n";
-                            $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
-                            $message .= "Pakua ripoti hapa: {$url}";
-                        } else {
-                            // Message for Standard Grades (Styles 1 & 2)
-                            $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
-                            $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
-                            $message .= "wa Tarehe: {$dateFormat} ni:\n";
-                            // Parse courses string
-                            $coursesArray = explode("\n", $student['courses']);
-                            foreach ($coursesArray as $course) {
-                                $message .= strtoupper($course) . "\n";
-                            }
-                            $message .= "Jumla: {$student['total_marks']}\n";
-                            $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
-                            $message .= "Daraja: {$student['grade']}\n";
-                            $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
-                            $message .= "Pakua ripoti hapa: {$url}";
-                        }
-
-                        $message = $this->cleanSmsText($message);
-
-                        // Log::info("Prepared SMS for {$fullname} ({$phoneNumber}):\n{$message}");
-                        // Send SMS
-                        $response = $nextSmsService->sendSmsByNext(
-                            $sender,
-                            $phoneNumber,
-                            $message,
-                            $student['student_id'] . '_' . uniqid()
-                        );
-
-                        if ($response['success']) {
-                            $successCount++;
-                        } else {
-                            $failCount++;
-                            $failedStudents[] = $fullname;
-                        }
-
-                        // Add small delay to avoid rate limiting
-                        usleep(50000); // 0.05 second delay
-
-                    } catch (\Exception $e) {
-                        $failCount++;
-                        $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
-                        continue;
+                        $message .= "Jumla: {$student['total_marks']}\n";
+                        $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
+                        $message .= "Daraja: {$student['grade']}\n";
+                        $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
+                        $message .= "Pakua ripoti hapa: {$url}";
                     }
+
+                    $message = $this->cleanSmsText($message);
+
+                    SendResultSmsJob::dispatch(
+                        $student,
+                        $sender,
+                        $message
+                    );
                 }
 
                 // Show appropriate message
-                if ($successCount == 0 && $failCount > 0) {
-                    Alert()->toast("Results published but failed to send SMS to all {$failCount} parents", 'error');
-                } elseif ($failCount > 0) {
-                    $failedNames = implode(', ', array_slice($failedStudents, 0, 5));
-                    if (count($failedStudents) > 5) {
-                        $failedNames .= ' and ' . (count($failedStudents) - 5) . ' more';
-                    }
-                    Alert()->toast("Results published! {$successCount} SMS sent, {$failCount} failed (e.g., {$failedNames})", 'warning');
-                } else {
-                    Alert()->toast("Results published and SMS sent to {$successCount} parents successfully!", 'success');
-                }
+                Alert()->toast(
+                    "Results published successfully. SMS are being processed in background.",
+                    'success'
+                );
 
                 return back();
             } else {
@@ -3752,83 +3707,65 @@ class ResultsController extends Controller
             $nextSmsService = new NextSmsService();
 
             foreach ($parentsPayload as $payload) {
+
                 try {
-                    // check if student has total score and average, if not skip SMS
-                    if ($payload['total_score'] === 0 || $payload['total_average'] === 0) {
-                        // Log::warning("Missing total score or average for student ID: {$payload['student_id']}");
-                        $failCount++;
+
+                    // Skip invalid results
+                    if (
+                        empty($payload['total_score']) ||
+                        empty($payload['total_average'])
+                    ) {
                         continue;
                     }
 
-                    // ==== REKEDISHA: Check if parent exists ====
-                    $parent = Parents::find($payload['parent_id']);
-
-                    if (!$parent) {
-                        // Log::warning("Parent not found for student ID: {$payload['student_id']}");
-                        $failCount++;
-                        continue;
-                    }
-
-                    // ==== REKEDISHA: Check if user exists ====
-                    $user = User::find($parent->user_id);
-
-                    if (!$user || empty($user->phone)) {
-                        // Log::warning("User or phone not found for parent ID: {$parent->id}");
-                        $failCount++;
-                        continue;
-                    }
-
-                    $phoneNumber = $this->formatPhoneNumber($user->phone);
-
-                    if (!$phoneNumber) {
-                        // Log::warning("Invalid phone number format: {$user->phone}");
-                        $failCount++;
-                        continue;
-                    }
-
-                    // ==== REKEDISHA: Create better formatted message ====
+                    // Create SMS message
                     $message = "MATOKEO YA {$payload['student_name']}\n";
-                    $message .= "Ripoti: " . strtoupper($report->title) . "\n";
+                    $message .= "Aina ya Ripoti: " . strtoupper($report->title) . "\n";
                     $message .= "Tarehe: {$reportDate}\n";
-                    $message .= "MATOKEO YA MASOMO:\n";
+                    $message .= "MASOMO:\n";
                     $message .= $payload['subject_results'];
                     $message .= "Jumla: {$payload['total_score']}\n";
                     $message .= "Wastani: {$payload['total_average']}\n";
                     $message .= "Nafasi: {$payload['position']}\n";
                     $message .= "Pakua ripoti: {$link}";
 
-                    // Check message length
+                    // Prevent oversized SMS
                     if (strlen($message) > 480) {
                         $message = substr($message, 0, 477) . "...";
                     }
 
-                    // Log::info("Sending SMS to {$phoneNumber} for student: {$payload['student_name']}");
-                    $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+                    // CLEAN SMS TEXT
+                    $message = $this->cleanSmsText($message);
 
-                    if ($response['success']) {
-                        $successCount++;
-                        // Log::info("SMS sent successfully to {$phoneNumber}");
-                    } else {
-                        $failCount++;
-                        // Log::error("SMS failed for {$phoneNumber}: {$response['error']}");
-                    }
+                    // Prepare minimal student data for queue
+                    $studentData = [
+                        'student_id' => $payload['student_id'],
+                        'parent_id' => $payload['parent_id']
+                    ];
 
-                    // Add small delay to avoid rate limiting
-                    usleep(100000); // 0.1 second delay
+                    // Dispatch Queue Job
+                    SendResultSmsJob::dispatch(
+                        $studentData,
+                        $sender,
+                        $message
+                    );
 
                 } catch (\Exception $e) {
-                    $failCount++;
-                    // Log::error("Error sending SMS for student ID {$payload['student_id']}: " . $e->getMessage());
+
+                    Log::error('Queue Dispatch Error', [
+                        'student_id' => $payload['student_id'],
+                        'error' => $e->getMessage()
+                    ]);
+
                     continue;
                 }
             }
 
             // Show summary alert
-            if ($failCount > 0) {
-                Alert()->toast("Report published! {$successCount} SMS sent successfully, {$failCount} failed.", 'warning');
-            } else {
-                Alert()->toast("Report has been published and {$successCount} SMS sent to parents successfully!", 'success');
-            }
+            Alert()->toast(
+                "Combined report published successfully. SMS are being processed in background.",
+                'success'
+            );
 
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         } catch (Exception $e) {

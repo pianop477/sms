@@ -25,8 +25,8 @@
         }
 
         .btn-search {
-            background: white;
-            color: #4e73df;
+            background: rgb(3, 94, 99);
+            color: white;
             padding: 10px 25px;
             border-radius: 8px;
             border: none;
@@ -189,7 +189,7 @@
                         </div>
                         <div class="col-md-3 mb-3 d-flex align-items-end">
                             <button type="button" class="btn btn-search w-100" id="searchBtn">
-                                <i class="fas fa-search me-2"></i> Search Statement
+                                <i class="fas fa-search me-2"></i> Search
                             </button>
                         </div>
                     </div>
@@ -345,7 +345,7 @@
             });
 
             if (!staffId) {
-                showToast('Please enter Staff ID', 'warning');
+                showToast('Please enter Staff ID', 'error');
                 return;
             }
 
@@ -476,7 +476,7 @@
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="${pdfUrl}" class="btn btn-download mt-4" target="_blank">
-                            <i class="fas fa-download me-2"></i> Download PDF Statement
+                            <i class="fas fa-download me-2"></i> Download Statement
                         </a>
                     </div>
                 </div>
@@ -488,17 +488,18 @@
                 <div class="stat-box"><div class="stat-value">TZS ${formatNumber(summary.total_nssf || 0)}</div><div class="stat-label">Total NSSF</div></div>
                 <div class="stat-box"><div class="stat-value">TZS ${formatNumber(summary.total_paye || 0)}</div><div class="stat-label">Total PAYE</div></div>
                 <div class="stat-box"><div class="stat-value">TZS ${formatNumber(summary.total_heslb || 0)}</div><div class="stat-label">Total HESLB</div></div>
-                <div class="stat-box"><div class="stat-value text-success">TZS ${formatNumber(summary.total_net || 0)}</div><div class="stat-label">Total Net Paid</div></div>
+                <div class="stat-box"><div class="stat-value">TZS ${formatNumber(summary.total_loan || 0)}</div><div class="stat-label">Total Loans</div></div>
+                <div class="stat-box"><div class="stat-value text-success">TZS ${formatNumber(summary.total_paid || 0)}</div><div class="stat-label">Total Paid</div></div>
             </div>
 
             <div class="statement-card">
-                <h5 class="mb-3"><i class="fas fa-table me-2"></i> Monthly Payment Breakdown</h5>
+                <h5 class="mb-3"><i class="fas fa-table me-2"></i> Monthly Payment History</h5>
                 <div class="table-responsive">
                     <table class="table table-bordered table-statement">
                         <thead>
                             <tr><th>#</th><th>Month</th><th>Payment Date</th><th class="text-end">Basic Salary</th><th class="text-end">Allowances</th>
                             <th class="text-end">Gross Pay</th><th class="text-end">NSSF</th><th class="text-end">PAYE</th>
-                            <th class="text-end">HESLB</th><th class="text-end">Net Pay</th><th class="text-end">Amount Paid</th></thead>
+                            <th class="text-end">HESLB</th><th class="text-end">Staff Loans</th><th class="text-end">Amount Paid</th></thead>
                         <tbody>
         `;
 
@@ -514,7 +515,7 @@
                     <td class="text-end">${formatNumber(row.deductions?.nssf || 0)}</td>
                     <td class="text-end">${formatNumber(row.deductions?.paye || 0)}</td>
                     <td class="text-end">${formatNumber(row.deductions?.heslb || 0)}</td>
-                    <td class="text-end text-success fw-bold">${formatNumber(row.net_salary || 0)}</td>
+                    <td class="text-end text-success fw-bold">${formatNumber(row.deductions.loan || 0)}</td>
                     <td class="text-end text-primary fw-bold">${formatNumber(row.amount_paid || 0)}</td>
                 </tr>
             `;
@@ -524,12 +525,12 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5" class="text-end fw-bold">TOTAL:</td>
+                                <td colspan="5" class="fw-bold">TOTAL:</td>
                                 <td class="text-end fw-bold">${formatNumber(summary.total_gross || 0)}</td>
                                 <td class="text-end fw-bold">${formatNumber(summary.total_nssf || 0)}</td>
                                 <td class="text-end fw-bold">${formatNumber(summary.total_paye || 0)}</td>
                                 <td class="text-end fw-bold">${formatNumber(summary.total_heslb || 0)}</td>
-                                <td class="text-end fw-bold">${formatNumber(summary.total_net || 0)}</td>
+                                <td class="text-end fw-bold">${formatNumber(summary.total_loan || 0)}</td>
                                 <td class="text-end fw-bold">${formatNumber(summary.total_paid || 0)}</td>
                             </tr>
                         </tfoot>

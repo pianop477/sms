@@ -215,7 +215,7 @@ class EmployeeStatementController extends Controller
                 return redirect()->back()->with('error', 'Failed to generate PDF: ' . $errorBody);
             }
 
-            $filename = "Payment Statement_". strtoupper($staffId).".pdf";
+            $filename = "Salary Statement_". strtoupper($staffId).".pdf";
 
             return response($response->body())
                 ->header('Content-Type', 'application/pdf')
