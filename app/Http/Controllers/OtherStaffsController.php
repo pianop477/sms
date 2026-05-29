@@ -982,10 +982,10 @@ class OtherStaffsController extends Controller
         }
 
         if($type == 'driver') {
-            $fileName = $staff->driver_name. '.jpg';
+            $fileName = strtoupper($staff->driver_name). '.jpg';
         }
         else {
-            $fileName = $staff->first_name . '_' . $teacher->last_name . '.jpg';
+            $fileName = strtoupper($staff->first_name) . '_' . $teacher->last_name . '.jpg';
         }
 
         // $fileName = $staff->user->first_name . '_' . $teacher->user->last_name . '.jpg';

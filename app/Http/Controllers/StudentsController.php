@@ -1503,7 +1503,7 @@ class StudentsController extends Controller
             return back();
         }
 
-        $fileName = $studentRecord->first_name . '_' . $studentRecord->last_name . '.jpg';
+        $fileName = strtoupper($studentRecord->first_name . '_' . $studentRecord->last_name) . '.jpg';
         return response()->download($filePath, $fileName);
     }
 

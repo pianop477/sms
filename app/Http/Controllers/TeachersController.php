@@ -762,7 +762,7 @@ class TeachersController extends Controller
             return back();
         }
 
-        $fileName = $teacher->user->first_name . '_' . $teacher->user->last_name . '.jpg';
+        $fileName = strtoupper($teacher->user->first_name . '_' . $teacher->user->last_name) . '.jpg';
         return response()->download($filePath, $fileName);
     }
 }
