@@ -429,7 +429,7 @@
                         </div>
                         <div class="header-title">
                             <h3>Deleted Student Accounts</h3>
-                            <p>Manage and restore deleted student accounts</p>
+                            <p class="text-white">Manage and restore deleted student accounts</p>
                         </div>
                     </div>
                     <div class="nav-tabs-custom">

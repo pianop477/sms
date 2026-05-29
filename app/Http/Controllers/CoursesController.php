@@ -275,8 +275,8 @@ class CoursesController extends Controller
         $teacher = class_learning_courses::where('teacher_id', $request->teacher_id)
                                             ->where('school_id', $request->school_id)
                                             ->count();
-        if($teacher >= 3) {
-            Alert()->toast('Only 3 courses allowed to be assigned for single teacher', 'error');
+        if($teacher > 6) {
+            Alert()->toast('Only 6 courses allowed to be assigned for single teacher', 'error');
             return back();
         }
         $class_course = class_learning_courses::create([

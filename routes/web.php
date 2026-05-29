@@ -282,6 +282,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
         Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
         Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
+        Route::put('Delete-permanent/{id}', [TeachersController::class, 'deletePermanent'])->name('teachers.permanent.delete');
         Route::get('/api/search-students', [StudentsController::class, 'searchStudent'])->name('api.search.students');
 
         // daily school report routes
@@ -374,6 +375,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::put('/update-bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'updateStaffBankDetails'])->name('save.staff.bank');
             Route::put('/update/alternative-phone/stype/{type}/{id}', [OtherStaffsController::class, 'addStaffAlternativePhone'])->name('staff.add.phone');
             Route::get('/trash', [OtherStaffsController::class, 'deletedStaffs'])->name('staffs.trash');
+            Route::put('/other-staff/delete/type/{type}/{id}', [OtherStaffsController::class, 'deletePermanentStaff'])->name('staffs.permanent-delete');
             Route::get('/Other-staff/profile/type/{type}/{id}', [OtherStaffsController::class, 'otherStaffProfilePicture'])->name('other.staff.profile.picture');
         });
     });

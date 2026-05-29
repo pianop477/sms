@@ -507,8 +507,10 @@ class TeachersController extends Controller
         $userLogged = Auth::user();
 
         if ($teachers->school_id != $userLogged->school_id) {
-            Alert()->toast('You are not authorized to perform this action', 'error');
-            return back();
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized user access'
+            ], 401);
         }
 
         // Find the associated user record
@@ -528,11 +530,10 @@ class TeachersController extends Controller
             $teachers->save();
         });
 
-        // Show success message
-        Alert()->toast('Teacher has been unblocked successfully', 'success');
-
-        // Redirect back
-        return back();
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher has been activated successful'
+        ], 200);
     }
 
     // delete and move to trash teacher in the school ***********************************************************
@@ -764,5 +765,31 @@ class TeachersController extends Controller
 
         $fileName = strtoupper($teacher->user->first_name . '_' . $teacher->user->last_name) . '.jpg';
         return response()->download($filePath, $fileName);
+    }
+
+    public function deletePermanent($id)
+    {
+        $decoded = Hashids::decode($id);
+        $teacher = Teacher::with('user')->findOrFail($decoded[0]);
+
+        if(! $teacher) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Teacher not found'
+            ], 404);
+        }
+
+        $teacher->user->update([
+            'status' => 3
+        ]);
+
+        $teacher->update([
+            'status' => 3
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher has been deleted successful'
+        ], 200);
     }
 }

@@ -364,19 +364,26 @@ class OtherStaffsController extends Controller
             }
 
             if (! $staff) {
-                Alert()->toast('failed to get staff information', 'error');
-                return back();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Staff not found'
+                ], 404);
             }
 
             $staff->update([
                 'status' => $request->input('status', 1)
             ]);
 
-            Alert()->toast('Staff has been restored successfully', 'success');
+            return response()->json([
+                'success' => true,
+                'message' => 'Staff has been activated successful'
+            ], 200);
             return back();
         } catch (Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error '. $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -990,5 +997,33 @@ class OtherStaffsController extends Controller
 
         // $fileName = $staff->user->first_name . '_' . $teacher->user->last_name . '.jpg';
         return response()->download($filePath, $fileName);
+    }
+
+    public function deletePermanentStaff($type, $id)
+    {
+        $decoded = Hashids::decode($id);
+
+        if($type == 'driver') {
+            $staff = Transport::findOrFail($decoded[0]);
+        }
+        else {
+            $staff = Other_staff::findOrFail($decoded[0]);
+        }
+
+        if(! $staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Staff not found'
+            ], 404);
+        }
+
+        $staff->update([
+            'status' => 3
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Staff has been deleted successful',
+        ], 200);
     }
 }
