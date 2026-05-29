@@ -191,14 +191,18 @@
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Teacher Photo">
                         <h5 class="profile-name mb-1" style="color:gold;">
                             {{ ucwords(strtolower($teachers->first_name . ' ' . $teachers->last_name)) }}</h5>
-                        <p class="mb-0 text-white text-uppercase">ID #: <strong>{{ $teachers->member_id }}</strong></p>
+                        <p class="mb-0 text-white text-uppercase">STAFF ID #: <strong>{{ $teachers->member_id }}</strong></p>
                     </div>
 
                     <div class="card-body">
                         <div class="d-flex justify-content-center mb-3">
                             <a href="javascript:void(0)" data-photo="{{ $avatarImage }}"
-                                class="btn btn-outline-danger mr-1 btn-action mr-2 view-photo">
-                                <i class="fas fa-image mr-1"></i> View Photo
+                                class="btn btn-outline-danger me-2 btn-action mr-2 view-photo">
+                                <i class="fas fa-image mr-1"></i> View
+                            </a>
+                            <a href="{{ route('teacher.profile.picture', ['id' => Hashids::encode($teachers->id)]) }}"
+                                class="btn btn-outline-success btn-action">
+                                <i class="fas fa-download me-1"></i> Download
                             </a>
                         </div>
 

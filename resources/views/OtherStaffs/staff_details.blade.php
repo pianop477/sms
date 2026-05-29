@@ -213,14 +213,18 @@
                         <h5 class="profile-name mb-1" style="color:gold;">
                             {{ $type == 'driver' ? ucwords(strtolower($staff->driver_name)) : ucwords(strtolower($staff->first_name . ' ' . $staff->last_name)) }}
                         </h5>
-                        <p class="mb-0 text-white text-uppercase">ID #: <strong>{{ $staff->staff_id ?? 'n/a' }}</strong></p>
+                        <p class="mb-0 text-white text-uppercase">STAFF ID #: <strong>{{ $staff->staff_id ?? 'n/a' }}</strong></p>
                     </div>
 
                     <div class="card-body">
                         <div class="d-flex justify-content-center mb-3">
                             <a href="javascript:void(0)" data-photo="{{ $avatarImage }}"
-                                class="btn btn-outline-danger mr-1 btn-action me-2 view-photo">
-                                <i class="fas fa-image me-1"></i> View Photo
+                                class="btn btn-outline-danger mr-2 btn-action me-2 view-photo">
+                                <i class="fas fa-image me-1"></i> View
+                            </a>
+                            <a href="{{ route('other.staff.profile.picture', ['type' => $type, 'id' => Hashids::encode($staff->id)]) }}"
+                                class="btn btn-outline-success btn-action">
+                                <i class="fas fa-download me-1"></i> Download
                             </a>
                         </div>
 

@@ -734,4 +734,35 @@ class TeachersController extends Controller
 
         return $fullStaffId;
     }
+
+    public function teacherProfilePicture($id)
+    {
+        $decoded = Hashids::decode($id);
+        if (empty($id)) {
+            // abort(404, 'Student not found');
+            Alert()->toast('No such teacher was found', 'error');
+            return back();
+        }
+
+        $teacher = Teacher::with('User')->findOrFail($decoded[0]);
+
+        // hakikisha tuna jina la picha
+        if (empty($teacher->user->image)) {
+            // return back()->with('error', 'No picture set for this student.');
+            Alert()->toast('No picture set for this teacher.', 'error');
+            return back();
+        }
+
+        $filePath = storage_path('app/public/profile/' . $teacher->user->image);
+
+
+        if (!file_exists($filePath)) {
+            // return back()->with('error', 'Picture file does not exist on the server.');
+            Alert()->toast('Picture file does not exist on the server.', 'error');
+            return back();
+        }
+
+        $fileName = $teacher->user->first_name . '_' . $teacher->user->last_name . '.jpg';
+        return response()->download($filePath, $fileName);
+    }
 }

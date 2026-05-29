@@ -297,6 +297,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
         // users management & permission
         Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
+        Route::get('/download/profile/{id}', [TeachersController::class, 'teacherProfilePicture'])->name('teacher.profile.picture');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
@@ -373,6 +374,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::put('/update-bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'updateStaffBankDetails'])->name('save.staff.bank');
             Route::put('/update/alternative-phone/stype/{type}/{id}', [OtherStaffsController::class, 'addStaffAlternativePhone'])->name('staff.add.phone');
             Route::get('/trash', [OtherStaffsController::class, 'deletedStaffs'])->name('staffs.trash');
+            Route::get('/Other-staff/profile/type/{type}/{id}', [OtherStaffsController::class, 'otherStaffProfilePicture'])->name('other.staff.profile.picture');
         });
     });
 

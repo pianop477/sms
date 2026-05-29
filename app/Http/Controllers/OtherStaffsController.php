@@ -940,4 +940,55 @@ class OtherStaffsController extends Controller
 
         return $isActive;
     }
+
+    public function otherStaffProfilePicture($type, $id)
+    {
+        $decoded = Hashids::decode($id);
+        if (empty($id)) {
+            // abort(404, 'Student not found');
+            Alert()->toast('No such teacher was found', 'error');
+            return back();
+        }
+
+        // dd($decoded);
+        if ($type == 'driver') {
+            $staff = Transport::findOrFail($decoded[0]);
+        } else {
+            $staff = Other_staffs::findOrFail($decoded[0]);
+        }
+
+        // dd($staff);
+
+
+        if (! $staff) {
+            Alert()->toast('Invalid user detected', 'error');
+            return back();
+        }
+
+        // hakikisha tuna jina la picha
+        if (empty($staff->profile_image)) {
+            // return back()->with('error', 'No picture set for this student.');
+            Alert()->toast('No picture set for this staff.', 'error');
+            return back();
+        }
+
+        $filePath = storage_path('app/public/profile/' . $staff->profile_image);
+
+
+        if (!file_exists($filePath)) {
+            // return back()->with('error', 'Picture file does not exist on the server.');
+            Alert()->toast('Picture file does not exist on the server.', 'error');
+            return back();
+        }
+
+        if($type == 'driver') {
+            $fileName = $staff->driver_name. '.jpg';
+        }
+        else {
+            $fileName = $staff->first_name . '_' . $teacher->last_name . '.jpg';
+        }
+
+        // $fileName = $staff->user->first_name . '_' . $teacher->user->last_name . '.jpg';
+        return response()->download($filePath, $fileName);
+    }
 }
