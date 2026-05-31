@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('student_fee_assignments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('student_id')->unique();
+            $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('fee_structure_id');
             $table->timestamps();
 

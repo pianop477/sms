@@ -22,6 +22,12 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
 {
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
+    {
+        $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
+        $this->appBaseUrl = config('app.url', 'http://localhost');
+    }
     public function rules(): array
     {
         return [
@@ -250,7 +256,7 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
                 $formattedPhone = $this->formatPhoneNumber($parentUser->phone);
 
                 $nextSmsService = new NextSmsService();
-                $link = "https://shuleapp.tech";
+                $link = $this->appBaseUrl;
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
                     'to' => [$formattedPhone],

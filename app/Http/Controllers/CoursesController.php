@@ -22,7 +22,7 @@ class CoursesController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $classes = Grade::where('school_id', '=', Auth::user()->school_id)->orderBy('id', 'ASC')->get();
+        $classes = Grade::where('school_id', '=', Auth::user()->school_id)->orderBy('class_name', 'ASC')->get();
 
         //fetch all registered subjects in the institution
         $subjects = Subject::where('school_id', $user->school_id)->orderBy('course_name')->get();

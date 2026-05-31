@@ -319,8 +319,14 @@ class ExamController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit(Examination $exam)
+    public function edit($exam)
     {
+        $decoded = Hashids::decode($exam);
+        $exam = Examination::findOrFail($decoded[0]);
+        if(! $exam) {
+            Alert()->toast('No examination were found', 'error');
+            return back();
+        }
         return view('Examinations.Edit', compact('exam'));
     }
 

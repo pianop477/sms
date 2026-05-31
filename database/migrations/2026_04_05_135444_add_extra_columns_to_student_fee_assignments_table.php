@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_fee_assignments', function (Blueprint $table) {
-            //
-                        //
-            $table->year('academic_year')->nullable()->after('fee_structure_id');
-            $table->dropUnique('student_fee_assignments_student_id_unique');
 
-            // 2. Add composite unique key for student_id and academic_year
+            $table->year('academic_year')->nullable()->after('fee_structure_id');
+
             $table->index('academic_year');
-            $table->unique(['student_id', 'academic_year'], 'uk_student_year');
+
+            $table->unique(
+                ['student_id', 'academic_year'],
+                'uk_student_year'
+            );
         });
     }
 
@@ -31,7 +32,6 @@ return new class extends Migration
         Schema::table('student_fee_assignments', function (Blueprint $table) {
 
             $table->dropUnique('uk_student_year');
-            $table->unique('student_id', 'student_fee_assignments_student_id_unique');
         });
     }
 };

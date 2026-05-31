@@ -372,6 +372,10 @@
             background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
         }
 
+        .action-icon.primary {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%)
+        }
+
         .action-icon.success {
             background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
         }
@@ -745,6 +749,9 @@
                                         <td>
                                             <div class="action-icons">
                                                 @if ($exam->status == 1)
+                                                    <a href="{{ route('exams.type.edit', ['exam' => Hashids::encode($exam->id)]) }}" class="action-icon primary">
+                                                        <i class="fas fa-edit" title="Edit"></i>
+                                                    </a>
                                                     <form action="{{ route('exams.block', ['exam' => Hashids::encode($exam->id)]) }}"
                                                           method="POST"
                                                           class="d-inline"

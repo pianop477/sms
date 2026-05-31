@@ -27,10 +27,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('fee_structures', function (Blueprint $table) {
-            //
-            $table->dropForeign(['class_id']);
-            $table->dropColumn('class_id');
+
             $table->dropUnique('unique_fee_structure_per_class');
+
+            $table->dropForeign(['class_id']);
+
+            $table->dropColumn('class_id');
+
         });
     }
 };
