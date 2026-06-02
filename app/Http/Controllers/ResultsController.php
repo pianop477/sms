@@ -4202,10 +4202,6 @@ class ResultsController extends Controller
         return view('generated_reports.general_pdf', compact('fileUrl', 'results', 'year', 'reports', 'class', 'school', 'report', 'schoolInfo'));
     }
 
-    /**
-     * Parent download student combined report
-     * Shares the same blade view as downloadCombinedReport
-     */
     public function parentDownloadStudentCombinedReport($school, $year, $report, $student, $class)
     {
         $studentId = Hashids::decode($student)[0];
@@ -4803,10 +4799,7 @@ class ResultsController extends Controller
         }
     }
 
-    /**
-     * Clean SMS text to use only GSM 03.38 character set
-     * This ensures SMS is counted as standard GSM (160 chars per segment)
-     */
+
     private function cleanSmsText($text)
     {
         // Badilisha baadhi ya Unicode kuwa ASCII
@@ -4827,10 +4820,7 @@ class ResultsController extends Controller
         return $text;
     }
 
-    /**
-     * Generate bulk individual student reports (single PDF with multiple pages)
-     * OPTIMIZED for 100+ students with memory management
-     */
+
     public function bulkStudentReports($school, $year, $class, $examType, $month, $date, Request $request)
     {
         // Decode IDs
@@ -4855,8 +4845,20 @@ class ResultsController extends Controller
             ->whereDate('exam_date', $date)
             ->value('marking_style') ?? 1;
 
-        // Get all results with school data
-        $results = Examination_result::query()
+        // OPTIMIZATION 1: Use chunking for students - get student IDs first
+        $studentIds = Student::where('class_id', $class_id[0])
+            ->where('school_id', $schools->id)
+            ->where('status', 1)
+            ->orderBy('admission_number')
+            ->pluck('id');
+
+        if ($studentIds->isEmpty()) {
+            Alert()->toast('No students found', 'info');
+            return redirect()->back();
+        }
+
+        // OPTIMIZATION 2: Get all results in one query (still efficient)
+        $allResults = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -4896,27 +4898,24 @@ class ResultsController extends Controller
             ->whereDate('examination_results.exam_date', $date)
             ->get();
 
-        if ($results->isEmpty()) {
+        if ($allResults->isEmpty()) {
             Alert()->toast('No results found', 'info');
             return redirect()->back();
         }
 
         // Group results by student
-        $groupedResults = $results->groupBy('student_id');
+        $resultsByStudent = $allResults->groupBy('student_id');
 
         // Pre-calculate subject scores for ranking (optimization)
         $subjectScoresCache = [];
-        foreach ($results->groupBy('course_id') as $courseId => $courseResults) {
+        foreach ($allResults->groupBy('course_id') as $courseId => $courseResults) {
             $subjectScoresCache[$courseId] = $courseResults->pluck('score', 'student_id');
         }
 
-        // ============ PRE-CALCULATE RANKS FOR ALL SUBJECTS (TIE HANDLING) ============
+        // Pre-calculate ranks for all subjects
         $subjectRanksCache = [];
         foreach ($subjectScoresCache as $courseId => $scores) {
-            // Sort scores in descending order
             $sortedScores = $scores->sortDesc();
-
-            // Calculate ranks with tie handling
             $rank = 1;
             $previousScore = null;
             $sameRankCount = 0;
@@ -4932,65 +4931,17 @@ class ResultsController extends Controller
                 $ranks[$studentId] = $rank;
                 $previousScore = $score;
             }
-
             $subjectRanksCache[$courseId] = $ranks;
         }
-        // ============ END PRE-CALCULATION ============
 
-        // Process each student
-        $allStudentsData = [];
+        // Process each student to calculate averages and rankings
         $studentAverages = [];
-
-        foreach ($groupedResults as $studentId => $studentResults) {
-            $totalMarks = $studentResults->sum('score');
+        foreach ($resultsByStudent as $studentId => $studentResults) {
             $averageScore = $studentResults->avg('score');
             $studentAverages[$studentId] = $averageScore;
-
-            // Calculate course ranks using cached ranks
-            foreach ($studentResults as $result) {
-                // Get rank from cache
-                $ranksForSubject = $subjectRanksCache[$result->course_id] ?? [];
-                $result->courseRank = $ranksForSubject[$studentId] ?? '-';
-
-                $grade = $this->calculateGrade($result->score, $marking_style);
-                $result->grade = $grade;
-                $result->remarks = $this->getRemarksForGrade($grade, $marking_style, $result->score);
-            }
-
-            // Division calculation for style 3
-            $aggregatePoints = 0;
-            $division = null;
-            if ($marking_style == 3) {
-                $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5, 'ABS' => 6];
-                foreach ($studentResults as $result) {
-                    $courseGrade = $this->calculateGrade($result->score, $marking_style);
-                    $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
-                }
-                $division = $this->calculateDivisionForStyle3($aggregatePoints, $studentResults->count());
-            }
-
-            $studentObject = new \stdClass();
-            $studentObject->id = $studentId;
-            $studentObject->first_name = $studentResults->first()->first_name;
-            $studentObject->middle_name = $studentResults->first()->middle_name;
-            $studentObject->last_name = $studentResults->first()->last_name;
-            $studentObject->admission_number = $studentResults->first()->admission_number;
-            $studentObject->group = $studentResults->first()->group;
-            $studentObject->gender = $studentResults->first()->gender;
-            $studentObject->image = $studentResults->first()->image;
-            $studentObject->class_name = $results->first()->class_name;
-
-            $allStudentsData[$studentId] = [
-                'results' => $studentResults,
-                'totalScore' => $totalMarks,
-                'averageScore' => $averageScore,
-                'aggregatePoints' => $aggregatePoints,
-                'division' => $division,
-                'studentObject' => $studentObject,
-            ];
         }
 
-        // Calculate class rankings (tie handling)
+        // Calculate class rankings
         arsort($studentAverages);
         $rank = 1;
         $studentRankings = [];
@@ -5009,79 +4960,166 @@ class ResultsController extends Controller
         }
         $rankings = collect($studentRankings);
 
-        // Generate HTML pages for each student
-        $htmlPages = [];
+        // OPTIMIZATION 3: Generate PDF in chunks (process 10 students at a time, then merge)
+        $chunkSize = 10;
+        $studentChunks = array_chunk($studentIds->toArray(), $chunkSize);
+        $tempFiles = [];
+
         $schoolInfo = $schools;
-
-        foreach ($allStudentsData as $studentId => $studentData) {
-            $studentRank = $studentRankings[$studentId] ?? 1;
-
-            $overallGradeInfo = $this->calculateOverallGrade(
-                $studentData['averageScore'],
-                $marking_style,
-                $studentData['division']
-            );
-
-            // Generate QR code
-            $qrPng = $this->generateQRCodeForBulkStudent($studentData['studentObject'], $date);
-
-            $html = view('Results.individual_student_report_pdf', [
-                'results' => $studentData['results'],
-                'studentId' => $studentData['studentObject'],
-                'totalScore' => $studentData['totalScore'],
-                'averageScore' => $studentData['averageScore'],
-                'studentRank' => $studentRank,
-                'rankings' => $rankings,
-                'division' => $studentData['division'],
-                'aggregatePoints' => $studentData['aggregatePoints'],
-                'marking_style' => $marking_style,
-                'date' => $date,
-                'qrPng' => $qrPng,
-                'overallGrade' => $overallGradeInfo['grade'],
-                'gradeComment' => $overallGradeInfo['comment'],
-                'schoolInfo' => $schoolInfo,
-            ])->render();
-
-            $htmlPages[] = $html;
-            unset($studentData);
-        }
-
-        // PDF Generation - Direct streaming to avoid memory issues
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', 300);
+        $timestamp = Carbon::now()->timestamp;
 
         try {
-            // Combine all HTML pages
-            $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
-                        implode('<div style="page-break-after: always;"></div>', $htmlPages) .
-                        '</body></html>';
+            foreach ($studentChunks as $chunkIndex => $chunkStudentIds) {
+                // Process each chunk
+                $htmlPages = [];
 
-            // Clean HTML for special characters
-            $fullHtml = mb_convert_encoding($fullHtml, 'HTML-ENTITIES', 'UTF-8');
+                foreach ($chunkStudentIds as $studentId) {
+                    $studentResults = $resultsByStudent[$studentId] ?? collect();
 
-            // Create PDF with optimized settings
-            $pdf = Pdf::loadHTML($fullHtml);
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isPhpEnabled', true);
-            $pdf->setPaper('A4', 'portrait');
+                    if ($studentResults->isEmpty()) {
+                        continue;
+                    }
 
-            // Generate filename
-            $timestamp = Carbon::now()->timestamp;
-            $fileName = "bulk_student_reports_{$timestamp}.pdf";
+                    $totalMarks = $studentResults->sum('score');
+                    $averageScore = $studentResults->avg('score');
 
-            // Stream directly to browser
-            return $pdf->download($fileName);
+                    // Calculate course ranks using cached ranks
+                    foreach ($studentResults as $result) {
+                        $ranksForSubject = $subjectRanksCache[$result->course_id] ?? [];
+                        $result->courseRank = $ranksForSubject[$studentId] ?? '-';
+
+                        $grade = $this->calculateGrade($result->score, $marking_style);
+                        $result->grade = $grade;
+                        $result->remarks = $this->getRemarksForGrade($grade, $marking_style, $result->score);
+                    }
+
+                    // Division calculation for style 3
+                    $aggregatePoints = 0;
+                    $division = null;
+                    if ($marking_style == 3) {
+                        $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5, 'ABS' => 6];
+                        foreach ($studentResults as $result) {
+                            $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                            $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+                        }
+                        $division = $this->calculateDivisionForStyle3($aggregatePoints, $studentResults->count());
+                    }
+
+                    $studentObject = new \stdClass();
+                    $studentObject->id = $studentId;
+                    $studentObject->first_name = $studentResults->first()->first_name;
+                    $studentObject->middle_name = $studentResults->first()->middle_name;
+                    $studentObject->last_name = $studentResults->first()->last_name;
+                    $studentObject->admission_number = $studentResults->first()->admission_number;
+                    $studentObject->group = $studentResults->first()->group;
+                    $studentObject->gender = $studentResults->first()->gender;
+                    $studentObject->image = $studentResults->first()->image;
+                    $studentObject->class_name = $allResults->first()->class_name;
+
+                    $studentRank = $studentRankings[$studentId] ?? 1;
+                    $overallGradeInfo = $this->calculateOverallGrade($averageScore, $marking_style, $division);
+                    $qrPng = $this->generateQRCodeForBulkStudent($studentObject, $date);
+
+                    $html = view('Results.individual_student_report_pdf', [
+                        'results' => $studentResults,
+                        'studentId' => $studentObject,
+                        'totalScore' => $totalMarks,
+                        'averageScore' => $averageScore,
+                        'studentRank' => $studentRank,
+                        'rankings' => $rankings,
+                        'division' => $division,
+                        'aggregatePoints' => $aggregatePoints,
+                        'marking_style' => $marking_style,
+                        'date' => $date,
+                        'qrPng' => $qrPng,
+                        'overallGrade' => $overallGradeInfo['grade'],
+                        'gradeComment' => $overallGradeInfo['comment'],
+                        'schoolInfo' => $schoolInfo,
+                    ])->render();
+
+                    $htmlPages[] = $html;
+                    unset($studentResults);
+                }
+
+                if (!empty($htmlPages)) {
+                    // Generate PDF for this chunk
+                    $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
+                                implode('<div style="page-break-after: always;"></div>', $htmlPages) .
+                                '</body></html>';
+
+                    $pdf = Pdf::loadHTML($fullHtml);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('A4', 'portrait');
+
+                    $tempFileName = "temp_chunk_{$timestamp}_{$chunkIndex}.pdf";
+                    $tempFilePath = public_path("reports/{$tempFileName}");
+
+                    if (!file_exists(public_path('reports'))) {
+                        mkdir(public_path('reports'), 0755, true);
+                    }
+
+                    $pdf->save($tempFilePath);
+                    $tempFiles[] = $tempFilePath;
+
+                    // Free memory
+                    unset($htmlPages);
+                    unset($fullHtml);
+                    unset($pdf);
+                }
+            }
+
+            // Get class name for filename
+            $className = $allResults->first()->class_name ?? 'students';
+            $safeClassName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $className);
+            $timestamp = Carbon::now()->format('Ymd_His');
+
+            // OPTIMIZATION 4: Merge all PDFs if multiple chunks
+            if (count($tempFiles) == 1) {
+                // Only one file, return it directly with class name
+                $finalFileName = "{$safeClassName}_student_reports_{$timestamp}.pdf";
+                return response()->download($tempFiles[0], $finalFileName)
+                    ->deleteFileAfterSend(true);
+            } else {
+                // Multiple files - create a ZIP file with class name
+                $zip = new \ZipArchive();
+                $zipFileName = "{$safeClassName}_student_reports.zip";
+                $zipPath = public_path("reports/{$zipFileName}");
+
+                if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+                    foreach ($tempFiles as $index => $tempFile) {
+                        $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                    }
+                    $zip->close();
+                }
+
+                // Clean up temp files
+                foreach ($tempFiles as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
+                }
+
+                return response()->download($zipPath, $zipFileName)
+                    ->deleteFileAfterSend(true);
+            }
 
         } catch (\Exception $e) {
             \Log::error('PDF Generation failed: ' . $e->getMessage());
+
+            // Clean up temp files on error
+            foreach ($tempFiles as $tempFile) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
             Alert()->toast('Failed to generate PDF. Please try again.', 'error');
             return redirect()->back();
         }
     }
 
-    /**
-     * Generate QR code for bulk student report - Simplified working version
-     */
+
     private function generateQRCodeForBulkStudent($student, $date)
     {
         try {
@@ -5113,9 +5151,7 @@ class ResultsController extends Controller
         }
     }
 
-    /**
-     * Helper: Get remarks based on grade and score
-     */
+
     private function getRemarksForGrade($grade, $marking_style, $score = null)
     {
         if ($score === null || $score === 0) {
@@ -5136,9 +5172,6 @@ class ResultsController extends Controller
     }
 
 
-    /**
-     * Helper: Get month number from month name
-     */
     private function getMonthNumber($month)
     {
         $monthsArray = [
@@ -5175,7 +5208,7 @@ class ResultsController extends Controller
 
     public function bulkCombinedReports($school, $year, $class, $report)
     {
-        set_time_limit(300);
+        set_time_limit(600);
         ini_set('memory_limit', '512M');
 
         $schoolId = Hashids::decode($school)[0];
@@ -5183,7 +5216,7 @@ class ResultsController extends Controller
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
-        if (! $reports) {
+        if (!$reports) {
             Alert()->toast('Report not found', 'error');
             return redirect()->back();
         }
@@ -5192,8 +5225,7 @@ class ResultsController extends Controller
         $combineOption = $reports->combine_option ?? 'individual';
         $storedClassId = $reports->class_id ?? $classId;
 
-        // ============ GET MARKING STYLE FROM EXAMINATION_RESULTS ============
-        // HAPA NDIO FIX: Chukua marking style kutoka examination_results table
+        // Get marking style from examination_results
         $firstExamResult = Examination_result::query()
             ->where('class_id', $storedClassId)
             ->where('school_id', $schoolId)
@@ -5202,27 +5234,29 @@ class ResultsController extends Controller
 
         $markingStyle = $firstExamResult ? ($firstExamResult->marking_style ?? 2) : 2;
 
-        // \Log::info('===========================================');
-        // \Log::info('MARKING STYLE FROM EXAMINATION_RESULTS: ' . $markingStyle);
-        // \Log::info('===========================================');
-        // ============ END FIX ============
-
         // Get school info once
         $schoolInfo = school::find($schoolId);
 
-        // Get all active students in the class
-        $students = Student::where('class_id', $classId)
+        // Get class name
+        $className = $reports->class_name;
+        if (empty($className)) {
+            $classInfo = Grade::find($storedClassId);
+            $className = $classInfo->class_name ?? 'N/A';
+        }
+
+        // OPTIMIZATION 1: Get student IDs only first (not full objects)
+        $studentIds = Student::where('class_id', $classId)
             ->where('school_id', $schoolId)
             ->where('status', 1)
             ->orderBy('admission_number')
-            ->get();
+            ->pluck('id');
 
-        if ($students->isEmpty()) {
+        if ($studentIds->isEmpty()) {
             Alert()->toast('No students found in this class', 'error');
             return redirect()->back();
         }
 
-        // PRE-LOAD ALL RESULTS FOR THE CLASS
+        // PRE-LOAD ALL RESULTS FOR THE CLASS (one query)
         $allResults = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -5232,7 +5266,7 @@ class ResultsController extends Controller
             ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
             ->select(
-                'examination_results.*',  // Hii inajumuisha marking_style
+                'examination_results.*',
                 'students.id as studentId',
                 'students.first_name',
                 'students.middle_name',
@@ -5271,16 +5305,6 @@ class ResultsController extends Controller
             return redirect()->back();
         }
 
-        $className = $reports->class_name;
-        if (empty($className)) {
-            $classInfo = Grade::find($storedClassId);
-            $className = $classInfo->class_name ?? 'N/A';
-        }
-        // Also set it on the student object for each student
-        foreach ($students as $student) {
-            $student->class_name = $className;
-        }
-
         // Group results by student
         $resultsByStudent = $allResults->groupBy('studentId');
 
@@ -5293,85 +5317,148 @@ class ResultsController extends Controller
         // Pre-calculate all student averages for ranking
         $allStudentAverages = $this->calculateAllStudentAveragesForBulkCombined($resultsByStudent, $combineOption, $examDates, $storedClassId, $schoolId);
 
-        // Generate HTML for each student
-        $htmlPages = [];
-        $counter = 0;
-        $totalStudents = count($students);
+        // OPTIMIZATION 2: Process students in chunks of 10
+        $chunkSize = 10;
+        $studentChunks = array_chunk($studentIds->toArray(), $chunkSize);
+        $tempFiles = [];
+        $timestamp = Carbon::now()->timestamp;
 
-        foreach ($students as $student) {
-            $counter++;
-            $studentResults = $resultsByStudent[$student->id] ?? collect();
+        try {
+            foreach ($studentChunks as $chunkIndex => $chunkStudentIds) {
+                $htmlPages = [];
 
-            if ($studentResults->isEmpty()) {
-                continue;
+                foreach ($chunkStudentIds as $studentId) {
+                    $student = Student::find($studentId);
+                    if (!$student) continue;
+
+                    $student->class_name = $className;
+                    $studentResults = $resultsByStudent[$student->id] ?? collect();
+
+                    if ($studentResults->isEmpty()) {
+                        continue;
+                    }
+
+                    // Generate individual student report data
+                    $studentReportData = $this->generateStudentReportDataForBulkCombined(
+                        $student,
+                        $studentResults,
+                        $examHeaders,
+                        $combineOption,
+                        $markingStyle,
+                        $allStudentAverages,
+                        $reports,
+                        $schoolInfo,
+                        $storedClassId,
+                        $schoolId,
+                        $examDates
+                    );
+
+                    // Generate QR code (simplified to avoid memory issues)
+                    $qrPng = $this->generateQRForBulkCombined($studentReportData, $reports, $schoolInfo);
+
+                    $html = view('generated_reports.compiled_report_bulk', [
+                        'students' => $studentReportData['students'],
+                        'finalData' => $studentReportData['finalData'],
+                        'studentGeneralAverage' => $studentReportData['studentGeneralAverage'],
+                        'totalScoreForStudent' => $studentReportData['totalScoreForStudent'],
+                        'generalPosition' => $studentReportData['generalPosition'],
+                        'totalStudents' => $studentReportData['totalStudents'],
+                        'subjectCount' => $studentReportData['subjectCount'],
+                        'examAverages' => $studentReportData['examAverages'],
+                        'examHeaders' => $examHeaders,
+                        'examSpecifications' => $examSpecifications,
+                        'schoolInfo' => $schoolInfo,
+                        'reports' => $reports,
+                        'qrPng' => $qrPng,
+                        'year' => $year,
+                        'class' => $class,
+                        'school' => $school,
+                        'report' => $report,
+                        'markingStyle' => $markingStyle,
+                        'className' => $className,
+                        'currentStudent' => $chunkIndex * $chunkSize + count($htmlPages) + 1,
+                        'totalStudents' => count($studentIds),
+                    ])->render();
+
+                    $htmlPages[] = $html;
+                    unset($studentReportData);
+                    unset($student);
+                }
+
+                if (!empty($htmlPages)) {
+                    // Generate PDF for this chunk
+                    $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
+                                implode('<div style="page-break-after: always;"></div>', $htmlPages) .
+                                '</body></html>';
+
+                    $pdf = Pdf::loadHTML($fullHtml);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('A4', 'portrait');
+
+                    $tempFileName = "temp_combined_chunk_{$timestamp}_{$chunkIndex}.pdf";
+                    $folderPath = public_path('reports');
+
+                    if (!File::exists($folderPath)) {
+                        File::makeDirectory($folderPath, 0755, true);
+                    }
+
+                    $tempFilePath = $folderPath . '/' . $tempFileName;
+                    $pdf->save($tempFilePath);
+                    $tempFiles[] = $tempFilePath;
+
+                    // Free memory
+                    unset($htmlPages);
+                    unset($fullHtml);
+                    unset($pdf);
+                }
             }
 
-            // Generate individual student report data
-            $studentReportData = $this->generateStudentReportDataForBulkCombined(
-                $student,
-                $studentResults,
-                $examHeaders,
-                $combineOption,
-                $markingStyle,  // Sasa marking style ni sahihi
-                $allStudentAverages,
-                $reports,
-                $schoolInfo,
-                $storedClassId,
-                $schoolId,
-                $examDates
-            );
+            // OPTIMIZATION 3: Merge or return files
+            if (count($tempFiles) == 1) {
+                // Single file - use class name in filename
+                $finalFileName = "{$className}_{$reports->title}_all_students.pdf";
+                return response()->download($tempFiles[0], $finalFileName)
+                    ->deleteFileAfterSend(true);
+            } else {
+                // Multiple files - create ZIP file
+                $zipFileName = "{$className}_{$reports->title}_all_students.zip";
+                $zipPath = public_path("reports/{$zipFileName}");
 
-            // Generate QR code
-            $qrPng = $this->generateQRForBulkCombined($studentReportData, $reports, $schoolInfo);
+                $zip = new \ZipArchive();
+                if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+                    foreach ($tempFiles as $index => $tempFile) {
+                        $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                    }
+                    $zip->close();
+                }
 
-            $html = view('generated_reports.compiled_report_bulk', [
-                'students' => $studentReportData['students'],
-                'finalData' => $studentReportData['finalData'],
-                'studentGeneralAverage' => $studentReportData['studentGeneralAverage'],
-                'totalScoreForStudent' => $studentReportData['totalScoreForStudent'],
-                'generalPosition' => $studentReportData['generalPosition'],
-                'totalStudents' => $studentReportData['totalStudents'],
-                'subjectCount' => $studentReportData['subjectCount'],
-                'examAverages' => $studentReportData['examAverages'],
-                'examHeaders' => $examHeaders,
-                'examSpecifications' => $examSpecifications,  // Make sure this is passed
-                'schoolInfo' => $schoolInfo,
-                'reports' => $reports,
-                'qrPng' => $qrPng,
-                'year' => $year,
-                'class' => $class,
-                'school' => $school,
-                'report' => $report,
-                'markingStyle' => $markingStyle,
-                'className' => $className,  // Add this
-                'currentStudent' => $counter,
-                'totalStudents' => $totalStudents,
-            ])->render();
+                // Clean up temp files
+                foreach ($tempFiles as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
+                }
 
-            $htmlPages[] = $html;
-            unset($studentReportData);
+                return response()->download($zipPath, $zipFileName)
+                    ->deleteFileAfterSend(true);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Bulk Combined PDF Generation failed: ' . $e->getMessage());
+
+            // Clean up temp files on error
+            foreach ($tempFiles as $tempFile) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
+            Alert()->toast('Failed to generate reports. Please try again.', 'error');
+            return redirect()->back();
         }
-
-        // Merge all HTML into one PDF
-        $pdf = Pdf::loadHTML('<html><body>'.implode('<div style="page-break-after: always;"></div>', $htmlPages).'</body></html>');
-        $pdf->setOption('isHtml5ParserEnabled', true);
-        $pdf->setOption('isPhpEnabled', true);
-        $pdf->setPaper('A4', 'portrait');
-
-        $timestamp = Carbon::now()->timestamp;
-        $fileName = "bulk_combined_reports_{$timestamp}.pdf";
-        $folderPath = public_path('reports');
-
-        if (! File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
-        }
-
-        $pdf->save($folderPath.'/'.$fileName);
-
-        return response()->download($folderPath.'/'.$fileName, "{$reports->title}_all_students.pdf", [
-            'Content-Type' => 'application/pdf',
-        ])->deleteFileAfterSend(true);
     }
+
 
     /**
      * Get exam headers for bulk combined reports

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Academic Report - {{ $studentId->first_name }} {{ $studentId->last_name }}</title>
@@ -41,7 +42,8 @@
             border-collapse: collapse;
         }
 
-        .logo-cell, .photo-cell {
+        .logo-cell,
+        .photo-cell {
             width: 12%;
             text-align: center;
             vertical-align: middle;
@@ -65,7 +67,8 @@
             margin: 2px 0;
         }
 
-        .school-address, .school-contacts {
+        .school-address,
+        .school-contacts {
             font-size: 9px;
             margin: 2px 0;
         }
@@ -153,45 +156,108 @@
             text-align: center;
         }
 
-        .subject-name, .teacher-name {
+        .subject-name,
+        .teacher-name {
             text-align: left;
         }
 
-        .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F {
+        .grade-A,
+        .grade-B,
+        .grade-C,
+        .grade-D,
+        .grade-E,
+        .grade-F {
             font-weight: bold;
             padding: 2px 8px;
             border-radius: 3px;
             display: inline-block;
         }
-        .grade-A { background-color: #e8f5e9; border: 1px solid #2e7d32; }
-        .grade-B { background-color: #e3f2fd; border: 1px solid #1565c0; }
-        .grade-C { background-color: #fff3e0; border: 1px solid #e65100; }
-        .grade-D { background-color: #ffebee; border: 1px solid #c62828; }
-        .grade-E, .grade-F { background-color: #fce4ec; border: 1px solid #b71c1c; }
 
-        .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
+        .grade-A {
+            background-color: #e8f5e9;
+            border: 1px solid #2e7d32;
+        }
+
+        .grade-B {
+            background-color: #e3f2fd;
+            border: 1px solid #1565c0;
+        }
+
+        .grade-C {
+            background-color: #fff3e0;
+            border: 1px solid #e65100;
+        }
+
+        .grade-D {
+            background-color: #ffebee;
+            border: 1px solid #c62828;
+        }
+
+        .grade-E,
+        .grade-F {
+            background-color: #fce4ec;
+            border: 1px solid #b71c1c;
+        }
+
+        .remark-excellent,
+        .remark-good,
+        .remark-pass,
+        .remark-poor,
+        .remark-fail {
             padding: 2px 10px;
             border-radius: 3px;
             font-weight: bold;
             display: inline-block;
         }
-        .remark-excellent { background-color: #2e7d32; color: white; }
-        .remark-good { background-color: #1565c0; color: white; }
-        .remark-pass { background-color: #e65100; color: white; }
-        .remark-poor { background-color: #c62828; color: white; }
-        .remark-fail { background-color: #b71c1c; color: white; }
+
+        .remark-excellent {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .remark-good {
+            background-color: #1565c0;
+            color: white;
+        }
+
+        .remark-pass {
+            background-color: #e65100;
+            color: white;
+        }
+
+        .remark-poor {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .remark-fail {
+            background-color: #b71c1c;
+            color: white;
+        }
 
         @media print {
-            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F,
-            .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
+
+            .grade-A,
+            .grade-B,
+            .grade-C,
+            .grade-D,
+            .grade-E,
+            .grade-F,
+            .remark-excellent,
+            .remark-good,
+            .remark-pass,
+            .remark-poor,
+            .remark-fail {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+
             .report-table th {
                 background-color: #e0e0e0 !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+
             .section-header {
                 background: #000 !important;
                 -webkit-print-color-adjust: exact;
@@ -279,10 +345,20 @@
         }
 
         @media print {
+
+            /* Prevent memory intensive rendering */
+            * {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
             body {
                 padding: 0;
                 margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
+
             .footer {
                 position: fixed;
                 bottom: 0;
@@ -290,10 +366,21 @@
             }
         }
 
-        .text-center { text-align: center; }
-        .text-uppercase { text-transform: uppercase; }
-        .text-capitalize { text-transform: capitalize; }
-        .bold { font-weight: bold; }
+        .text-center {
+            text-align: center;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-capitalize {
+            text-transform: capitalize;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -308,32 +395,36 @@
                     $logoPath = '';
                     $logoExists = false;
                     if(!empty($logoFileName)) {
-                        $paths = [
-                            public_path('storage/logo/' . $logoFileName),
-                            storage_path('app/public/logo/' . $logoFileName),
-                            public_path('logo/' . $logoFileName)
-                        ];
-                        foreach($paths as $p) {
-                            if(file_exists($p) && is_file($p)) {
-                                $logoPath = $p;
-                                $logoExists = true;
-                                break;
-                            }
-                        }
+                    $paths = [
+                    public_path('storage/logo/' . $logoFileName),
+                    storage_path('app/public/logo/' . $logoFileName),
+                    public_path('logo/' . $logoFileName)
+                    ];
+                    foreach($paths as $p) {
+                    if(file_exists($p) && is_file($p)) {
+                    $logoPath = $p;
+                    $logoExists = true;
+                    break;
+                    }
+                    }
                     }
                     @endphp
                     @if($logoExists && !empty($logoPath))
-                        <img src="{{ $logoPath }}" class="logo-img" alt="School Logo">
+                    <img src="{{ $logoPath }}" class="logo-img" alt="School Logo">
                     @else
-                        <div style="width:65px;height:65px;border:1px solid #ccc;margin:0 auto;line-height:65px;font-size:9px;">LOGO</div>
+                    <div
+                        style="width:65px;height:65px;border:1px solid #ccc;margin:0 auto;line-height:65px;font-size:9px;">
+                        LOGO</div>
                     @endif
                 </td>
                 <td class="school-info-cell">
                     <div class="school-name">THE UNITED REPUBLIC OF TANZANIA</div>
                     <div class="school-name">PRESIDENT'S OFFICE - TAMISEMI</div>
                     <div class="school-name">{{ strtoupper($schoolInfo->school_name ?? 'SCHOOL NAME') }}</div>
-                    <div class="school-address">{{ $schoolInfo->postal_address ?? '_____' }} - {{ $schoolInfo->postal_name ?? '_____' }}</div>
-                    <div class="school-contacts">Email: {{ strtolower($schoolInfo->school_email ?? 'info@school.ac.tz') }} | Tel: {{ $schoolInfo->school_phone ?? '______' }}</div>
+                    <div class="school-address">{{ $schoolInfo->postal_address ?? '_____' }} - {{
+                        $schoolInfo->postal_name ?? '_____' }}</div>
+                    <div class="school-contacts">Email: {{ strtolower($schoolInfo->school_email ?? 'info@school.ac.tz')
+                        }} | Tel: {{ $schoolInfo->school_phone ?? '______' }}</div>
                 </td>
                 <td class="photo-cell">
                     @php
@@ -341,37 +432,39 @@
                     $studentImagePath = '';
                     $hasImage = false;
                     if(!empty($studentImageName)) {
-                        $paths = [
-                            public_path('storage/students/' . $studentImageName),
-                            storage_path('app/public/students/' . $studentImageName),
-                            public_path('students/' . $studentImageName)
-                        ];
-                        foreach($paths as $p) {
-                            if(file_exists($p) && is_file($p)) {
-                                $studentImagePath = $p;
-                                $hasImage = true;
-                                break;
-                            }
-                        }
+                    $paths = [
+                    public_path('storage/students/' . $studentImageName),
+                    storage_path('app/public/students/' . $studentImageName),
+                    public_path('students/' . $studentImageName)
+                    ];
+                    foreach($paths as $p) {
+                    if(file_exists($p) && is_file($p)) {
+                    $studentImagePath = $p;
+                    $hasImage = true;
+                    break;
+                    }
+                    }
                     }
                     if(!$hasImage) {
-                        $defaultPaths = [
-                            public_path('storage/students/student.jpg'),
-                            storage_path('app/public/students/student.jpg')
-                        ];
-                        foreach($defaultPaths as $p) {
-                            if(file_exists($p) && is_file($p)) {
-                                $studentImagePath = $p;
-                                $hasImage = true;
-                                break;
-                            }
-                        }
+                    $defaultPaths = [
+                    public_path('storage/students/student.jpg'),
+                    storage_path('app/public/students/student.jpg')
+                    ];
+                    foreach($defaultPaths as $p) {
+                    if(file_exists($p) && is_file($p)) {
+                    $studentImagePath = $p;
+                    $hasImage = true;
+                    break;
+                    }
+                    }
                     }
                     @endphp
                     @if($hasImage && !empty($studentImagePath))
-                        <img src="{{ $studentImagePath }}" class="student-photo" alt="Student Photo">
+                    <img src="{{ $studentImagePath }}" class="student-photo" alt="Student Photo">
                     @else
-                        <div style="width:65px;height:65px;border:1px solid #ccc;margin:0 auto;line-height:65px;font-size:9px;">PHOTO</div>
+                    <div
+                        style="width:65px;height:65px;border:1px solid #ccc;margin:0 auto;line-height:65px;font-size:9px;">
+                        PHOTO</div>
                     @endif
                 </td>
             </tr>
@@ -380,7 +473,8 @@
         <!-- REPORT TITLE -->
         <div class="report-title">
             <h3>ACADEMIC PROGRESS REPORT</h3>
-            <p>{{ strtoupper($results->first()->exam_type ?? 'TERMINAL') }} - {{ \Carbon\Carbon::parse($date ?? now())->format('Y') }}</p>
+            <p>{{ strtoupper($results->first()->exam_type ?? 'TERMINAL') }} - {{ \Carbon\Carbon::parse($date ??
+                now())->format('Y') }}</p>
         </div>
 
         <!-- STUDENT INFORMATION -->
@@ -390,11 +484,13 @@
                 <td class="info-label">ADMISSION No.</td>
                 <td class="info-value">{{ strtoupper($studentId->admission_number ?? 'N/A') }}</td>
                 <td class="info-label">CLASS</td>
-                <td class="info-value">{{ strtoupper($studentId->class_name ?? $results->first()->class_name ?? 'N/A') }}</td>
+                <td class="info-value">{{ strtoupper($studentId->class_name ?? $results->first()->class_name ?? 'N/A')
+                    }}</td>
             </tr>
             <tr>
                 <td class="info-label">STUDENT NAME</td>
-                <td class="info-value">{{ strtoupper($studentId->first_name ?? '') }} {{ strtoupper($studentId->middle_name ?? '') }} {{ strtoupper($studentId->last_name ?? '') }}</td>
+                <td class="info-value">{{ strtoupper($studentId->first_name ?? '') }} {{
+                    strtoupper($studentId->middle_name ?? '') }} {{ strtoupper($studentId->last_name ?? '') }}</td>
                 <td class="info-label">STREAM</td>
                 <td class="info-value">{{ strtoupper($studentId->group ?? 'N/A') }}</td>
             </tr>
@@ -410,17 +506,28 @@
         <div class="section-header">SUBJECT PERFORMANCE</div>
         <table class="report-table">
             <thead>
-                <tr><th width="45%">SUBJECT NAME (CODE)</th><th width="20%">TEACHER</th><th width="10%">SCORE</th><th width="8%">GRADE</th><th width="7%">RANK</th><th width="10%">REMARKS</th></tr>
+                <tr>
+                    <th width="45%">SUBJECT NAME (CODE)</th>
+                    <th width="20%">TEACHER</th>
+                    <th width="10%">SCORE</th>
+                    <th width="8%">GRADE</th>
+                    <th width="7%">RANK</th>
+                    <th width="10%">REMARKS</th>
+                </tr>
             </thead>
             <tbody>
                 @php $subjectCount = 0; @endphp
                 @foreach ($results as $result)
                 @php $subjectCount++; @endphp
                 <tr>
-                    <td class="subject-name text-capitalize">{{ ucwords(strtolower($result->course_name ?? 'N/A')) }} <span class="text-uppercase">({{ strtoupper($result->course_code ?? 'N/A') }})</span></td>
-                    <td class="teacher-name text-capitalize">{{ ucwords(strtolower($result->teacher_first_name ?? '')) }} {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.</td>
+                    <td class="subject-name text-capitalize">{{ ucwords(strtolower($result->course_name ?? 'N/A')) }}
+                        <span class="text-uppercase">({{ strtoupper($result->course_code ?? 'N/A') }})</span>
+                    </td>
+                    <td class="teacher-name text-capitalize">{{ ucwords(strtolower($result->teacher_first_name ?? ''))
+                        }} {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.</td>
                     <td class="bold text-center">{{ $result->score ?? 'X' }}</td>
-                    <td class="text-center"><span class="grade-{{ $result->grade ?? 'X' }}">{{ $result->grade ?? 'X' }}</span></td>
+                    <td class="text-center"><span class="grade-{{ $result->grade ?? 'X' }}">{{ $result->grade ?? 'X'
+                            }}</span></td>
                     <td class="text-center">{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
                     <td class="text-center">{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
                 </tr>
@@ -432,10 +539,17 @@
         @if ($marking_style == 3 && isset($division))
         <table class="division-section">
             <tbody>
-                <tr><td width="50%"><strong>AGGREGATE POINTS</strong><br><span class="division-score">{{ $aggregatePoints ?? 0 }}</span></td>
-                    <td width="50%"><strong>DIVISION</strong><br><span style="font-size:16px;font-weight:bold;padding:2px 15px;border:1px solid #000;display:inline-block;">{{ $division === '0' ? '0' : $division }}</span></td>
+                <tr>
+                    <td width="50%"><strong>AGGREGATE POINTS</strong><br><span class="division-score">{{
+                            $aggregatePoints ?? 0 }}</span></td>
+                    <td width="50%"><strong>DIVISION</strong><br><span
+                            style="font-size:16px;font-weight:bold;padding:2px 15px;border:1px solid #000;display:inline-block;">{{
+                            $division === '0' ? '0' : $division }}</span></td>
                 </tr>
-                <tr><td colspan="2" style="font-size:9px;padding:4px;"><strong>Division Guide:</strong> I (Excellent) | II (Good) | III (Pass) | IV (Poor) | 0 (Fail)</td></tr>
+                <tr>
+                    <td colspan="2" style="font-size:9px;padding:4px;"><strong>Division Guide:</strong> I (Excellent) |
+                        II (Good) | III (Pass) | IV (Poor) | 0 (Fail)</td>
+                </tr>
             </tbody>
         </table>
         @endif
@@ -444,8 +558,18 @@
         <div class="section-header">OVERALL PERFORMANCE SUMMARY</div>
         <table class="report-table">
             <tbody>
-                <tr class="summary-row"><td width="25%">TOTAL MARKS</td><td width="25%"><strong>{{ number_format($totalScore ?? 0, 2) }}</strong></td><td width="25%">CLASS POSITION</td><td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td></tr>
-                <tr class="summary-row"><td class="summary-label">GENERAL AVERAGE</td><td class="summary-value"><strong>{{ number_format($averageScore ?? 0, 2) }}</strong></td><td class="summary-label">SUBJECTS TAKEN</td><td class="summary-value"><strong>{{ $subjectCount }}</strong></td></tr>
+                <tr class="summary-row">
+                    <td width="25%">TOTAL MARKS</td>
+                    <td width="25%"><strong>{{ number_format($totalScore ?? 0, 2) }}</strong></td>
+                    <td width="25%">CLASS POSITION</td>
+                    <td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
+                </tr>
+                <tr class="summary-row">
+                    <td class="summary-label">GENERAL AVERAGE</td>
+                    <td class="summary-value"><strong>{{ number_format($averageScore ?? 0, 2) }}</strong></td>
+                    <td class="summary-label">SUBJECTS TAKEN</td>
+                    <td class="summary-value"><strong>{{ $subjectCount }}</strong></td>
+                </tr>
                 <tr class="summary-row">
                     <td class="summary-label">OVERALL GRADE</td>
                     <td colspan="3">
@@ -453,71 +577,94 @@
                         $overallGrade = ''; $gradeComment = ''; $remarkClass = '';
                         $avgScore = $averageScore ?? 0;
                         if ($marking_style == 3 && isset($division)) {
-                            if ($division == 'I') { $overallGrade = 'I'; $gradeComment = 'EXCELLENT'; $remarkClass = 'remark-excellent'; }
-                            elseif ($division == 'II') { $overallGrade = 'II'; $gradeComment = 'GOOD'; $remarkClass = 'remark-good'; }
-                            elseif ($division == 'III') { $overallGrade = 'III'; $gradeComment = 'PASS'; $remarkClass = 'remark-pass'; }
-                            elseif ($division == 'IV') { $overallGrade = 'IV'; $gradeComment = 'POOR'; $remarkClass = 'remark-poor'; }
-                            else { $overallGrade = '0'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
+                        if ($division == 'I') { $overallGrade = 'I'; $gradeComment = 'EXCELLENT'; $remarkClass =
+                        'remark-excellent'; }
+                        elseif ($division == 'II') { $overallGrade = 'II'; $gradeComment = 'GOOD'; $remarkClass =
+                        'remark-good'; }
+                        elseif ($division == 'III') { $overallGrade = 'III'; $gradeComment = 'PASS'; $remarkClass =
+                        'remark-pass'; }
+                        elseif ($division == 'IV') { $overallGrade = 'IV'; $gradeComment = 'POOR'; $remarkClass =
+                        'remark-poor'; }
+                        else { $overallGrade = '0'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
                         }
                         elseif ($marking_style == 1) {
-                            if ($avgScore >= 40.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; $remarkClass = 'remark-excellent'; }
-                            elseif ($avgScore >= 30.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; $remarkClass = 'remark-good'; }
-                            elseif ($avgScore >= 20.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; $remarkClass = 'remark-pass'; }
-                            elseif ($avgScore >= 10.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; $remarkClass = 'remark-poor'; }
-                            else { $overallGrade = 'E'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
+                        if ($avgScore >= 40.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; $remarkClass =
+                        'remark-excellent'; }
+                        elseif ($avgScore >= 30.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; $remarkClass =
+                        'remark-good'; }
+                        elseif ($avgScore >= 20.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; $remarkClass =
+                        'remark-pass'; }
+                        elseif ($avgScore >= 10.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; $remarkClass =
+                        'remark-poor'; }
+                        else { $overallGrade = 'E'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
                         }
                         else {
-                            if ($avgScore >= 80.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; $remarkClass = 'remark-excellent'; }
-                            elseif ($avgScore >= 60.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; $remarkClass = 'remark-good'; }
-                            elseif ($avgScore >= 40.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; $remarkClass = 'remark-pass'; }
-                            elseif ($avgScore >= 20.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; $remarkClass = 'remark-poor'; }
-                            else { $overallGrade = 'E'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
+                        if ($avgScore >= 80.5) { $overallGrade = 'A'; $gradeComment = 'EXCELLENT'; $remarkClass =
+                        'remark-excellent'; }
+                        elseif ($avgScore >= 60.5) { $overallGrade = 'B'; $gradeComment = 'GOOD'; $remarkClass =
+                        'remark-good'; }
+                        elseif ($avgScore >= 40.5) { $overallGrade = 'C'; $gradeComment = 'PASS'; $remarkClass =
+                        'remark-pass'; }
+                        elseif ($avgScore >= 20.5) { $overallGrade = 'D'; $gradeComment = 'POOR'; $remarkClass =
+                        'remark-poor'; }
+                        else { $overallGrade = 'E'; $gradeComment = 'FAIL'; $remarkClass = 'remark-fail'; }
                         }
                         @endphp
                         <strong>Grade {{ $overallGrade }}</strong>
                     </td>
                 </tr>
-                <tr class="summary-row"><td class="summary-label">GENERAL REMARKS</td><td colspan="3"><span class="{{ $remarkClass }}">{{ $gradeComment }}</span></td></tr>
+                <tr class="summary-row">
+                    <td class="summary-label">GENERAL REMARKS</td>
+                    <td colspan="3"><span class="{{ $remarkClass }}">{{ $gradeComment }}</span></td>
+                </tr>
             </tbody>
-        }</table>
+            }
+        </table>
 
         <!-- HEAD TEACHER'S COMMENT -->
         @php
         $headComment = '';
         $avgScore = $averageScore ?? 0;
         if ($marking_style == 3 && isset($division)) {
-            if ($division == 'I') $headComment = 'Outstanding Achievement! Keep shining!';
-            elseif ($division == 'II') $headComment = 'Very Good Performance! Push harder!';
-            elseif ($division == 'III') $headComment = 'Good Effort! Keep building!';
-            elseif ($division == 'IV') $headComment = 'Room for Improvement. Work harder!';
-            else $headComment = 'Fresh Start Ahead. We will support you!';
+        if ($division == 'I') $headComment = 'Outstanding Achievement! Keep shining!';
+        elseif ($division == 'II') $headComment = 'Very Good Performance! Push harder!';
+        elseif ($division == 'III') $headComment = 'Good Effort! Keep building!';
+        elseif ($division == 'IV') $headComment = 'Room for Improvement. Work harder!';
+        else $headComment = 'Fresh Start Ahead. We will support you!';
         } else {
-            if ($marking_style == 1) {
-                if ($avgScore >= 40.5) $headComment = 'Outstanding Achievement! Keep shining!';
-                elseif ($avgScore >= 30.5) $headComment = 'Very Good Performance! Push harder!';
-                elseif ($avgScore >= 20.5) $headComment = 'Good Effort! Keep building!';
-                elseif ($avgScore >= 10.5) $headComment = 'Room for Improvement. Work harder!';
-                else $headComment = 'Fresh Start Ahead. We will support you!';
-            } else {
-                if ($avgScore >= 80.5) $headComment = 'Exceptional Achievement! Continue being a role model!';
-                elseif ($avgScore >= 60.5) $headComment = 'Commendable Performance! Keep pushing!';
-                elseif ($avgScore >= 40.5) $headComment = 'Making Progress! Keep the momentum!';
-                elseif ($avgScore >= 20.5) $headComment = 'Time to Unlock Your Potential!';
-                else $headComment = 'Your Comeback Story Starts Now!';
-            }
+        if ($marking_style == 1) {
+        if ($avgScore >= 40.5) $headComment = 'Outstanding Achievement! Keep shining!';
+        elseif ($avgScore >= 30.5) $headComment = 'Very Good Performance! Push harder!';
+        elseif ($avgScore >= 20.5) $headComment = 'Good Effort! Keep building!';
+        elseif ($avgScore >= 10.5) $headComment = 'Room for Improvement. Work harder!';
+        else $headComment = 'Fresh Start Ahead. We will support you!';
+        } else {
+        if ($avgScore >= 80.5) $headComment = 'Exceptional Achievement! Continue being a role model!';
+        elseif ($avgScore >= 60.5) $headComment = 'Commendable Performance! Keep pushing!';
+        elseif ($avgScore >= 40.5) $headComment = 'Making Progress! Keep the momentum!';
+        elseif ($avgScore >= 20.5) $headComment = 'Time to Unlock Your Potential!';
+        else $headComment = 'Your Comeback Story Starts Now!';
+        }
         }
         @endphp
 
         <table class="comment-section">
-            <tbody><tr><td class="comment-label">HEAD TEACHER'S REMARKS</td><td class="comment-content"><i>{{ $headComment }}</i></td></tr></tbody>
+            <tbody>
+                <tr>
+                    <td class="comment-label">HEAD TEACHER'S REMARKS</td>
+                    <td class="comment-content"><i>{{ $headComment }}</i></td>
+                </tr>
+            </tbody>
         </table>
 
         <!-- QR CODE SECTION -->
         <div class="qr-section">
             @if(!empty($qrPng))
-                <img src="data:image/png;base64,{{ $qrPng }}" class="qr-code" alt="Verification QR Code">
+            <img src="data:image/png;base64,{{ $qrPng }}" class="qr-code" alt="Verification QR Code">
             @else
-                <div style="width:100px;height:100px;border:1px solid #ccc;margin:0 auto;text-align:center;line-height:100px;">QR</div>
+            <div
+                style="width:100px;height:100px;border:1px solid #ccc;margin:0 auto;text-align:center;line-height:100px;">
+                QR</div>
             @endif
             <div class="qr-text"><strong>Scan to Verify Authenticity</strong></div>
         </div>
@@ -530,4 +677,5 @@
         </div>
     </div>
 </body>
+
 </html>
