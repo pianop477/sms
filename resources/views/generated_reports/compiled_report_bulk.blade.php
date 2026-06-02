@@ -412,9 +412,9 @@
                         {{ strtoupper($schoolInfo->school_name ?? 'SCHOOL NAME') }}
                     </div>
                     <div class="school-address">
-                        {{ $schoolInfo->postal_address ?? '______' }} -
-                        {{ $schoolInfo->postal_name ?? '______' }},
-                        {{ $schoolInfo->country ?? 'TANZANIA' }}
+                        {{ ucwords(strtolower($schoolInfo->postal_address ?? '______')) }} -
+                        {{ ucwords(strtolower($schoolInfo->postal_name ?? '______')) }},
+                        {{ ucwords(strtolower($schoolInfo->country ?? 'TANZANIA')) }}
                     </div>
                     <div class="school-contacts">
                         Email: {{ strtolower($schoolInfo->school_email ?? 'info@school.ac.tz') }} |

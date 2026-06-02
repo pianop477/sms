@@ -4837,7 +4837,7 @@ class ResultsController extends Controller
             return redirect()->route('error.page');
         }
 
-        // Increase execution limits for production
+        // Increase execution limits
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', 600);
         set_time_limit(600);
@@ -4850,7 +4850,7 @@ class ResultsController extends Controller
             ->whereDate('exam_date', $date)
             ->value('marking_style') ?? 1;
 
-        // OPTIMIZATION 1: Get student IDs first
+        // Get student IDs first
         $studentIds = Student::where('class_id', $class_id[0])
             ->where('school_id', $schools->id)
             ->where('status', 1)
@@ -4963,23 +4963,38 @@ class ResultsController extends Controller
         }
         $rankings = collect($studentRankings);
 
-        // Get class name for filename
-        $className = $allResults->first()->class_name ?? 'students';
-        $safeClassName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $className);
-        $fileTimestamp = Carbon::now()->format('Ymd_His');
+        // ============ SETUP REPORTS DIRECTORY WITH PROPER PERMISSIONS ============
+        $folderPath = public_path('reports');
 
-        // OPTIMIZATION: Process in chunks and stream directly (no temp files)
+        // Create directory if not exists with proper permissions
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        // Ensure directory is writable
+        if (!is_writable($folderPath)) {
+            chmod($folderPath, 0755);
+        }
+
+        // Clear old temp files (older than 1 hour)
+        $files = glob($folderPath . '/temp_*');
+        $now = time();
+        foreach ($files as $file) {
+            if (is_file($file) && ($now - filemtime($file)) > 3600) {
+                unlink($file);
+            }
+        }
+        // ============ END DIRECTORY SETUP ============
+
+        // Process in chunks
         $chunkSize = 10;
         $studentChunks = array_chunk($studentIds->toArray(), $chunkSize);
-        $allHtmlPages = [];
-        $totalChunks = count($studentChunks);
-        $currentChunk = 0;
-
+        $tempFiles = [];
         $schoolInfo = $schools;
+        $timestamp = Carbon::now()->timestamp;
 
         try {
             foreach ($studentChunks as $chunkIndex => $chunkStudentIds) {
-                $currentChunk++;
                 $htmlPages = [];
 
                 foreach ($chunkStudentIds as $studentId) {
@@ -4992,7 +5007,6 @@ class ResultsController extends Controller
                     $totalMarks = $studentResults->sum('score');
                     $averageScore = $studentResults->avg('score');
 
-                    // Calculate course ranks using cached ranks
                     foreach ($studentResults as $result) {
                         $ranksForSubject = $subjectRanksCache[$result->course_id] ?? [];
                         $result->courseRank = $ranksForSubject[$studentId] ?? '-';
@@ -5002,7 +5016,6 @@ class ResultsController extends Controller
                         $result->remarks = $this->getRemarksForGrade($grade, $marking_style, $result->score);
                     }
 
-                    // Division calculation for style 3
                     $aggregatePoints = 0;
                     $division = null;
                     if ($marking_style == 3) {
@@ -5027,9 +5040,7 @@ class ResultsController extends Controller
 
                     $studentRank = $studentRankings[$studentId] ?? 1;
                     $overallGradeInfo = $this->calculateOverallGrade($averageScore, $marking_style, $division);
-
-                    // Disable QR to save memory
-                    $qrPng = '';
+                    $qrPng = $this->generateQRCodeForBulkStudent($studentObject, $date);
 
                     $html = view('Results.individual_student_report_pdf', [
                         'results' => $studentResults,
@@ -5053,34 +5064,73 @@ class ResultsController extends Controller
                 }
 
                 if (!empty($htmlPages)) {
-                    $allHtmlPages = array_merge($allHtmlPages, $htmlPages);
+                    $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
+                                implode('<div style="page-break-after: always;"></div>', $htmlPages) .
+                                '</body></html>';
+
+                    $pdf = Pdf::loadHTML($fullHtml);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('A4', 'portrait');
+
+                    $tempFileName = "temp_chunk_{$timestamp}_{$chunkIndex}.pdf";
+                    $tempFilePath = $folderPath . '/' . $tempFileName;
+
+                    $pdf->save($tempFilePath);
+
+                    // Set proper permissions on created file
+                    chmod($tempFilePath, 0644);
+
+                    $tempFiles[] = $tempFilePath;
+
                     unset($htmlPages);
+                    unset($fullHtml);
+                    unset($pdf);
                 }
             }
 
-            // Generate single PDF with all pages
-            $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
-                        implode('<div style="page-break-after: always;"></div>', $allHtmlPages) .
-                        '</body></html>';
+            // Get class name for filename
+            $className = $allResults->first()->class_name ?? 'students';
+            $safeClassName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $className);
+            $fileTimestamp = Carbon::now()->format('Ymd_His');
 
-            $fullHtml = mb_convert_encoding($fullHtml, 'HTML-ENTITIES', 'UTF-8');
+            if (count($tempFiles) == 1) {
+                $finalFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.pdf";
+                return response()->download($tempFiles[0], $finalFileName)
+                    ->deleteFileAfterSend(true);
+            } else {
+                $zipFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.zip";
+                $zipPath = $folderPath . '/' . $zipFileName;
 
-            $pdf = Pdf::loadHTML($fullHtml);
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isPhpEnabled', true);
-            $pdf->setPaper('A4', 'portrait');
+                $zip = new \ZipArchive();
+                if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+                    foreach ($tempFiles as $index => $tempFile) {
+                        $zip->addFile($tempFile, "student_" . ($index + 1) . ".pdf");
+                    }
+                    $zip->close();
+                    chmod($zipPath, 0644);
+                }
 
-            $finalFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.pdf";
+                // Clean up temp files
+                foreach ($tempFiles as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
+                }
 
-            // Free memory
-            unset($allHtmlPages);
-            unset($fullHtml);
-
-            // Stream directly to browser (no file saved on server)
-            return $pdf->download($finalFileName);
+                return response()->download($zipPath, $zipFileName)
+                    ->deleteFileAfterSend(true);
+            }
 
         } catch (\Exception $e) {
             \Log::error('PDF Generation failed: ' . $e->getMessage());
+
+            foreach ($tempFiles as $tempFile) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
             Alert()->toast('Failed to generate PDF. Please try again.', 'error');
             return redirect()->back();
         }
@@ -5223,7 +5273,7 @@ class ResultsController extends Controller
             return redirect()->back();
         }
 
-        // PRE-LOAD ALL RESULTS FOR THE CLASS (one query)
+        // PRE-LOAD ALL RESULTS FOR THE CLASS
         $allResults = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -5284,13 +5334,35 @@ class ResultsController extends Controller
         // Pre-calculate all student averages for ranking
         $allStudentAverages = $this->calculateAllStudentAveragesForBulkCombined($resultsByStudent, $combineOption, $examDates, $storedClassId, $schoolId);
 
-        // Process students in chunks and collect HTML
+        // ============ SETUP REPORTS DIRECTORY WITH PROPER PERMISSIONS ============
+        $folderPath = public_path('reports');
+
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        if (!is_writable($folderPath)) {
+            chmod($folderPath, 0755);
+        }
+
+        // Clear old temp files (older than 1 hour)
+        $files = glob($folderPath . '/temp_combined_*');
+        $now = time();
+        foreach ($files as $file) {
+            if (is_file($file) && ($now - filemtime($file)) > 3600) {
+                unlink($file);
+            }
+        }
+        // ============ END DIRECTORY SETUP ============
+
+        // Process students in chunks
         $chunkSize = 10;
         $studentChunks = array_chunk($studentIds->toArray(), $chunkSize);
-        $allHtmlPages = [];
+        $tempFiles = [];
+        $timestamp = Carbon::now()->timestamp;
 
         try {
-            foreach ($studentChunks as $chunkStudentIds) {
+            foreach ($studentChunks as $chunkIndex => $chunkStudentIds) {
                 $htmlPages = [];
 
                 foreach ($chunkStudentIds as $studentId) {
@@ -5304,7 +5376,6 @@ class ResultsController extends Controller
                         continue;
                     }
 
-                    // Generate individual student report data
                     $studentReportData = $this->generateStudentReportDataForBulkCombined(
                         $student,
                         $studentResults,
@@ -5319,8 +5390,7 @@ class ResultsController extends Controller
                         $examDates
                     );
 
-                    // Disable QR to save memory
-                    $qrPng = '';
+                    $qrPng = $this->generateQRForBulkCombined($studentReportData, $reports, $schoolInfo);
 
                     $html = view('generated_reports.compiled_report_bulk', [
                         'students' => $studentReportData['students'],
@@ -5342,7 +5412,7 @@ class ResultsController extends Controller
                         'report' => $report,
                         'markingStyle' => $markingStyle,
                         'className' => $className,
-                        'currentStudent' => count($allHtmlPages) + count($htmlPages) + 1,
+                        'currentStudent' => $chunkIndex * $chunkSize + count($htmlPages) + 1,
                         'totalStudents' => count($studentIds),
                     ])->render();
 
@@ -5352,38 +5422,70 @@ class ResultsController extends Controller
                 }
 
                 if (!empty($htmlPages)) {
-                    $allHtmlPages = array_merge($allHtmlPages, $htmlPages);
+                    $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
+                                implode('<div style="page-break-after: always;"></div>', $htmlPages) .
+                                '</body></html>';
+
+                    $pdf = Pdf::loadHTML($fullHtml);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('A4', 'portrait');
+
+                    $tempFileName = "temp_combined_chunk_{$timestamp}_{$chunkIndex}.pdf";
+                    $tempFilePath = $folderPath . '/' . $tempFileName;
+
+                    $pdf->save($tempFilePath);
+                    chmod($tempFilePath, 0644);
+
+                    $tempFiles[] = $tempFilePath;
+
                     unset($htmlPages);
+                    unset($fullHtml);
+                    unset($pdf);
                 }
             }
 
-            // Generate single PDF with all pages
-            $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
-                        implode('<div style="page-break-after: always;"></div>', $allHtmlPages) .
-                        '</body></html>';
-
-            $fullHtml = mb_convert_encoding($fullHtml, 'HTML-ENTITIES', 'UTF-8');
-
-            $pdf = Pdf::loadHTML($fullHtml);
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isPhpEnabled', true);
-            $pdf->setPaper('A4', 'portrait');
-
-            // Clean filename
+            // Return files
             $safeClassName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $className);
             $safeReportTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $reports->title);
-            $timestamp = Carbon::now()->format('Ymd_His');
-            $finalFileName = "{$safeClassName}_{$safeReportTitle}_all_students.pdf";
+            $fileTimestamp = Carbon::now()->format('Ymd_His');
 
-            // Free memory
-            unset($allHtmlPages);
-            unset($fullHtml);
+            if (count($tempFiles) == 1) {
+                $finalFileName = "{$safeClassName}_{$safeReportTitle}_all_students_{$fileTimestamp}.pdf";
+                return response()->download($tempFiles[0], $finalFileName)
+                    ->deleteFileAfterSend(true);
+            } else {
+                $zipFileName = "{$safeClassName}_{$safeReportTitle}_all_students_{$fileTimestamp}.zip";
+                $zipPath = $folderPath . '/' . $zipFileName;
 
-            // Stream directly to browser (no file saved on server)
-            return $pdf->download($finalFileName);
+                $zip = new \ZipArchive();
+                if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+                    foreach ($tempFiles as $index => $tempFile) {
+                        $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                    }
+                    $zip->close();
+                    chmod($zipPath, 0644);
+                }
+
+                foreach ($tempFiles as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
+                }
+
+                return response()->download($zipPath, $zipFileName)
+                    ->deleteFileAfterSend(true);
+            }
 
         } catch (\Exception $e) {
             \Log::error('Bulk Combined PDF Generation failed: ' . $e->getMessage());
+
+            foreach ($tempFiles as $tempFile) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
             Alert()->toast('Failed to generate reports. Please try again.', 'error');
             return redirect()->back();
         }
