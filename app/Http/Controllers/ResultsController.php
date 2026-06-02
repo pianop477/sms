@@ -3929,26 +3929,22 @@ class ResultsController extends Controller
 
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates;
-        // return $examDates;
-        $marking_style = $reports->marking_style ?? 2; // Default to style 2 if not set
 
-        // 1. GET ALL STUDENTS IN THE CLASS
+        // 1. GET ALL STUDENTS IN THE CLASS (ACTIVE ONLY)
         $students = Student::where('class_id', $classId)
             ->where('school_id', $schoolId)
-            ->where('status', 1) // Only active students
+            ->where('status', 1)
             ->orderBy('admission_number')
             ->get();
 
-        // 2. GET ALL SUBJECTS FOR THIS CLASS
+        // 2. GET ALL SUBJECTS THAT HAVE RESULTS FOR THESE EXAM DATES
         $subjects = Subject::whereHas('examination_results', function ($query) use ($classId, $schoolId, $examDates) {
             $query->where('class_id', $classId)
                 ->where('school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates);
         })
-            ->select('id', 'course_name', 'course_code')
-            ->get();
-
-            // return $subjects;
+        ->select('id', 'course_name', 'course_code')
+        ->get();
 
         // 3. GET ALL EXAM RESULTS
         $results = Examination_result::query()
@@ -3972,34 +3968,49 @@ class ResultsController extends Controller
                 'examination_results.marking_style'
             )
             ->where('examination_results.class_id', $classId)
-            ->whereIn('students.status', [1, 2]) // Only active students
+            ->where('students.status', 1)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-            return $results;
+        // Early return if no results
+        if ($results->isEmpty()) {
+            return back()->with('error', 'Hakuna matokeo yanayopatikana kwa tarehe zilizochaguliwa.');
+        }
+
+        // Get marking_style from first result (all results should have same style)
+        $markingStyle = $results->first()->marking_style ?? 1;
 
         $totalCandidates = $results->pluck('student_id')->unique()->count();
+
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
         $studentData = [];
         $subjectCodes = $subjects->pluck('course_code')->toArray();
 
         foreach ($students as $student) {
+            // Get all results for this student
             $studentResults = $results->where('student_id', $student->id);
+
+            // Skip students with no results
+            if ($studentResults->isEmpty()) {
+                continue;
+            }
 
             $studentSubjectAverages = [];
             $totalScore = 0;
             $subjectCount = 0;
 
             foreach ($subjects as $subject) {
-                $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score');
-                $average = $subjectScores->avg();
+                // Get all scores for this subject from this student
+                $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score')->filter();
 
-                if (! is_null($average)) {
-                    $roundedAverage = number_format($average, 2);
+                if ($subjectScores->isNotEmpty()) {
+                    $average = $subjectScores->avg();
+                    $roundedAverage = round($average, 2);
+
                     $studentSubjectAverages[$subject->course_code] = [
                         'score' => $roundedAverage,
-                        'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style),
+                        'grade' => $this->calculateGrade($roundedAverage, $markingStyle),
                     ];
                     $totalScore += $roundedAverage;
                     $subjectCount++;
@@ -4011,17 +4022,17 @@ class ResultsController extends Controller
                 }
             }
 
-            $overallAverage = $subjectCount > 0 ? number_format($totalScore / $subjectCount, 2) : 0;
+            $overallAverage = $subjectCount > 0 ? round($totalScore / $subjectCount, 2) : 0;
 
             $studentData[] = [
                 'student_id' => $student->id,
                 'admission_number' => $student->admission_number,
                 'gender' => $student->gender,
-                'student_name' => $student->first_name.' '.($student->middle_name ? $student->middle_name.' ' : '').$student->last_name,
+                'student_name' => trim($student->first_name.' '.($student->middle_name ? $student->middle_name.' ' : '').$student->last_name),
                 'subject_averages' => $studentSubjectAverages,
                 'total' => round($totalScore, 2),
-                'average' => round($overallAverage, 2),
-                'grade' => $this->calculateGrade($overallAverage, $results->first()->marking_style),
+                'average' => $overallAverage,
+                'grade' => $this->calculateGrade($overallAverage, $markingStyle),
             ];
         }
 
@@ -4034,11 +4045,9 @@ class ResultsController extends Controller
 
         foreach ($sortedStudents as $index => $student) {
             if ($previousScore !== null && $student['total'] == $previousScore) {
-                // Tie: keep same rank
                 $student['rank'] = $currentRank;
                 $skip++;
             } else {
-                // New rank
                 $currentRank = $index + 1;
                 $student['rank'] = $currentRank;
                 $skip = 0;
@@ -4067,10 +4076,10 @@ class ResultsController extends Controller
             }
         }
 
-        // 7. CALCULATE SUBJECT AVERAGES AND OVERALL AVERAGE
+        // 7. CALCULATE SUBJECT AVERAGES
         $subjectAverages = [];
         $overallTotalAverage = 0;
-        $subjectCount = 0;
+        $subjectCountTotal = 0;
         $subjectAveragesSum = 0;
 
         foreach ($subjects as $subject) {
@@ -4078,52 +4087,53 @@ class ResultsController extends Controller
             $studentCount = 0;
 
             foreach ($rankedStudents as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['score'])) {
+                if (isset($student['subject_averages'][$subject->course_code]['score']) &&
+                    $student['subject_averages'][$subject->course_code]['score'] !== null) {
                     $subjectTotal += $student['subject_averages'][$subject->course_code]['score'];
                     $studentCount++;
                 }
             }
 
             if ($studentCount > 0) {
-                $subjectAverage = number_format($subjectTotal / $studentCount, 2);
+                $subjectAverage = round($subjectTotal / $studentCount, 2);
                 $subjectAverages[$subject->course_code] = [
                     'average' => $subjectAverage,
-                    'grade' => $this->calculateGrade($subjectAverage, $results->first()->marking_style),
+                    'grade' => $this->calculateGrade($subjectAverage, $markingStyle),
                 ];
                 $overallTotalAverage += $subjectAverage;
-                $subjectAveragesSum += $subjectAverage; // Ongeza wastani wa kila somo kwenye jumla
-                $subjectCount++;
+                $subjectAveragesSum += $subjectAverage;
+                $subjectCountTotal++;
             }
         }
 
-        $overallTotalAverage = $subjectCount > 0 ? number_format($overallTotalAverage / $subjectCount, 3) : 0;
-        $overallGrade = $this->calculateGrade($overallTotalAverage, $results->first()->marking_style);
+        $overallTotalAverage = $subjectCountTotal > 0 ? round($overallTotalAverage / $subjectCountTotal, 3) : 0;
+        $overallGrade = $this->calculateGrade($overallTotalAverage, $markingStyle);
 
-        // 8. PREPARE SUBJECT RANKING DATA WITH POSITIONS
+        // 8. PREPARE SUBJECT RANKING DATA
         $subjectPerformance = [];
         foreach ($subjects as $subject) {
-            $subjectAverages = [];
+            $subjectScores = [];
 
             foreach ($studentData as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['score'])) {
-                    $subjectAverages[] = $student['subject_averages'][$subject->course_code]['score'];
+                if (isset($student['subject_averages'][$subject->course_code]['score']) &&
+                    $student['subject_averages'][$subject->course_code]['score'] !== null) {
+                    $subjectScores[] = $student['subject_averages'][$subject->course_code]['score'];
                 }
             }
 
-            $subjectAverage = count($subjectAverages) > 0 ? number_format(array_sum($subjectAverages) / count($subjectAverages), 2) : 0;
+            $subjectAverage = count($subjectScores) > 0 ? round(array_sum($subjectScores) / count($subjectScores), 2) : 0;
 
             $subjectPerformance[] = [
                 'subject_id' => $subject->id,
                 'subject_code' => $subject->course_code,
                 'subject_name' => $subject->course_name,
                 'average' => $subjectAverage,
-                'grade' => $this->calculateGrade($subjectAverage, $results->first()->marking_style),
+                'grade' => $this->calculateGrade($subjectAverage, $markingStyle),
             ];
         }
 
-        // Sort subjects by average (highest first) and assign positions with tie handling
-        $sortedSubjects = collect($subjectPerformance)->sortByDesc('average');
-
+        // Sort subjects by average and assign positions
+        $sortedSubjects = collect($subjectPerformance)->sortByDesc('average')->values();
         $subjectPositions = [];
         $currentPosition = 1;
         $previousAverage = null;
@@ -4151,11 +4161,12 @@ class ResultsController extends Controller
             foreach ($studentData as $student) {
                 if (isset($student['subject_averages'][$subject->course_code]['grade'])) {
                     $grade = $student['subject_averages'][$subject->course_code]['grade'];
+                    $gender = strtolower($student['gender']);
 
-                    if ($student['gender'] == 'male') {
-                        $maleGrades[$grade]++;
+                    if ($gender == 'male') {
+                        if (isset($maleGrades[$grade])) $maleGrades[$grade]++;
                     } else {
-                        $femaleGrades[$grade]++;
+                        if (isset($femaleGrades[$grade])) $femaleGrades[$grade]++;
                     }
                 }
             }
@@ -4189,15 +4200,14 @@ class ResultsController extends Controller
             'classInfo',
             'class',
             'reports',
-            'results',
-            'marking_style'
+            'results'
         ));
 
         $timestamp = Carbon::now()->timestamp;
         $fileName = "report_{$timestamp}.pdf";
         $folderPath = public_path('reports');
 
-        if (! File::exists($folderPath)) {
+        if (!File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0755, true);
         }
 
