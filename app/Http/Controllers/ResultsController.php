@@ -3929,7 +3929,7 @@ class ResultsController extends Controller
 
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates;
-        return $examDates;
+        // return $examDates;
         $marking_style = $reports->marking_style ?? 2; // Default to style 2 if not set
 
         // 1. GET ALL STUDENTS IN THE CLASS
@@ -3947,6 +3947,8 @@ class ResultsController extends Controller
         })
             ->select('id', 'course_name', 'course_code')
             ->get();
+
+            return $subjects;
 
         // 3. GET ALL EXAM RESULTS
         $results = Examination_result::query()
