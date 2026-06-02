@@ -4963,26 +4963,31 @@ class ResultsController extends Controller
         }
         $rankings = collect($studentRankings);
 
-        // ============ SETUP REPORTS DIRECTORY WITH PROPER PERMISSIONS ============
-        $folderPath = public_path('reports');
+        // ============ SETUP REPORTS DIRECTORY ============
+        $folderPath = storage_path('app/reports'); // Use storage_path instead of public_path
 
-        // Create directory if not exists with proper permissions
+        // Create directory if not exists
         if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
-        }
-
-        // Ensure directory is writable
-        if (!is_writable($folderPath)) {
-            chmod($folderPath, 0755);
-        }
-
-        // Clear old temp files (older than 1 hour)
-        $files = glob($folderPath . '/temp_*');
-        $now = time();
-        foreach ($files as $file) {
-            if (is_file($file) && ($now - filemtime($file)) > 3600) {
-                unlink($file);
+            try {
+                File::makeDirectory($folderPath, 0755, true);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create directory: ' . $e->getMessage());
+                Alert()->toast('Unable to create reports directory. Please contact administrator.', 'error');
+                return redirect()->back();
             }
+        }
+
+        // Clean old temp files (older than 1 hour)
+        try {
+            $files = glob($folderPath . '/temp_*');
+            $now = time();
+            foreach ($files as $file) {
+                if (is_file($file) && ($now - filemtime($file)) > 3600) {
+                    @unlink($file);
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore cleanup errors
         }
         // ============ END DIRECTORY SETUP ============
 
@@ -5040,7 +5045,7 @@ class ResultsController extends Controller
 
                     $studentRank = $studentRankings[$studentId] ?? 1;
                     $overallGradeInfo = $this->calculateOverallGrade($averageScore, $marking_style, $division);
-                    $qrPng = $this->generateQRCodeForBulkStudent($studentObject, $date);
+                    $qrPng = ''; // Disable QR to save memory
 
                     $html = view('Results.individual_student_report_pdf', [
                         'results' => $studentResults,
@@ -5077,10 +5082,6 @@ class ResultsController extends Controller
                     $tempFilePath = $folderPath . '/' . $tempFileName;
 
                     $pdf->save($tempFilePath);
-
-                    // Set proper permissions on created file
-                    chmod($tempFilePath, 0644);
-
                     $tempFiles[] = $tempFilePath;
 
                     unset($htmlPages);
@@ -5108,13 +5109,12 @@ class ResultsController extends Controller
                         $zip->addFile($tempFile, "student_" . ($index + 1) . ".pdf");
                     }
                     $zip->close();
-                    chmod($zipPath, 0644);
                 }
 
                 // Clean up temp files
                 foreach ($tempFiles as $tempFile) {
                     if (file_exists($tempFile)) {
-                        unlink($tempFile);
+                        @unlink($tempFile);
                     }
                 }
 
@@ -5125,9 +5125,10 @@ class ResultsController extends Controller
         } catch (\Exception $e) {
             \Log::error('PDF Generation failed: ' . $e->getMessage());
 
+            // Clean up temp files on error
             foreach ($tempFiles as $tempFile) {
                 if (file_exists($tempFile)) {
-                    unlink($tempFile);
+                    @unlink($tempFile);
                 }
             }
 
@@ -5334,24 +5335,30 @@ class ResultsController extends Controller
         // Pre-calculate all student averages for ranking
         $allStudentAverages = $this->calculateAllStudentAveragesForBulkCombined($resultsByStudent, $combineOption, $examDates, $storedClassId, $schoolId);
 
-        // ============ SETUP REPORTS DIRECTORY WITH PROPER PERMISSIONS ============
-        $folderPath = public_path('reports');
+        // ============ SETUP REPORTS DIRECTORY ============
+        $folderPath = storage_path('app/reports');
 
         if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
-        }
-
-        if (!is_writable($folderPath)) {
-            chmod($folderPath, 0755);
-        }
-
-        // Clear old temp files (older than 1 hour)
-        $files = glob($folderPath . '/temp_combined_*');
-        $now = time();
-        foreach ($files as $file) {
-            if (is_file($file) && ($now - filemtime($file)) > 3600) {
-                unlink($file);
+            try {
+                File::makeDirectory($folderPath, 0755, true);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create directory: ' . $e->getMessage());
+                Alert()->toast('Unable to create reports directory. Please contact administrator.', 'error');
+                return redirect()->back();
             }
+        }
+
+        // Clean old temp files
+        try {
+            $files = glob($folderPath . '/temp_combined_*');
+            $now = time();
+            foreach ($files as $file) {
+                if (is_file($file) && ($now - filemtime($file)) > 3600) {
+                    @unlink($file);
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore cleanup errors
         }
         // ============ END DIRECTORY SETUP ============
 
@@ -5390,7 +5397,7 @@ class ResultsController extends Controller
                         $examDates
                     );
 
-                    $qrPng = $this->generateQRForBulkCombined($studentReportData, $reports, $schoolInfo);
+                    $qrPng = ''; // Disable QR
 
                     $html = view('generated_reports.compiled_report_bulk', [
                         'students' => $studentReportData['students'],
@@ -5435,8 +5442,6 @@ class ResultsController extends Controller
                     $tempFilePath = $folderPath . '/' . $tempFileName;
 
                     $pdf->save($tempFilePath);
-                    chmod($tempFilePath, 0644);
-
                     $tempFiles[] = $tempFilePath;
 
                     unset($htmlPages);
@@ -5464,12 +5469,11 @@ class ResultsController extends Controller
                         $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
                     }
                     $zip->close();
-                    chmod($zipPath, 0644);
                 }
 
                 foreach ($tempFiles as $tempFile) {
                     if (file_exists($tempFile)) {
-                        unlink($tempFile);
+                        @unlink($tempFile);
                     }
                 }
 
@@ -5482,7 +5486,7 @@ class ResultsController extends Controller
 
             foreach ($tempFiles as $tempFile) {
                 if (file_exists($tempFile)) {
-                    unlink($tempFile);
+                    @unlink($tempFile);
                 }
             }
 
