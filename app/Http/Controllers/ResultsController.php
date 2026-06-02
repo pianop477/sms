@@ -3937,16 +3937,7 @@ class ResultsController extends Controller
             ->orderBy('admission_number')
             ->get();
 
-        // 2. GET ALL SUBJECTS FOR THIS CLASS (all subjects, not just those with results)
-        $subjects = Subject::whereHas('examination_results', function ($query) use ($classId, $schoolId, $examDates) {
-            $query->where('class_id', $classId)
-                ->where('school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates);
-        })
-        ->select('id', 'course_name', 'course_code')
-        ->get();
-
-        // 3. GET ALL EXAM RESULTS
+        // 2. GET ALL EXAM RESULTS FIRST
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -3973,16 +3964,38 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
+        // Early return if no results
         if ($results->isEmpty()) {
             return back()->with('error', 'Hakuna matokeo yanayopatikana kwa tarehe zilizochaguliwa.');
         }
 
+        // Get marking_style from first result
         $markingStyle = $results->first()->marking_style ?? 1;
-        $totalCandidates = $students->count(); // Total students in class, not just those with results
+
+        // Get the Exam_term from first result
+        $examTerm = $results->first()->Exam_term;
+
+        // 3. GET ALL UNIQUE SUBJECT CODES FROM RESULTS (actual subjects that have data)
+        $allSubjectCodes = $results->groupBy('course_code')->keys()->toArray();
+
+        // Also get subject details for each code
+        $subjectsInfo = [];
+        foreach ($allSubjectCodes as $code) {
+            $firstResult = $results->firstWhere('course_code', $code);
+            if ($firstResult) {
+                $subjectsInfo[$code] = [
+                    'id' => $firstResult->subject_id,
+                    'name' => $firstResult->course_name,
+                    'code' => $code
+                ];
+            }
+        }
+
+        $totalCandidates = $students->count();
 
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
         $studentData = [];
-        $subjectCodes = $subjects->pluck('course_code')->toArray();
+        $subjectCodes = $allSubjectCodes;
 
         foreach ($students as $student) {
             $studentResults = $results->where('student_id', $student->id);
@@ -3990,24 +4003,23 @@ class ResultsController extends Controller
             $studentSubjectAverages = [];
             $totalScore = 0;
             $subjectCount = 0;
-            $hasAnyScore = false;
 
-            foreach ($subjects as $subject) {
-                $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score')->filter();
+            foreach ($allSubjectCodes as $courseCode) {
+                // Get scores for this subject from this student
+                $subjectScores = $studentResults->where('course_code', $courseCode)->pluck('score')->filter();
 
                 if ($subjectScores->isNotEmpty()) {
                     $average = $subjectScores->avg();
                     $roundedAverage = round($average, 2);
 
-                    $studentSubjectAverages[$subject->course_code] = [
+                    $studentSubjectAverages[$courseCode] = [
                         'score' => $roundedAverage,
                         'grade' => $this->calculateGrade($roundedAverage, $markingStyle),
                     ];
                     $totalScore += $roundedAverage;
                     $subjectCount++;
-                    $hasAnyScore = true;
                 } else {
-                    $studentSubjectAverages[$subject->course_code] = [
+                    $studentSubjectAverages[$courseCode] = [
                         'score' => null,
                         'grade' => null,
                     ];
@@ -4022,9 +4034,9 @@ class ResultsController extends Controller
                 'gender' => $student->gender,
                 'student_name' => trim($student->first_name.' '.($student->middle_name ? $student->middle_name.' ' : '').$student->last_name),
                 'subject_averages' => $studentSubjectAverages,
-                'total' => $hasAnyScore ? round($totalScore, 2) : 0,
+                'total' => round($totalScore, 2),
                 'average' => $overallAverage,
-                'grade' => $hasAnyScore ? $this->calculateGrade($overallAverage, $markingStyle) : 'ABS',
+                'grade' => $subjectCount > 0 ? $this->calculateGrade($overallAverage, $markingStyle) : 'ABS',
             ];
         }
 
@@ -4052,7 +4064,7 @@ class ResultsController extends Controller
             $previousScore = $student['total'];
         }
 
-        // Merge students without scores (they get rank = null)
+        // Merge students without scores
         $studentsWithoutScores = array_filter($studentData, function($student) {
             return $student['total'] == 0;
         });
@@ -4085,21 +4097,21 @@ class ResultsController extends Controller
         $subjectCountTotal = 0;
         $subjectAveragesSum = 0;
 
-        foreach ($subjects as $subject) {
+        foreach ($allSubjectCodes as $courseCode) {
             $subjectTotal = 0;
             $studentCount = 0;
 
             foreach ($studentData as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['score']) &&
-                    $student['subject_averages'][$subject->course_code]['score'] !== null) {
-                    $subjectTotal += $student['subject_averages'][$subject->course_code]['score'];
+                if (isset($student['subject_averages'][$courseCode]['score']) &&
+                    $student['subject_averages'][$courseCode]['score'] !== null) {
+                    $subjectTotal += $student['subject_averages'][$courseCode]['score'];
                     $studentCount++;
                 }
             }
 
             if ($studentCount > 0) {
                 $subjectAverage = round($subjectTotal / $studentCount, 2);
-                $subjectAverages[$subject->course_code] = [
+                $subjectAverages[$courseCode] = [
                     'average' => $subjectAverage,
                     'grade' => $this->calculateGrade($subjectAverage, $markingStyle),
                 ];
@@ -4114,22 +4126,22 @@ class ResultsController extends Controller
 
         // 8. PREPARE SUBJECT RANKING DATA
         $subjectPerformance = [];
-        foreach ($subjects as $subject) {
+        foreach ($allSubjectCodes as $courseCode) {
             $subjectScores = [];
 
             foreach ($studentData as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['score']) &&
-                    $student['subject_averages'][$subject->course_code]['score'] !== null) {
-                    $subjectScores[] = $student['subject_averages'][$subject->course_code]['score'];
+                if (isset($student['subject_averages'][$courseCode]['score']) &&
+                    $student['subject_averages'][$courseCode]['score'] !== null) {
+                    $subjectScores[] = $student['subject_averages'][$courseCode]['score'];
                 }
             }
 
             $subjectAverage = count($subjectScores) > 0 ? round(array_sum($subjectScores) / count($subjectScores), 2) : 0;
 
             $subjectPerformance[] = [
-                'subject_id' => $subject->id,
-                'subject_code' => $subject->course_code,
-                'subject_name' => $subject->course_name,
+                'subject_id' => $subjectsInfo[$courseCode]['id'] ?? null,
+                'subject_code' => $courseCode,
+                'subject_name' => $subjectsInfo[$courseCode]['name'] ?? $courseCode,
                 'average' => $subjectAverage,
                 'grade' => $this->calculateGrade($subjectAverage, $markingStyle),
             ];
@@ -4157,14 +4169,14 @@ class ResultsController extends Controller
 
         // 9. PREPARE PERFORMANCE ANALYSIS BY GENDER
         $performanceAnalysis = [];
-        foreach ($subjects as $subject) {
+        foreach ($allSubjectCodes as $courseCode) {
             $maleGrades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
             $femaleGrades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
 
             foreach ($studentData as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['grade']) &&
-                    $student['subject_averages'][$subject->course_code]['grade'] !== null) {
-                    $grade = $student['subject_averages'][$subject->course_code]['grade'];
+                if (isset($student['subject_averages'][$courseCode]['grade']) &&
+                    $student['subject_averages'][$courseCode]['grade'] !== null) {
+                    $grade = $student['subject_averages'][$courseCode]['grade'];
                     $gender = strtolower($student['gender']);
 
                     if ($gender == 'male') {
@@ -4176,8 +4188,8 @@ class ResultsController extends Controller
             }
 
             $performanceAnalysis[] = [
-                'subject_code' => $subject->course_code,
-                'subject_name' => $subject->course_name,
+                'subject_code' => $courseCode,
+                'subject_name' => $subjectsInfo[$courseCode]['name'] ?? $courseCode,
                 'male_grades' => $maleGrades,
                 'female_grades' => $femaleGrades,
             ];
@@ -4204,7 +4216,8 @@ class ResultsController extends Controller
             'classInfo',
             'class',
             'reports',
-            'results'
+            'results',
+            'examTerm'
         ));
 
         $timestamp = Carbon::now()->timestamp;
@@ -4218,7 +4231,7 @@ class ResultsController extends Controller
         $pdf->save($folderPath.'/'.$fileName);
         $fileUrl = asset('reports/'.$fileName);
 
-        return view('generated_reports.general_pdf', compact('fileUrl', 'results', 'year', 'reports', 'class', 'school', 'report', 'schoolInfo'));
+        return view('generated_reports.general_pdf', compact('fileUrl', 'results', 'year', 'reports', 'class', 'school', 'report', 'schoolInfo', 'examTerm'));
     }
 
     public function parentDownloadStudentCombinedReport($school, $year, $report, $student, $class)
