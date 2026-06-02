@@ -3937,7 +3937,7 @@ class ResultsController extends Controller
             ->orderBy('admission_number')
             ->get();
 
-        // 2. GET ALL SUBJECTS THAT HAVE RESULTS FOR THESE EXAM DATES
+        // 2. GET ALL SUBJECTS FOR THIS CLASS (all subjects, not just those with results)
         $subjects = Subject::whereHas('examination_results', function ($query) use ($classId, $schoolId, $examDates) {
             $query->where('class_id', $classId)
                 ->where('school_id', $schoolId)
@@ -3973,35 +3973,26 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-        // Early return if no results
         if ($results->isEmpty()) {
             return back()->with('error', 'Hakuna matokeo yanayopatikana kwa tarehe zilizochaguliwa.');
         }
 
-        // Get marking_style from first result (all results should have same style)
         $markingStyle = $results->first()->marking_style ?? 1;
-
-        $totalCandidates = $results->pluck('student_id')->unique()->count();
+        $totalCandidates = $students->count(); // Total students in class, not just those with results
 
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
         $studentData = [];
         $subjectCodes = $subjects->pluck('course_code')->toArray();
 
         foreach ($students as $student) {
-            // Get all results for this student
             $studentResults = $results->where('student_id', $student->id);
-
-            // Skip students with no results
-            if ($studentResults->isEmpty()) {
-                continue;
-            }
 
             $studentSubjectAverages = [];
             $totalScore = 0;
             $subjectCount = 0;
+            $hasAnyScore = false;
 
             foreach ($subjects as $subject) {
-                // Get all scores for this subject from this student
                 $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score')->filter();
 
                 if ($subjectScores->isNotEmpty()) {
@@ -4014,6 +4005,7 @@ class ResultsController extends Controller
                     ];
                     $totalScore += $roundedAverage;
                     $subjectCount++;
+                    $hasAnyScore = true;
                 } else {
                     $studentSubjectAverages[$subject->course_code] = [
                         'score' => null,
@@ -4030,14 +4022,18 @@ class ResultsController extends Controller
                 'gender' => $student->gender,
                 'student_name' => trim($student->first_name.' '.($student->middle_name ? $student->middle_name.' ' : '').$student->last_name),
                 'subject_averages' => $studentSubjectAverages,
-                'total' => round($totalScore, 2),
+                'total' => $hasAnyScore ? round($totalScore, 2) : 0,
                 'average' => $overallAverage,
-                'grade' => $this->calculateGrade($overallAverage, $markingStyle),
+                'grade' => $hasAnyScore ? $this->calculateGrade($overallAverage, $markingStyle) : 'ABS',
             ];
         }
 
-        // 5. CALCULATE STUDENT RANKS WITH TIE HANDLING
-        $sortedStudents = collect($studentData)->sortByDesc('total')->values();
+        // 5. CALCULATE STUDENT RANKS (ONLY FOR STUDENTS WITH SCORES)
+        $studentsWithScores = array_filter($studentData, function($student) {
+            return $student['total'] > 0;
+        });
+
+        $sortedStudents = collect($studentsWithScores)->sortByDesc('total')->values();
         $rankedStudents = [];
         $previousScore = null;
         $currentRank = 0;
@@ -4052,9 +4048,18 @@ class ResultsController extends Controller
                 $student['rank'] = $currentRank;
                 $skip = 0;
             }
-
             $rankedStudents[] = $student;
             $previousScore = $student['total'];
+        }
+
+        // Merge students without scores (they get rank = null)
+        $studentsWithoutScores = array_filter($studentData, function($student) {
+            return $student['total'] == 0;
+        });
+
+        foreach ($studentsWithoutScores as $student) {
+            $student['rank'] = null;
+            $rankedStudents[] = $student;
         }
 
         // 6. CALCULATE GRADE DISTRIBUTION SUMMARY
@@ -4064,14 +4069,12 @@ class ResultsController extends Controller
             'total' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0],
         ];
 
-        foreach ($rankedStudents as $student) {
+        foreach ($studentData as $student) {
             $gender = strtolower($student['gender']);
             $grade = $student['grade'];
 
-            if (isset($gradeSummary[$gender][$grade])) {
+            if ($grade !== 'ABS' && isset($gradeSummary[$gender][$grade])) {
                 $gradeSummary[$gender][$grade]++;
-            }
-            if (isset($gradeSummary['total'][$grade])) {
                 $gradeSummary['total'][$grade]++;
             }
         }
@@ -4086,7 +4089,7 @@ class ResultsController extends Controller
             $subjectTotal = 0;
             $studentCount = 0;
 
-            foreach ($rankedStudents as $student) {
+            foreach ($studentData as $student) {
                 if (isset($student['subject_averages'][$subject->course_code]['score']) &&
                     $student['subject_averages'][$subject->course_code]['score'] !== null) {
                     $subjectTotal += $student['subject_averages'][$subject->course_code]['score'];
@@ -4159,7 +4162,8 @@ class ResultsController extends Controller
             $femaleGrades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
 
             foreach ($studentData as $student) {
-                if (isset($student['subject_averages'][$subject->course_code]['grade'])) {
+                if (isset($student['subject_averages'][$subject->course_code]['grade']) &&
+                    $student['subject_averages'][$subject->course_code]['grade'] !== null) {
                     $grade = $student['subject_averages'][$subject->course_code]['grade'];
                     $gender = strtolower($student['gender']);
 
