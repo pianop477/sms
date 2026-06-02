@@ -3948,7 +3948,7 @@ class ResultsController extends Controller
             ->select('id', 'course_name', 'course_code')
             ->get();
 
-            return $subjects;
+            // return $subjects;
 
         // 3. GET ALL EXAM RESULTS
         $results = Examination_result::query()
@@ -3972,12 +3972,12 @@ class ResultsController extends Controller
                 'examination_results.marking_style'
             )
             ->where('examination_results.class_id', $classId)
-            ->where('students.status', 1) // Only active students
+            ->whereIn('students.status', [1, 2]) // Only active students
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-            // return $results;
+            return $results;
 
         $totalCandidates = $results->pluck('student_id')->unique()->count();
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
