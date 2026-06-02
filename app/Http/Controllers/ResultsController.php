@@ -5077,13 +5077,13 @@ class ResultsController extends Controller
             // OPTIMIZATION 4: Merge all PDFs if multiple chunks
             if (count($tempFiles) == 1) {
                 // Only one file, return it directly with class name
-                $finalFileName = "{$safeClassName}_student_reports_{$timestamp}.pdf";
+                $finalFileName = "student_reports_{$timestamp}.pdf";
                 return response()->download($tempFiles[0], $finalFileName)
                     ->deleteFileAfterSend(true);
             } else {
                 // Multiple files - create a ZIP file with class name
                 $zip = new \ZipArchive();
-                $zipFileName = "{$safeClassName}_student_reports.zip";
+                $zipFileName = "student_reports.zip";
                 $zipPath = public_path("reports/{$zipFileName}");
 
                 if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
@@ -5417,12 +5417,12 @@ class ResultsController extends Controller
             // OPTIMIZATION 3: Merge or return files
             if (count($tempFiles) == 1) {
                 // Single file - use class name in filename
-                $finalFileName = "{$className}_{$reports->title}_all_students.pdf";
+                $finalFileName = "{$reports->title}_all_students.pdf";
                 return response()->download($tempFiles[0], $finalFileName)
                     ->deleteFileAfterSend(true);
             } else {
                 // Multiple files - create ZIP file
-                $zipFileName = "{$className}_{$reports->title}_all_students.zip";
+                $zipFileName = "{$reports->title}_all_students.zip";
                 $zipPath = public_path("reports/{$zipFileName}");
 
                 $zip = new \ZipArchive();
