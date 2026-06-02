@@ -270,6 +270,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Delete-student-result/school/{school}/year/{year}/class/{class}/examType/{examTyoe}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'deleteStudentResult'])->name('delete.student.result');
         Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'publishResult'])->name('publish.results');
         Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
+        Route::get('/results/bulk-student-reports/{school}/{year}/{class}/{examType}/{month}/{date}', [ResultsController::class, 'bulkStudentReports'])
+                    ->name('results.bulk.student.reports');
+        Route::get('/results/bulk-combined-reports/{school}/{year}/{class}/{report}', [ResultsController::class, 'bulkCombinedReports'])
+                ->name('results.bulk.combined.reports');
 
         // packages management
         Route::get('/Packages/year', [PackagesController::class, 'packagesByYear'])->name('package.byYear');

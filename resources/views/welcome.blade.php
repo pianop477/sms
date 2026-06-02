@@ -423,13 +423,13 @@
         }
 
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(245, 86, 86, 0.1);
             padding: 10px;
             border-radius: 8px;
             border-left: 3px solid #ef4444;
             margin-bottom: 16px;
             font-size: 13px;
-            color: #9c1010;
+            color: #e16969;
         }
 
         .success-message {
@@ -517,7 +517,7 @@
                         <label for="login-password" class="form-label">Password</label>
                         <input type="password" id="login-password" name="password" class="form-control" placeholder="********" required>
                         <button type="button" class="password-toggle" id="toggleLoginPassword">
-                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-eye mt-8"></i>
                         </button>
                     </div>
 
@@ -643,9 +643,6 @@
                     <div class="hidden md:block text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color);">
                         <i class="fas fa-clock mr-1"></i><span id="live-time">00:00:00</span>
                     </div>
-                    <button id="showLoginBtn" class="gradient-bg text-white px-4 sm:px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 pulse">
-                        <i class="fas fa-sign-in-alt mr-2"></i><span id="nav-login">Login Now</span>
-                    </button>
                     <button id="menu-toggle" class="md:hidden focus:outline-none" style="color: var(--text-primary);"><i class="fas fa-bars text-2xl"></i></button>
                 </div>
             </div>
@@ -1205,7 +1202,7 @@
             toggleLoginPassword.addEventListener('click', function() {
                 const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
                 loginPassword.setAttribute('type', type);
-                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye mt-8"></i>' : '<i class="fas fa-eye-slash mt-8"></i>';
             });
         }
 

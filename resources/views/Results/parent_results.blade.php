@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Academic Report - {{ $studentId->first_name }} {{ $studentId->last_name }}</title>
     <style>
-        /* RESET & BASE - Normal Readable Fonts */
+        /* RESET & BASE - Relaxed Readable Fonts */
         * {
             margin: 0;
             padding: 0;
@@ -14,31 +14,31 @@
 
         body {
             font-family: 'Times New Roman', 'Arial', serif;
-            font-size: 11px;
-            line-height: 1.35;
+            font-size: 12px;
+            line-height: 1.45;
             background: white;
             color: #000000;
-            padding: 0.4cm;
+            padding: 0.35cm;
         }
 
-        /* Page Setup for Printing - Optimized for One Page */
+        /* Page Setup for Printing - Balanced Margins */
         @page {
             size: A4;
-            margin: 0.8cm 0.8cm 1cm 0.8cm;
+            margin: auto;
         }
 
         /* Container */
         .report-container {
             max-width: 100%;
-            margin: 0 auto;
+            margin: auto;
         }
 
-        /* ============ HEADER SECTION ============ */
+        /* ============ HEADER SECTION - Relaxed ============ */
         .school-header {
             width: 100%;
             border-bottom: 2px solid #000000;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
         }
 
         .school-header table {
@@ -55,6 +55,7 @@
         .logo-img {
             max-width: 75px;
             max-height: 75px;
+            object-fit: contain;
         }
 
         .school-info-cell {
@@ -67,17 +68,17 @@
             font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
         .school-address {
-            font-size: 9px;
+            font-size: 11px;
             margin: 2px 0;
             text-transform: uppercase;
         }
 
         .school-contacts {
-            font-size: 10px;
+            font-size: 11px;
             margin: 2px 0;
         }
 
@@ -95,14 +96,14 @@
             padding: 2px;
         }
 
-        /* ============ REPORT TITLE ============ */
+        /* ============ REPORT TITLE - Relaxed ============ */
         .report-title {
             text-align: center;
             margin: 8px 0;
         }
 
         .report-title h3 {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -111,15 +112,15 @@
 
         .report-title p {
             font-size: 12px;
-            margin-top: 2px;
+            margin-top: 3px;
             text-transform: uppercase;
         }
 
-        /* ============ SECTION HEADER ============ */
+        /* ============ SECTION HEADER - Relaxed ============ */
         .section-header {
             background: #000000;
             color: white;
-            padding: 4px;
+            padding: 5px;
             text-align: center;
             font-size: 12px;
             font-weight: bold;
@@ -127,7 +128,7 @@
             margin: 10px 0 6px 0;
         }
 
-        /* ============ STUDENT INFO SECTION ============ */
+        /* ============ STUDENT INFO SECTION - Relaxed ============ */
         .student-info {
             width: 100%;
             margin: 8px 0;
@@ -137,42 +138,42 @@
 
         .student-info td {
             border: 1px solid #000000;
-            padding: 6px 8px;
+            padding: 7px 10px;
             vertical-align: top;
         }
 
         .info-label {
             font-weight: bold;
-            width: 35%;
+            width: 30%;
             background-color: #f5f5f5;
             font-size: 12px;
         }
 
         .info-value {
-            width: 65%;
+            width: 70%;
             font-size: 12px;
         }
 
-        /* ============ RESULTS TABLE ============ */
+        /* ============ RESULTS TABLE - Relaxed ============ */
         .results-table {
             width: 100%;
             border-collapse: collapse;
             margin: 8px 0;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .results-table th {
             border: 1px solid #000000;
-            padding: 5px 3px;
+            padding: 6px 4px;
             background-color: #f0f0f0;
             font-weight: bold;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .results-table td {
             border: 1px solid #000000;
-            padding: 5px 3px;
+            padding: 5px 4px;
             text-align: center;
             font-size: 12px;
         }
@@ -181,114 +182,33 @@
             text-align: left;
         }
 
-        /* ============ GRADE BADGES - Optimized for Color & B&W Printing ============ */
-        .grade-A {
-            background-color: #e8f5e9;
-            border: 1px solid #2e7d32;
+        /* ============ GRADE STYLING ============ */
+        .grade-text {
             font-weight: bold;
-            padding: 2px 7px;
-            border-radius: 3px;
-            display: inline-block;
-            font-size: 12px;
-        }
-        .grade-B {
-            background-color: #e3f2fd;
-            border: 1px solid #1565c0;
-            padding: 2px 7px;
-            border-radius: 3px;
-            display: inline-block;
-            font-size: 12px;
-        }
-        .grade-C {
-            background-color: #fff3e0;
-            border: 1px solid #e65100;
-            padding: 2px 7px;
-            border-radius: 3px;
-            display: inline-block;
-            font-size: 12px;
-        }
-        .grade-D {
-            background-color: #ffebee;
-            border: 1px solid #c62828;
-            padding: 2px 7px;
-            border-radius: 3px;
-            display: inline-block;
-            font-size: 12px;
-        }
-        .grade-E, .grade-F {
-            background-color: #fce4ec;
-            border: 1px solid #b71c1c;
-            padding: 2px 7px;
-            border-radius: 3px;
-            display: inline-block;
             font-size: 12px;
         }
 
-        /* General Remarks Badges */
-        .remark-excellent {
-            background-color: #2e7d32;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 3px;
+        .remark-text {
             font-weight: bold;
             font-size: 12px;
-            display: inline-block;
-        }
-        .remark-good {
-            background-color: #1565c0;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-        }
-        .remark-pass {
-            background-color: #e65100;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-        }
-        .remark-poor {
-            background-color: #c62828;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-        }
-        .remark-fail {
-            background-color: #b71c1c;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
+            font-style:italic;
         }
 
         /* For B&W Printing */
         @media print {
-            .grade-A, .grade-B, .grade-C, .grade-D, .grade-E, .grade-F {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .remark-excellent, .remark-good, .remark-pass, .remark-poor, .remark-fail {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
             .results-table th {
                 background-color: #e0e0e0 !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            .section-header {
+                background: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
 
-        /* ============ SUMMARY SECTION ============ */
+        /* ============ SUMMARY SECTION - Relaxed ============ */
         .summary-section {
             width: 100%;
             margin: 8px 0;
@@ -298,7 +218,7 @@
 
         .summary-section td {
             border: 1px solid #000000;
-            padding: 6px 8px;
+            padding: 7px 10px;
         }
 
         .summary-label {
@@ -309,15 +229,15 @@
 
         .summary-value {
             font-size: 12px;
+            font-weight: bold;
         }
 
-        /* ============ DIVISION SECTION ============ */
+        /* ============ DIVISION SECTION - Relaxed ============ */
         .division-section {
             width: 100%;
             margin: 8px 0;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
             border-collapse: collapse;
-            background-color: #f9f9f9;
         }
 
         .division-section td {
@@ -326,11 +246,11 @@
         }
 
         .division-score {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
 
-        /* ============ HEAD TEACHER COMMENT ============ */
+        /* ============ HEAD TEACHER COMMENT - Relaxed ============ */
         .comment-section {
             width: 100%;
             margin: 8px 0;
@@ -339,7 +259,7 @@
         }
 
         .comment-section td {
-            padding: 8px 10px;
+            padding: 8px 12px;
             vertical-align: top;
         }
 
@@ -353,40 +273,41 @@
 
         .comment-content {
             width: 78%;
-            line-height: 1.4;
+            line-height: 1.45;
             font-size: 12px;
             font-style: italic;
         }
 
-        /* ============ QR CODE SECTION ============ */
+        /* ============ QR CODE SECTION - Relaxed ============ */
         .qr-section {
             text-align: center;
-            margin: 10px 0 8px 0;
+            margin: 10px 0 6px 0;
             page-break-inside: avoid;
         }
 
         .qr-code {
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto;
         }
 
         .qr-text {
-            font-size: 9px;
-            margin-top: 0px;
+            font-size: 10px;
+            margin-top: 0.5px;
             font-weight: bold;
+            font-style:italic;
         }
 
-        /* ============ FOOTER ============ */
+        /* ============ FOOTER - Relaxed ============ */
         .footer {
             position: fixed;
-            bottom: 3px;
+            bottom: 8px;
             width: 100%;
             margin-top: 8px;
-            padding-top: 6px;
+            padding-top: 5px;
             border-top: 1px solid #000000;
             text-align: center;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         /* Print Optimization */
@@ -406,8 +327,6 @@
 
         /* Utility Classes */
         .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
         .text-uppercase { text-transform: uppercase; }
         .text-capitalize { text-transform: capitalize; }
         .bold { font-weight: bold; }
@@ -421,23 +340,43 @@
             <tr>
                 <td class="logo-cell">
                     @php
-                        $logoPath = storage_path('app/public/logo/' . ($results->first()->logo ?? 'default.png'));
-                        $logoExists = file_exists($logoPath) && !empty($results->first()->logo);
+                        $logoFileName = $results->first()->logo ?? '';
+                        $logoPath = '';
+                        $logoExists = false;
+
+                        if(!empty($logoFileName)) {
+                            $possiblePaths = [
+                                public_path('storage/logo/' . $logoFileName),
+                                storage_path('app/public/logo/' . $logoFileName),
+                                public_path('logo/' . $logoFileName),
+                                storage_path('app/logo/' . $logoFileName)
+                            ];
+
+                            foreach($possiblePaths as $path) {
+                                if(file_exists($path) && is_file($path)) {
+                                    $logoPath = $path;
+                                    $logoExists = true;
+                                    break;
+                                }
+                            }
+                        }
                     @endphp
-                    @if($logoExists)
+                    @if($logoExists && !empty($logoPath))
                         <img src="{{ $logoPath }}" class="logo-img" alt="School Logo">
                     @else
-                        <div style="width: 75px; height: 75px; border: 1px solid #ccc; margin: 0 auto;"></div>
+                        <div>
+                            LOGO
+                        </div>
                     @endif
                 </td>
                 <td class="school-info-cell">
                     <div class="school-name">THE UNITED REPUBLIC OF TANZANIA</div>
                     <div class="school-name">PRESIDENT'S OFFICE - TAMISEMI</div>
-                    <div class="school-name" style="font-size: 11px; margin-top: 3px;">
+                    <div class="school-name">
                         {{ strtoupper($results->first()->school_name ?? 'SCHOOL NAME') }}
                     </div>
                     <div class="school-address">
-                        P.O.BOX {{ $results->first()->postal_address ?? '______' }} -
+                        {{ $results->first()->postal_address ?? '______' }} -
                         {{ $results->first()->postal_name ?? '______' }},
                         {{ $results->first()->country ?? 'TANZANIA' }}
                     </div>
@@ -448,13 +387,33 @@
                 </td>
                 <td class="photo-cell">
                     @php
-                        $studentImage = storage_path('app/public/students/' . ($studentId->image ?? ''));
-                        $hasImage = file_exists($studentImage) && !empty($studentId->image);
+                        $studentImageName = $studentId->image ?? 'student.jpg';
+                        $studentImagePath = '';
+                        $hasImage = false;
+
+                        if(!empty($studentImageName)) {
+                            $possiblePaths = [
+                                public_path('storage/students/' . $studentImageName),
+                                storage_path('app/public/students/' . $studentImageName),
+                                public_path('students/' . $studentImageName),
+                                storage_path('app/students/' . $studentImageName)
+                            ];
+
+                            foreach($possiblePaths as $path) {
+                                if(file_exists($path) && is_file($path)) {
+                                    $studentImagePath = $path;
+                                    $hasImage = true;
+                                    break;
+                                }
+                            }
+                        }
                     @endphp
-                    @if($hasImage)
-                        <img src="{{ $studentImage }}" class="student-photo" alt="Student Photo">
+                    @if($hasImage && !empty($studentImagePath))
+                        <img src="{{ $studentImagePath }}" class="student-photo" alt="Student Photo">
                     @else
-                        <img src="{{ storage_path('app/public/students/student.jpg') }}" class="student-photo" alt="Student Photo">
+                        <div>
+                            PHOTO
+                        </div>
                     @endif
                 </td>
             </tr>
@@ -472,15 +431,15 @@
 
         <!-- ==================== STUDENT INFORMATION ==================== -->
         <div class="section-header">STUDENT'S INFORMATION</div>
-        <table class="student-info" cellpadding="6" cellspacing="0">
+        <table class="student-info" cellpadding="7" cellspacing="0">
             <tr>
-                <td class="info-label">ADMISSION NUMBER</td>
+                <td class="info-label">ADMISSION No.</td>
                 <td class="info-value">{{ strtoupper($results->first()->admission_number ?? 'N/A') }}</td>
                 <td class="info-label">CLASS</td>
                 <td class="info-value">{{ strtoupper($results->first()->class_name ?? 'N/A') }}</td>
             </tr>
             <tr>
-                <td class="info-label">STUDENT NAME</td>
+                <td class="info-label">FULL NAME</td>
                 <td class="info-value">
                     {{ strtoupper($studentId->first_name ?? '') }}
                     {{ strtoupper($studentId->middle_name ?? '') }}
@@ -499,16 +458,16 @@
 
         <!-- ==================== RESULTS TABLE ==================== -->
         <div class="section-header">SUBJECT PERFORMANCE</div>
-        <table class="results-table" cellpadding="5" cellspacing="0">
+        <table class="results-table" cellpadding="6" cellspacing="0">
             <thead>
                 <tr>
-                    <th width="28%">SUBJECT NAME</th>
+                    <th width="30%">SUBJECT NAME</th>
                     <th width="10%">CODE</th>
                     <th width="15%">TEACHER</th>
                     <th width="10%">SCORE</th>
                     <th width="8%">GRADE</th>
                     <th width="8%">RANK</th>
-                    <th width="21%">REMARKS</th>
+                    <th width="19%">REMARKS</th>
                 </tr>
             </thead>
             <tbody>
@@ -523,24 +482,9 @@
                         {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.
                     </td>
                     <td class="bold">{{ $result->score ?? 'X' }}</td>
-                    <td>
-                        @php
-                            $grade = $result->grade ?? 'X';
-                            if($grade == 'A') $gradeClass = 'grade-A';
-                            elseif($grade == 'B') $gradeClass = 'grade-B';
-                            elseif($grade == 'C') $gradeClass = 'grade-C';
-                            elseif($grade == 'D') $gradeClass = 'grade-D';
-                            elseif($grade == 'E') $gradeClass = 'grade-E';
-                            else $gradeClass = '';
-                        @endphp
-                        @if($grade != 'X')
-                            <span class="{{ $gradeClass }}">{{ $grade }}</span>
-                        @else
-                            <span>{{ $grade }}</span>
-                        @endif
-                    </td>
+                    <td class="grade-text">{{ $result->grade ?? 'X' }}</td>
                     <td>{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
-                    <td class="italic">{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
+                    <td>{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -548,13 +492,13 @@
 
         <!-- ==================== OVERALL PERFORMANCE SUMMARY ==================== -->
         <div class="section-header">OVERALL PERFORMANCE SUMMARY</div>
-        <table class="summary-section" cellpadding="6" cellspacing="0">
+        <table class="summary-section" cellpadding="7" cellspacing="0">
             <tbody>
                 <tr>
                     <td class="summary-label" width="25%">TOTAL MARKS</td>
-                    <td class="summary-value" width="25%"><strong>{{ $totalScore ?? 0 }}</strong></td>
+                    <td class="summary-value" width="25%"><strong>{{ number_format($totalScore ?? 0, 2) }}</strong></td>
                     <td class="summary-label" width="25%">CLASS POSITION</td>
-                    <td class="summary-value" width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
+                    <td class="summary-value" width="25%"><strong>{{ $studentRank ?? 1 }} / {{ $rankings->count() ?? 1 }}</strong></td>
                 </tr>
                 <tr>
                     <td class="summary-label">GENERAL AVERAGE</td>
@@ -565,94 +509,66 @@
                 <tr>
                     <td class="summary-label">OVERALL GRADE</td>
                     <td colspan="3">
-                        @php
-                            $overallGrade = '';
-                            $gradeComment = '';
-                            $remarkClass = '';
-
-                            if ($marking_style == 1) {
-                                if (($averageScore ?? 0) >= 40.5) {
-                                    $overallGrade = 'A';
-                                    $gradeComment = 'EXCELLENT';
-                                    $remarkClass = 'remark-excellent';
-                                } elseif (($averageScore ?? 0) >= 30.5) {
-                                    $overallGrade = 'B';
-                                    $gradeComment = 'GOOD';
-                                    $remarkClass = 'remark-good';
-                                } elseif (($averageScore ?? 0) >= 20.5) {
-                                    $overallGrade = 'C';
-                                    $gradeComment = 'PASS';
-                                    $remarkClass = 'remark-pass';
-                                } elseif (($averageScore ?? 0) >= 10.5) {
-                                    $overallGrade = 'D';
-                                    $gradeComment = 'POOR';
-                                    $remarkClass = 'remark-poor';
+                        <strong class="remark-text">
+                            @php
+                                if ($marking_style == 3 && isset($division)) {
+                                    echo 'Division ' . ($division === '0' ? '0' : $division);
                                 } else {
-                                    $overallGrade = 'E';
-                                    $gradeComment = 'FAIL';
-                                    $remarkClass = 'remark-fail';
+                                    $avg = $averageScore ?? 0;
+                                    if ($marking_style == 1) {
+                                        if ($avg >= 40.5) echo 'A (Excellent)';
+                                        elseif ($avg >= 30.5) echo 'B (Good)';
+                                        elseif ($avg >= 20.5) echo 'C (Pass)';
+                                        elseif ($avg >= 10.5) echo 'D (Poor)';
+                                        else echo 'E (Fail)';
+                                    } else {
+                                        if ($avg >= 80.5) echo 'A (Excellent)';
+                                        elseif ($avg >= 60.5) echo 'B (Good)';
+                                        elseif ($avg >= 40.5) echo 'C (Pass)';
+                                        elseif ($avg >= 20.5) echo 'D (Poor)';
+                                        else echo 'E (Fail)';
+                                    }
                                 }
-                            } elseif ($marking_style == 2) {
-                                if (($averageScore ?? 0) >= 80.5) {
-                                    $overallGrade = 'A';
-                                    $gradeComment = 'EXCELLENT';
-                                    $remarkClass = 'remark-excellent';
-                                } elseif (($averageScore ?? 0) >= 60.5) {
-                                    $overallGrade = 'B';
-                                    $gradeComment = 'GOOD';
-                                    $remarkClass = 'remark-good';
-                                } elseif (($averageScore ?? 0) >= 40.5) {
-                                    $overallGrade = 'C';
-                                    $gradeComment = 'PASS';
-                                    $remarkClass = 'remark-pass';
-                                } elseif (($averageScore ?? 0) >= 20.5) {
-                                    $overallGrade = 'D';
-                                    $gradeComment = 'POOR';
-                                    $remarkClass = 'remark-poor';
-                                } else {
-                                    $overallGrade = 'E';
-                                    $gradeComment = 'FAIL';
-                                    $remarkClass = 'remark-fail';
-                                }
-                            } else {
-                                // Marking style 3 with division
-                                if ($division == 'I') {
-                                    $overallGrade = 'I';
-                                    $gradeComment = 'EXCELLENT';
-                                    $remarkClass = 'remark-excellent';
-                                } elseif ($division == 'II') {
-                                    $overallGrade = 'II';
-                                    $gradeComment = 'GOOD';
-                                    $remarkClass = 'remark-good';
-                                } elseif ($division == 'III') {
-                                    $overallGrade = 'III';
-                                    $gradeComment = 'PASS';
-                                    $remarkClass = 'remark-pass';
-                                } elseif ($division == 'IV') {
-                                    $overallGrade = 'IV';
-                                    $gradeComment = 'POOR';
-                                    $remarkClass = 'remark-poor';
-                                } else {
-                                    $overallGrade = '0';
-                                    $gradeComment = 'FAIL';
-                                    $remarkClass = 'remark-fail';
-                                }
-                            }
-                        @endphp
-                        <strong>Grade {{ $overallGrade }}</strong>
+                            @endphp
+                        </strong>
                     </td>
                 </tr>
                 <tr>
                     <td class="summary-label">GENERAL REMARKS</td>
                     <td colspan="3">
-                        <span class="{{ $remarkClass }}">{{ $gradeComment }}</span>
+                        <strong class="remark-text">
+                            @php
+                                if ($marking_style == 3 && isset($division)) {
+                                    if ($division == 'I') echo 'EXCELLENT';
+                                    elseif ($division == 'II') echo 'GOOD';
+                                    elseif ($division == 'III') echo 'PASS';
+                                    elseif ($division == 'IV') echo 'POOR';
+                                    else echo 'FAIL';
+                                } else {
+                                    $avg = $averageScore ?? 0;
+                                    if ($marking_style == 1) {
+                                        if ($avg >= 40.5) echo 'EXCELLENT';
+                                        elseif ($avg >= 30.5) echo 'GOOD';
+                                        elseif ($avg >= 20.5) echo 'PASS';
+                                        elseif ($avg >= 10.5) echo 'POOR';
+                                        else echo 'FAIL';
+                                    } else {
+                                        if ($avg >= 80.5) echo 'EXCELLENT';
+                                        elseif ($avg >= 60.5) echo 'GOOD';
+                                        elseif ($avg >= 40.5) echo 'PASS';
+                                        elseif ($avg >= 20.5) echo 'POOR';
+                                        else echo 'FAIL';
+                                    }
+                                }
+                            @endphp
+                        </strong>
                     </td>
                 </tr>
             </tbody>
         </table>
 
         <!-- ==================== DIVISION SECTION (For Marking Style 3) ==================== -->
-        @if ($marking_style == 3)
+        @if ($marking_style == 3 && isset($division))
         <table class="division-section" cellpadding="8" cellspacing="0">
             <tr>
                 <td width="50%">
@@ -661,22 +577,13 @@
                 </td>
                 <td width="50%">
                     <strong>DIVISION</strong><br>
-                    <span class="division-score" style="
-                        background-color:
-                            @if($division == 'I') #2e7d32
-                            @elseif($division == 'II') #1565c0
-                            @elseif($division == 'III') #e65100
-                            @elseif($division == 'IV') #c62828
-                            @else #b71c1c
-                            @endif;
-                        color: white; padding: 4px 20px; border-radius: 4px; display: inline-block;
-                    ">
+                    <span>
                         {{ $division === '0' ? '0' : $division }}
                     </span>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="font-size: 8px; padding: 4px;">
+                <td colspan="2">
                     <strong>Division Guide:</strong> I (Excellent) | II (Good) | III (Pass) | IV (Poor) | 0 (Fail)
                 </td>
             </tr>
@@ -688,61 +595,47 @@
             $headComment = '';
             $avgScore = $averageScore ?? 0;
 
-            if ($marking_style == 3) {
-                if ($division == 'I') {
-                    $headComment = 'Outstanding Achievement! You have demonstrated exceptional mastery of all subjects. Keep shining!';
-                } elseif ($division == 'II') {
-                    $headComment = 'Very Good Performance! You have shown strong understanding across the curriculum. Push harder!';
-                } elseif ($division == 'III') {
-                    $headComment = 'Good Effort! You are on the right track. Keep building on this foundation!';
-                } elseif ($division == 'IV') {
-                    $headComment = 'Room for Improvement. You can rise higher! Believe in yourself and work harder!';
-                } else {
-                    $headComment = 'Fresh Start Ahead. Every setback is a setup for a comeback. We will support you!';
-                }
+            if ($marking_style == 3 && isset($division)) {
+                if ($division == 'I') $headComment = 'Outstanding Achievement! Keep shining!';
+                elseif ($division == 'II') $headComment = 'Very Good Performance! Push harder!';
+                elseif ($division == 'III') $headComment = 'Good Effort! Keep building!';
+                elseif ($division == 'IV') $headComment = 'Room for Improvement. Work harder!';
+                else $headComment = 'Fresh Start Ahead. We will support you!';
             } else {
                 if ($marking_style == 1) {
-                    if ($avgScore >= 40.5) {
-                        $headComment = 'Outstanding Achievement! Excellent mastery of all subjects. Keep shining!';
-                    } elseif ($avgScore >= 30.5) {
-                        $headComment = 'Very Good Performance! Strong understanding across the curriculum. Push harder!';
-                    } elseif ($avgScore >= 20.5) {
-                        $headComment = 'Good Effort! You are on the right track. Keep building!';
-                    } elseif ($avgScore >= 10.5) {
-                        $headComment = 'Room for Improvement. You can rise higher! Believe in yourself!';
-                    } else {
-                        $headComment = 'Fresh Start Ahead. Every setback is a comeback. We will support you!';
-                    }
+                    if ($avgScore >= 40.5) $headComment = 'Outstanding Achievement! Keep shining!';
+                    elseif ($avgScore >= 30.5) $headComment = 'Very Good Performance! Push harder!';
+                    elseif ($avgScore >= 20.5) $headComment = 'Good Effort! Keep building!';
+                    elseif ($avgScore >= 10.5) $headComment = 'Room for Improvement. Work harder!';
+                    else $headComment = 'Fresh Start Ahead. We will support you!';
                 } else {
-                    if ($avgScore >= 80.5) {
-                        $headComment = 'Exceptional Achievement! You have set a standard of excellence. Continue being a role model!';
-                    } elseif ($avgScore >= 60.5) {
-                        $headComment = 'Commendable Performance! Your hard work is paying off. Keep pushing forward!';
-                    } elseif ($avgScore >= 40.5) {
-                        $headComment = 'Making Progress! Keep the momentum going. You have what it takes!';
-                    } elseif ($avgScore >= 20.5) {
-                        $headComment = 'Time to Unlock Your Potential. Start today and attend all remedial classes!';
-                    } else {
-                        $headComment = 'Your Comeback Story Starts Now. One-on-one mentoring sessions arranged!';
-                    }
+                    if ($avgScore >= 80.5) $headComment = 'Exceptional Achievement! Continue being a role model!';
+                    elseif ($avgScore >= 60.5) $headComment = 'Commendable Performance! Keep pushing!';
+                    elseif ($avgScore >= 40.5) $headComment = 'Making Progress! Keep the momentum!';
+                    elseif ($avgScore >= 20.5) $headComment = 'Time to Unlock Your Potential!';
+                    else $headComment = 'Your Comeback Story Starts Now!';
                 }
             }
         @endphp
 
-        <table class="comment-section" cellpadding="7" cellspacing="0">
+        <table class="comment-section" cellpadding="8" cellspacing="0">
             <tbody>
                 <tr>
                     <td class="comment-label">HEAD TEACHER'S REMARKS</td>
-                    <td class="comment-content">
-                        {{ $headComment }}
-                    </td>
+                    <td class="comment-content">{{ $headComment }}</td>
                 </tr>
             </tbody>
         </table>
 
         <!-- ==================== QR CODE SECTION ==================== -->
         <div class="qr-section">
-            <img src="data:image/png;base64,{{ $qrPng ?? '' }}" class="qr-code" alt="Verification QR Code">
+            @if(!empty($qrPng))
+                <img src="data:image/png;base64,{{ $qrPng }}" class="qr-code" alt="Verification QR Code">
+            @else
+                <div>
+                    QR
+                </div>
+            @endif
             <div class="qr-text">
                 <strong>Scan to Verify Authenticity</strong>
             </div>
@@ -751,8 +644,8 @@
         <!-- ==================== FOOTER ==================== -->
         <div class="footer">
             &copy; {{ date('Y') }} - {{ strtoupper($results->first()->school_name ?? 'SCHOOL') }} |
-            Printed: {{ now()->format('d-M-Y H:i:s') }} |
-            Document ID: {{ strtoupper(substr(md5(uniqid()), 0, 8)) }}
+            Printed: {{ now()->format('d-M-Y H:i') }} |
+            Powered by ShuleApp System
         </div>
     </div>
 </body>

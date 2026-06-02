@@ -152,7 +152,6 @@
         width: 200%;
         height: 200%;
         background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-        /* animation: spin 30s linear infinite; */
     }
 
     .header-modern::after {
@@ -338,7 +337,6 @@
         align-items: center;
         gap: 10px;
         border-left: 4px solid var(--danger);
-        /* animation: pulse 10s infinite; */
     }
 
     /* Exam List */
@@ -465,30 +463,11 @@
         font-size: 1rem;
     }
 
-    .action-icon.view {
-        /* background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); */
-        background: var(--primary);
-    }
-
-    .action-icon.download {
-        /* background: linear-gradient(135deg, var(--success) 0%, #4cc9f0 100%); */
-        background: var(--teal);
-    }
-
-    .action-icon.publish {
-        /* background: linear-gradient(135deg, #28a745 0%, #20c997 100%); */
-        background: var(--warning);
-    }
-
-    .action-icon.unpublish {
-        /* background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); */
-        background: var(--success);
-    }
-
-    .action-icon.delete {
-        /* background: linear-gradient(135deg, var(--danger) 0%, #dc3545 100%); */
-        background: var(--danger);
-    }
+    .action-icon.view { background: var(--primary); }
+    .action-icon.download { background: var(--teal); }
+    .action-icon.publish { background: var(--warning); }
+    .action-icon.unpublish { background: var(--success); }
+    .action-icon.delete { background: var(--danger); }
 
     .action-icon:hover {
         transform: translateY(-5px) rotate(360deg);
@@ -538,7 +517,7 @@
     }
 
     .checkbox-container-modern {
-        max-height: 250px;
+        max-height: 350px;
         overflow-y: auto;
         border: 2px solid #e9ecef;
         border-radius: 15px;
@@ -561,6 +540,33 @@
         transform: translateX(5px);
         box-shadow: var(--shadow-sm);
     }
+
+    /* Marking Style Group */
+    .marking-style-group {
+        background: #f0f4ff;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+
+    .marking-style-group:hover {
+        box-shadow: var(--shadow-sm);
+    }
+
+    .marking-style-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .badge-points { background: #28a745; }
+    .badge-percentage { background: #17a2b8; }
+    .badge-division { background: #6f42c1; }
 
     /* Badges */
     .badge-modern {
@@ -597,157 +603,46 @@
         50% { transform: translateY(-20px); }
     }
 
-    /* Loading Spinner */
-    /* .loading-spinner {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 70px;
-        height: 70px;
-        border: 5px solid #f3f3f3;
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        z-index: 9999;
-        display: none;
-    } */
-
-    /* Toast Notifications */
-    .toast-notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border-radius: 15px;
-        padding: 15px 25px;
-        box-shadow: var(--shadow-lg);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
-        z-index: 10000;
-    }
-
-    .toast-notification.show {
-        transform: translateX(0);
-    }
-
-    .toast-success {
-        border-left: 5px solid #28a745;
-    }
-
-    .toast-error {
-        border-left: 5px solid var(--danger);
-    }
-
     /* Responsive Design */
     @media (max-width: 1200px) {
-        .header-title {
-            font-size: 2rem;
-        }
+        .header-title { font-size: 2rem; }
     }
 
     @media (max-width: 992px) {
-        .action-list-modern {
-            flex-wrap: wrap;
-        }
+        .action-list-modern { flex-wrap: wrap; }
     }
 
     @media (max-width: 768px) {
-        .dashboard-container {
-            margin: 15px auto;
-        }
-
-        .header-modern {
-            padding: 30px 20px;
-        }
-
-        .header-title {
-            font-size: 1.6rem;
-        }
-
-        .card-header-modern {
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
-        }
-
-        .table-modern {
-            display: block;
-            overflow-x: auto;
-        }
-
-        .action-list-modern {
-            justify-content: center;
-        }
+        .dashboard-container { margin: 15px auto; }
+        .header-modern { padding: 30px 20px; }
+        .header-title { font-size: 1.6rem; }
+        .card-header-modern { flex-direction: column; gap: 15px; text-align: center; }
+        .table-modern { display: block; overflow-x: auto; }
     }
 
     @media (max-width: 576px) {
-        .header-title {
-            font-size: 1.3rem;
-        }
-
-        .btn-back-modern {
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
-        .card-body-modern {
-            padding: 15px;
-        }
+        .header-title { font-size: 1.3rem; }
+        .btn-back-modern { padding: 8px 15px; font-size: 0.9rem; }
+        .card-body-modern { padding: 15px; }
     }
 
     /* Dark Mode */
     @media (prefers-color-scheme: dark) {
-        body {
-            background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
-        }
-
-        .glass-card {
-            background: rgba(33, 37, 41, 0.95);
-        }
-
-        .exam-item-modern {
-            background: #2b3035;
-            border-color: #495057;
-        }
-
-        .exam-link-modern {
-            color: #e9ecef;
-        }
-
-        .table-modern tbody td {
-            color: #e9ecef;
-            border-bottom-color: #495057;
-        }
-
-        .table-modern tbody tr:hover {
-            background: #343a40;
-        }
-
-        .form-control-modern {
-            background: #2b3035;
-            border-color: #495057;
-            color: #e9ecef;
-        }
-
-        .checkbox-container-modern {
-            background: #2b3035;
-            border-color: #495057;
-        }
-
-        .checkbox-item-modern {
-            background: #343a40;
-            color: #e9ecef;
-        }
+        body { background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%); }
+        .glass-card { background: rgba(33, 37, 41, 0.95); }
+        .exam-item-modern { background: #2b3035; border-color: #495057; }
+        .exam-link-modern { color: #e9ecef; }
+        .table-modern tbody td { color: #e9ecef; border-bottom-color: #495057; }
+        .table-modern tbody tr:hover { background: #343a40; }
+        .form-control-modern { background: #2b3035; border-color: #495057; color: #e9ecef; }
+        .checkbox-container-modern { background: #2b3035; border-color: #495057; }
+        .checkbox-item-modern { background: #343a40; color: #e9ecef; }
+        .marking-style-group { background: #1e2a3a; }
     }
 </style>
 
 <div class="animated-bg"></div>
 <div class="particles"></div>
-{{-- <div class="loading-spinner" id="loadingSpinner"></div> --}}
 
 <div class="dashboard-container">
     <!-- Modern Header -->
@@ -825,7 +720,6 @@
                     </button>
                 </div>
                 <div class="card-body-modern">
-                    <!-- Alerts -->
                     @if (Session::has('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle me-2"></i>
@@ -842,7 +736,6 @@
                         </div>
                     @endif
 
-                    <!-- Table -->
                     <div class="table-wrapper">
                         <table class="table-modern">
                             <thead>
@@ -960,7 +853,6 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
                     @if($reports->hasPages())
                         <div class="pagination-container mt-4">
                             {{ $reports->links() }}
@@ -972,7 +864,7 @@
     </div>
 </div>
 
-<!-- Modern Modal -->
+<!-- Modern Modal with Marking Style Badges -->
 <div class="modal fade modal-modern" id="compileModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -1035,32 +927,68 @@
                                 <i class="fas fa-database text-danger me-2"></i>
                                 Results Data Set
                             </h6>
+                            <div class="alert alert-info alert-sm mb-3" style="font-size: 12px; padding: 8px 12px;">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>Note:</strong> Select dates with the <strong>SAME marking style</strong> only. Mixing different marking styles will cause calculation errors.
+                            </div>
                             @if ($groupedByMonth->isEmpty())
                                 <div class="empty-state-modern">
                                     <i class="fas fa-exclamation"></i>
                                     <p class="mt-2">No results found</p>
                                 </div>
                             @else
-                                <div class="checkbox-container-modern">
-                                    @foreach ($groupedByMonth as $date => $resultDate)
-                                        <div class="checkbox-item-modern">
-                                            <div class="form-check">
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       name="exam_dates[]"
-                                                       value="{{$date}}"
-                                                       id="date-{{Str::slug($date)}}">
-                                                <label class="form-check-label" for="date-{{Str::slug($date)}}">
-                                                    <strong>{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</strong>
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        {{ ucwords(strtolower($resultDate->first()->exam_type)) }}
-                                                        (Term {{ strtoupper($resultDate->first()->Exam_term) }})
-                                                    </small>
-                                                </label>
+                                <div class="checkbox-container-modern" id="checkboxContainer">
+                                    @php
+                                        $groupedByMarkingStyle = [];
+                                        foreach ($groupedByMonth as $date => $resultDate) {
+                                            $markingStyle = $resultDate->first()->marking_style ?? 2;
+                                            $groupedByMarkingStyle[$markingStyle][$date] = $resultDate;
+                                        }
+                                    @endphp
+
+                                    @foreach ($groupedByMarkingStyle as $markingStyle => $dates)
+                                        <div class="marking-style-group" style="border-left-color: {{ $markingStyle == 1 ? '#28a745' : ($markingStyle == 2 ? '#17a2b8' : '#6f42c1') }}">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-tag me-2"></i>
+                                                <strong style="font-size: 13px;">
+                                                    Marking Style:
+                                                    @if($markingStyle == 1)
+                                                        <span class="marking-style-badge badge-points">Points (0-50)</span>
+                                                    @elseif($markingStyle == 2)
+                                                        <span class="marking-style-badge badge-percentage">Percentage (0-100)</span>
+                                                    @else
+                                                        <span class="marking-style-badge badge-division">Division System</span>
+                                                    @endif
+                                                </strong>
                                             </div>
+                                            @foreach ($dates as $date => $resultDate)
+                                                <div class="checkbox-item-modern" style="margin-left: 15px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input marking-style-checkbox"
+                                                               type="checkbox"
+                                                               name="exam_dates[]"
+                                                               value="{{$date}}"
+                                                               data-marking-style="{{ $markingStyle }}"
+                                                               id="date-{{Str::slug($date)}}">
+                                                        <label class="form-check-label" for="date-{{Str::slug($date)}}">
+                                                            <strong>{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</strong>
+                                                            <br>
+                                                            <small class="text-muted">
+                                                                {{ ucwords(strtolower($resultDate->first()->exam_type)) }}
+                                                                (Term {{ strtoupper($resultDate->first()->Exam_term) }})
+                                                            </small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @endforeach
+                                </div>
+
+                                <!-- Warning when mixing marking styles -->
+                                <div id="markingStyleWarning" class="alert alert-warning mt-3" style="display: none; font-size: 12px; padding: 10px;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Warning:</strong> You have selected dates with different marking styles. This may cause calculation errors. Please select dates with the same marking style only.
                                 </div>
                             @endif
                         </div>
@@ -1114,8 +1042,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-compile-modern"
-                            onclick="return confirm('Generate compiled results?')">
+                    <button type="submit" class="btn-compile-modern" id="submitReportBtn">
                         <i class="fas fa-cog me-2"></i>
                         Generate Report
                     </button>
@@ -1143,7 +1070,6 @@ document.getElementById('reportType').addEventListener('change', function() {
 // Form validation
 document.addEventListener('DOMContentLoaded', function() {
     const forms = document.querySelectorAll('.needs-validation');
-
     forms.forEach(form => {
         form.addEventListener('submit', function(event) {
             if (!form.checkValidity()) {
@@ -1155,26 +1081,61 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Show loading spinner on form submit
-// document.querySelectorAll('form').forEach(form => {
-//     form.addEventListener('submit', function() {
-//         document.getElementById('loadingSpinner').style.display = 'block';
-//     });
-// });
+// Marking style validation - prevent mixing different marking styles
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.marking-style-checkbox');
+    const warningDiv = document.getElementById('markingStyleWarning');
+    const submitBtn = document.getElementById('submitReportBtn');
+
+    if (checkboxes.length > 0) {
+        function checkMarkingStyleConsistency() {
+            const selectedStyles = new Set();
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const style = checkbox.getAttribute('data-marking-style');
+                    selectedStyles.add(style);
+                }
+            });
+
+            if (selectedStyles.size > 1) {
+                if (warningDiv) warningDiv.style.display = 'block';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.6';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            } else {
+                if (warningDiv) warningDiv.style.display = 'none';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', checkMarkingStyleConsistency);
+        });
+    }
+});
 
 // Animate particles
 function createParticles() {
     const particlesContainer = document.querySelector('.particles');
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.width = Math.random() * 10 + 5 + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 20 + 's';
-        particle.style.animationDuration = Math.random() * 10 + 20 + 's';
-        particlesContainer.appendChild(particle);
+    if (particlesContainer) {
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 10 + 5 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 20 + 's';
+            particlesContainer.appendChild(particle);
+        }
     }
 }
 createParticles();

@@ -155,10 +155,10 @@
 
     /* --- Action Buttons: High-end UX --- */
     .action-btn.manage {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 8px;
-        background: #fff;
+        background: rgba(32, 93, 224, 0.3)
         color: var(--brand-primary);
         border: 1px solid #e2e8f0;
         display: inline-flex;
@@ -172,7 +172,7 @@
         background: var(--brand-primary);
         color: white;
         border-color: var(--brand-primary);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 4px 12px rgba(32, 93, 224, 0.3);
     }
 
     /* --- Fix: Mobile Responsive Labels --- */

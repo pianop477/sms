@@ -527,7 +527,7 @@
                     <a href="{{route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report])}}" class="btn-action btn-back">
                         <i class="fas fa-arrow-circle-left"></i> Back
                     </a>
-                    <a href="{{route('download.combined.report', ['school'=>$school, 'year'=>$year, 'class' => $class, 'report' => $report, 'student' => Hashids::encode($studentId)])}}" class="btn-action btn-download">
+                    <a href="{{route('download.combined.report', ['school'=>$school, 'year'=>$year, 'class' => $class, 'report' => $report, 'student' => Hashids::encode($studentId)])}}" target="_blank" class="btn-action btn-download" onclick="return confirm('Are you sure?')">
                         <i class="fas fa-download"></i> Download PDF
                     </a>
                 </div>

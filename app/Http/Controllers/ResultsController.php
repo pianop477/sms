@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
 use App\Exports\ResultsExport;
+use App\Jobs\SendResultSmsJob;
 use App\Models\compiled_results;
 use App\Models\Examination;
 use App\Models\Examination_result;
@@ -21,25 +20,26 @@ use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
+use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Crypt;
-use Endroid\QrCode\Builder\Builder;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Jobs\SendResultSmsJob;
 
 class ResultsController extends Controller
 {
     protected $beemSmsService;
+
     protected $nextSmsService;
+
     protected $appBaseUrl;
 
     public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
@@ -59,6 +59,7 @@ class ResultsController extends Controller
             ->find($decoded[0]);
         if (! $students) {
             Alert()->toast('No such student was found', 'error');
+
             return back();
         }
 
@@ -67,6 +68,7 @@ class ResultsController extends Controller
 
         if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
+
             return to_route('home');
         }
 
@@ -93,8 +95,6 @@ class ResultsController extends Controller
     /**
      * Show the form for creating the resource.
      */
-
-
     public function resultByType($student, $year)
     {
         $decoded = Hashids::decode($student);
@@ -105,6 +105,7 @@ class ResultsController extends Controller
 
         if (! $students) {
             Alert()->toast('No such student was found', 'error');
+
             return back();
         }
         $user = Auth::user();
@@ -112,6 +113,7 @@ class ResultsController extends Controller
 
         if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
+
             return to_route('home');
         }
         $examTypes = Examination_result::query()
@@ -134,7 +136,6 @@ class ResultsController extends Controller
             ->unique()
             ->values();
 
-
         // Check for combined examination results
         $reports = generated_reports::where('school_id', $students->school_id)
             ->where('status', 1)
@@ -142,7 +143,6 @@ class ResultsController extends Controller
             ->whereIn('class_id', $classIdsForYear)
             ->orderBy('created_at', 'DESC')
             ->get();
-
 
         // Combine both $examTypes and $reports into one array
         $combinedItems = collect();
@@ -152,7 +152,7 @@ class ResultsController extends Controller
             $combinedItems->push([
                 'type' => 'exam',
                 'id' => $exam->exam_id,
-                'label' => $exam->exam_type
+                'label' => $exam->exam_type,
             ]);
         }
 
@@ -193,6 +193,7 @@ class ResultsController extends Controller
 
         if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
+
             return to_route('home');
         }
         // Pata matokeo yote ya mwanafunzi kwa mwaka husika na aina ya mtihani
@@ -278,6 +279,7 @@ class ResultsController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found for this student', 'info');
+
             return redirect()->back();
         }
 
@@ -298,7 +300,7 @@ class ResultsController extends Controller
                 'C' => 3,
                 'D' => 4,
                 'F' => 5,
-                'ABS' => 6
+                'ABS' => 6,
             ];
 
             foreach ($results as $result) {
@@ -427,14 +429,14 @@ class ResultsController extends Controller
 
         // ================= QR CODE VERIFICATION =================
         $verificationData = [
-            'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
+            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
             'admission_number' => $studentId->admission_number,
             'class' => $results->first()->class_name ?? '-',
-            'report_type' => $results->first()->exam_type . ' Assessment',
+            'report_type' => $results->first()->exam_type.' Assessment',
             'term' => $results->first()->Exam_term ?? '-',
             'school' => $results->first()->school_name ?? '-',
             'report_date' => Carbon::parse($date)->format('Y-m-d'),
-            'report_id' => sha1($studentId->id . $exam_id[0] . $date),
+            'report_id' => sha1($studentId->id.$exam_id[0].$date),
             'issued_at' => now()->timestamp,
             'total_score' => $totalScore,
             'average_score' => $averageScore,
@@ -487,15 +489,15 @@ class ResultsController extends Controller
         $folderPath = public_path('reports');
 
         // Make sure the directory exists
-        if (!File::exists($folderPath)) {
+        if (! File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0755, true);
         }
 
         // Save the PDF to the 'reports' folder
-        $pdf->save($folderPath . '/' . $fileName);
+        $pdf->save($folderPath.'/'.$fileName);
 
         // Generate the URL for accessing the saved PDF
-        $fileUrl = asset('reports/' . $fileName);
+        $fileUrl = asset('reports/'.$fileName);
 
         // Return the view with the file URL to be used in the iframe
         return view('Results.parent_academic_reports', compact(
@@ -524,6 +526,7 @@ class ResultsController extends Controller
         // return $schools;
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -558,6 +561,7 @@ class ResultsController extends Controller
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         } else {
             $results = Examination_result::query()
@@ -613,7 +617,7 @@ class ResultsController extends Controller
             'September' => 9,
             'October' => 10,
             'November' => 11,
-            'December' => 12
+            'December' => 12,
         ];
 
         //query examination lists
@@ -665,6 +669,7 @@ class ResultsController extends Controller
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -698,6 +703,7 @@ class ResultsController extends Controller
             })->map(function ($dateGroup) {
                 // Amua status kwa kila tarehe
                 $status = $dateGroup->first()->status; // Chukua status ya kwanza ya matokeo ya tarehe hiyo
+
                 return [
                     'results' => $dateGroup,
                     'status' => $status, // Pita status kwenye view
@@ -722,9 +728,9 @@ class ResultsController extends Controller
             ]);
 
             $teacherDecoded = Hashids::decode($request->teacher_id);
-            $schoolDecoded  = Hashids::decode($request->school);
-            $classDecoded   = Hashids::decode($request->class);
-            $examDecoded    = Hashids::decode($request->examType);
+            $schoolDecoded = Hashids::decode($request->school);
+            $classDecoded = Hashids::decode($request->class);
+            $examDecoded = Hashids::decode($request->examType);
 
             if (
                 empty($teacherDecoded) ||
@@ -736,9 +742,9 @@ class ResultsController extends Controller
             }
 
             $teacher_id = $teacherDecoded[0];
-            $school_id  = $schoolDecoded[0];
-            $class_id   = $classDecoded[0];
-            $exam_type  = $examDecoded[0];
+            $school_id = $schoolDecoded[0];
+            $class_id = $classDecoded[0];
+            $exam_type = $examDecoded[0];
 
             $courses = Examination_result::query()
                 ->where('examination_results.school_id', $school_id)
@@ -752,15 +758,15 @@ class ResultsController extends Controller
                 ->get();
 
             return response()->json(
-                $courses->map(fn($c) => [
+                $courses->map(fn ($c) => [
                     'id' => Hashids::encode($c->course_id),
-                    'name' => $c->course_name . ' (' . $c->course_code . ')'
+                    'name' => $c->course_name.' ('.$c->course_code.')',
                 ])
             );
         } catch (\Throwable $e) {
             Log::error('getCoursesByTeacher error', [
                 'msg' => $e->getMessage(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]);
 
             return response()->json([], 500);
@@ -783,6 +789,7 @@ class ResultsController extends Controller
         // Authorization check
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -842,23 +849,25 @@ class ResultsController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found for this selection', 'info');
+
             return redirect()->route('results.general', ['school' => $school]);
         }
 
         // Filter students by class_id
         $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
 
-        $totalMaleStudents = $studentsByClass->filter(fn($student) => strtolower($student->first()->gender) === 'male')->count();
-        $totalFemaleStudents = $studentsByClass->filter(fn($student) => strtolower($student->first()->gender) === 'female')->count();
+        $totalMaleStudents = $studentsByClass->filter(fn ($student) => strtolower($student->first()->gender) === 'male')->count();
+        $totalFemaleStudents = $studentsByClass->filter(fn ($student) => strtolower($student->first()->gender) === 'female')->count();
 
         // Average score per course with grade and course name
         $averageScoresByCourse = $results->groupBy('course_id')->map(function ($courseResults) use ($marking_style) {
             $averageScore = $courseResults->avg('score');
+
             return [
                 'course_name' => $courseResults->first()->course_name,
                 'course_code' => $courseResults->first()->course_code,
                 'average_score' => $averageScore,
-                'grade' => $this->calculateGrade($averageScore, $marking_style)
+                'grade' => $this->calculateGrade($averageScore, $marking_style),
             ];
         });
 
@@ -879,7 +888,7 @@ class ResultsController extends Controller
                 'II' => 0,
                 'III' => 0,
                 'IV' => 0,
-                '0' => 0
+                '0' => 0,
             ];
         }
 
@@ -928,7 +937,7 @@ class ResultsController extends Controller
                     'C' => 3,
                     'D' => 4,
                     'F' => 5,
-                    'ABS' => 6
+                    'ABS' => 6,
                 ];
 
                 foreach ($studentResults as $result) {
@@ -947,8 +956,8 @@ class ResultsController extends Controller
                 return [
                     'student_id' => $studentResults->first()->student_id,
                     'admission_number' => $studentResults->first()->admission_number,
-                    'student_name' => trim($studentResults->first()->first_name . ' ' .
-                        $studentResults->first()->middle_name . ' ' .
+                    'student_name' => trim($studentResults->first()->first_name.' '.
+                        $studentResults->first()->middle_name.' '.
                         $studentResults->first()->last_name),
                     'gender' => $gender, // Tumia gender iliyorekebishwa
                     'courses' => $studentResults->map(function ($result) use ($marking_style) {
@@ -974,8 +983,8 @@ class ResultsController extends Controller
                 return [
                     'student_id' => $studentResults->first()->student_id,
                     'admission_number' => $studentResults->first()->admission_number,
-                    'student_name' => trim($studentResults->first()->first_name . ' ' .
-                        $studentResults->first()->middle_name . ' ' .
+                    'student_name' => trim($studentResults->first()->first_name.' '.
+                        $studentResults->first()->middle_name.' '.
                         $studentResults->first()->last_name),
                     'gender' => $gender, // Tumia gender iliyorekebishwa
                     'courses' => $studentResults->map(function ($result) use ($marking_style) {
@@ -1051,6 +1060,7 @@ class ResultsController extends Controller
                     }
                 }
             }
+
             return $grades;
         });
 
@@ -1138,15 +1148,16 @@ class ResultsController extends Controller
         // Format for teachers dropdown
         $teachers = $teachersWithCourses->map(function ($teacherResults, $teacherId) {
             $firstRecord = $teacherResults->first();
+
             return [
                 'id' => Hashids::encode($teacherId),
-                'name' => $firstRecord->first_name . ' ' . $firstRecord->last_name,
+                'name' => $firstRecord->first_name.' '.$firstRecord->last_name,
                 'courses' => $teacherResults->map(function ($result) {
                     return [
                         'id' => Hashids::encode($result->course_id),
-                        'name' => $result->course_name . ' (' . $result->course_code . ')'
+                        'name' => $result->course_name.' ('.$result->course_code.')',
                     ];
-                })->unique('id')->values()
+                })->unique('id')->values(),
             ];
         })->values();
 
@@ -1189,15 +1200,15 @@ class ResultsController extends Controller
         $folderPath = public_path('reports');
 
         // Make sure the directory exists
-        if (!File::exists($folderPath)) {
+        if (! File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0755, true);
         }
 
         // Save the PDF to the 'reports' folder
-        $pdf->save($folderPath . '/' . $fileName);
+        $pdf->save($folderPath.'/'.$fileName);
 
         // Generate the URL for accessing the saved PDF
-        $fileUrl = asset('reports/' . $fileName);
+        $fileUrl = asset('reports/'.$fileName);
 
         // Return the view with the file URL
         return view('Results.class_pdf_results', compact(
@@ -1381,7 +1392,7 @@ class ResultsController extends Controller
                             'C' => 3,
                             'D' => 4,
                             'F' => 5,
-                            'ABS' => 6
+                            'ABS' => 6,
                         ];
 
                         $aggregatePoints = 0;
@@ -1475,7 +1486,7 @@ class ResultsController extends Controller
                 $url = $this->appBaseUrl;
                 $dateFormat = Carbon::parse($date)->format('d/m/Y');
                 $nextSmsService = new NextSmsService();
-                $sender = $schools->sender_id ?? "SHULE APP";
+                $sender = $schools->sender_id ?? 'SHULE APP';
 
                 // Track SMS sending results
                 $successCount = 0;
@@ -1485,18 +1496,18 @@ class ResultsController extends Controller
                 // Loop through ranked students and send SMS
                 foreach ($rankedStudents as $student) {
 
-                    $fullname = $student['first_name'] . ' ' . $student['last_name'];
+                    $fullname = $student['first_name'].' '.$student['last_name'];
 
                     if ($marking_style == 3) {
 
-                        $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
-                        $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                        $message = 'Habari, Matokeo ya '.strtoupper($fullname)."\n";
+                        $message .= 'Mtihani wa: '.strtoupper($student['exam_type'])."\n";
                         $message .= "wa Tarehe: {$dateFormat} ni:\n";
 
                         $coursesArray = explode("\n", $student['courses']);
 
                         foreach ($coursesArray as $course) {
-                            $message .= strtoupper($course) . "\n";
+                            $message .= strtoupper($course)."\n";
                         }
 
                         $message .= "Jumla ya Pointi: {$student['aggregate_points']}\n";
@@ -1506,18 +1517,18 @@ class ResultsController extends Controller
 
                     } else {
 
-                        $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
-                        $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                        $message = 'Habari, Matokeo ya '.strtoupper($fullname)."\n";
+                        $message .= 'Mtihani wa: '.strtoupper($student['exam_type'])."\n";
                         $message .= "wa Tarehe: {$dateFormat} ni:\n";
 
                         $coursesArray = explode("\n", $student['courses']);
 
                         foreach ($coursesArray as $course) {
-                            $message .= strtoupper($course) . "\n";
+                            $message .= strtoupper($course)."\n";
                         }
 
                         $message .= "Jumla: {$student['total_marks']}\n";
-                        $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
+                        $message .= 'Wastani: '.number_format($student['average_marks'], 1)."\n";
                         $message .= "Daraja: {$student['grade']}\n";
                         $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
                         $message .= "Pakua ripoti hapa: {$url}";
@@ -1534,17 +1545,19 @@ class ResultsController extends Controller
 
                 // Show appropriate message
                 Alert()->toast(
-                    "Results published successfully. SMS are being processed in background.",
+                    'Results published successfully. SMS are being processed in background.',
                     'success'
                 );
 
                 return back();
             } else {
                 Alert()->toast('No results found to publish', 'warning');
+
                 return back();
             }
         } catch (Exception $e) {
-            Alert()->toast('Error: ' . $e->getMessage(), 'error');
+            Alert()->toast('Error: '.$e->getMessage(), 'error');
+
             return back();
         }
     }
@@ -1563,6 +1576,7 @@ class ResultsController extends Controller
 
             if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
+
                 return redirect()->route('error.page');
             }
 
@@ -1575,15 +1589,18 @@ class ResultsController extends Controller
                 ->update(['status' => 1]);
             if ($updatedRows) {
                 Alert()->toast('Results unpublished successfully', 'success');
+
                 return back();
             } else {
                 Alert()->toast('No results found to unpublish.', 'error');
+
                 return redirect()->back();
             }
 
             // return $monthsArray;
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
+
             return back();
         }
     }
@@ -1604,6 +1621,7 @@ class ResultsController extends Controller
 
             if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
+
                 return redirect()->route('error.page');
             }
 
@@ -1630,6 +1648,7 @@ class ResultsController extends Controller
                 ->exists();
             if ($isPublished) {
                 Alert()->toast('Results data set is already published. Cannot delete.', 'error');
+
                 return to_route('results.monthsByExamType', [$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
             }
 
@@ -1640,6 +1659,7 @@ class ResultsController extends Controller
 
             if ($existInCompile) {
                 Alert()->toast('Results already exist in the compiled reports. Cannot delete.', 'error');
+
                 return to_route('results.monthsByExamType', [$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
             }
             // return $monthsArray;
@@ -1656,14 +1676,17 @@ class ResultsController extends Controller
                     ->delete();
                 if ($results) {
                     Alert()->toast('Results has deleted successfully', 'success');
+
                     return redirect()->back();
                 }
             } else {
                 Alert()->toast('Invalid month name provided.', 'error');
+
                 return redirect()->back();
             }
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
+
             return back();
         }
     }
@@ -1681,6 +1704,7 @@ class ResultsController extends Controller
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -1751,6 +1775,7 @@ class ResultsController extends Controller
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -1764,9 +1789,11 @@ class ResultsController extends Controller
 
         if ($results) {
             Alert()->toast('Results deleted successfully', 'success');
+
             return redirect()->back();
         } else {
             Alert()->toast('No results found to delete.', 'error');
+
             return redirect()->back();
         }
     }
@@ -1783,6 +1810,7 @@ class ResultsController extends Controller
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
+
             return redirect()->route('error.page');
         }
 
@@ -1800,7 +1828,7 @@ class ResultsController extends Controller
             'September' => 9,
             'October' => 10,
             'November' => 11,
-            'December' => 12
+            'December' => 12,
         ];
 
         $monthValue = $monthsArray[$month];
@@ -1850,6 +1878,7 @@ class ResultsController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found for this student', 'info');
+
             return redirect()->back();
         }
 
@@ -1870,7 +1899,7 @@ class ResultsController extends Controller
                 'C' => 3,
                 'D' => 4,
                 'F' => 5,
-                'ABS' => 6
+                'ABS' => 6,
             ];
 
             foreach ($results as $result) {
@@ -2000,22 +2029,22 @@ class ResultsController extends Controller
                     ->first();
 
                 if ($uploadingTeacher) {
-                    $result->uploading_teacher_name = $uploadingTeacher->first_name . ' ' . $uploadingTeacher->last_name;
-                    $result->uploading_teacher_initials = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
+                    $result->uploading_teacher_name = $uploadingTeacher->first_name.' '.$uploadingTeacher->last_name;
+                    $result->uploading_teacher_initials = $uploadingTeacher->first_name.'. '.substr($uploadingTeacher->last_name, 0, 1);
                 }
             }
         }
 
         // Generate QR payload with summary
         $verificationData = [
-            'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
+            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
             'admission_number' => $studentId->admission_number,
             'class' => $results->isNotEmpty() ? $results->first()->class_name : '-',
-            'report_type' => $results->isNotEmpty() ? $results->first()->exam_type . ' Assessment' : 'Assessment',
+            'report_type' => $results->isNotEmpty() ? $results->first()->exam_type.' Assessment' : 'Assessment',
             'term' => $results->isNotEmpty() ? $results->first()->Exam_term : '-',
             'school' => $results->isNotEmpty() ? $results->first()->school_name : $schools->school_name,
             'report_date' => Carbon::parse($date)->format('Y-m-d'),
-            'report_id' => sha1($studentId->id . $exam_id[0] . $class_id[0] . $date),
+            'report_id' => sha1($studentId->id.$exam_id[0].$class_id[0].$date),
             'issued_at' => now()->timestamp,
 
             // 🔹 Add these summary fields
@@ -2066,9 +2095,8 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name . ' Results ' . $month . ' ' . $year . '.pdf' : 'Report_' . $year . '.pdf');
+        return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name.' Results '.$month.' '.$year.'.pdf' : 'Report_'.$year.'.pdf');
     }
-
 
     //Re-send sms results individually
     public function sendResultSms($school, $year, $class, $examType, $month, $student_id, $date)
@@ -2084,6 +2112,7 @@ class ResultsController extends Controller
 
             if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
+
                 return redirect()->route('error.page');
             }
 
@@ -2103,7 +2132,7 @@ class ResultsController extends Controller
                 'September' => 9,
                 'October' => 10,
                 'November' => 11,
-                'December' => 12
+                'December' => 12,
             ];
             $monthValue = $monthsArray[$month];
 
@@ -2144,6 +2173,7 @@ class ResultsController extends Controller
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
                 Alert()->toast('This result data set is locked 🔐', 'error');
+
                 return redirect()->back();
             }
 
@@ -2163,7 +2193,7 @@ class ResultsController extends Controller
                     'C' => 3,
                     'D' => 4,
                     'F' => 5,
-                    'ABS' => 6
+                    'ABS' => 6,
                 ];
 
                 $aggregatePoints = 0;
@@ -2209,7 +2239,7 @@ class ResultsController extends Controller
 
                     $rankingsWithPoints[] = [
                         'student_id' => $ranking->student_id,
-                        'aggregate_points' => $points
+                        'aggregate_points' => $points,
                     ];
                 }
 
@@ -2263,7 +2293,7 @@ class ResultsController extends Controller
                 $studentInRankings = isset($rankings) && (($marking_style == 3 && collect($sortedRankings)->contains('student_id', $studentInfo->id)) ||
                     ($marking_style != 3 && $rankings->contains('student_id', $studentInfo->id)));
 
-                if (!$studentInRankings) {
+                if (! $studentInRankings) {
                     $studentRank = 'N/A';
                     $totalStudents = 0;
                 } else {
@@ -2275,7 +2305,7 @@ class ResultsController extends Controller
             }
 
             // Prepare basic info
-            $fullName = $studentInfo->first_name . ' ' . $studentInfo->last_name;
+            $fullName = $studentInfo->first_name.' '.$studentInfo->last_name;
             $examination = $results->first()->exam_type;
             $schoolName = strtoupper($results->first()->school_name);
             $url = $this->appBaseUrl;
@@ -2284,27 +2314,29 @@ class ResultsController extends Controller
             // Find parent phone
             $parent = Parents::where('id', $studentInfo->parent_id)->first();
 
-            if (!$parent) {
+            if (! $parent) {
                 Alert()->toast('Parent information not found for this student', 'error');
+
                 return redirect()->back();
             }
 
             $users = User::where('id', $parent->user_id)->first();
 
-            if (!$users || empty($users->phone)) {
+            if (! $users || empty($users->phone)) {
                 Alert()->toast('Parent phone number not found', 'error');
+
                 return redirect()->back();
             }
 
             // ==== REKEDISHA: Create message based on marking style ====
             if ($marking_style == 3) {
                 // Message for Division Style (Style 3)
-                $messageContent = "Habari, Matokeo ya " . strtoupper($fullName) . "\n";
-                $messageContent .= "Mtihani wa: " . strtoupper($examination) . "\n";
+                $messageContent = 'Habari, Matokeo ya '.strtoupper($fullName)."\n";
+                $messageContent .= 'Mtihani wa: '.strtoupper($examination)."\n";
                 $messageContent .= "wa Tarehe: {$dateFormat} ni:\n";
                 foreach ($results as $result) {
                     $grade = $this->calculateGrade($result->score, $marking_style);
-                    $messageContent .= strtoupper($result->course_code) . ": {$result->score}{$grade}\n";
+                    $messageContent .= strtoupper($result->course_code).": {$result->score}{$grade}\n";
                 }
                 $messageContent .= "Jumla ya Pointi: {$aggregatePoints}\n";
                 $messageContent .= "Divisheni: {$division}\n";
@@ -2317,16 +2349,16 @@ class ResultsController extends Controller
                 }
                 $messageContent .= "Pakua ripoti hapa: {$url}";
             } else {
-                $messageContent = "Habari, Matokeo ya " . strtoupper($fullName) . "\n";
-                $messageContent .= "Mtihani wa: " . strtoupper($examination) . "\n";
+                $messageContent = 'Habari, Matokeo ya '.strtoupper($fullName)."\n";
+                $messageContent .= 'Mtihani wa: '.strtoupper($examination)."\n";
                 $messageContent .= "wa Tarehe: {$dateFormat} ni:\n";
 
                 foreach ($results as $result) {
-                    $messageContent .= strtoupper($result->course_code) . ": {$result->score}\n";
+                    $messageContent .= strtoupper($result->course_code).": {$result->score}\n";
                 }
 
                 $messageContent .= "Jumla: {$totalScore}\n";
-                $messageContent .= "Wastani: " . number_format($averageScore, 1) . "\n";
+                $messageContent .= 'Wastani: '.number_format($averageScore, 1)."\n";
                 $messageContent .= "Daraja: {$grade}\n";
                 $messageContent .= "Nafasi: {$studentRank}";
 
@@ -2342,26 +2374,30 @@ class ResultsController extends Controller
 
             // Send SMS via NextSMS API
             $nextSmsService = new NextSmsService();
-            $sender = $schools->sender_id ?? "SHULE APP";
+            $sender = $schools->sender_id ?? 'SHULE APP';
             $destination = $this->formatPhoneNumber($users->phone);
             $reference = uniqid();
 
             $response = $nextSmsService->sendSmsByNext($sender, $destination, $messageContent, $reference);
 
-            if (!$response['success']) {
-                Alert()->toast('SMS failed: ' . $response['error'], 'error');
+            if (! $response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+
                 return back();
             }
 
             // Log::info("SMS sent to {$destination}: {$messageContent}");
 
             Alert()->toast('Results SMS has been sent successfully', 'success');
+
             return redirect()->back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
+
             return redirect()->back();
         }
     }
+
     private function formatPhoneNumber($phone)
     {
         // Remove any non-numeric characters
@@ -2369,9 +2405,9 @@ class ResultsController extends Controller
 
         // Ensure the number starts with the country code (e.g., 255 for Tanzania)
         if (strlen($phone) == 9) {
-            $phone = '255' . $phone;
+            $phone = '255'.$phone;
         } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
-            $phone = '255' . substr($phone, 1);
+            $phone = '255'.substr($phone, 1);
         }
 
         return $phone;
@@ -2401,6 +2437,7 @@ class ResultsController extends Controller
 
         return response()->json(['success' => false]);
     }
+
     //send compiled results to the table compiled_results table
     public function saveCompiledResults(Request $request, $school, $year, $class)
     {
@@ -2420,7 +2457,7 @@ class ResultsController extends Controller
         $reportTerm = $request->input('term');
         $school_id = Auth::user()->school_id;
 
-        if ($examType === 'custom' && !empty($customExamType)) {
+        if ($examType === 'custom' && ! empty($customExamType)) {
             $examType = $customExamType;
         }
 
@@ -2437,8 +2474,9 @@ class ResultsController extends Controller
                 ->select('exam_type_id', 'marking_style')
                 ->first();
 
-            if (!$examInfo) {
-                Alert()->toast('No results found for date: ' . Carbon::parse($date)->format('d/m/Y'), 'error');
+            if (! $examInfo) {
+                Alert()->toast('No results found for date: '.Carbon::parse($date)->format('d/m/Y'), 'error');
+
                 return back()->withInput();
             }
 
@@ -2449,16 +2487,16 @@ class ResultsController extends Controller
             $formattedDate = Carbon::parse($date)->format('d/m/Y');
 
             // Store exam info for conflict checking
-            $examKey = $formattedDate . ' - ' . $examTypeName;
+            $examKey = $formattedDate.' - '.$examTypeName;
 
-            if (!isset($markingStyles[$markingStyle])) {
+            if (! isset($markingStyles[$markingStyle])) {
                 $markingStyles[$markingStyle] = [];
             }
 
             $markingStyles[$markingStyle][] = [
                 'date' => $formattedDate,
                 'exam_type' => $examTypeName,
-                'key' => $examKey
+                'key' => $examKey,
             ];
         }
 
@@ -2470,7 +2508,7 @@ class ResultsController extends Controller
             $styleDescriptions = [
                 1 => 'Style 1 (Point system)',
                 2 => 'Style 2 (Percentage system)',
-                3 => 'Style 3 (Division System)'
+                3 => 'Style 3 (Division System)',
             ];
 
             $errorMessage .= "\n\nDetails:\n";
@@ -2509,6 +2547,7 @@ class ResultsController extends Controller
             }
 
             Alert()->toast($errorMessage, 'error')->persistent(true);
+
             return back()->withInput();
         }
 
@@ -2517,7 +2556,7 @@ class ResultsController extends Controller
         $styleDescription = [
             1 => 'Style 1 (Point system)',
             2 => 'Style 2 (Percentage system)',
-            3 => 'Style 3 (Division System)'
+            3 => 'Style 3 (Division System)',
         ][$primaryMarkingStyle] ?? "Style $primaryMarkingStyle";
 
         // Check for duplicates
@@ -2528,6 +2567,7 @@ class ResultsController extends Controller
 
         if ($alreadyExists) {
             Alert()->toast('This results data set already exists', 'error');
+
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
 
@@ -2544,6 +2584,7 @@ class ResultsController extends Controller
         ]);
 
         Alert()->toast("Report generated successfully using $styleDescription.", 'success');
+
         return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
     }
 
@@ -2603,11 +2644,11 @@ class ResultsController extends Controller
                 'course_id',
                 function ($row) {
                     return date('Y-m-d', strtotime($row->exam_date));
-                }
+                },
             ]);
         // return $studentsReport;
 
-        return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'reports', 'allScores', 'myReportData', 'year', 'school',));
+        return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'reports', 'allScores', 'myReportData', 'year', 'school'));
     }
 
     //function for showing individual student report which is already compiled
@@ -2672,9 +2713,9 @@ class ResultsController extends Controller
             return [
                 'abbr' => $item->symbolic_abbr,
                 'date' => $item->exam_date,
-                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
+                'display' => $item->symbolic_abbr.' '.\Carbon\Carbon::parse($item->exam_date)->format('d M Y'),
             ];
-        })->unique(fn($item) => $item['abbr'] . $item['date'])->values();
+        })->unique(fn ($item) => $item['abbr'].$item['date'])->values();
 
         $combineOption = $reports->combine_option ?? 'individual';
         $finalData = [];
@@ -2691,7 +2732,7 @@ class ResultsController extends Controller
             // Chukua mwalimu wa kwanza aliyepakia matokeo kwenye somo hili
             $uploadingTeacher = $subjectResults->first();
             $teacher = $uploadingTeacher && $uploadingTeacher->teacher_first_name && $uploadingTeacher->teacher_last_name
-                ? $uploadingTeacher->teacher_first_name . '. ' . substr($uploadingTeacher->teacher_last_name, 0, 1)
+                ? $uploadingTeacher->teacher_first_name.'. '.substr($uploadingTeacher->teacher_last_name, 0, 1)
                 : 'N/A';
 
             // AU: Tafuta mwalimu kutoka kwa teacher_id iliyohifadhiwa kwenye examination_results
@@ -2708,7 +2749,7 @@ class ResultsController extends Controller
             }
 
             if ($examTeacher) {
-                $teacher = $examTeacher->first_name . '. ' . substr($examTeacher->last_name, 0, 1);
+                $teacher = $examTeacher->first_name.'. '.substr($examTeacher->last_name, 0, 1);
             }
 
             $examScores = [];
@@ -2721,7 +2762,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
 
                 $total = collect($examScores)->filter()->sum();
@@ -2731,7 +2772,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
@@ -2740,7 +2781,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
@@ -2759,7 +2800,7 @@ class ResultsController extends Controller
                 'examScores' => $examScores,
                 'total' => $total,
                 'average' => round($average, 2),
-                'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
+                'position' => 0, // Placeholder, itabakiweka baada ya rank calculation
             ];
         }
 
@@ -2833,7 +2874,7 @@ class ResultsController extends Controller
         $totalScoreForStudent = round($studentTotalMarks, 2);
 
         $examHeadersWithDates = $results
-            ->mapWithKeys(fn($item) => [$item->symbolic_abbr => $item->exam_date])
+            ->mapWithKeys(fn ($item) => [$item->symbolic_abbr => $item->exam_date])
             ->unique()
             ->toBase();
 
@@ -2845,14 +2886,14 @@ class ResultsController extends Controller
             $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr . '_' . $date] ?? null;
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL POSITION (USING TOTAL MARKS) ===================
@@ -2923,12 +2964,12 @@ class ResultsController extends Controller
         $totalStudents = count($generalRanked);
 
         $examSpecifications = $results
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'abbr' => $item->symbolic_abbr,
                 'full_name' => $item->exam_type,
-                'date' => $item->exam_date
+                'date' => $item->exam_date,
             ])
-            ->unique(fn($item) => $item['abbr'] . $item['full_name'])
+            ->unique(fn ($item) => $item['abbr'].$item['full_name'])
             ->values()
             ->keyBy('abbr');
 
@@ -2999,6 +3040,7 @@ class ResultsController extends Controller
 
                 if ($results->isEmpty()) {
                     Alert()->toast('No results found for this student.', 'error');
+
                     return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
                 }
 
@@ -3006,7 +3048,7 @@ class ResultsController extends Controller
                 $subjectAverages = $results->groupBy('course_id')->map(function ($subjectResults) {
                     return [
                         'course_code' => $subjectResults->first()->course_code,
-                        'average' => $subjectResults->avg('score')
+                        'average' => $subjectResults->avg('score'),
                     ];
                 });
 
@@ -3043,7 +3085,7 @@ class ResultsController extends Controller
                     $studentsWithRank->push([
                         'student_id' => $student_id,
                         'score' => $score,
-                        'rank' => $rank
+                        'rank' => $rank,
                     ]);
 
                     $previousScore = $score;
@@ -3059,8 +3101,9 @@ class ResultsController extends Controller
                 $studentData = $results->first();
                 $parentId = $studentData->parent_id ?? null;
 
-                if (!$parentId) {
+                if (! $parentId) {
                     Alert()->toast('Parent not found for this student.', 'error');
+
                     return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
                 }
 
@@ -3069,30 +3112,31 @@ class ResultsController extends Controller
                     ->findOrFail($parentId);
                 $phoneNumber = $parent->phone ?? null;
 
-                if (!$phoneNumber) {
+                if (! $phoneNumber) {
                     Alert()->toast('Phone number not found for parent.', 'error');
+
                     return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
                 }
 
                 // Format SMS message
                 $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-                $studentName = strtoupper($studentData->first_name . ' ' . $studentData->last_name);
+                $studentName = strtoupper($studentData->first_name.' '.$studentData->last_name);
                 $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
                 $schoolInfo = school::find($schoolId);
-                $sender = $schoolInfo->sender_id ?? "SHULE APP";
+                $sender = $schoolInfo->sender_id ?? 'SHULE APP';
                 $link = $this->appBaseUrl;
 
                 // ==== REKEDISHA: Build subject results part of the message ====
-                $subjectResultsText = "";
+                $subjectResultsText = '';
                 foreach ($subjectAverages as $subject) {
                     $averageValue = $subject['average'] ?? 0;
-                    $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($averageValue, 1) . "\n";
+                    $subjectResultsText .= strtoupper($subject['course_code']).': '.number_format($averageValue, 1)."\n";
                 }
 
                 // ==== REKEDISHA: Create better formatted message ====
                 $message = "MATOKEO YA {$studentName}\n";
                 $message .= "==========================\n";
-                $message .= "Ripoti: " . strtoupper($reports->title) . "\n";
+                $message .= 'Ripoti: '.strtoupper($reports->title)."\n";
                 $message .= "Tarehe: {$reportDate}\n";
                 $message .= "Darasa: {$studentData->class_name}\n";
                 $message .= "==========================\n";
@@ -3100,7 +3144,7 @@ class ResultsController extends Controller
                 $message .= $subjectResultsText;
                 $message .= "==========================\n";
                 $message .= "Jumla: {$studentTotal}\n";
-                $message .= "Wastani: " . number_format($studentAverage, 1) . "\n";
+                $message .= 'Wastani: '.number_format($studentAverage, 1)."\n";
 
                 if ($studentRank !== '-' && $totalStudents > 0) {
                     $message .= "Nafasi: {$studentRank} kati ya {$totalStudents}\n";
@@ -3114,7 +3158,7 @@ class ResultsController extends Controller
                 // Check message length
                 if (strlen($message) > 480) {
                     // Trim if too long
-                    $message = substr($message, 0, 477) . "...";
+                    $message = substr($message, 0, 477).'...';
                 }
 
                 try {
@@ -3126,37 +3170,43 @@ class ResultsController extends Controller
                         uniqid()
                     );
 
-                    if (!$response['success']) {
-                        Alert()->toast('SMS failed: ' . $response['error'], 'error');
+                    if (! $response['success']) {
+                        Alert()->toast('SMS failed: '.$response['error'], 'error');
+
                         return back();
                     }
 
                     Alert()->toast('Results SMS has been Re-sent successfully', 'success');
+
                     return to_route('students.combined.report', [
                         'school' => $school,
                         'year' => $year,
                         'class' => $class,
-                        'report' => $report
+                        'report' => $report,
                     ]);
                 } catch (\Exception $e) {
-                    Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
+                    Alert()->toast('Failed to send SMS: '.$e->getMessage(), 'error');
+
                     return redirect()->back();
                 }
             } else {
                 Alert()->toast('This report data set is locked 🔐, please unlock it first', 'error');
+
                 return to_route('students.combined.report', [
                     'school' => $school,
                     'year' => $year,
                     'class' => $class,
-                    'report' => $report
+                    'report' => $report,
                 ]);
             }
         } catch (\Exception $e) {
-            Alert()->toast('Error: ' . $e->getMessage(), 'error');
+            Alert()->toast('Error: '.$e->getMessage(), 'error');
+
             return redirect()->back();
         }
     }
-    //download student report
+
+
     public function downloadCombinedReport($school, $year, $class, $report, $student)
     {
         $studentId = Hashids::decode($student)[0];
@@ -3165,11 +3215,28 @@ class ResultsController extends Controller
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
-        $examDates = $reports->exam_dates; // array
+        if (!$reports) {
+            Alert()->toast('Report not found', 'error');
+            return redirect()->back();
+        }
 
-        // ==== REKEDISHA 1: Pata class_id ya kwenye generated_reports ====
+        $examDates = $reports->exam_dates;
+        $combineOption = $reports->combine_option ?? 'individual';
         $storedClassId = $reports->class_id ?? $classId;
 
+        // Get student and school info directly from database
+        $studentData = Student::find($studentId);
+        $schoolInfo = school::find($schoolId);
+
+        if (!$studentData) {
+            Alert()->toast('Student not found', 'error');
+            return redirect()->back();
+        }
+
+        // Get marking style from the first examination result
+        $markingStyle = $this->getMarkingStyleForCombinedReport($storedClassId, $schoolId, $examDates);
+
+        // Get all results with proper selects
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -3182,7 +3249,8 @@ class ResultsController extends Controller
                 'students.id as studentId',
                 'students.first_name',
                 'students.middle_name',
-                'students.last_name', 'students.status',
+                'students.last_name',
+                'students.status',
                 'students.group',
                 'students.gender',
                 'students.image',
@@ -3198,38 +3266,46 @@ class ResultsController extends Controller
                 'schools.school_name',
                 'schools.school_reg_no',
                 'schools.postal_address',
-                'schools.postal_name', 'schools.school_email', 'schools.school_phone',
+                'schools.postal_name',
+                'schools.school_email',
+                'schools.school_phone',
                 'schools.school_alternative_phone',
                 'schools.logo',
                 'schools.country',
                 'users.first_name as teacher_first_name',
                 'users.last_name as teacher_last_name',
-                'teachers.id as teacher_id' // ==== REKEDISHA: Ongeza teacher_id ====
+                'teachers.id as teacher_id'
             )
             ->where('examination_results.student_id', $studentId)
             ->where('students.status', 1)
-            ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
+            ->where('examination_results.class_id', $storedClassId)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found for this student', 'error');
+            return redirect()->back();
+        }
+
         $classResultsGrouped = $results->groupBy('subjectId');
 
-        // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
-        $examHeaders = $results->map(function ($item) {
-            return [
-                'abbr' => $item->symbolic_abbr,
-                'date' => $item->exam_date,
-                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
-            ];
-        })->unique(function ($item) {
-            return $item['abbr'] . $item['date'];
-        })->values();
+        // Build exam headers with proper null checks
+        $examHeaders = [];
+        $seen = [];
+        foreach ($results as $item) {
+            if (isset($item->symbolic_abbr) && !empty($item->symbolic_abbr) && !isset($seen[$item->symbolic_abbr . $item->exam_date])) {
+                $seen[$item->symbolic_abbr . $item->exam_date] = true;
+                $examHeaders[] = [
+                    'abbr' => $item->symbolic_abbr,
+                    'date' => $item->exam_date,
+                    'display' => $item->symbolic_abbr . ' ' . Carbon::parse($item->exam_date)->format('d M Y'),
+                ];
+            }
+        }
 
+        // Process each subject
         $finalData = [];
-        $combineOption = $reports->combine_option ?? 'individual';
-
-        // Vigezo vya kuweka jumla za mwanafunzi
         $studentTotalMarks = 0;
         $subjectCount = 0;
 
@@ -3237,7 +3313,7 @@ class ResultsController extends Controller
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
 
-            // ==== REKEDISHA 2: Tafuta mwalimu aliyepakia matokeo ====
+            // Get teacher name
             $uploadingTeacher = null;
             foreach ($subjectResults as $result) {
                 if ($result->teacher_id) {
@@ -3254,13 +3330,13 @@ class ResultsController extends Controller
             if ($uploadingTeacher) {
                 $teacher = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
             } else {
-                // Fallback: tumia mwalimu kutoka kwenye results (iliyokuwa awali)
                 $firstResult = $subjectResults->first();
                 if ($firstResult && $firstResult->teacher_first_name && $firstResult->teacher_last_name) {
                     $teacher = $firstResult->teacher_first_name . '. ' . substr($firstResult->teacher_last_name, 0, 1);
                 }
             }
 
+            // Calculate scores based on combine option
             $examScores = [];
             $total = 0;
             $average = 0;
@@ -3272,7 +3348,6 @@ class ResultsController extends Controller
                         ->first()->score ?? null;
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
-
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
             } elseif ($combineOption == 'sum') {
@@ -3283,8 +3358,9 @@ class ResultsController extends Controller
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-            } elseif ($combineOption == 'average') {
+                $filteredCount = count(array_filter($examScores));
+                $average = $filteredCount > 0 ? $total / $filteredCount : 0;
+            } else { // average
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
@@ -3292,101 +3368,79 @@ class ResultsController extends Controller
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
-                $total = 0;
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            // Ongeza kwa jumla za mwanafunzi
             $studentTotalMarks += $average;
             $subjectCount++;
 
             $finalData[] = [
                 'subjectName' => $subjectName,
-                'teacher' => $teacher,
                 'subjectCode' => $subjectCode,
+                'teacher' => $teacher,
                 'examScores' => $examScores,
-                'total' => $total,
+                'total' => round($total, 2),
                 'average' => round($average, 2),
-                'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
+                'grade' => $this->calculateGradeForCombined($average, $markingStyle),
+                'position' => 0,
             ];
         }
 
-        // **Sasa hesabu position ya kila somo**
+        // Calculate subject positions with tie handling
         foreach ($finalData as &$subject) {
-            $allStudentSubjectAverages = [];
-
-            // Pata wanafunzi wote na averages zao kwenye somo hili
             $subjectId = DB::table('subjects')
                 ->where('course_name', $subject['subjectName'])
                 ->where('course_code', $subject['subjectCode'])
                 ->value('id');
 
             if ($subjectId) {
-                // Get all students' averages for this subject
                 $subjectResultsAll = DB::table('examination_results')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->where('examination_results.course_id', $subjectId)
-                    ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
-                    ->where('examination_results.school_id', $schoolId)
+                    ->where('course_id', $subjectId)
+                    ->where('class_id', $storedClassId)
+                    ->where('school_id', $schoolId)
                     ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                    ->select('examination_results.*', 'subjects.course_name')
                     ->get()
                     ->groupBy('student_id');
 
-                foreach ($subjectResultsAll as $student_id => $studentResults) {
-                    // Calculate average for each student using the same combine option
+                $studentAverages = [];
+                foreach ($subjectResultsAll as $stdId => $subjectRes) {
                     if ($combineOption == 'individual') {
-                        $avg = $studentResults->avg('score') ?? 0;
+                        $avg = $subjectRes->avg('score') ?? 0;
                     } elseif ($combineOption == 'sum') {
-                        $avg = $studentResults->count() > 0 ? $studentResults->sum('score') / $studentResults->count() : 0;
-                    } elseif ($combineOption == 'average') {
-                        $avg = $studentResults->avg('score') ?? 0;
+                        $avg = $subjectRes->count() > 0 ? $subjectRes->sum('score') / $subjectRes->count() : 0;
+                    } else {
+                        $avg = $subjectRes->avg('score') ?? 0;
                     }
-
-                    $allStudentSubjectAverages[$student_id] = round($avg, 2);
+                    $studentAverages[$stdId] = round($avg, 2);
                 }
 
-                // Sort in descending order and assign positions with tie handling
-                arsort($allStudentSubjectAverages);
-                $positions = [];
+                arsort($studentAverages);
                 $position = 1;
-                $previousAverage = null;
+                $previousAvg = null;
                 $sameRankCount = 0;
+                $positions = [];
 
-                foreach ($allStudentSubjectAverages as $std_id => $avg) {
-                    if ($previousAverage !== null && $avg < $previousAverage) {
+                foreach ($studentAverages as $stdId => $avg) {
+                    if ($previousAvg !== null && $avg < $previousAvg) {
                         $position += $sameRankCount;
                         $sameRankCount = 1;
                     } else {
                         $sameRankCount++;
                     }
-
-                    $positions[$std_id] = $position;
-                    $previousAverage = $avg;
+                    $positions[$stdId] = $position;
+                    $previousAvg = $avg;
                 }
 
-                // Set the position for this student
                 $subject['position'] = $positions[$studentId] ?? '-';
             }
         }
         unset($subject);
 
-        $students = $results->first();
-        $schoolInfo = $results->first();
-
-        // **Calculate Student General Average** (jumla ya average za masomo / idadi ya masomo)
+        // Calculate student general average
         $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
-
-        // **Total Marks** (jumla ya average za masomo yote - zilizokaa rounded)
         $totalScoreForStudent = round($studentTotalMarks, 2);
 
-        // =================== EXAM HEADERS WITH DATES ===================
-        $examHeadersWithDates = $results
-            ->mapWithKeys(function ($item) {
-                return [$item->symbolic_abbr => $item->exam_date];
-            })->unique()->toBase();
-
-        // =================== EXAM AVERAGE PER EXAM DATE ===================
+        // Calculate exam averages
         $examAverages = [];
         foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
@@ -3401,28 +3455,25 @@ class ResultsController extends Controller
                     $countPerExam++;
                 }
             }
-
             $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
-        // =================== GENERAL POSITION (USING TOTAL MARKS WITH 1 DECIMAL) ===================
-        // Pata average za wanafunzi wote kwa kutumia logic ile ile
-        $allStudentAverages = [];
-
-        // ==== REKEDISHA 3: Pata wanafunzi wote kutoka kwa examination_results ====
-        // Hii inahakikisha tunapata wanafunzi waliokuwepo wakati wa mtihani
+        // ============ FIXED: Calculate class rankings with correct total count ============
         $allStudents = DB::table('examination_results')
-            ->where('class_id', $storedClassId) // TUMIA STORED CLASS ID
+            ->where('class_id', $storedClassId)
             ->where('school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->distinct()
             ->pluck('student_id');
 
+        // Get total students count FIRST
+        $totalStudentsCount = $allStudents->count();
+
+        $allStudentAverages = [];
         foreach ($allStudents as $stdId) {
-            // Pata results za mwanafunzi huyu
-            $studentResults = DB::table('examination_results')
+            $stdResults = DB::table('examination_results')
                 ->where('student_id', $stdId)
-                ->where('class_id', $storedClassId) // TUMIA STORED CLASS ID
+                ->where('class_id', $storedClassId)
                 ->where('school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                 ->get()
@@ -3431,116 +3482,88 @@ class ResultsController extends Controller
             $studentTotalAvg = 0;
             $studentSubjectCount = 0;
 
-            foreach ($studentResults as $courseId => $subjectResults) {
-                // Calculate average for each subject using the same combine option
+            foreach ($stdResults as $subjectResults) {
                 if ($combineOption == 'individual') {
                     $subjectAvg = $subjectResults->avg('score') ?? 0;
                 } elseif ($combineOption == 'sum') {
                     $subjectAvg = $subjectResults->count() > 0 ? $subjectResults->sum('score') / $subjectResults->count() : 0;
-                } elseif ($combineOption == 'average') {
+                } else {
                     $subjectAvg = $subjectResults->avg('score') ?? 0;
                 }
-
                 $studentTotalAvg += round($subjectAvg, 2);
                 $studentSubjectCount++;
             }
-
-            // Calculate student's general average (total of subject averages)
-            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg, 2) : 0;
+            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg / $studentSubjectCount, 2) : 0;
         }
 
-        // Sort in descending order and assign positions with tie handling
+        // Sort and assign positions
         arsort($allStudentAverages);
         $generalRanked = [];
         $rank = 1;
-        $currentPosition = 1;
-        $previousAverage = null;
+        $previousAvg = null;
         $sameRankCount = 0;
 
-        foreach ($allStudentAverages as $std_id => $avg) {
-            if ($previousAverage !== null && $avg < $previousAverage) {
+        foreach ($allStudentAverages as $stdId => $avg) {
+            if ($previousAvg !== null && $avg < $previousAvg) {
                 $rank += $sameRankCount;
                 $sameRankCount = 1;
             } else {
                 $sameRankCount++;
             }
-
-            $generalRanked[$std_id] = $rank;
-            $previousAverage = $avg;
+            $generalRanked[$stdId] = $rank;
+            $previousAvg = $avg;
         }
 
         $generalPosition = $generalRanked[$studentId] ?? '-';
-        $totalStudents = count($generalRanked);
+        // ============ END FIX ============
 
-        // =================== EXAM SPECIFICATIONS ===================
-        $examSpecifications = $results
-            ->map(function ($item) {
-                return [
+        // Exam specifications with direct loop
+        $examSpecifications = [];
+        $specSeen = [];
+        foreach ($results as $item) {
+            if (isset($item->symbolic_abbr) && !empty($item->symbolic_abbr) && !isset($specSeen[$item->symbolic_abbr])) {
+                $specSeen[$item->symbolic_abbr] = true;
+                $examSpecifications[] = (object)[
                     'abbr' => $item->symbolic_abbr,
-                    'full_name' => $item->exam_type,
-                    'date' => $item->exam_date
+                    'full_name' => $item->exam_type ?? 'N/A',
+                    'date' => $item->exam_date,
                 ];
-            })
-            ->unique(function ($item) {
-                return $item['abbr'] . $item['full_name'];
-            })
-            ->values()
-            ->keyBy('abbr');
+            }
+        }
+        $examSpecifications = collect($examSpecifications)->keyBy('abbr');
 
-        $verificationData = [
-            'student_name' => trim(
-                $students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name
-            ),
-            'admission_number' => $students->admission_number,
-            'class' => $students->class_name,
-            'report_type' => $reports->title,
-            'term' => $reports->term,
-            'school' => $schoolInfo->school_name,
-            'report_date' => $reports->created_at->format('Y-m-d'),
-            'report_id' => $reports->id,
-            'issued_at' => now()->timestamp,
+        // Calculate division for marking style 3
+        $aggregatePoints = null;
+        $division = null;
+        if ($markingStyle == 3) {
+            $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5];
+            $totalPoints = 0;
+            foreach ($finalData as $subject) {
+                $grade = $subject['grade'];
+                $totalPoints += $gradePoints[$grade] ?? 5;
+            }
+            $aggregatePoints = $totalPoints;
+            $division = $this->calculateDivisionForCombined($aggregatePoints, $subjectCount);
+        }
 
-            // ================== SUMMARY INFO ==================
-            'total_score' => $totalScoreForStudent ?? 0,
-            'average_score' => $studentGeneralAverage ?? 0,
-            'student_rank' => $generalPosition ?? '-',
-            'total_students' => $totalStudents ?? 0,
-        ];
+        // Add class_name to studentData if not exists
+        $studentData->class_name = $studentData->class_name ?? $results->first()->class_name ?? 'N/A';
+        $studentData->school_name = $schoolInfo->school_name;
 
-        $verificationData['signature'] = hash_hmac(
-            'sha256',
-            json_encode($verificationData),
-            config('app.key')
-        );
+        // Generate QR code
+        $qrPng = $this->generateQRForCombined($studentData, $reports, $schoolInfo, $totalScoreForStudent, $studentGeneralAverage, $generalPosition, $totalStudentsCount, $markingStyle, $division, $aggregatePoints);
 
-        $encryptedPayload = Crypt::encryptString(
-            json_encode($verificationData)
-        );
-
-        $verificationUrl = route('report.verify', [
-            'payload' => $encryptedPayload
-        ]);
-
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->data($verificationUrl)
-            ->size(150)
-            ->margin(5)
-            ->build();
-
-        $qrPng = base64_encode($result->getString());
-
+        // Load PDF view
         $pdf = Pdf::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
             'studentGeneralAverage',
-            'examHeadersWithDates',
             'results',
             'examAverages',
             'year',
             'generalPosition',
-            'totalStudents',
-            'students',
+            'totalStudentsCount',
+            'studentData',
             'reports',
             'schoolInfo',
             'examSpecifications',
@@ -3551,21 +3574,118 @@ class ResultsController extends Controller
             'subjectCount',
             'reportId',
             'classId',
-            'qrPng'
+            'qrPng',
+            'markingStyle',
+            'aggregatePoints',
+            'division'
         ));
 
-        $timestamp = Carbon::now()->timestamp;
-        $fileName = "report_{$timestamp}.pdf";
-        $folderPath = public_path('reports');
+        return $pdf->stream("{$studentData->first_name}_{$reports->title}.pdf");
+    }
+    /**
+     * Get marking style for combined report
+     */
+    private function getMarkingStyleForCombinedReport($classId, $schoolId, $examDates)
+    {
+        $firstResult = Examination_result::query()
+            ->where('class_id', $classId)
+            ->where('school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->first();
 
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
+        return $firstResult ? ($firstResult->marking_style ?? 2) : 2;
+    }
+
+    /**
+     * Calculate grade for combined report based on marking style
+     */
+    private function calculateGradeForCombined($average, $markingStyle)
+    {
+        if ($average <= 0 || $average === null) {
+            return $markingStyle == 3 ? 'F' : 'E';
         }
 
-        $pdf->save($folderPath . '/' . $fileName);
-        $fileUrl = asset('reports/' . $fileName);
+        if ($markingStyle == 1) {
+            if ($average >= 40.5) return 'A';
+            if ($average >= 30.5) return 'B';
+            if ($average >= 20.5) return 'C';
+            if ($average >= 10.5) return 'D';
+            return 'E';
+        } elseif ($markingStyle == 2) {
+            if ($average >= 80.5) return 'A';
+            if ($average >= 60.5) return 'B';
+            if ($average >= 40.5) return 'C';
+            if ($average >= 20.5) return 'D';
+            return 'E';
+        } else {
+            if ($average >= 80) return 'A';
+            if ($average >= 60) return 'B';
+            if ($average >= 40) return 'C';
+            if ($average >= 20) return 'D';
+            return 'F';
+        }
+    }
 
-        return view('generated_reports.pdf_report', compact('fileUrl', 'year', 'reports', 'class', 'school', 'report', 'students', 'studentId', 'schoolId', 'classId', 'reportId'));
+    /**
+     * Calculate division for marking style 3
+     */
+    private function calculateDivisionForCombined($aggregatePoints, $totalSubjects)
+    {
+        if ($totalSubjects == 0) return '0';
+
+        $averagePoints = $aggregatePoints / $totalSubjects;
+
+        if ($averagePoints <= 1.5) return 'I';
+        if ($averagePoints <= 2.5) return 'II';
+        if ($averagePoints <= 3.5) return 'III';
+        if ($averagePoints <= 4.5) return 'IV';
+        return '0';
+    }
+
+    /**
+     * Generate QR code for combined report
+     */
+    private function generateQRForCombined($student, $reports, $schoolInfo, $totalScore, $averageScore, $studentRank, $totalStudents, $markingStyle, $division = null, $aggregatePoints = null)
+    {
+        try {
+            $verificationData = [
+                'student_name' => trim($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name),
+                'admission_number' => $student->admission_number,
+                'class' => $reports->class_name ?? 'N/A',
+                'report_type' => $reports->title,
+                'term' => $reports->term,
+                'school' => $schoolInfo->school_name,
+                'report_date' => $reports->created_at->format('Y-m-d'),
+                'report_id' => $reports->id,
+                'issued_at' => now()->timestamp,
+                'total_score' => $totalScore,
+                'average_score' => round($averageScore, 2),
+                'student_rank' => $studentRank,
+                'total_students' => $totalStudents,
+                'marking_style' => $markingStyle,
+            ];
+
+            if ($markingStyle == 3) {
+                $verificationData['division'] = $division;
+                $verificationData['aggregate_points'] = $aggregatePoints;
+            }
+
+            $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
+            $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
+            $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
+
+            $result = Builder::create()
+                ->writer(new PngWriter())
+                ->data($verificationUrl)
+                ->size(120)
+                ->margin(4)
+                ->build();
+
+            return base64_encode($result->getString());
+        } catch (\Exception $e) {
+            \Log::error('QR generation failed: ' . $e->getMessage());
+            return '';
+        }
     }
 
     //publish combined report to parents
@@ -3580,8 +3700,9 @@ class ResultsController extends Controller
             // STEP 1: Update report status to "published"
             $report = generated_reports::findOrFail($reportId);
 
-            if (!$report) {
+            if (! $report) {
                 Alert()->toast('Report not found.', 'error');
+
                 return redirect()->back();
             }
 
@@ -3591,8 +3712,9 @@ class ResultsController extends Controller
             // Fanya update moja tu
             $updatedReport = $report->update(['status' => $status]);
 
-            if (!$updatedReport) {
+            if (! $updatedReport) {
                 Alert()->toast('Failed to publish the report.', 'error');
+
                 return redirect()->back();
             }
 
@@ -3627,6 +3749,7 @@ class ResultsController extends Controller
             // Check if results exist
             if ($results->isEmpty()) {
                 Alert()->toast('No exam results found for these dates.', 'error');
+
                 return redirect()->back();
             }
 
@@ -3636,7 +3759,7 @@ class ResultsController extends Controller
                 $subjectAverages = $studentResults->groupBy('course_id')->map(function ($subjectResults) {
                     return [
                         'course_code' => $subjectResults->first()->course_code,
-                        'average' => $subjectResults->avg('score')
+                        'average' => $subjectResults->avg('score'),
                     ];
                 });
 
@@ -3680,20 +3803,20 @@ class ResultsController extends Controller
                 $positionText = "{$student['rank']} kati ya {$totalStudents}";
 
                 // Build subject results text
-                $subjectResultsText = "";
+                $subjectResultsText = '';
                 foreach ($student['subject_averages'] as $subject) {
                     $subjectAverage = $subject['average'] ?? 0;
-                    $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($subjectAverage, 1) . "\n";
+                    $subjectResultsText .= strtoupper($subject['course_code']).': '.number_format($subjectAverage, 1)."\n";
                 }
 
                 return [
                     'student_id' => $student['student_id'],
                     'parent_id' => $student['parent_id'],
-                    'student_name' => strtoupper($student['first_name'] . ' ' . $student['last_name']),
+                    'student_name' => strtoupper($student['first_name'].' '.$student['last_name']),
                     'position' => $positionText,
                     'total_score' => number_format($student['total_score'], 1),
                     'total_average' => number_format($student['total_average'], 1), // 1 decimal place
-                    'subject_results' => $subjectResultsText
+                    'subject_results' => $subjectResultsText,
                 ];
             });
 
@@ -3702,7 +3825,7 @@ class ResultsController extends Controller
             $failCount = 0;
             $schoolInfo = school::find($schoolId);
             $link = $this->appBaseUrl;
-            $sender = $schoolInfo->sender_id ?? "SHULE APP";
+            $sender = $schoolInfo->sender_id ?? 'SHULE APP';
             $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
             $nextSmsService = new NextSmsService();
 
@@ -3720,7 +3843,7 @@ class ResultsController extends Controller
 
                     // Create SMS message
                     $message = "MATOKEO YA {$payload['student_name']}\n";
-                    $message .= "Aina ya Ripoti: " . strtoupper($report->title) . "\n";
+                    $message .= 'Aina ya Ripoti: '.strtoupper($report->title)."\n";
                     $message .= "Tarehe: {$reportDate}\n";
                     $message .= "MASOMO:\n";
                     $message .= $payload['subject_results'];
@@ -3731,7 +3854,7 @@ class ResultsController extends Controller
 
                     // Prevent oversized SMS
                     if (strlen($message) > 480) {
-                        $message = substr($message, 0, 477) . "...";
+                        $message = substr($message, 0, 477).'...';
                     }
 
                     // CLEAN SMS TEXT
@@ -3740,7 +3863,7 @@ class ResultsController extends Controller
                     // Prepare minimal student data for queue
                     $studentData = [
                         'student_id' => $payload['student_id'],
-                        'parent_id' => $payload['parent_id']
+                        'parent_id' => $payload['parent_id'],
                     ];
 
                     // Dispatch Queue Job
@@ -3754,7 +3877,7 @@ class ResultsController extends Controller
 
                     Log::error('Queue Dispatch Error', [
                         'student_id' => $payload['student_id'],
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
 
                     continue;
@@ -3763,13 +3886,14 @@ class ResultsController extends Controller
 
             // Show summary alert
             Alert()->toast(
-                "Combined report published successfully. SMS are being processed in background.",
+                'Combined report published successfully. SMS are being processed in background.',
                 'success'
             );
 
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         } catch (Exception $e) {
-            Alert()->toast('Error: ' . $e->getMessage(), 'error');
+            Alert()->toast('Error: '.$e->getMessage(), 'error');
+
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
     }
@@ -3788,9 +3912,11 @@ class ResultsController extends Controller
             $reports->update(['status' => $status]);
 
             Alert()->toast('Results data set has been Locked successfully 🔐', 'success');
+
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
+
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
     }
@@ -3864,18 +3990,18 @@ class ResultsController extends Controller
                 $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score');
                 $average = $subjectScores->avg();
 
-                if (!is_null($average)) {
+                if (! is_null($average)) {
                     $roundedAverage = number_format($average, 2);
                     $studentSubjectAverages[$subject->course_code] = [
                         'score' => $roundedAverage,
-                        'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style)
+                        'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style),
                     ];
                     $totalScore += $roundedAverage;
                     $subjectCount++;
                 } else {
                     $studentSubjectAverages[$subject->course_code] = [
                         'score' => null,
-                        'grade' => null
+                        'grade' => null,
                     ];
                 }
             }
@@ -3886,7 +4012,7 @@ class ResultsController extends Controller
                 'student_id' => $student->id,
                 'admission_number' => $student->admission_number,
                 'gender' => $student->gender,
-                'student_name' => $student->first_name . ' ' . ($student->middle_name ? $student->middle_name . ' ' : '') . $student->last_name,
+                'student_name' => $student->first_name.' '.($student->middle_name ? $student->middle_name.' ' : '').$student->last_name,
                 'subject_averages' => $studentSubjectAverages,
                 'total' => round($totalScore, 2),
                 'average' => round($overallAverage, 2),
@@ -3921,7 +4047,7 @@ class ResultsController extends Controller
         $gradeSummary = [
             'male' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0],
             'female' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0],
-            'total' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]
+            'total' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0],
         ];
 
         foreach ($rankedStudents as $student) {
@@ -3957,7 +4083,7 @@ class ResultsController extends Controller
                 $subjectAverage = number_format($subjectTotal / $studentCount, 2);
                 $subjectAverages[$subject->course_code] = [
                     'average' => $subjectAverage,
-                    'grade' => $this->calculateGrade($subjectAverage, $results->first()->marking_style)
+                    'grade' => $this->calculateGrade($subjectAverage, $results->first()->marking_style),
                 ];
                 $overallTotalAverage += $subjectAverage;
                 $subjectAveragesSum += $subjectAverage; // Ongeza wastani wa kila somo kwenye jumla
@@ -4066,28 +4192,50 @@ class ResultsController extends Controller
         $fileName = "report_{$timestamp}.pdf";
         $folderPath = public_path('reports');
 
-        if (!File::exists($folderPath)) {
+        if (! File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0755, true);
         }
 
-        $pdf->save($folderPath . '/' . $fileName);
-        $fileUrl = asset('reports/' . $fileName);
+        $pdf->save($folderPath.'/'.$fileName);
+        $fileUrl = asset('reports/'.$fileName);
 
         return view('generated_reports.general_pdf', compact('fileUrl', 'results', 'year', 'reports', 'class', 'school', 'report', 'schoolInfo'));
     }
 
-    //download parent_student combined report
+    /**
+     * Parent download student combined report
+     * Shares the same blade view as downloadCombinedReport
+     */
     public function parentDownloadStudentCombinedReport($school, $year, $report, $student, $class)
     {
         $studentId = Hashids::decode($student)[0];
-        // return $studentId;
         $schoolId = Hashids::decode($school)[0];
         $reportId = Hashids::decode($report)[0];
         $classId = Hashids::decode($class)[0];
 
         $reports = generated_reports::find($reportId);
-        $examDates = $reports->exam_dates; // array
+        if (!$reports) {
+            Alert()->toast('Report not found', 'error');
+            return redirect()->back();
+        }
 
+        $examDates = $reports->exam_dates;
+        $combineOption = $reports->combine_option ?? 'individual';
+        $storedClassId = $reports->class_id ?? $classId;
+
+        // Get student and school info directly from database
+        $studentData = Student::find($studentId);
+        $schoolInfo = school::find($schoolId);
+
+        if (!$studentData) {
+            Alert()->toast('Student not found', 'error');
+            return redirect()->back();
+        }
+
+        // Get marking style from the first examination result
+        $markingStyle = $this->getMarkingStyleForCombinedReport($storedClassId, $schoolId, $examDates);
+
+        // Get all results with proper selects
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -4101,6 +4249,7 @@ class ResultsController extends Controller
                 'students.first_name',
                 'students.middle_name',
                 'students.last_name',
+                'students.status',
                 'students.group',
                 'students.gender',
                 'students.image',
@@ -4117,43 +4266,76 @@ class ResultsController extends Controller
                 'schools.school_reg_no',
                 'schools.postal_address',
                 'schools.postal_name',
+                'schools.school_email',
+                'schools.school_phone',
+                'schools.school_alternative_phone',
                 'schools.logo',
                 'schools.country',
                 'users.first_name as teacher_first_name',
-                'users.last_name as teacher_last_name'
+                'users.last_name as teacher_last_name',
+                'teachers.id as teacher_id'
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $classId)
+            ->where('students.status', 1)
+            ->where('examination_results.class_id', $storedClassId)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
         if ($results->isEmpty()) {
-            Alert()->toast('No examination results found for the selected student and report.', 'error');
+            Alert()->toast('No results found for this student', 'error');
             return redirect()->back();
         }
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-        // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
-        $examHeaders = $results->map(function ($item) {
-            return [
-                'abbr' => $item->symbolic_abbr,
-                'date' => $item->exam_date,
-                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
-            ];
-        })->unique(function ($item) {
-            return $item['abbr'] . $item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
-        })->values();
+        // Build exam headers with proper null checks
+        $examHeaders = [];
+        $seen = [];
+        foreach ($results as $item) {
+            if (isset($item->symbolic_abbr) && !empty($item->symbolic_abbr) && !isset($seen[$item->symbolic_abbr . $item->exam_date])) {
+                $seen[$item->symbolic_abbr . $item->exam_date] = true;
+                $examHeaders[] = [
+                    'abbr' => $item->symbolic_abbr,
+                    'date' => $item->exam_date,
+                    'display' => $item->symbolic_abbr . ' ' . Carbon::parse($item->exam_date)->format('d M Y'),
+                ];
+            }
+        }
 
+        // Process each subject
         $finalData = [];
-        $combineOption = $reports->combine_option ?? 'individual';
+        $studentTotalMarks = 0;
+        $subjectCount = 0;
 
         foreach ($classResultsGrouped as $subjectId => $subjectResults) {
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
-            $teacher = $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
 
+            // Get teacher name
+            $uploadingTeacher = null;
+            foreach ($subjectResults as $result) {
+                if ($result->teacher_id) {
+                    $uploadingTeacher = DB::table('teachers')
+                        ->join('users', 'users.id', '=', 'teachers.user_id')
+                        ->where('teachers.id', $result->teacher_id)
+                        ->select('users.first_name', 'users.last_name')
+                        ->first();
+                    break;
+                }
+            }
+
+            $teacher = 'N/A';
+            if ($uploadingTeacher) {
+                $teacher = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
+            } else {
+                $firstResult = $subjectResults->first();
+                if ($firstResult && $firstResult->teacher_first_name && $firstResult->teacher_last_name) {
+                    $teacher = $firstResult->teacher_first_name . '. ' . substr($firstResult->teacher_last_name, 0, 1);
+                }
+            }
+
+            // Calculate scores based on combine option
             $examScores = [];
             $total = 0;
             $average = 0;
@@ -4165,7 +4347,6 @@ class ResultsController extends Controller
                         ->first()->score ?? null;
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
-
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
             } elseif ($combineOption == 'sum') {
@@ -4176,8 +4357,9 @@ class ResultsController extends Controller
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-            } elseif ($combineOption == 'average') {
+                $filteredCount = count(array_filter($examScores));
+                $average = $filteredCount > 0 ? $total / $filteredCount : 0;
+            } else { // average
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
@@ -4185,38 +4367,79 @@ class ResultsController extends Controller
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
-                $total = 0;
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            $allScores = Examination_result::where('course_id', $subjectId)
-                ->where('class_id', $classId)
-                ->where('school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                ->get()
-                ->groupBy('student_id')
-                ->map(function ($scores) {
-                    return $scores->sum('score'); // Daima tumia jumla kwa rank
-                })
-                ->sortDesc()
-                ->values();
+            $studentTotalMarks += $average;
+            $subjectCount++;
 
-            $position = $allScores->search($total) + 1;
-
-            $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
+            $finalData[] = [
+                'subjectName' => $subjectName,
+                'subjectCode' => $subjectCode,
+                'teacher' => $teacher,
+                'examScores' => $examScores,
+                'total' => round($total, 2),
+                'average' => round($average, 2),
+                'grade' => $this->calculateGradeForCombined($average, $markingStyle),
+                'position' => 0,
+            ];
         }
 
-        $students = $results->first();
-        $schoolInfo = $results->first();
-        // return $schoolInfo;
+        // Calculate subject positions with tie handling
+        foreach ($finalData as &$subject) {
+            $subjectId = DB::table('subjects')
+                ->where('course_name', $subject['subjectName'])
+                ->where('course_code', $subject['subjectCode'])
+                ->value('id');
 
-        // =================== EXAM HEADERS WITH DATES ===================
-        $examHeadersWithDates = $results
-            ->mapWithKeys(function ($item) {
-                return [$item->symbolic_abbr => $item->exam_date];
-            })->unique()->toBase(); // toBase() to allow ->values()
+            if ($subjectId) {
+                $subjectResultsAll = DB::table('examination_results')
+                    ->where('course_id', $subjectId)
+                    ->where('class_id', $storedClassId)
+                    ->where('school_id', $schoolId)
+                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                    ->get()
+                    ->groupBy('student_id');
 
-        // =================== EXAM AVERAGE PER EXAM DATE ===================
+                $studentAverages = [];
+                foreach ($subjectResultsAll as $stdId => $subjectRes) {
+                    if ($combineOption == 'individual') {
+                        $avg = $subjectRes->avg('score') ?? 0;
+                    } elseif ($combineOption == 'sum') {
+                        $avg = $subjectRes->count() > 0 ? $subjectRes->sum('score') / $subjectRes->count() : 0;
+                    } else {
+                        $avg = $subjectRes->avg('score') ?? 0;
+                    }
+                    $studentAverages[$stdId] = round($avg, 2);
+                }
+
+                arsort($studentAverages);
+                $position = 1;
+                $previousAvg = null;
+                $sameRankCount = 0;
+                $positions = [];
+
+                foreach ($studentAverages as $stdId => $avg) {
+                    if ($previousAvg !== null && $avg < $previousAvg) {
+                        $position += $sameRankCount;
+                        $sameRankCount = 1;
+                    } else {
+                        $sameRankCount++;
+                    }
+                    $positions[$stdId] = $position;
+                    $previousAvg = $avg;
+                }
+
+                $subject['position'] = $positions[$studentId] ?? '-';
+            }
+        }
+        unset($subject);
+
+        // Calculate student general average
+        $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
+        $totalScoreForStudent = round($studentTotalMarks, 2);
+
+        // Calculate exam averages
         $examAverages = [];
         foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
@@ -4231,129 +4454,113 @@ class ResultsController extends Controller
                     $countPerExam++;
                 }
             }
-
-            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
-        // =================== GENERAL AVERAGE ===================
-        $sumOfAverages = array_sum($examAverages);
-        $validScores = $results->filter(function ($item) {
-            return !is_null($item->score);
-        });
-
-        $studentGeneralAverage = $validScores->count() > 0
-            ? number_format($validScores->avg('score'), 2)
-            : 0;
-
-        $totalScoreForStudent = $validScores->sum('score');
-
-        // =================== GENERAL POSITION (WITH TIE RANKING) ===================
-        $studentId = $results->first()->student_id ?? null;
-
-        // Pata alama za wanafunzi wote waliopo kwenye report hiyo
-        $allStudentScores = Examination_result::where('class_id', $classId)
+        // Calculate class rankings
+        $allStudents = DB::table('examination_results')
+            ->where('class_id', $storedClassId)
             ->where('school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-            ->get()
-            ->groupBy('student_id')
-            ->map(function ($results) {
-                return $results->sum('score');
-            });
+            ->distinct()
+            ->pluck('student_id');
 
-        // Pangilia kwa kushuka (descending)
-        $sortedScores = $allStudentScores->sortDesc();
+        $totalStudentsCount = $allStudents->count();
 
-        // Tumia tie-aware ranking
-        $ranked = [];
-        $rank = 1;
-        $position = 1;
-        $previousScore = null;
+        $allStudentAverages = [];
+        foreach ($allStudents as $stdId) {
+            $stdResults = DB::table('examination_results')
+                ->where('student_id', $stdId)
+                ->where('class_id', $storedClassId)
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get()
+                ->groupBy('course_id');
 
-        foreach ($sortedScores as $student_id => $score) {
-            if ($previousScore !== null && $score < $previousScore) {
-                $rank = $position;
+            $studentTotalAvg = 0;
+            $studentSubjectCount = 0;
+
+            foreach ($stdResults as $subjectResults) {
+                if ($combineOption == 'individual') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                } elseif ($combineOption == 'sum') {
+                    $subjectAvg = $subjectResults->count() > 0 ? $subjectResults->sum('score') / $subjectResults->count() : 0;
+                } else {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                }
+                $studentTotalAvg += round($subjectAvg, 2);
+                $studentSubjectCount++;
             }
-            $ranked[$student_id] = $rank;
-            $previousScore = $score;
-            $position++;
+            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg / $studentSubjectCount, 2) : 0;
         }
 
-        // Pata nafasi ya mwanafunzi anayehusika
-        $generalPosition = $ranked[$studentId] ?? '-';
-        $totalStudents = count($ranked);
+        // Sort and assign positions
+        arsort($allStudentAverages);
+        $generalRanked = [];
+        $rank = 1;
+        $previousAvg = null;
+        $sameRankCount = 0;
 
-        // =================== EXAM SPECIFICATIONS ===================
-        $examSpecifications = $results
-            ->map(function ($item) {
-                return [
+        foreach ($allStudentAverages as $stdId => $avg) {
+            if ($previousAvg !== null && $avg < $previousAvg) {
+                $rank += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+            $generalRanked[$stdId] = $rank;
+            $previousAvg = $avg;
+        }
+
+        $generalPosition = $generalRanked[$studentId] ?? '-';
+
+        // Exam specifications with direct loop
+        $examSpecifications = [];
+        $specSeen = [];
+        foreach ($results as $item) {
+            if (isset($item->symbolic_abbr) && !empty($item->symbolic_abbr) && !isset($specSeen[$item->symbolic_abbr])) {
+                $specSeen[$item->symbolic_abbr] = true;
+                $examSpecifications[] = (object)[
                     'abbr' => $item->symbolic_abbr,
-                    'full_name' => $item->exam_type,
-                    'date' => $item->exam_date
+                    'full_name' => $item->exam_type ?? 'N/A',
+                    'date' => $item->exam_date,
                 ];
-            })
-            ->unique(function ($item) {
-                return $item['abbr'] . $item['full_name'];
-            })
-            ->values()
-            ->keyBy('abbr'); // We key by abbreviation for easy lookup
+            }
+        }
+        $examSpecifications = collect($examSpecifications)->keyBy('abbr');
 
-        //verify using qr code
-        $verificationData = [
-            'student_name' => trim($students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name),
-            'admission_number' => $students->admission_number,
-            'class' => $students->class_name,
-            'report_type' => $reports->title,
-            'term' => $reports->term,
-            'school' => $schoolInfo->school_name,
-            'report_date' => $reports->created_at->format('Y-m-d'),
-            'report_id' => $reports->id,
-            'issued_at' => now()->timestamp,
+        // Calculate division for marking style 3
+        $aggregatePoints = null;
+        $division = null;
+        if ($markingStyle == 3) {
+            $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5];
+            $totalPoints = 0;
+            foreach ($finalData as $subject) {
+                $grade = $subject['grade'];
+                $totalPoints += $gradePoints[$grade] ?? 5;
+            }
+            $aggregatePoints = $totalPoints;
+            $division = $this->calculateDivisionForCombined($aggregatePoints, $subjectCount);
+        }
 
-            // ================== SUMMARY INFO ==================
-            'total_score' => $totalScoreForStudent ?? 0,
-            'average_score' => $studentGeneralAverage ?? 0,
-            'student_rank' => $generalPosition ?? '-',
-            'total_students' => $totalStudents ?? 0,
-        ];
+        // Add class_name to studentData if not exists
+        $studentData->class_name = $studentData->class_name ?? $results->first()->class_name ?? 'N/A';
+        $studentData->school_name = $schoolInfo->school_name;
 
-        $verificationData['signature'] = hash_hmac(
-            'sha256',
-            json_encode($verificationData),
-            config('app.key')
-        );
+        // Generate QR code
+        $qrPng = $this->generateQRForCombined($studentData, $reports, $schoolInfo, $totalScoreForStudent, $studentGeneralAverage, $generalPosition, $totalStudentsCount, $markingStyle, $division, $aggregatePoints);
 
-
-        $encryptedPayload = Crypt::encryptString(
-            json_encode($verificationData)
-        );
-
-        $verificationUrl = route('report.verify', [
-            'payload' => $encryptedPayload
-        ]);
-
-
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->data($verificationUrl)
-            ->size(150)
-            ->margin(5)
-            ->build();
-
-
-        $qrPng = base64_encode($result->getString());
-
+        // Load PDF view - using same variables as downloadCombinedReport
         $pdf = Pdf::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
             'studentGeneralAverage',
-            'examHeadersWithDates',
             'results',
             'examAverages',
-            'sumOfAverages',
             'year',
             'generalPosition',
-            'totalStudents',
-            'students',
+            'totalStudentsCount',
+            'studentData',
             'reports',
             'schoolInfo',
             'examSpecifications',
@@ -4361,25 +4568,16 @@ class ResultsController extends Controller
             'report',
             'class',
             'totalScoreForStudent',
-            'qrPng'
+            'subjectCount',
+            'reportId',
+            'classId',
+            'qrPng',
+            'markingStyle',
+            'aggregatePoints',
+            'division'
         ));
-        // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
-        $timestamp = Carbon::now()->timestamp;
-        $fileName = "report_{$timestamp}.pdf"; // Filename format: student_result_<admission_number>_<timestamp>.pdf
-        $folderPath = public_path('reports'); // Folder path in public directory
 
-        // Make sure the directory exists
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
-        }
-
-        // Save the PDF to the 'reports' folder
-        $pdf->save($folderPath . '/' . $fileName);
-
-        // Generate the URL for accessing the saved PDF
-        $fileUrl = asset('reports/' . $fileName);
-
-        return view('generated_reports.student_pdf_report', compact('fileUrl', 'year', 'reports', 'class', 'school', 'report', 'students', 'studentId', 'schoolId', 'classId', 'reportId'));
+        return $pdf->stream("{$studentData->first_name}_{$reports->title}.pdf");
     }
 
     // function to delete compiled results*************************************************
@@ -4399,7 +4597,7 @@ class ResultsController extends Controller
 
             $report = generated_reports::find($report_id[0]);
 
-            if (!$report) {
+            if (! $report) {
                 return redirect()
                     ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                     ->with('error', 'Report not found');
@@ -4421,11 +4619,12 @@ class ResultsController extends Controller
                 ->route('results.examTypesByClass', [
                     'school' => Hashids::encode($school_id),
                     'year' => $year,
-                    'class' => Hashids::encode($class_id)
+                    'class' => Hashids::encode($class_id),
                 ])
                 ->with('success', 'Report deleted successfully');
         } catch (\Exception $e) {
-            Log::error("Delete report error: " . $e->getMessage());
+            Log::error('Delete report error: '.$e->getMessage());
+
             return redirect()
                 ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                 ->with('error', 'Error deleting report');
@@ -4449,21 +4648,21 @@ class ResultsController extends Controller
                 config('app.key')
             );
 
-            if (!hash_equals($expectedSignature, $signature)) {
+            if (! hash_equals($expectedSignature, $signature)) {
                 return view('generated_reports.verification', [
                     'valid' => false,
-                    'message' => 'Invalid or tampered report'
+                    'message' => 'Invalid or tampered report',
                 ]);
             }
 
             return view('generated_reports.verification', [
                 'valid' => true,
-                'data' => $payload
+                'data' => $payload,
             ]);
         } catch (\Exception $e) {
             return view('generated_reports.verification', [
                 'valid' => false,
-                'message' => 'Invalid or expired QR code'
+                'message' => 'Invalid or expired QR code',
             ]);
         }
     }
@@ -4507,14 +4706,14 @@ class ResultsController extends Controller
             if ($results->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No results found for the selected criteria'
+                    'message' => 'No results found for the selected criteria',
                 ]);
             }
 
             if ($results->contains('status', 2)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Results data set has been locked and cannot be rolled back 🔐'
+                    'message' => 'Results data set has been locked and cannot be rolled back 🔐',
                 ]);
             }
 
@@ -4533,7 +4732,7 @@ class ResultsController extends Controller
                     'exam_date' => $result->exam_date,
                 ])->first();
 
-                if (!$existingTemp) {
+                if (! $existingTemp) {
                     // Create temporary result
                     temporary_results::create([
                         'student_id' => $result->student_id,
@@ -4546,7 +4745,7 @@ class ResultsController extends Controller
                         'exam_term' => $result->Exam_term,
                         'marking_style' => $result->marking_style,
                         'exam_date' => $result->exam_date,
-                        'expiry_date' => now()->addHours(72)
+                        'expiry_date' => now()->addHours(72),
                     ]);
                 }
 
@@ -4561,10 +4760,10 @@ class ResultsController extends Controller
             if ($user) {
                 $course = Subject::find($result->course_id);
                 $examType = Examination::find($result->exam_type_id);
-                $message = "Dear " . strtoupper($user->first_name) .
-                    ", Your results for " . strtoupper($course->course_name). " ".
-                    strtoupper(($examType->exam_type)) . " - " . Carbon::parse($result->exam_date)->format('d M Y') .
-                    " have been reverted to temporary storage. Kindly review and resubmit before due date.";
+                $message = 'Dear '.strtoupper($user->first_name).
+                    ', Your results for '.strtoupper($course->course_name).' '.
+                    strtoupper(($examType->exam_type)).' - '.Carbon::parse($result->exam_date)->format('d M Y').
+                    ' have been reverted to temporary storage. Kindly review and resubmit before due date.';
                 $cleanMessage = $this->cleanSmsText($message);
                 $school = school::find($result->school_id);
 
@@ -4573,7 +4772,7 @@ class ResultsController extends Controller
                     'from' => $school->sender_id ?? 'SHULE APP',
                     'to' => $this->formatPhoneNumber($user->phone),
                     'text' => $cleanMessage,
-                    'reference' => 'rollback_notification_' . time()
+                    'reference' => 'rollback_notification_'.time(),
                 ];
 
                 // Log::info("Sending rollback notification to teacher (User ID: {$user->id}) with payload: " . json_encode($payload));
@@ -4590,16 +4789,16 @@ class ResultsController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Successfully rolled back ' . $results->count() . ' records to temporary storage',
+                'message' => 'Successfully rolled back '.$results->count().' records to temporary storage',
                 'count' => $results->count(),
-                'has_remaining_results' => $remainingResultsCount > 0
+                'has_remaining_results' => $remainingResultsCount > 0,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error rolling back results: ' . $e->getMessage()
+                'message' => 'Error rolling back results: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -4626,5 +4825,910 @@ class ResultsController extends Controller
         $text = preg_replace('/[^A-Za-z0-9 @£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&\'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà]/u', '', $text);
 
         return $text;
+    }
+
+    /**
+     * Generate bulk individual student reports (single PDF with multiple pages)
+     * OPTIMIZED for 100+ students with memory management
+     */
+    public function bulkStudentReports($school, $year, $class, $examType, $month, $date, Request $request)
+    {
+        // Decode IDs
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $exam_id = Hashids::decode($examType);
+
+        $user = Auth::user();
+        $schools = School::find($school_id[0]);
+
+        // Authorization check
+        if ($user->school_id != $schools->id) {
+            Alert()->toast('You are not authorized', 'error');
+            return redirect()->route('error.page');
+        }
+
+        // Get marking style from examination_results
+        $marking_style = Examination_result::query()
+            ->where('school_id', $schools->id)
+            ->where('class_id', $class_id[0])
+            ->where('exam_type_id', $exam_id[0])
+            ->whereDate('exam_date', $date)
+            ->value('marking_style') ?? 1;
+
+        // Get all results with school data
+        $results = Examination_result::query()
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->leftJoin('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users as teacher_users', 'teacher_users.id', '=', 'teachers.user_id')
+            ->select(
+                'examination_results.*',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.admission_number',
+                'students.group',
+                'students.image',
+                'students.gender',
+                'students.id as student_id',
+                'subjects.course_name',
+                'subjects.course_code',
+                'grades.class_name',
+                'examinations.exam_type',
+                'examination_results.Exam_term',
+                'teacher_users.first_name as teacher_first_name',
+                'teacher_users.last_name as teacher_last_name',
+                'schools.school_name',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+                'schools.school_phone',
+                'schools.school_email'
+            )
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->where('students.status', 1)
+            ->whereDate('examination_results.exam_date', $date)
+            ->get();
+
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found', 'info');
+            return redirect()->back();
+        }
+
+        // Group results by student
+        $groupedResults = $results->groupBy('student_id');
+
+        // Pre-calculate subject scores for ranking (optimization)
+        $subjectScoresCache = [];
+        foreach ($results->groupBy('course_id') as $courseId => $courseResults) {
+            $subjectScoresCache[$courseId] = $courseResults->pluck('score', 'student_id');
+        }
+
+        // ============ PRE-CALCULATE RANKS FOR ALL SUBJECTS (TIE HANDLING) ============
+        $subjectRanksCache = [];
+        foreach ($subjectScoresCache as $courseId => $scores) {
+            // Sort scores in descending order
+            $sortedScores = $scores->sortDesc();
+
+            // Calculate ranks with tie handling
+            $rank = 1;
+            $previousScore = null;
+            $sameRankCount = 0;
+            $ranks = [];
+
+            foreach ($sortedScores as $studentId => $score) {
+                if ($previousScore !== null && $score < $previousScore) {
+                    $rank += $sameRankCount;
+                    $sameRankCount = 1;
+                } else {
+                    $sameRankCount++;
+                }
+                $ranks[$studentId] = $rank;
+                $previousScore = $score;
+            }
+
+            $subjectRanksCache[$courseId] = $ranks;
+        }
+        // ============ END PRE-CALCULATION ============
+
+        // Process each student
+        $allStudentsData = [];
+        $studentAverages = [];
+
+        foreach ($groupedResults as $studentId => $studentResults) {
+            $totalMarks = $studentResults->sum('score');
+            $averageScore = $studentResults->avg('score');
+            $studentAverages[$studentId] = $averageScore;
+
+            // Calculate course ranks using cached ranks
+            foreach ($studentResults as $result) {
+                // Get rank from cache
+                $ranksForSubject = $subjectRanksCache[$result->course_id] ?? [];
+                $result->courseRank = $ranksForSubject[$studentId] ?? '-';
+
+                $grade = $this->calculateGrade($result->score, $marking_style);
+                $result->grade = $grade;
+                $result->remarks = $this->getRemarksForGrade($grade, $marking_style, $result->score);
+            }
+
+            // Division calculation for style 3
+            $aggregatePoints = 0;
+            $division = null;
+            if ($marking_style == 3) {
+                $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5, 'ABS' => 6];
+                foreach ($studentResults as $result) {
+                    $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                    $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+                }
+                $division = $this->calculateDivisionForStyle3($aggregatePoints, $studentResults->count());
+            }
+
+            $studentObject = new \stdClass();
+            $studentObject->id = $studentId;
+            $studentObject->first_name = $studentResults->first()->first_name;
+            $studentObject->middle_name = $studentResults->first()->middle_name;
+            $studentObject->last_name = $studentResults->first()->last_name;
+            $studentObject->admission_number = $studentResults->first()->admission_number;
+            $studentObject->group = $studentResults->first()->group;
+            $studentObject->gender = $studentResults->first()->gender;
+            $studentObject->image = $studentResults->first()->image;
+            $studentObject->class_name = $results->first()->class_name;
+
+            $allStudentsData[$studentId] = [
+                'results' => $studentResults,
+                'totalScore' => $totalMarks,
+                'averageScore' => $averageScore,
+                'aggregatePoints' => $aggregatePoints,
+                'division' => $division,
+                'studentObject' => $studentObject,
+            ];
+        }
+
+        // Calculate class rankings (tie handling)
+        arsort($studentAverages);
+        $rank = 1;
+        $studentRankings = [];
+        $previousAvg = null;
+        $sameRankCount = 0;
+
+        foreach ($studentAverages as $studentId => $avg) {
+            if ($previousAvg !== null && $avg < $previousAvg) {
+                $rank += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+            $studentRankings[$studentId] = $rank;
+            $previousAvg = $avg;
+        }
+        $rankings = collect($studentRankings);
+
+        // Generate HTML pages for each student
+        $htmlPages = [];
+        $schoolInfo = $schools;
+
+        foreach ($allStudentsData as $studentId => $studentData) {
+            $studentRank = $studentRankings[$studentId] ?? 1;
+
+            $overallGradeInfo = $this->calculateOverallGrade(
+                $studentData['averageScore'],
+                $marking_style,
+                $studentData['division']
+            );
+
+            // Generate QR code
+            $qrPng = $this->generateQRCodeForBulkStudent($studentData['studentObject'], $date);
+
+            $html = view('Results.individual_student_report_pdf', [
+                'results' => $studentData['results'],
+                'studentId' => $studentData['studentObject'],
+                'totalScore' => $studentData['totalScore'],
+                'averageScore' => $studentData['averageScore'],
+                'studentRank' => $studentRank,
+                'rankings' => $rankings,
+                'division' => $studentData['division'],
+                'aggregatePoints' => $studentData['aggregatePoints'],
+                'marking_style' => $marking_style,
+                'date' => $date,
+                'qrPng' => $qrPng,
+                'overallGrade' => $overallGradeInfo['grade'],
+                'gradeComment' => $overallGradeInfo['comment'],
+                'schoolInfo' => $schoolInfo,
+            ])->render();
+
+            $htmlPages[] = $html;
+            unset($studentData);
+        }
+
+        // PDF Generation - Direct streaming to avoid memory issues
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 300);
+
+        try {
+            // Combine all HTML pages
+            $fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' .
+                        implode('<div style="page-break-after: always;"></div>', $htmlPages) .
+                        '</body></html>';
+
+            // Clean HTML for special characters
+            $fullHtml = mb_convert_encoding($fullHtml, 'HTML-ENTITIES', 'UTF-8');
+
+            // Create PDF with optimized settings
+            $pdf = Pdf::loadHTML($fullHtml);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setPaper('A4', 'portrait');
+
+            // Generate filename
+            $timestamp = Carbon::now()->timestamp;
+            $fileName = "bulk_student_reports_{$timestamp}.pdf";
+
+            // Stream directly to browser
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            \Log::error('PDF Generation failed: ' . $e->getMessage());
+            Alert()->toast('Failed to generate PDF. Please try again.', 'error');
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Generate QR code for bulk student report - Simplified working version
+     */
+    private function generateQRCodeForBulkStudent($student, $date)
+    {
+        try {
+            // Create SIMPLE verification text - short enough for QR
+            $verificationText = json_encode([
+                's' => substr($student->admission_number ?? '', 0, 10),
+                'n' => substr(trim($student->first_name . ' ' . $student->last_name), 0, 15),
+                'd' => Carbon::parse($date)->format('Ymd'),
+            ]);
+
+            // Limit text length to avoid "Too much data" error
+            if (strlen($verificationText) > 200) {
+                $verificationText = substr($verificationText, 0, 200);
+            }
+
+            // Build QR code
+            $resultQr = Builder::create()
+                ->writer(new PngWriter())
+                ->data($verificationText)
+                ->size(90)
+                ->margin(2)
+                ->build();
+
+            return base64_encode($resultQr->getString());
+
+        } catch (\Exception $e) {
+            \Log::error('QR Code generation failed: ' . $e->getMessage());
+            return '';
+        }
+    }
+
+    /**
+     * Helper: Get remarks based on grade and score
+     */
+    private function getRemarksForGrade($grade, $marking_style, $score = null)
+    {
+        if ($score === null || $score === 0) {
+            return 'ABSENT';
+        }
+
+        $remarks = [
+            'A' => 'Excellent',
+            'B' => 'Good',
+            'C' => 'Pass',
+            'D' => 'Poor',
+            'E' => 'Fail',
+            'F' => 'Fail',
+            'ABS' => 'Absent'
+        ];
+
+        return $remarks[$grade] ?? '-';
+    }
+
+
+    /**
+     * Helper: Get month number from month name
+     */
+    private function getMonthNumber($month)
+    {
+        $monthsArray = [
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12,
+        ];
+
+        return $monthsArray[$month] ?? 1;
+    }
+
+    private function calculateOverallGrade($averageScore, $marking_style, $division = null)
+    {
+        if ($marking_style == 3 && $division) {
+            $grades = ['I' => 'EXCELLENT', 'II' => 'GOOD', 'III' => 'PASS', 'IV' => 'POOR', '0' => 'FAIL'];
+            return ['grade' => $division, 'comment' => $grades[$division] ?? 'PASS'];
+        }
+
+        if ($marking_style == 1) {
+            if ($averageScore >= 40.5) return ['grade' => 'A', 'comment' => 'EXCELLENT'];
+            if ($averageScore >= 30.5) return ['grade' => 'B', 'comment' => 'GOOD'];
+            if ($averageScore >= 20.5) return ['grade' => 'C', 'comment' => 'PASS'];
+            if ($averageScore >= 10.5) return ['grade' => 'D', 'comment' => 'POOR'];
+            return ['grade' => 'E', 'comment' => 'FAIL'];
+        }
+
+        if ($averageScore >= 80.5) return ['grade' => 'A', 'comment' => 'EXCELLENT'];
+        if ($averageScore >= 60.5) return ['grade' => 'B', 'comment' => 'GOOD'];
+        if ($averageScore >= 40.5) return ['grade' => 'C', 'comment' => 'PASS'];
+        if ($averageScore >= 20.5) return ['grade' => 'D', 'comment' => 'POOR'];
+        return ['grade' => 'E', 'comment' => 'FAIL'];
+    }
+
+
+    public function bulkCombinedReports($school, $year, $class, $report)
+    {
+        set_time_limit(300);
+        ini_set('memory_limit', '512M');
+
+        $schoolId = Hashids::decode($school)[0];
+        $classId = Hashids::decode($class)[0];
+        $reportId = Hashids::decode($report)[0];
+
+        $reports = generated_reports::find($reportId);
+        if (! $reports) {
+            Alert()->toast('Report not found', 'error');
+            return redirect()->back();
+        }
+
+        $examDates = $reports->exam_dates;
+        $combineOption = $reports->combine_option ?? 'individual';
+        $storedClassId = $reports->class_id ?? $classId;
+
+        // ============ GET MARKING STYLE FROM EXAMINATION_RESULTS ============
+        // HAPA NDIO FIX: Chukua marking style kutoka examination_results table
+        $firstExamResult = Examination_result::query()
+            ->where('class_id', $storedClassId)
+            ->where('school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->first();
+
+        $markingStyle = $firstExamResult ? ($firstExamResult->marking_style ?? 2) : 2;
+
+        // \Log::info('===========================================');
+        // \Log::info('MARKING STYLE FROM EXAMINATION_RESULTS: ' . $markingStyle);
+        // \Log::info('===========================================');
+        // ============ END FIX ============
+
+        // Get school info once
+        $schoolInfo = school::find($schoolId);
+
+        // Get all active students in the class
+        $students = Student::where('class_id', $classId)
+            ->where('school_id', $schoolId)
+            ->where('status', 1)
+            ->orderBy('admission_number')
+            ->get();
+
+        if ($students->isEmpty()) {
+            Alert()->toast('No students found in this class', 'error');
+            return redirect()->back();
+        }
+
+        // PRE-LOAD ALL RESULTS FOR THE CLASS
+        $allResults = Examination_result::query()
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select(
+                'examination_results.*',  // Hii inajumuisha marking_style
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.status',
+                'students.group',
+                'students.gender',
+                'students.image',
+                'students.admission_number',
+                'subjects.id as subjectId',
+                'subjects.course_name',
+                'subjects.course_code',
+                'grades.class_name',
+                'grades.class_code',
+                'examinations.exam_type',
+                'examinations.symbolic_abbr',
+                'schools.school_name',
+                'schools.logo',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.school_email',
+                'schools.school_phone',
+                'schools.country',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name',
+                'teachers.id as teacher_id'
+            )
+            ->where('students.status', 1)
+            ->where('examination_results.class_id', $storedClassId)
+            ->where('examination_results.school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->get();
+
+        if ($allResults->isEmpty()) {
+            Alert()->toast('No results found for this report', 'error');
+            return redirect()->back();
+        }
+
+        $className = $reports->class_name;
+        if (empty($className)) {
+            $classInfo = Grade::find($storedClassId);
+            $className = $classInfo->class_name ?? 'N/A';
+        }
+        // Also set it on the student object for each student
+        foreach ($students as $student) {
+            $student->class_name = $className;
+        }
+
+        // Group results by student
+        $resultsByStudent = $allResults->groupBy('studentId');
+
+        // Get exam headers once
+        $examHeaders = $this->getExamHeadersForBulkCombined($allResults);
+
+        // Get exam specifications once
+        $examSpecifications = $this->getExamSpecificationsForBulkCombined($allResults);
+
+        // Pre-calculate all student averages for ranking
+        $allStudentAverages = $this->calculateAllStudentAveragesForBulkCombined($resultsByStudent, $combineOption, $examDates, $storedClassId, $schoolId);
+
+        // Generate HTML for each student
+        $htmlPages = [];
+        $counter = 0;
+        $totalStudents = count($students);
+
+        foreach ($students as $student) {
+            $counter++;
+            $studentResults = $resultsByStudent[$student->id] ?? collect();
+
+            if ($studentResults->isEmpty()) {
+                continue;
+            }
+
+            // Generate individual student report data
+            $studentReportData = $this->generateStudentReportDataForBulkCombined(
+                $student,
+                $studentResults,
+                $examHeaders,
+                $combineOption,
+                $markingStyle,  // Sasa marking style ni sahihi
+                $allStudentAverages,
+                $reports,
+                $schoolInfo,
+                $storedClassId,
+                $schoolId,
+                $examDates
+            );
+
+            // Generate QR code
+            $qrPng = $this->generateQRForBulkCombined($studentReportData, $reports, $schoolInfo);
+
+            $html = view('generated_reports.compiled_report_bulk', [
+                'students' => $studentReportData['students'],
+                'finalData' => $studentReportData['finalData'],
+                'studentGeneralAverage' => $studentReportData['studentGeneralAverage'],
+                'totalScoreForStudent' => $studentReportData['totalScoreForStudent'],
+                'generalPosition' => $studentReportData['generalPosition'],
+                'totalStudents' => $studentReportData['totalStudents'],
+                'subjectCount' => $studentReportData['subjectCount'],
+                'examAverages' => $studentReportData['examAverages'],
+                'examHeaders' => $examHeaders,
+                'examSpecifications' => $examSpecifications,  // Make sure this is passed
+                'schoolInfo' => $schoolInfo,
+                'reports' => $reports,
+                'qrPng' => $qrPng,
+                'year' => $year,
+                'class' => $class,
+                'school' => $school,
+                'report' => $report,
+                'markingStyle' => $markingStyle,
+                'className' => $className,  // Add this
+                'currentStudent' => $counter,
+                'totalStudents' => $totalStudents,
+            ])->render();
+
+            $htmlPages[] = $html;
+            unset($studentReportData);
+        }
+
+        // Merge all HTML into one PDF
+        $pdf = Pdf::loadHTML('<html><body>'.implode('<div style="page-break-after: always;"></div>', $htmlPages).'</body></html>');
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isPhpEnabled', true);
+        $pdf->setPaper('A4', 'portrait');
+
+        $timestamp = Carbon::now()->timestamp;
+        $fileName = "bulk_combined_reports_{$timestamp}.pdf";
+        $folderPath = public_path('reports');
+
+        if (! File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        $pdf->save($folderPath.'/'.$fileName);
+
+        return response()->download($folderPath.'/'.$fileName, "{$reports->title}_all_students.pdf", [
+            'Content-Type' => 'application/pdf',
+        ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Get exam headers for bulk combined reports
+     */
+    private function getExamHeadersForBulkCombined($results)
+    {
+        return $results->map(function ($item) {
+            return [
+                'abbr' => $item->symbolic_abbr,
+                'date' => $item->exam_date,
+                'display' => $item->symbolic_abbr.' '.Carbon::parse($item->exam_date)->format('d M Y'),
+            ];
+        })->unique(function ($item) {
+            return $item['abbr'].$item['date'];
+        })->values()->toArray();
+    }
+
+    /**
+     * Get exam specifications for bulk combined reports
+     */
+    private function getExamSpecificationsForBulkCombined($results)
+    {
+        return $results
+            ->map(function ($item) {
+                return (object)[
+                    'abbr' => $item->symbolic_abbr ?? 'N/A',
+                    'full_name' => $item->exam_type ?? 'N/A',
+                    'date' => $item->exam_date,
+                ];
+            })
+            ->unique(function ($item) {
+                return $item->abbr . $item->full_name;
+            })
+            ->values()
+            ->keyBy('abbr');
+    }
+
+    /**
+     * Calculate all student averages for ranking (used for position)
+     */
+    private function calculateAllStudentAveragesForBulkCombined($resultsByStudent, $combineOption, $examDates, $storedClassId, $schoolId)
+    {
+        $allStudentAverages = [];
+
+        foreach ($resultsByStudent as $stdId => $studentResults) {
+            $groupedBySubject = $studentResults->groupBy('subjectId');
+            $studentTotalAvg = 0;
+            $studentSubjectCount = 0;
+
+            foreach ($groupedBySubject as $subjectId => $subjectResults) {
+                if ($combineOption == 'individual') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                } elseif ($combineOption == 'sum') {
+                    $subjectAvg = $subjectResults->count() > 0 ? $subjectResults->sum('score') / $subjectResults->count() : 0;
+                } else { // average
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                }
+                $studentTotalAvg += round($subjectAvg, 2);
+                $studentSubjectCount++;
+            }
+
+            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg / $studentSubjectCount, 2) : 0;
+        }
+
+        // Sort and assign ranks with tie handling
+        arsort($allStudentAverages);
+        $generalRanked = [];
+        $rank = 1;
+        $previousAverage = null;
+        $sameRankCount = 0;
+
+        foreach ($allStudentAverages as $std_id => $avg) {
+            if ($previousAverage !== null && $avg < $previousAverage) {
+                $rank += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+            $generalRanked[$std_id] = $rank;
+            $previousAverage = $avg;
+        }
+
+        return [
+            'averages' => $allStudentAverages,
+            'ranks' => $generalRanked,
+            'total_students' => count($generalRanked),
+        ];
+    }
+
+    /**
+     * Generate data for a single student (same logic as downloadCombinedReport)
+     */
+    private function generateStudentReportDataForBulkCombined($student, $studentResults, $examHeaders, $combineOption, $markingStyle, $allStudentAverages, $reports, $schoolInfo, $storedClassId, $schoolId, $examDates)
+    {
+        // Group results by subject
+        $classResultsGrouped = $studentResults->groupBy('subjectId');
+
+        $finalData = [];
+        $studentTotalMarks = 0;
+        $subjectCount = 0;
+
+        // Process each subject
+        foreach ($classResultsGrouped as $subjectId => $subjectResults) {
+            $firstResult = $subjectResults->first();
+            $subjectName = $firstResult->course_name;
+            $subjectCode = $firstResult->course_code;
+
+            // Get teacher name
+            $uploadingTeacher = null;
+            foreach ($subjectResults as $result) {
+                if ($result->teacher_id) {
+                    $uploadingTeacher = DB::table('teachers')
+                        ->join('users', 'users.id', '=', 'teachers.user_id')
+                        ->where('teachers.id', $result->teacher_id)
+                        ->select('users.first_name', 'users.last_name')
+                        ->first();
+                    break;
+                }
+            }
+
+            $teacher = 'N/A';
+            if ($uploadingTeacher) {
+                $teacher = $uploadingTeacher->first_name.'. '.substr($uploadingTeacher->last_name, 0, 1);
+            } else {
+                if ($firstResult && $firstResult->teacher_first_name && $firstResult->teacher_last_name) {
+                    $teacher = $firstResult->teacher_first_name.'. '.substr($firstResult->teacher_last_name, 0, 1);
+                }
+            }
+
+            // Calculate exam scores based on combine option
+            $examScores = [];
+            $total = 0;
+            $average = 0;
+
+            if ($combineOption == 'individual') {
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                }
+                $total = collect($examScores)->filter()->sum();
+                $average = collect($examScores)->filter()->avg() ?? 0;
+            } elseif ($combineOption == 'sum') {
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                }
+                $total = collect($examScores)->sum();
+                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+            } else { // average
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                }
+                $filtered = collect($examScores)->filter();
+                $average = $filtered->count() > 0 ? $filtered->avg() : 0;
+                $total = $average;
+            }
+
+            // Calculate subject position
+            $subjectPosition = $this->calculateSubjectPositionForBulkCombined($subjectId, $student->id, $combineOption, $examDates, $storedClassId, $schoolId);
+
+            $finalData[] = [
+                'subjectName' => $subjectName,
+                'subjectCode' => $subjectCode,
+                'teacher' => $teacher,
+                'examScores' => $examScores,
+                'total' => round($total, 2),
+                'average' => round($average, 2),
+                'position' => $subjectPosition,
+                'grade' => $this->calculateGradeForMarkingStyle($average, $markingStyle),
+            ];
+
+            $studentTotalMarks += $average;
+            $subjectCount++;
+        }
+
+        // Calculate exam averages
+        $examAverages = [];
+        foreach ($examHeaders as $exam) {
+            $totalPerExam = 0;
+            $countPerExam = 0;
+            $abbr = $exam['abbr'];
+            $date = $exam['date'];
+
+            foreach ($finalData as $subject) {
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                if (is_numeric($score)) {
+                    $totalPerExam += $score;
+                    $countPerExam++;
+                }
+            }
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
+        }
+
+        $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
+        $totalScoreForStudent = round($studentTotalMarks, 2);
+        $generalPosition = $allStudentAverages['ranks'][$student->id] ?? '-';
+        $totalStudents = $allStudentAverages['total_students'];
+
+        // Add class name to student object
+        $student->class_name = $reports->class_name ?? ($student->class_name ?? 'N/A');
+        $student->school_name = $schoolInfo->school_name;
+        $student->admission_number = $student->admission_number ?? 'N/A';
+
+        return [
+            'students' => $student,
+            'finalData' => $finalData,
+            'studentGeneralAverage' => $studentGeneralAverage,
+            'totalScoreForStudent' => $totalScoreForStudent,
+            'generalPosition' => $generalPosition,
+            'totalStudents' => $totalStudents,
+            'subjectCount' => $subjectCount,
+            'examAverages' => $examAverages,
+        ];
+    }
+
+    /**
+     * Calculate subject position for a student
+     */
+    private function calculateSubjectPositionForBulkCombined($subjectId, $studentId, $combineOption, $examDates, $storedClassId, $schoolId)
+    {
+        // Get all students' averages for this subject
+        $subjectResultsAll = DB::table('examination_results')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->where('examination_results.course_id', $subjectId)
+            ->where('examination_results.class_id', $storedClassId)
+            ->where('examination_results.school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->select('examination_results.*')
+            ->get()
+            ->groupBy('student_id');
+
+        $allStudentSubjectAverages = [];
+
+        foreach ($subjectResultsAll as $stdId => $results) {
+            if ($combineOption == 'individual') {
+                $avg = $results->avg('score') ?? 0;
+            } elseif ($combineOption == 'sum') {
+                $avg = $results->count() > 0 ? $results->sum('score') / $results->count() : 0;
+            } else {
+                $avg = $results->avg('score') ?? 0;
+            }
+            $allStudentSubjectAverages[$stdId] = round($avg, 2);
+        }
+
+        // Sort and assign positions with tie handling
+        arsort($allStudentSubjectAverages);
+        $position = 1;
+        $previousAverage = null;
+        $sameRankCount = 0;
+        $positions = [];
+
+        foreach ($allStudentSubjectAverages as $std_id => $avg) {
+            if ($previousAverage !== null && $avg < $previousAverage) {
+                $position += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+            $positions[$std_id] = $position;
+            $previousAverage = $avg;
+        }
+
+        return $positions[$studentId] ?? '-';
+    }
+
+    /**
+     * Calculate grade based on marking style
+     */
+    private function calculateGradeForMarkingStyle($average, $markingStyle)
+    {
+        if ($markingStyle == 1) {
+            if ($average >= 40.5) {
+                return 'A';
+            }
+            if ($average >= 30.5) {
+                return 'B';
+            }
+            if ($average >= 20.5) {
+                return 'C';
+            }
+            if ($average >= 10.5) {
+                return 'D';
+            }
+
+            return 'E';
+        } elseif ($markingStyle == 2) {
+            if ($average >= 80.5) {
+                return 'A';
+            }
+            if ($average >= 60.5) {
+                return 'B';
+            }
+            if ($average >= 40.5) {
+                return 'C';
+            }
+            if ($average >= 20.5) {
+                return 'D';
+            }
+
+            return 'E';
+        } else { // markingStyle == 3
+            if ($average >= 80) {
+                return 'A';
+            }
+            if ($average >= 60) {
+                return 'B';
+            }
+            if ($average >= 40) {
+                return 'C';
+            }
+            if ($average >= 20) {
+                return 'D';
+            }
+
+            return 'F';
+        }
+    }
+
+    /**
+     * Generate QR code for bulk combined report - Simplified version
+     */
+    private function generateQRForBulkCombined($studentData, $reports, $schoolInfo)
+    {
+        try {
+            // Create VERY SHORT verification text - use only essential data
+            $verificationText = json_encode([
+                's' => substr($studentData['students']->admission_number ?? '', 0, 8),
+                'n' => substr(trim(($studentData['students']->first_name ?? '') . ' ' . ($studentData['students']->last_name ?? '')), 0, 10),
+                'c' => substr($reports->class_name ?? 'N/A', 0, 10),
+                'd' => now()->format('Ymd'),
+            ]);
+
+            // If still too long, use simple text
+            if (strlen($verificationText) > 150) {
+                $verificationText = $studentData['students']->admission_number ?? 'STUDENT';
+            }
+
+            // Build QR code with minimal settings
+            $result = Builder::create()
+                ->writer(new PngWriter())
+                ->data($verificationText)
+                ->size(80)  // Small size
+                ->margin(2)
+                ->build();
+
+            return base64_encode($result->getString());
+
+        } catch (\Exception $e) {
+            \Log::error('QR generation failed: ' . $e->getMessage());
+            return '';
+        }
     }
 }
