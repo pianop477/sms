@@ -3928,8 +3928,8 @@ class ResultsController extends Controller
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
-        return $reports;
         $examDates = $reports->exam_dates;
+        dd("report examination dates: ". $examDates);
         $marking_style = $reports->marking_style ?? 2; // Default to style 2 if not set
 
         // 1. GET ALL STUDENTS IN THE CLASS
