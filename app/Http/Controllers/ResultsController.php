@@ -2068,11 +2068,11 @@ class ResultsController extends Controller
         $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
 
         $resultQr = Builder::create()
-            ->writer(new PngWriter())
-            ->data($verificationUrl)
-            ->size(140)
-            ->margin(4)
-            ->build();
+                ->writer(new PngWriter())
+                ->data($verificationUrl)
+                ->size(120)
+                ->margin(4)
+                ->build();
 
         $qrPng = base64_encode($resultQr->getString());
 
@@ -3974,6 +3974,8 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
+            return $results;
+
         $totalCandidates = $results->pluck('student_id')->unique()->count();
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
         $studentData = [];
@@ -4837,6 +4839,11 @@ class ResultsController extends Controller
             return redirect()->route('error.page');
         }
 
+        // Increase execution limits
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 600);
+        set_time_limit(600);
+
         // Get marking style from examination_results
         $marking_style = Examination_result::query()
             ->where('school_id', $schools->id)
@@ -4960,17 +4967,22 @@ class ResultsController extends Controller
         }
         $rankings = collect($studentRankings);
 
+        // Setup reports directory
+        $folderPath = public_path('reports');
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
         // OPTIMIZATION 3: Generate PDF in chunks (process 10 students at a time, then merge)
         $chunkSize = 10;
         $studentChunks = array_chunk($studentIds->toArray(), $chunkSize);
         $tempFiles = [];
-
         $schoolInfo = $schools;
         $timestamp = Carbon::now()->timestamp;
 
         try {
             foreach ($studentChunks as $chunkIndex => $chunkStudentIds) {
-                // Process each chunk
+                // Initialize htmlPages for this chunk
                 $htmlPages = [];
 
                 foreach ($chunkStudentIds as $studentId) {
@@ -5018,7 +5030,20 @@ class ResultsController extends Controller
 
                     $studentRank = $studentRankings[$studentId] ?? 1;
                     $overallGradeInfo = $this->calculateOverallGrade($averageScore, $marking_style, $division);
-                    $qrPng = $this->generateQRCodeForBulkStudent($studentObject, $date);
+
+                    // UPDATED QR CODE CALL
+                    $qrPng = $this->generateQRCodeForBulkStudent(
+                        $studentObject,
+                        $date,
+                        $totalMarks,
+                        $averageScore,
+                        $studentRank,
+                        $rankings->count(),
+                        $marking_style,
+                        $division,
+                        $aggregatePoints,
+                        $schoolInfo
+                    );
 
                     $html = view('Results.individual_student_report_pdf', [
                         'results' => $studentResults,
@@ -5053,14 +5078,13 @@ class ResultsController extends Controller
                     $pdf->setPaper('A4', 'portrait');
 
                     $tempFileName = "temp_chunk_{$timestamp}_{$chunkIndex}.pdf";
-                    $tempFilePath = public_path("reports/{$tempFileName}");
-
-                    if (!file_exists(public_path('reports'))) {
-                        mkdir(public_path('reports'), 0755, true);
-                    }
+                    $tempFilePath = $folderPath . '/' . $tempFileName;
 
                     $pdf->save($tempFilePath);
-                    $tempFiles[] = $tempFilePath;
+
+                    if (file_exists($tempFilePath)) {
+                        $tempFiles[] = $tempFilePath;
+                    }
 
                     // Free memory
                     unset($htmlPages);
@@ -5069,34 +5093,56 @@ class ResultsController extends Controller
                 }
             }
 
+            // Check if we have any temp files
+            if (empty($tempFiles)) {
+                Alert()->toast('No reports were generated. Please try again.', 'error');
+                return redirect()->back();
+            }
+
             // Get class name for filename
             $className = $allResults->first()->class_name ?? 'students';
             $safeClassName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $className);
-            $timestamp = Carbon::now()->format('Ymd_His');
+            $fileTimestamp = Carbon::now()->format('Ymd_His');
 
             // OPTIMIZATION 4: Merge all PDFs if multiple chunks
             if (count($tempFiles) == 1) {
                 // Only one file, return it directly with class name
-                $finalFileName = "student_reports_{$timestamp}.pdf";
+                $finalFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.pdf";
+
+                if (!file_exists($tempFiles[0])) {
+                    Alert()->toast('Report file not found. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
                 return response()->download($tempFiles[0], $finalFileName)
                     ->deleteFileAfterSend(true);
             } else {
                 // Multiple files - create a ZIP file with class name
                 $zip = new \ZipArchive();
-                $zipFileName = "student_reports.zip";
-                $zipPath = public_path("reports/{$zipFileName}");
+                $zipFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.zip";
+                $zipPath = $folderPath . '/' . $zipFileName;
 
                 if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
                     foreach ($tempFiles as $index => $tempFile) {
-                        $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                        if (file_exists($tempFile)) {
+                            $zip->addFile($tempFile, "student_" . ($index + 1) . ".pdf");
+                        }
                     }
                     $zip->close();
+                } else {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
+                if (!file_exists($zipPath)) {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
                 }
 
                 // Clean up temp files
                 foreach ($tempFiles as $tempFile) {
                     if (file_exists($tempFile)) {
-                        unlink($tempFile);
+                        @unlink($tempFile);
                     }
                 }
 
@@ -5110,7 +5156,7 @@ class ResultsController extends Controller
             // Clean up temp files on error
             foreach ($tempFiles as $tempFile) {
                 if (file_exists($tempFile)) {
-                    unlink($tempFile);
+                    @unlink($tempFile);
                 }
             }
 
@@ -5120,30 +5166,47 @@ class ResultsController extends Controller
     }
 
 
-    private function generateQRCodeForBulkStudent($student, $date)
+    /**
+     * Generate QR code for bulk student report - Using same logic as individual report
+     */
+    private function generateQRCodeForBulkStudent($student, $date, $totalScore, $averageScore, $studentRank, $totalStudents, $marking_style, $division = null, $aggregatePoints = null, $schoolInfo = null)
     {
         try {
-            // Create SIMPLE verification text - short enough for QR
-            $verificationText = json_encode([
-                's' => substr($student->admission_number ?? '', 0, 10),
-                'n' => substr(trim($student->first_name . ' ' . $student->last_name), 0, 15),
-                'd' => Carbon::parse($date)->format('Ymd'),
-            ]);
+            $verificationData = [
+                'student_name' => trim($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name),
+                'admission_number' => $student->admission_number,
+                'class' => $student->class_name ?? 'N/A',
+                'report_type' => 'Academic Progress Report',
+                'term' => 'I', // Default term
+                'school' => $schoolInfo ? $schoolInfo->school_name : ($student->school_name ?? 'N/A'),
+                'report_date' => Carbon::parse($date)->format('Y-m-d'),
+                'report_id' => sha1($student->id . $date),
+                'issued_at' => now()->timestamp,
+                'total_score' => $totalScore,
+                'average_score' => round($averageScore, 2),
+                'student_rank' => $studentRank,
+                'total_students' => $totalStudents,
+                'marking_style' => $marking_style,
+            ];
 
-            // Limit text length to avoid "Too much data" error
-            if (strlen($verificationText) > 200) {
-                $verificationText = substr($verificationText, 0, 200);
+            // Add division info for marking style 3
+            if ($marking_style == 3 && $division) {
+                $verificationData['division'] = $division;
+                $verificationData['aggregate_points'] = $aggregatePoints;
             }
 
-            // Build QR code
-            $resultQr = Builder::create()
+            $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
+            $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
+            $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
+
+            $result = Builder::create()
                 ->writer(new PngWriter())
-                ->data($verificationText)
-                ->size(90)
-                ->margin(2)
+                ->data($verificationUrl)
+                ->size(120)
+                ->margin(4)
                 ->build();
 
-            return base64_encode($resultQr->getString());
+            return base64_encode($result->getString());
 
         } catch (\Exception $e) {
             \Log::error('QR Code generation failed: ' . $e->getMessage());
@@ -5581,10 +5644,10 @@ class ResultsController extends Controller
 
             $teacher = 'N/A';
             if ($uploadingTeacher) {
-                $teacher = $uploadingTeacher->first_name.'. '.substr($uploadingTeacher->last_name, 0, 1);
+                $teacher = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
             } else {
                 if ($firstResult && $firstResult->teacher_first_name && $firstResult->teacher_last_name) {
-                    $teacher = $firstResult->teacher_first_name.'. '.substr($firstResult->teacher_last_name, 0, 1);
+                    $teacher = $firstResult->teacher_first_name . '. ' . substr($firstResult->teacher_last_name, 0, 1);
                 }
             }
 
@@ -5598,7 +5661,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
@@ -5607,7 +5670,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
@@ -5616,7 +5679,7 @@ class ResultsController extends Controller
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
                         ->where('exam_date', $exam['date'])
                         ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
@@ -5650,19 +5713,34 @@ class ResultsController extends Controller
             $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                $score = $subject['examScores'][$abbr . '_' . $date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
-            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
         $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
         $totalScoreForStudent = round($studentTotalMarks, 2);
         $generalPosition = $allStudentAverages['ranks'][$student->id] ?? '-';
         $totalStudents = $allStudentAverages['total_students'];
+
+        // ============ CALCULATE DIVISION FOR MARKING STYLE 3 ============
+        $aggregatePoints = null;
+        $division = null;
+        if ($markingStyle == 3) {
+            $gradePoints = ['A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'F' => 5];
+            $totalPoints = 0;
+            foreach ($finalData as $subject) {
+                $grade = $subject['grade'];
+                $totalPoints += $gradePoints[$grade] ?? 5;
+            }
+            $aggregatePoints = $totalPoints;
+            $division = $this->calculateDivisionForBulkCombined($aggregatePoints, $subjectCount);
+        }
+        // ============ END DIVISION CALCULATION ============
 
         // Add class name to student object
         $student->class_name = $reports->class_name ?? ($student->class_name ?? 'N/A');
@@ -5678,6 +5756,8 @@ class ResultsController extends Controller
             'totalStudents' => $totalStudents,
             'subjectCount' => $subjectCount,
             'examAverages' => $examAverages,
+            'division' => $division,
+            'aggregatePoints' => $aggregatePoints,
         ];
     }
 
@@ -5785,30 +5865,45 @@ class ResultsController extends Controller
     }
 
     /**
-     * Generate QR code for bulk combined report - Simplified version
+     * Generate QR code for bulk combined report - Using same logic as individual report
      */
     private function generateQRForBulkCombined($studentData, $reports, $schoolInfo)
     {
         try {
-            // Create VERY SHORT verification text - use only essential data
-            $verificationText = json_encode([
-                's' => substr($studentData['students']->admission_number ?? '', 0, 8),
-                'n' => substr(trim(($studentData['students']->first_name ?? '') . ' ' . ($studentData['students']->last_name ?? '')), 0, 10),
-                'c' => substr($reports->class_name ?? 'N/A', 0, 10),
-                'd' => now()->format('Ymd'),
-            ]);
+            $student = $studentData['students'];
 
-            // If still too long, use simple text
-            if (strlen($verificationText) > 150) {
-                $verificationText = $studentData['students']->admission_number ?? 'STUDENT';
+            $verificationData = [
+                'student_name' => trim($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name),
+                'admission_number' => $student->admission_number,
+                'class' => $reports->class_name ?? 'N/A',
+                'report_type' => $reports->title,
+                'term' => $reports->term,
+                'school' => $schoolInfo->school_name,
+                'report_date' => $reports->created_at->format('Y-m-d'),
+                'report_id' => $reports->id,
+                'issued_at' => now()->timestamp,
+                'total_score' => $studentData['totalScoreForStudent'] ?? 0,
+                'average_score' => round($studentData['studentGeneralAverage'] ?? 0, 2),
+                'student_rank' => $studentData['generalPosition'] ?? '-',
+                'total_students' => $studentData['totalStudents'] ?? 0,
+                'marking_style' => $reports->marking_style ?? 2,
+            ];
+
+            // Add division info for marking style 3
+            if (($reports->marking_style ?? 2) == 3 && isset($studentData['division'])) {
+                $verificationData['division'] = $studentData['division'];
+                $verificationData['aggregate_points'] = $studentData['aggregatePoints'] ?? 0;
             }
 
-            // Build QR code with minimal settings
+            $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
+            $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
+            $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
+
             $result = Builder::create()
                 ->writer(new PngWriter())
-                ->data($verificationText)
-                ->size(80)  // Small size
-                ->margin(2)
+                ->data($verificationUrl)
+                ->size(120)
+                ->margin(4)
                 ->build();
 
             return base64_encode($result->getString());
@@ -5817,5 +5912,18 @@ class ResultsController extends Controller
             \Log::error('QR generation failed: ' . $e->getMessage());
             return '';
         }
+    }
+
+    private function calculateDivisionForBulkCombined($aggregatePoints, $totalSubjects)
+    {
+        if ($totalSubjects == 0) return '0';
+
+        $averagePoints = $aggregatePoints / $totalSubjects;
+
+        if ($averagePoints <= 1.5) return 'I';
+        if ($averagePoints <= 2.5) return 'II';
+        if ($averagePoints <= 3.5) return 'III';
+        if ($averagePoints <= 4.5) return 'IV';
+        return '0';
     }
 }
