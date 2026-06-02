@@ -3928,6 +3928,7 @@ class ResultsController extends Controller
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
+        return $reports;
         $examDates = $reports->exam_dates;
         $marking_style = $reports->marking_style ?? 2; // Default to style 2 if not set
 
@@ -3974,7 +3975,7 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-            return $results;
+            // return $results;
 
         $totalCandidates = $results->pluck('student_id')->unique()->count();
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
