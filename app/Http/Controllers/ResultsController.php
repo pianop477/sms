@@ -4964,9 +4964,8 @@ class ResultsController extends Controller
         $rankings = collect($studentRankings);
 
         // ============ SETUP REPORTS DIRECTORY ============
-        $folderPath = storage_path('app/reports'); // Use storage_path instead of public_path
+        $folderPath = storage_path('app/reports');
 
-        // Create directory if not exists
         if (!File::exists($folderPath)) {
             try {
                 File::makeDirectory($folderPath, 0755, true);
@@ -5045,7 +5044,7 @@ class ResultsController extends Controller
 
                     $studentRank = $studentRankings[$studentId] ?? 1;
                     $overallGradeInfo = $this->calculateOverallGrade($averageScore, $marking_style, $division);
-                    $qrPng = ''; // Disable QR to save memory
+                    $qrPng = ''; // Disable QR
 
                     $html = view('Results.individual_student_report_pdf', [
                         'results' => $studentResults,
@@ -5082,12 +5081,21 @@ class ResultsController extends Controller
                     $tempFilePath = $folderPath . '/' . $tempFileName;
 
                     $pdf->save($tempFilePath);
-                    $tempFiles[] = $tempFilePath;
+
+                    if (file_exists($tempFilePath)) {
+                        $tempFiles[] = $tempFilePath;
+                    }
 
                     unset($htmlPages);
                     unset($fullHtml);
                     unset($pdf);
                 }
+            }
+
+            // Check if we have any temp files
+            if (empty($tempFiles)) {
+                Alert()->toast('No reports were generated. Please try again.', 'error');
+                return redirect()->back();
             }
 
             // Get class name for filename
@@ -5097,6 +5105,12 @@ class ResultsController extends Controller
 
             if (count($tempFiles) == 1) {
                 $finalFileName = "{$safeClassName}_student_reports_{$fileTimestamp}.pdf";
+
+                if (!file_exists($tempFiles[0])) {
+                    Alert()->toast('Report file not found. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
                 return response()->download($tempFiles[0], $finalFileName)
                     ->deleteFileAfterSend(true);
             } else {
@@ -5106,9 +5120,20 @@ class ResultsController extends Controller
                 $zip = new \ZipArchive();
                 if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
                     foreach ($tempFiles as $index => $tempFile) {
-                        $zip->addFile($tempFile, "student_" . ($index + 1) . ".pdf");
+                        if (file_exists($tempFile)) {
+                            $zip->addFile($tempFile, "student_" . ($index + 1) . ".pdf");
+                        }
                     }
                     $zip->close();
+                } else {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
+                // Verify ZIP was created
+                if (!file_exists($zipPath)) {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
                 }
 
                 // Clean up temp files
@@ -5442,12 +5467,21 @@ class ResultsController extends Controller
                     $tempFilePath = $folderPath . '/' . $tempFileName;
 
                     $pdf->save($tempFilePath);
-                    $tempFiles[] = $tempFilePath;
+
+                    if (file_exists($tempFilePath)) {
+                        $tempFiles[] = $tempFilePath;
+                    }
 
                     unset($htmlPages);
                     unset($fullHtml);
                     unset($pdf);
                 }
+            }
+
+            // Check if we have any temp files
+            if (empty($tempFiles)) {
+                Alert()->toast('No reports were generated. Please try again.', 'error');
+                return redirect()->back();
             }
 
             // Return files
@@ -5457,6 +5491,12 @@ class ResultsController extends Controller
 
             if (count($tempFiles) == 1) {
                 $finalFileName = "{$safeClassName}_{$safeReportTitle}_all_students_{$fileTimestamp}.pdf";
+
+                if (!file_exists($tempFiles[0])) {
+                    Alert()->toast('Report file not found. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
                 return response()->download($tempFiles[0], $finalFileName)
                     ->deleteFileAfterSend(true);
             } else {
@@ -5466,9 +5506,20 @@ class ResultsController extends Controller
                 $zip = new \ZipArchive();
                 if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
                     foreach ($tempFiles as $index => $tempFile) {
-                        $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                        if (file_exists($tempFile)) {
+                            $zip->addFile($tempFile, "report_part_" . ($index + 1) . ".pdf");
+                        }
                     }
                     $zip->close();
+                } else {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
+                }
+
+                // Verify ZIP was created
+                if (!file_exists($zipPath)) {
+                    Alert()->toast('Failed to create ZIP file. Please try again.', 'error');
+                    return redirect()->back();
                 }
 
                 foreach ($tempFiles as $tempFile) {
