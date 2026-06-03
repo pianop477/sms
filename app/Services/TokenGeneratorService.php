@@ -11,9 +11,9 @@ class TokenGeneratorService
      * Character set - excluding similar looking characters
      * Removed: 0, O, I, 1 to avoid confusion
      */
-    private $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    private $characterCount = 32; // 24 letters + 8 numbers
-    private $tokenLength = 6;
+    private $characters = '0123456789';
+    private $characterCount = 10; // 24 letters + 8 numbers
+    private $tokenLength = 4;
 
     /**
      * Generate unique 6-character alphanumeric token

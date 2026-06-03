@@ -371,7 +371,7 @@ class SendExistingTokens extends Command
             $school = school::find($student->school_id);
 
             if ($parent && $parent->user && $parent->user->phone) {
-                $formattedToken = substr($token->token, 0, 3) . '-' . substr($token->token, 3, 3);
+                $formattedToken = $token->token;
                 $link = $this->appBaseUrl . '/tokens/verify';
 
                 $formattedPhone = $this->formatPhoneNumberForSms($parent->user->phone);

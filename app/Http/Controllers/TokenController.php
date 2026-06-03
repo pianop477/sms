@@ -50,7 +50,7 @@ class TokenController extends Controller
 
         // Validate token
         $request->validate([
-            'token' => 'required|string|min:6|max:6'
+            'token' => 'required|string|min:4|max:4'
         ]);
 
         try {
@@ -251,7 +251,7 @@ class TokenController extends Controller
 
             // ✅ Send SMS
             $school = school::find($student->school_id);
-            $formattedToken = substr($activeToken->token, 0, 3) . '-' . substr($activeToken->token, 3, 3);
+            $formattedToken = $activeToken->token;
             $expiryDate = Carbon::parse($activeToken->expires_at)->format('d/m/Y');
             $link = $this->appBaseUrl . '/tokens/verify';
 

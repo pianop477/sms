@@ -97,34 +97,48 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 16px;
             flex-wrap: wrap;
         }
 
         .token-box {
             display: flex;
-            gap: 8px;
+            gap: 16px;
         }
 
+        /* LARGER TOKEN INPUTS - Enhanced for better visibility */
         .token-input {
-            width: 52px;
-            height: 60px;
+            width: 100px;
+            height: 100px;
             text-align: center;
-            font-size: 26px;
-            font-weight: 700;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
+            font-size: 48px;
+            font-weight: 800;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
             background: #ffffff;
             text-transform: uppercase;
-            font-family: monospace;
+            font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
             transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            letter-spacing: 2px;
+        }
+
+        /* Hide number input spinners */
+        .token-input::-webkit-outer-spin-button,
+        .token-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .token-input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         .token-input:focus {
             border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            transform: scale(1.02);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+            transform: scale(1.03);
         }
 
         .token-input.error {
@@ -135,15 +149,15 @@
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
         .token-separator {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
             color: #667eea;
-            padding: 0 4px;
+            padding: 0 8px;
         }
 
         .btn-container {
@@ -642,25 +656,60 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 480px) {
-            body { padding: 12px; }
-            .gateway-card { padding: 20px 16px; border-radius: 24px; }
-            .gateway-header h2 { font-size: 1.3rem; }
-            .gateway-icon { width: 65px; height: 65px; }
-            .gateway-icon i { font-size: 32px; }
-            .token-input { width: 45px; height: 52px; font-size: 22px; border-radius: 12px; }
-            .token-separator { font-size: 20px; padding: 0 2px; }
-            .student-large-photo { width: 150px !important; height: 150px !important; }
-            .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-            .detail-value { text-align: left; }
+        /* Enhanced Responsive Styles for Larger Inputs */
+        @media (max-width: 560px) {
+            .token-input {
+                width: 75px;
+                height: 75px;
+                font-size: 36px;
+                border-radius: 16px;
+            }
+            .token-box {
+                gap: 12px;
+            }
+            .token-input-group {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .token-input {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+                border-radius: 14px;
+            }
+            .token-box {
+                gap: 10px;
+            }
+            .token-input-group {
+                gap: 8px;
+            }
         }
 
         @media (max-width: 380px) {
-            .token-input { width: 38px; height: 45px; font-size: 18px; border-radius: 10px; }
-            .token-box { gap: 6px; }
-            .token-input-group { gap: 4px; }
-            .token-separator { font-size: 16px; }
+            .token-input {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+                border-radius: 12px;
+            }
+            .token-box {
+                gap: 8px;
+            }
             .student-large-photo { width: 130px !important; height: 130px !important; }
+        }
+
+        @media (max-width: 340px) {
+            .token-input {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                border-radius: 10px;
+            }
+            .token-box {
+                gap: 6px;
+            }
         }
     </style>
 </head>
@@ -673,7 +722,7 @@
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <h2>GATE PASS VERIFICATION</h2>
-                <p>Ingiza msimbo uliopokea kwenye simu yako</p>
+                <p>Ingiza msimbo wa namba 4 uliopokea kwenye simu yako</p>
             </div>
 
             <div id="alertBox" class="alert"></div>
@@ -682,15 +731,10 @@
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="text">
-                        </div>
-                        <div class="token-separator">—</div>
-                        <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="4" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="5" autocomplete="off" inputmode="text">
+                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="numeric" pattern="[0-9]">
                         </div>
                     </div>
                 </div>
@@ -798,6 +842,11 @@
             let currentStudentId = null;
             let currentTokenData = null;
 
+            // --- CONFIGURATION ---
+            const ALERT_DURATION_MS = 3000;           // 3 seconds
+            const VERIFY_SESSION_DURATION_MS = 60000;  // 60 seconds
+            const SUCCESS_CONFIRM_DURATION_MS = 3000;  // 3 seconds
+
             function init() {
                 setupTokenInputs();
                 setupModal();
@@ -811,17 +860,31 @@
                     input.addEventListener('input', handleTokenInput);
                     input.addEventListener('keydown', handleTokenKeydown);
                     input.addEventListener('paste', handleTokenPaste);
+                    // Force numeric only by intercepting keypress
+                    input.addEventListener('keypress', handleNumericOnly);
                 });
                 verifyBtn.addEventListener('click', verifyToken);
                 resetBtn.addEventListener('click', resetAll);
             }
 
+            // Enforce only numeric characters (0-9)
+            function handleNumericOnly(e) {
+                const char = String.fromCharCode(e.which);
+                if (!/[0-9]/.test(char)) {
+                    e.preventDefault();
+                }
+            }
+
             function handleTokenInput(e) {
                 const input = e.target;
                 const idx = parseInt(input.dataset.idx);
-                let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                // Get only the last digit (in case user types multiple or non-numeric)
+                let val = input.value.replace(/[^0-9]/g, '').slice(-1);
                 input.value = val;
-                if (val && idx < tokenInputs.length - 1) tokenInputs[idx + 1].focus();
+
+                if (val && idx < tokenInputs.length - 1) {
+                    tokenInputs[idx + 1].focus();
+                }
                 updateVerifyButton();
                 hideAlert();
                 removeErrorStyling();
@@ -840,12 +903,16 @@
             function handleTokenPaste(e) {
                 e.preventDefault();
                 const text = (e.clipboardData || window.clipboardData).getData('text');
-                const clean = text.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 6);
+                // Extract only numeric characters, limit to 4
+                const clean = text.replace(/[^0-9]/g, '').substring(0, 4);
                 for (let i = 0; i < clean.length && i < tokenInputs.length; i++) {
                     tokenInputs[i].value = clean[i];
                 }
-                if (clean.length < tokenInputs.length) tokenInputs[clean.length].focus();
-                else tokenInputs[5].focus();
+                if (clean.length < tokenInputs.length) {
+                    tokenInputs[clean.length].focus();
+                } else {
+                    tokenInputs[3].focus();
+                }
                 updateVerifyButton();
                 hideAlert();
                 removeErrorStyling();
@@ -875,7 +942,10 @@
                 tokenSection.style.display = 'block';
                 verifyBtn.disabled = true;
                 removeErrorStyling();
-                if (verificationTimeout) clearTimeout(verificationTimeout);
+                if (verificationTimeout) {
+                    clearTimeout(verificationTimeout);
+                    verificationTimeout = null;
+                }
                 currentStudentId = null;
                 currentTokenData = null;
             }
@@ -889,14 +959,18 @@
                 return Array.from(tokenInputs).map(input => input.value).join('');
             }
 
-            function showAlert(message, type) {
+            function showAlert(message, type, autoHide = true, duration = ALERT_DURATION_MS) {
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type}`;
                 alertBox.style.display = 'block';
                 alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setTimeout(() => {
-                    if (alertBox.style.display === 'block') alertBox.style.display = 'none';
-                }, 5000);
+                if (autoHide) {
+                    setTimeout(() => {
+                        if (alertBox.style.display === 'block') {
+                            alertBox.style.display = 'none';
+                        }
+                    }, duration);
+                }
             }
 
             function hideAlert() {
@@ -918,7 +992,6 @@
                 const student = data.student;
                 const installment = data.installment;
                 const token = data.token;
-                const formattedToken = token.token.substring(0, 3) + '-' + token.token.substring(3, 6);
                 const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
 
                 const hasTransport = student.has_transport;
@@ -1005,21 +1078,21 @@
                 if (verificationTimeout) clearTimeout(verificationTimeout);
                 verificationTimeout = setTimeout(() => {
                     if (studentSection.style.display === 'block') {
-                        showAlert('Kipindi cha verification kimeisha. Tafadhali verify tena.', 'warning');
+                        showAlert('Kipindi cha verification kimeisha. Tafadhali verify tena.', 'warning', true, 4000);
                         resetAll();
                     }
-                }, 120000);
+                }, VERIFY_SESSION_DURATION_MS);
 
                 document.getElementById('confirmAccessBtn').addEventListener('click', () => confirmAccess());
                 document.getElementById('newVerifyBtn').addEventListener('click', () => resetAll());
             }
 
             function confirmAccess() {
-                showAlert('✅ RUHUSA IMETOLEWA! Mwanafunzi anaweza kuingia.', 'success');
+                showAlert('✅ RUHUSA IMETOLEWA! Mwanafunzi anaweza kuingia.', 'success', true, SUCCESS_CONFIRM_DURATION_MS);
                 setTimeout(() => {
                     resetAll();
-                    showAlert('TAYARI KWA VERIFICATION NYINGINE', 'info');
-                }, 5000);
+                    showAlert('TAYARI KWA VERIFICATION NYINGINE', 'info', true, 2500);
+                }, SUCCESS_CONFIRM_DURATION_MS);
             }
 
             function escapeHtml(str) {
@@ -1068,7 +1141,7 @@
                 modalAlert.style.display = 'block';
                 setTimeout(() => {
                     if (modalAlert.style.display === 'block') modalAlert.style.display = 'none';
-                }, 5000);
+                }, ALERT_DURATION_MS);
             }
 
             async function handleResendToken(e) {
@@ -1103,7 +1176,7 @@
                         setTimeout(() => {
                             resendModal.classList.remove('active');
                             resetModalForm();
-                        }, 5000);
+                        }, 3000);
                     } else {
                         showModalAlert(data.message, 'error');
                     }
@@ -1122,14 +1195,14 @@
                     if (alert && alert.classList.contains('alert-warning')) alert.style.display = 'none';
                 });
                 window.addEventListener('offline', () => {
-                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.', 'warning');
+                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.', 'warning', true, 4000);
                 });
             }
 
             async function verifyToken() {
                 const tokenCode = getFullToken();
-                if (tokenCode.length !== 6) {
-                    showAlert('Tafadhali ingiza token kamili (herufi 6)', 'error');
+                if (tokenCode.length !== 4) {
+                    showAlert('Tafadhali ingiza token kamili (namba 4)', 'error', true, 2500);
                     addErrorStyling();
                     return;
                 }
@@ -1153,17 +1226,18 @@
                     const data = await response.json();
 
                     if (response.ok && data.success) {
-                        showAlert(data.message, 'success');
+                        showAlert(data.message, 'success', true, 2000);
                         showStudentInfo(data.data);
                     } else {
-                        showAlert(data.message || 'Token si sahihi au imekwisha muda wake.', 'error');
+                        showAlert(data.message || 'Token si sahihi au imekwisha muda wake.', 'error', true, 3500);
                         addErrorStyling();
-                        setTimeout(() => resetAll(), 5000);
+                        setTimeout(() => resetAll(), 4000);
                     }
                 } catch (error) {
-                    showAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error');
+                    console.error('Verification error:', error);
+                    showAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error', true, 3500);
                     addErrorStyling();
-                    setTimeout(() => resetAll(), 5000);
+                    setTimeout(() => resetAll(), 4000);
                 } finally {
                     isLoading = false;
                     loadingSection.style.display = 'none';
