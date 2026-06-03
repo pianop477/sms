@@ -36,7 +36,7 @@
 
                     // Profile image handling
                     $imageName = Auth::user()->image;
-                    $defaultImage = Auth::user()->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg';
+                    $defaultImage = strtolower(Auth::user()->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg';
 
                     $profileImageExists = $imageName && Storage::disk('public')->exists('profile/' . $imageName);
                     $avatarImage = $profileImageExists
