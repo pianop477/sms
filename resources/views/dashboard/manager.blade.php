@@ -211,7 +211,7 @@
             background: linear-gradient(145deg, #329688, #00695c);
         }
 
-        /* Chart Container */
+        /* Chart Container with Fixed Height */
         .chart-card {
             background: white;
             border-radius: 20px;
@@ -219,7 +219,9 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
             border: 1px solid rgba(0, 0, 0, 0.03);
             transition: all 0.3s ease;
-            height: 100%;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
         }
 
         .chart-card:hover {
@@ -230,6 +232,7 @@
             border-bottom: 2px solid #f1f4f9;
             padding-bottom: 1rem;
             margin-bottom: 1.5rem;
+            flex-shrink: 0;
         }
 
         .chart-title {
@@ -237,6 +240,67 @@
             color: var(--primary);
             margin-bottom: 5px;
             font-size: 1rem;
+        }
+
+        .chart-body {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        .chart-body > div,
+        .chart-body > canvas {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Attendance Card Fixed Height */
+        .attendance-card-fixed {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendance-card-fixed .chart-header {
+            flex-shrink: 0;
+        }
+
+        .attendance-card-fixed .scrollable-attendance {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0.5rem 0.5rem 0.5rem;
+        }
+
+        /* Quick Stats Card Fixed Height */
+        .quick-stats-fixed {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-stats-fixed .chart-header {
+            flex-shrink: 0;
+        }
+
+        .quick-stats-fixed .scrollable-stats {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0.5rem;
+        }
+
+        /* Scrollable Table Container */
+        .scrollable-table-container {
+            max-height: 320px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Sticky Table Header */
+        .sticky-table-header thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #f8faff, #f1f5ff);
+            z-index: 10;
         }
 
         /* Table Premium */
@@ -310,6 +374,12 @@
             animation: pulse-glow 3s ease-in-out infinite;
         }
 
+        /* Small Table Scroll for Quick Stats */
+        .small-stats-scroll {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .stat-card-premium .card-value {
@@ -318,6 +388,21 @@
 
             .countdown-item .number {
                 font-size: 24px;
+            }
+
+            .chart-card {
+                height: auto;
+                min-height: 400px;
+            }
+
+            .attendance-card-fixed {
+                height: auto;
+                min-height: 450px;
+            }
+
+            .quick-stats-fixed {
+                height: auto;
+                min-height: 400px;
             }
         }
     </style>
@@ -427,7 +512,8 @@
                 </div>
             </div>
         </div>
-        <!-- Stats Cards -->
+
+        <!-- Stats Cards - First Row -->
         <div class="row g-4 mb-4">
             <!-- Teachers Card -->
             <div class="col-xl-4 col-md-4 col-6">
@@ -486,8 +572,10 @@
                 </a>
             </div>
         </div>
-        <!-- Courses Card -->
+
+        <!-- Stats Cards - Second Row -->
         <div class="row g-4 mb-4">
+            <!-- Courses Card -->
             <div class="col-xl-4 col-md-4 col-6">
                 <a href="{{ route('courses.index') }}" class="text-decoration-none">
                     <div class="stat-card-premium bg-gradient-course">
@@ -545,7 +633,7 @@
             </div>
         </div>
 
-        <!-- Charts Row -->
+        <!-- Charts Row with Fixed Heights -->
         <div class="row g-4 mb-4">
             <!-- Student Registration Chart -->
             <div class="col-xl-8">
@@ -556,7 +644,9 @@
                         </h5>
                         <p class="text-muted small mb-0">Distribution of students across classes</p>
                     </div>
-                    <div style="height: 350px;" id="studentChart"></div>
+                    <div class="chart-body">
+                        <div id="studentChart" style="height: 100%; width: 100%;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -569,12 +659,14 @@
                         </h5>
                         <p class="text-muted small mb-0">Educational background</p>
                     </div>
-                    <div style="height: 350px;" id="qualificationChart"></div>
+                    <div class="chart-body">
+                        <div id="qualificationChart" style="height: 100%; width: 100%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Analytics Row -->
+        <!-- Analytics Row with Fixed Heights -->
         <div class="row g-4">
             <!-- Gender Distribution -->
             <div class="col-xl-4">
@@ -585,15 +677,15 @@
                         </h5>
                         <p class="text-muted small mb-0">Male vs Female students ratio</p>
                     </div>
-                    <div style="height: 350px;">
-                        <canvas id="genderChart"></canvas>
+                    <div class="chart-body">
+                        <canvas id="genderChart" style="height: 100%; width: 100%;"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Attendance Summary -->
+            <!-- Attendance Summary - Fixed Height with Scrollable Content -->
             <div class="col-xl-5">
-                <div class="chart-card">
+                <div class="chart-card attendance-card-fixed">
                     <div class="chart-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -610,141 +702,148 @@
                         </div>
                     </div>
 
-                    @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                        <div class="table-responsive p-2" style="overflow-y: auto;">
-                            <table class="table table-premium">
-                                <thead>
-                                    <tr>
-                                        <th>Class</th>
-                                        <th class="text-center">Pres</th>
-                                        <th class="text-center">Abs</th>
-                                        <th class="text-center">Perm</th>
-                                        <th class="text-center">Rate</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $totalPresent = 0;
-                                        $totalStudents = 0;
-                                    @endphp
-                                    @foreach ($attendanceByClassData as $classData)
-                                        @php
-                                            $classId = $classData['class_id'] ?? null;
-                                            $stream = $classData['class_stream'] ?? null;
-
-                                            $registeredStudents = $classId
-                                                ? \App\Models\Student::where('class_id', $classId)
-                                                    ->when($stream, fn($q) => $q->where('group', $stream))
-                                                    ->where('status', 1)
-                                                    ->count()
-                                                : $classData['present'] +
-                                                    $classData['absent'] +
-                                                    $classData['permission'];
-
-                                            $attendanceRate =
-                                                $registeredStudents > 0
-                                                    ? round(($classData['present'] / $registeredStudents) * 100, 1)
-                                                    : 0;
-
-                                            $totalPresent += $classData['present'];
-                                            $totalStudents += $registeredStudents;
-                                        @endphp
+                    <div class="scrollable-attendance">
+                        @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
+                            <div class="scrollable-table-container">
+                                <table class="table table-premium sticky-table-header">
+                                    <thead>
                                         <tr>
-                                            <td>
-                                                <span class="fw-semibold">{{ $classData['class_code'] ?? '' }}/</span>
-                                                @if (!empty($stream))
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary ms-1">
-                                                        {{ strtoupper($stream) }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center fw-bold text-success">{{ $classData['present'] }}</td>
-                                            <td class="text-center text-danger">{{ $classData['absent'] }}</td>
-                                            <td class="text-center text-secondary">{{ $classData['permission'] }}</td>
-                                            <td class="text-center">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="progress flex-grow-1" style="height: 6px;">
-                                                        <div class="progress-bar {{ $attendanceRate >= 70 ? 'bg-success' : ($attendanceRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
-                                                            style="width: {{ $attendanceRate }}%"></div>
-                                                    </div>
-                                                    <small class="fw-semibold">{{ $attendanceRate }}%</small>
-                                                </div>
-                                            </td>
+                                            <th>Class</th>
+                                            <th class="text-center">Pres</th>
+                                            <th class="text-center">Abs</th>
+                                            <th class="text-center">Perm</th>
+                                            <th class="text-center">Rate</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="bg-light">
-                                    <tr>
-                                        <th>Overall</th>
-                                        <th class="text-center text-success">{{ $totalPresent }}</th>
-                                        <th class="text-center text-danger">
-                                            {{ array_sum(array_column($attendanceByClassData, 'absent')) }}</th>
-                                        <th class="text-center text-secondary">
-                                            {{ array_sum(array_column($attendanceByClassData, 'permission')) }}</th>
-                                        <th class="text-center">
-                                            @php $overallRate = $totalStudents > 0 ? round(($totalPresent / $totalStudents) * 100, 1) : 0; @endphp
-                                            <span
-                                                class="badge-premium {{ $overallRate >= 70 ? 'bg-success' : ($overallRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
-                                                style="color: white;">
-                                                {{ $overallRate }}%
-                                            </span>
-                                        </th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
-                            <h6 class="text-muted">No Attendance Today</h6>
-                            <p class="text-muted small">Records will appear once submitted</p>
-                        </div>
-                    @endif
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $totalPresent = 0;
+                                            $totalStudents = 0;
+                                        @endphp
+                                        @foreach ($attendanceByClassData as $classData)
+                                            @php
+                                                $classId = $classData['class_id'] ?? null;
+                                                $stream = $classData['class_stream'] ?? null;
+
+                                                $registeredStudents = $classId
+                                                    ? \App\Models\Student::where('class_id', $classId)
+                                                        ->when($stream, fn($q) => $q->where('group', $stream))
+                                                        ->where('status', 1)
+                                                        ->count()
+                                                    : $classData['present'] +
+                                                        $classData['absent'] +
+                                                        $classData['permission'];
+
+                                                $attendanceRate =
+                                                    $registeredStudents > 0
+                                                        ? round(($classData['present'] / $registeredStudents) * 100, 1)
+                                                        : 0;
+
+                                                $totalPresent += $classData['present'];
+                                                $totalStudents += $registeredStudents;
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-semibold">{{ $classData['class_code'] ?? '' }}/</span>
+                                                    @if (!empty($stream))
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary ms-1">
+                                                            {{ strtoupper($stream) }}
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center fw-bold text-success">{{ $classData['present'] }}</td>
+                                                <td class="text-center text-danger">{{ $classData['absent'] }}</td>
+                                                <td class="text-center text-secondary">{{ $classData['permission'] }}</td>
+                                                <td class="text-center">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                                            <div class="progress-bar {{ $attendanceRate >= 70 ? 'bg-success' : ($attendanceRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
+                                                                style="width: {{ $attendanceRate }}%"></div>
+                                                        </div>
+                                                        <small class="fw-semibold">{{ $attendanceRate }}%</small>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot class="bg-light">
+                                        <tr>
+                                            <th>Overall</th>
+                                            <th class="text-center text-success">{{ $totalPresent }}</th>
+                                            <th class="text-center text-danger">
+                                                {{ array_sum(array_column($attendanceByClassData, 'absent')) }}</th>
+                                            <th class="text-center text-secondary">
+                                                {{ array_sum(array_column($attendanceByClassData, 'permission')) }}</th>
+                                            <th class="text-center">
+                                                @php $overallRate = $totalStudents > 0 ? round(($totalPresent / $totalStudents) * 100, 1) : 0; @endphp
+                                                <span
+                                                    class="badge-premium {{ $overallRate >= 70 ? 'bg-success' : ($overallRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
+                                                    style="color: white;">
+                                                    {{ $overallRate }}%
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                                <h6 class="text-muted">No Attendance Today</h6>
+                                <p class="text-muted small">Records will appear once submitted</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <!-- Quick Stats -->
+            <!-- Quick Stats - Fixed Height with Scrollable Content -->
             <div class="col-xl-3">
-                <div class="chart-card">
+                <div class="chart-card quick-stats-fixed">
                     <div class="chart-header">
                         <h5 class="chart-title">
                             <i class="fas fa-table me-2"></i> Quick Overview
                         </h5>
                     </div>
 
-                    <!-- Students by Class -->
-                    <div class="mb-4">
-                        <h6 class="text-muted small fw-bold mb-3">Students by Class</h6>
-                        @if ($studentsByClass->isEmpty())
-                            <p class="text-center text-muted small">No data</p>
-                        @else
-                            @foreach ($studentsByClass as $class)
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="small fw-semibold">{{ strtoupper($class->class_code) }}</span>
-                                    <span class="">
-                                        {{ $class->student_count }}
-                                    </span>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
+                    <div class="scrollable-stats">
+                        <!-- Students by Class -->
+                        <div class="mb-4">
+                            <h6 class="text-muted small fw-bold mb-3">Students by Class</h6>
+                            <div class="small-stats-scroll">
+                                @if ($studentsByClass->isEmpty())
+                                    <p class="text-center text-muted small">No data</p>
+                                @else
+                                    @foreach ($studentsByClass as $class)
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small fw-semibold">{{ strtoupper($class->class_code) }}</span>
+                                            <span class="">
+                                                {{ $class->student_count }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
 
-                    <!-- Teachers by Gender -->
-                    <div>
-                        <h6 class="text-muted small fw-bold mb-3">Teachers by Gender</h6>
-                        @if ($teacherByGender->isEmpty())
-                            <p class="text-center text-muted small">No data</p>
-                        @else
-                            @foreach ($teacherByGender as $teacher)
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span
-                                        class="small fw-semibold text-capitalize">{{ ucfirst(strtolower($teacher->gender)) }}</span>
-                                    <span class="">
-                                        {{ $teacher->teacher_count }}
-                                    </span>
-                                </div>
-                            @endforeach
-                        @endif
+                        <!-- Teachers by Gender -->
+                        <div>
+                            <h6 class="text-muted small fw-bold mb-3">Teachers by Gender</h6>
+                            <div class="small-stats-scroll">
+                                @if ($teacherByGender->isEmpty())
+                                    <p class="text-center text-muted small">No data</p>
+                                @else
+                                    @foreach ($teacherByGender as $teacher)
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small fw-semibold text-capitalize">{{ ucfirst(strtolower($teacher->gender)) }}</span>
+                                            <span class="">
+                                                {{ $teacher->teacher_count }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -763,14 +862,12 @@
             // ========== FIXED COUNTDOWN TIMER ==========
             function initializeCountdown() {
                 const endDateStr = '{{ $jsEndDate }}';
-                // Parse the date properly
                 const endDate = new Date(endDateStr.replace(' ', 'T')).getTime();
 
                 function updateCountdown() {
                     const now = new Date().getTime();
                     const distance = endDate - now;
 
-                    // Get elements
                     const daysEl = document.getElementById('days');
                     const hoursEl = document.getElementById('hours');
                     const minutesEl = document.getElementById('minutes');
@@ -786,16 +883,13 @@
                         return;
                     }
 
-                    // Calculate time units
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    // Format with leading zeros
                     const format = (num) => num.toString().padStart(2, '0');
 
-                    // Update with animation
                     updateNumberWithAnimation(daysEl, format(days));
                     updateNumberWithAnimation(hoursEl, format(hours));
                     updateNumberWithAnimation(minutesEl, format(minutes));
@@ -814,12 +908,10 @@
                     }
                 }
 
-                // Initial call and set interval
                 updateCountdown();
                 setInterval(updateCountdown, 1000);
             }
 
-            // Initialize countdown
             initializeCountdown();
 
             // ========== STUDENT CHART (ECharts) ==========
@@ -828,7 +920,6 @@
                 const myChart = echarts.init(chartDom);
                 const chartData = @json($chartData);
 
-                // Process data
                 const groupedData = {};
                 chartData.forEach(item => {
                     const classCode = item.category.split(' (')[0];
@@ -898,7 +989,8 @@
             }
 
             // ========== QUALIFICATION CHART (amCharts) ==========
-            if (document.getElementById('qualificationChart')) {
+            const qualificationDom = document.getElementById('qualificationChart');
+            if (qualificationDom && typeof am5 !== 'undefined') {
                 am5.ready(function() {
                     const root = am5.Root.new("qualificationChart");
                     root.setThemes([am5themes_Animated.new(root)]);

@@ -387,12 +387,9 @@
         .table-responsive {
             border-radius: 15px;
             overflow-x: auto !important;
-            /* Horizontal scrolling only */
-            overflow-y: visible !important;
-            /* Allow vertical overflow for dropdowns */
+            overflow-y: auto !important;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
             position: relative;
-            /* Important for z-index */
             z-index: 1;
         }
 
@@ -404,6 +401,9 @@
         .progress-table thead {
             background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
             color: white;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
 
         .progress-table th {
@@ -474,53 +474,122 @@
             border-left: 5px solid;
         }
 
-        /* Responsive Design */
+        /* ============================================ */
+        /* FIXED HEIGHT & SCROLLABLE CONTENT STYLES */
+        /* ============================================ */
+
+        /* Fixed height containers for scrollable content */
+        .scrollable-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .scrollable-card-body {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .fixed-height-card {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fixed-height-card .card-header {
+            flex-shrink: 0;
+        }
+
+        .fixed-height-card .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        .attendance-card-fixed {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendance-card-fixed .card-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chart-card-fixed {
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card-fixed .chart-wrapper {
+            flex: 1;
+            min-height: auto;
+        }
+
+        /* Quick stats card fix */
+        .quick-stats-container {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-stats-container .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem;
+        }
+
+        .small-table-scroll {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        /* Sticky headers inside scrollable areas */
+        .sticky-header thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             .action-buttons {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .table-responsive {
-                overflow-x: auto;
+            .fixed-height-card {
+                height: auto;
+                min-height: 400px;
             }
 
-            .stat-card-premium .card-value {
-                font-size: 1.8rem;
+            .chart-card-fixed {
+                height: 400px;
             }
 
-            .countdown-item .number {
-                font-size: 24px;
+            .attendance-card-fixed {
+                height: 450px;
             }
 
-            .stat-card .card-value {
-                font-size: 1.5rem;
-            }
-
-            .stat-card .card-icon {
-                font-size: 2.5rem;
-            }
-
-            .chart-wrapper {
-                min-height: 250px;
+            .quick-stats-container {
+                height: auto;
+                min-height: 400px;
             }
         }
 
         .dropdown-menu {
             z-index: 9999 !important;
-            /* Higher than table */
             position: absolute !important;
         }
 
         .chart-container .dropdown-menu {
             position: fixed !important;
             z-index: 1060 !important;
-        }
-
-        /* Ensure table doesn't clip dropdowns */
-        .table-responsive {
-            overflow-x: auto !important;
-            overflow-y: visible !important;
         }
     </style>
 
@@ -578,33 +647,28 @@
                                 <strong><i class="fas fa-exclamation-triangle mr-2"></i> Contract Status:</strong> Not
                                 applied.
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @else
                             @if ($contract->status == 'expired')
                                 <div class="alert alert-danger alert-custom alert-dismissible fade show">
                                     <strong><i class="fas fa-times-circle mr-2"></i> Contract Status:</strong> Expired
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @elseif ($contract->status == 'rejected')
                                 <div class="alert alert-secondary alert-custom alert-dismissible fade show">
                                     <strong><i class="fas fa-times mr-2"></i> Contract Status:</strong> Rejected |
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @elseif ($contract->status == 'approved')
                                 <div class="alert alert-warning alert-custom alert-dismissible fade show">
                                     <strong><i class="fas fa-exclamation-circle mr-2"></i> Contract Status:</strong> Under
                                     Review |
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @elseif ($contract->status == 'pending')
                                 <div class="alert alert-info alert-custom alert-dismissible fade show">
                                     <strong><i class="fas fa-clock mr-2"></i> Contract Status:</strong> Pending |
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @elseif ($contract->status == 'activated')
                                 <div class="alert alert-success alert-custom alert-dismissible fade show">
@@ -612,13 +676,11 @@
                                     (Expires:
                                     {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View contract</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @else
                                 <div class="alert alert-secondary alert-custom alert-dismissible fade show">
                                     <strong><i class="fas fa-ban mr-2"></i> Contract Status:</strong> Terminated |
                                     <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                                 </div>
                             @endif
                         @endif
@@ -783,7 +845,7 @@
                         </div>
                     </div>
 
-                    <!-- Countdown Section - FIXED -->
+                    <!-- Countdown Section -->
                     <div class="countdown-premium">
                         <div class="countdown-item">
                             <span class="number" id="days">00</span>
@@ -805,7 +867,7 @@
                 </div>
             </div>
             <div class="row">
-                <!-- Stats Cards for Head Teacher -->
+                <!-- Stats Cards for Head Teacher - No changes needed, these are small cards -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -954,11 +1016,11 @@
                     </div>
                 </div>
 
-                <!-- Charts Section -->
+                <!-- Charts Section with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-8 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
@@ -972,7 +1034,7 @@
                         </div>
 
                         <div class="col-xl-4 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
@@ -987,11 +1049,11 @@
                     </div>
                 </div>
 
-                <!-- Additional Analytics -->
+                <!-- Additional Analytics with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
@@ -1005,7 +1067,7 @@
                         </div>
 
                         <div class="col-xl-5 mb-4">
-                            <div class="card border-0 shadow-sm h-100">
+                            <div class="card border-0 shadow-sm attendance-card-fixed">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
@@ -1024,11 +1086,11 @@
                                     </div>
                                 </div>
 
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 scrollable-content">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <div class="table-responsive" style="overflow-y: auto;">
-                                            <table class="table table-hover mb-0 table-sm">
-                                                <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
+                                        <div class="scrollable-table-container" style="max-height: 300px; overflow-y: auto;">
+                                            <table class="table table-hover mb-0 table-sm sticky-header">
+                                                <thead>
                                                     <tr>
                                                         <th class="border-0 py-3 ps-4">Class</th>
                                                         <th class="border-0 py-3 text-center">
@@ -1276,7 +1338,7 @@
                                                         </tr>
                                                     </tfoot>
                                                 @endif
-                                            </table>
+                                            </tr>
 
                                             {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
                                             <div class="row g-2 mt-1 mx-2">
@@ -1338,80 +1400,86 @@
                             </div>
                         </div>
 
-                        <!-- Quick Stats Tables -->
+                        <!-- Quick Stats Tables with Fixed Height -->
                         <div class="col-xl-3 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container quick-stats-container">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-table me-2"></i> Quick Overview
                                     </h5>
                                     <p class="chart-subtitle">Registration statistics</p>
                                 </div>
-                                <div class="row">
-                                    <!-- Students by Class -->
-                                    <div class="col-12 mb-3">
-                                        <div class="card border-0 bg-light">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
-                                                @if ($studentsByClass->isEmpty())
-                                                    <p class="text-center text-muted mb-0">No records available</p>
-                                                @else
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm dashboard-table mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Class</th>
-                                                                    <th class="text-end">Count</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($studentsByClass as $class)
-                                                                    <tr>
-                                                                        <td class="fw-semibold text-uppercase">
-                                                                            {{ $class->class_code }}</td>
-                                                                        <td class="text-end">
-                                                                            {{ strtoupper($class->student_count) }}</td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+                                <div class="scrollable-content">
+                                    <div class="row">
+                                        <!-- Students by Class -->
+                                        <div class="col-12 mb-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body p-3">
+                                                    <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                                    <div class="small-table-scroll">
+                                                        @if ($studentsByClass->isEmpty())
+                                                            <p class="text-center text-muted mb-0">No records available</p>
+                                                        @else
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm dashboard-table mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Class</th>
+                                                                            <th class="text-end">Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($studentsByClass as $class)
+                                                                            <tr>
+                                                                                <td class="fw-semibold text-uppercase">
+                                                                                    {{ $class->class_code }}</td>
+                                                                                <td class="text-end">
+                                                                                    {{ strtoupper($class->student_count) }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Teachers by Gender -->
-                                    <div class="col-12">
-                                        <div class="card border-0 bg-light">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
-                                                </h6>
-                                                @if ($teacherByGender->isEmpty())
-                                                    <p class="text-center text-muted mb-0">No records available</p>
-                                                @else
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm dashboard-table mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Gender</th>
-                                                                    <th class="text-end">Count</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($teacherByGender as $teacher)
-                                                                    <tr>
-                                                                        <td class="fw-semibold text-capitalize">
-                                                                            {{ ucwords(strtolower($teacher->gender)) }}
-                                                                        </td>
-                                                                        <td class="text-end">{{ $teacher->teacher_count }}
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+                                        <!-- Teachers by Gender -->
+                                        <div class="col-12">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body p-3">
+                                                    <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
+                                                    </h6>
+                                                    <div class="small-table-scroll">
+                                                        @if ($teacherByGender->isEmpty())
+                                                            <p class="text-center text-muted mb-0">No records available</p>
+                                                        @else
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm dashboard-table mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Gender</th>
+                                                                            <th class="text-end">Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($teacherByGender as $teacher)
+                                                                            <tr>
+                                                                                <td class="fw-semibold text-capitalize">
+                                                                                    {{ ucwords(strtolower($teacher->gender)) }}
+                                                                                </td>
+                                                                                <td class="text-end">{{ $teacher->teacher_count }}
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1426,7 +1494,7 @@
         <!-- Academic Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
             <div class="row">
-                <!-- Stats Cards for Academic Teacher -->
+                <!-- Stats Cards for Academic Teacher - No changes needed -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -1545,11 +1613,11 @@
                     </div>
                 </div>
 
-                <!-- Teaching Subjects and Charts -->
+                <!-- Teaching Subjects and Charts with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-bar me-2"></i> Student Registration
@@ -1563,15 +1631,15 @@
                         </div>
 
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-book me-2"></i> My Teaching Subjects
                                     </h5>
                                     <p class="chart-subtitle">Assigned courses and classes</p>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover progress-table mb-0">
+                                <div class="scrollable-table-container" style="max-height: 320px; overflow-y: auto;">
+                                    <table class="table table-hover progress-table mb-0 sticky-header">
                                         <thead>
                                             <tr>
                                                 <th>Subject</th>
@@ -1636,11 +1704,11 @@
                         </div>
                     </div>
                 </div>
-                <!-- Additional Analytics -->
+                <!-- Additional Analytics with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
@@ -1653,7 +1721,7 @@
                             </div>
                         </div>
                         <div class="col-xl-5 mb-4">
-                            <div class="card border-0 shadow-sm h-100">
+                            <div class="card border-0 shadow-sm attendance-card-fixed">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
@@ -1672,11 +1740,11 @@
                                     </div>
                                 </div>
 
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 scrollable-content">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <div class="table-responsive" style="overflow-y: auto;">
-                                            <table class="table table-hover mb-0 table-sm">
-                                                <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
+                                        <div class="scrollable-table-container" style="max-height: 300px; overflow-y: auto;">
+                                            <table class="table table-hover mb-0 table-sm sticky-header">
+                                                <thead>
                                                     <tr>
                                                         <th class="border-0 py-3 ps-4">Class</th>
                                                         <th class="border-0 py-3 text-center">
@@ -1986,81 +2054,87 @@
                             </div>
                         </div>
 
-                        <!-- Quick Stats Tables -->
+                        <!-- Quick Stats Tables with Fixed Height -->
                         <div class="col-xl-3 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container quick-stats-container">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-table me-2"></i> Quick Overview
                                     </h5>
                                     <p class="chart-subtitle">Registration statistics</p>
                                 </div>
-                                <div class="row">
-                                    <!-- Students by Class -->
-                                    <div class="col-12 mb-3">
-                                        <div class="card border-0 bg-light">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
-                                                @if ($studentsByClass->isEmpty())
-                                                    <p class="text-center text-muted mb-0">No records available</p>
-                                                @else
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm dashboard-table mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Class</th>
-                                                                    <th class="text-end">Count</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($studentsByClass as $class)
-                                                                    <tr>
-                                                                        <td class="fw-semibold text-uppercase">
-                                                                            {{ $class->class_code }}</td>
-                                                                        <td class="text-end">
-                                                                            {{ strtoupper($class->student_count) }}</td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+                                <div class="scrollable-content">
+                                    <div class="row">
+                                        <!-- Students by Class -->
+                                        <div class="col-12 mb-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body p-3">
+                                                    <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                                    <div class="small-table-scroll">
+                                                        @if ($studentsByClass->isEmpty())
+                                                            <p class="text-center text-muted mb-0">No records available</p>
+                                                        @else
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm dashboard-table mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Class</th>
+                                                                            <th class="text-end">Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($studentsByClass as $class)
+                                                                            <tr>
+                                                                                <td class="fw-semibold text-uppercase">
+                                                                                    {{ $class->class_code }}</td>
+                                                                                <td class="text-end">
+                                                                                    {{ strtoupper($class->student_count) }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Teachers by Gender -->
-                                    <div class="col-12">
-                                        <div class="card border-0 bg-light">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
-                                                </h6>
-                                                @if ($teacherByGender->isEmpty())
-                                                    <p class="text-center text-muted mb-0">No records available</p>
-                                                @else
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm dashboard-table mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Gender</th>
-                                                                    <th class="text-end">Count</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($teacherByGender as $teacher)
-                                                                    <tr>
-                                                                        <td class="fw-semibold text-capitalize">
-                                                                            {{ ucwords(strtolower($teacher->gender)) }}
-                                                                        </td>
-                                                                        <td class="text-end">
-                                                                            {{ $teacher->teacher_count }}
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+                                        <!-- Teachers by Gender -->
+                                        <div class="col-12">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body p-3">
+                                                    <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
+                                                    </h6>
+                                                    <div class="small-table-scroll">
+                                                        @if ($teacherByGender->isEmpty())
+                                                            <p class="text-center text-muted mb-0">No records available</p>
+                                                        @else
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm dashboard-table mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Gender</th>
+                                                                            <th class="text-end">Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($teacherByGender as $teacher)
+                                                                            <tr>
+                                                                                <td class="fw-semibold text-capitalize">
+                                                                                    {{ ucwords(strtolower($teacher->gender)) }}
+                                                                                </td>
+                                                                                <td class="text-end">
+                                                                                    {{ $teacher->teacher_count }}
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </td>
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -2075,7 +2149,7 @@
         <!-- Class Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
             <div class="row">
-                <!-- Stats Cards for Class Teacher -->
+                <!-- Stats Cards for Class Teacher - No changes needed -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -2134,19 +2208,19 @@
                     </div>
                 </div>
 
-                <!-- Class and Course Information -->
+                <!-- Class and Course Information with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-users me-2"></i> My Attendance Class
                                     </h5>
                                     <p class="chart-subtitle">Classes assigned for attendance management</p>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover progress-table mb-0">
+                                <div class="scrollable-table-container" style="max-height: 320px; overflow-y: auto;">
+                                    <table class="table table-hover progress-table mb-0 sticky-header">
                                         <thead>
                                             <tr>
                                                 <th>Class</th>
@@ -2174,15 +2248,15 @@
                             </div>
                         </div>
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-book me-2"></i> My Teaching Subjects
                                     </h5>
                                     <p class="chart-subtitle">Assigned courses and classes</p>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover progress-table mb-0">
+                                <div class="scrollable-table-container" style="max-height: 320px; overflow-y: auto;">
+                                    <table class="table table-hover progress-table mb-0 sticky-header">
                                         <thead>
                                             <tr>
                                                 <th>Subject</th>
@@ -2248,11 +2322,11 @@
                     </div>
                 </div>
 
-                <!-- Charts for Class Teacher -->
+                <!-- Charts for Class Teacher with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
@@ -2266,7 +2340,7 @@
                         </div>
 
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-calendar-check me-2"></i> Today's Attendance
@@ -2324,17 +2398,17 @@
                     </div>
                 </div>
 
-                <!-- Teaching Subjects -->
+                <!-- Teaching Subjects with Fixed Height -->
                 <div class="col-lg-12 mb-4">
-                    <div class="chart-container">
+                    <div class="chart-container fixed-height-card">
                         <div class="chart-header">
                             <h5 class="chart-title">
                                 <i class="fas fa-book me-2"></i> My Teaching Subjects
                             </h5>
                             <p class="chart-subtitle">Assigned courses and classes</p>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover progress-table mb-0">
+                        <div class="scrollable-table-container" style="max-height: 350px; overflow-y: auto;">
+                            <table class="table table-hover progress-table mb-0 sticky-header">
                                 <thead>
                                     <tr>
                                         <th>Subject</th>
