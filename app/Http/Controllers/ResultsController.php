@@ -638,12 +638,12 @@ class ResultsController extends Controller
         });
 
         //get compiled results
-        $compiled_results = compiled_results::where('school_id', $schools->id)
-            ->where('class_id', $classes->id)
-            ->get();
+        // $compiled_results = compiled_results::where('school_id', $schools->id)
+        //     ->where('class_id', $classes->id)
+        //     ->get();
 
         $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
-        $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
+        // $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
         $reports = generated_reports::query()
             ->join('users', 'users.id', '=', 'generated_reports.created_by')
@@ -654,7 +654,7 @@ class ResultsController extends Controller
             ->orderBy('generated_reports.created_at', 'desc')
             ->paginate(5);
 
-        return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
+        return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'year', 'exams', 'classes', 'groupedByExamType'));
     }
 
     //function for displaying general results by term ***************************************
