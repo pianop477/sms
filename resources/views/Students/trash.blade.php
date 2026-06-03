@@ -230,7 +230,6 @@
 
         .table-modern thead th {
             background: linear-gradient(135deg, #2b3d5c 0%, #1a2a44 100%);
-            /* color: white; */
             font-weight: 600;
             padding: 12px 12px;
             font-size: 0.85rem;
@@ -346,7 +345,13 @@
             background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
         }
 
-        .action-icon:hover {
+        .action-icon:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-icon:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
@@ -364,6 +369,13 @@
             font-size: 50px;
             color: #ffc107;
             margin-bottom: 15px;
+        }
+
+        /* Loading overlay for table */
+        .table-loading {
+            position: relative;
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         /* Responsive */
@@ -412,6 +424,21 @@
                 background: #742a2a;
                 color: #fed7d7;
             }
+        }
+
+        /* Button loading spinner */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 
@@ -504,31 +531,25 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="action-icons justify-content-center">
-                                                <!-- Restore Button -->
-                                                <form action="{{ route('student.restored.trash', ['student' => Hashids::encode($student->id)]) }}"
-                                                      method="POST"
-                                                      class="restore-form"
-                                                      data-name="{{ $student->first_name }} {{ $student->last_name }}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <button type="submit" class="action-icon success" onclick="return confirm('Are you sure?')" title="Restore Student">
-                                                        <i class="fas fa-undo-alt"></i>
-                                                    </button>
-                                                </form>
+                                                <!-- Restore Button - Using button instead of form for better control -->
+                                                <button type="button"
+                                                        class="action-icon success restore-btn"
+                                                        title="Restore Student"
+                                                        data-url="{{ route('student.restored.trash', ['student' => Hashids::encode($student->id)]) }}"
+                                                        data-name="{{ $student->first_name }} {{ $student->last_name }}">
+                                                    <i class="fas fa-undo-alt"></i>
+                                                </button>
 
                                                 <!-- Permanent Delete Button -->
-                                                <form action="{{ route('student.delete.permanent', ['student' => Hashids::encode($student->id)]) }}"
-                                                      method="POST"
-                                                      class="delete-form"
-                                                      data-name="{{ $student->first_name }} {{ $student->last_name }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="action-icon danger" onclick="return confirm('Are you sure?')" title="Permanently Delete">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button"
+                                                        class="action-icon danger delete-permanent-btn"
+                                                        title="Permanently Delete"
+                                                        data-url="{{ route('student.delete.permanent', ['student' => Hashids::encode($student->id)]) }}"
+                                                        data-name="{{ $student->first_name }} {{ $student->last_name }}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
                                             </div>
-                                         </td>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -549,15 +570,15 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <script>
         $(document).ready(function() {
             // ============ DATATABLE INITIALIZATION ============
-            // Check if table exists and destroy any existing instance
             if ($.fn.DataTable.isDataTable('#deletedStudentsTable')) {
                 $('#deletedStudentsTable').DataTable().destroy();
             }
 
-            // Initialize DataTable with safe options
             $('#deletedStudentsTable').DataTable({
                 paging: true,
                 pageLength: 10,
@@ -582,6 +603,200 @@
                         previous: "Previous"
                     }
                 }
+            });
+
+            // ============ EVENT DELEGATION FOR RESTORE BUTTONS ============
+            $(document).on('click', '.restore-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const $btn = $(this);
+                const userName = $btn.data('name');
+                const restoreUrl = $btn.data('url');
+
+                // Validate URL exists
+                if (!restoreUrl) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Invalid restore URL. Please refresh the page and try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Restore Student Account?',
+                    html: `Are you sure you want to restore <strong>${userName}</strong>?<br><br>The student will be reactivated and can log in again.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, restore it!',
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: false,
+                    allowEscapeKey: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state on button
+                        const originalIcon = $btn.html();
+                        $btn.prop('disabled', true);
+                        $btn.addClass('btn-loading');
+                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
+
+                        // Make AJAX request with PUT method
+                        $.ajax({
+                            url: restoreUrl,
+                            type: 'PUT',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: response.message || 'Student account restored successfully',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                // Reset button
+                                $btn.prop('disabled', false);
+                                $btn.removeClass('btn-loading');
+                                $btn.html(originalIcon);
+
+                                let errorMessage = 'Something went wrong!';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else if (xhr.status === 422) {
+                                    errorMessage = 'Invalid data provided';
+                                } else if (xhr.status === 404) {
+                                    errorMessage = 'Student account not found';
+                                } else if (xhr.status === 403) {
+                                    errorMessage = 'You do not have permission to perform this action';
+                                } else if (xhr.status === 500) {
+                                    errorMessage = 'Server error. Please try again later';
+                                }
+
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ============ EVENT DELEGATION FOR PERMANENT DELETE BUTTONS ============
+            $(document).on('click', '.delete-permanent-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const $btn = $(this);
+                const userName = $btn.data('name');
+                const deleteUrl = $btn.data('url');
+
+                // Validate URL exists
+                if (!deleteUrl) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Invalid delete URL. Please refresh the page and try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Permanently Delete Student Account?',
+                    html: `Are you sure you want to permanently delete <strong>${userName}</strong>?<br><br><span style="color: #dc3545;">⚠️ This action cannot be undone! All data associated with this student will be permanently removed from the system.</span>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete permanently!',
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: false,
+                    allowEscapeKey: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state on button
+                        const originalIcon = $btn.html();
+                        $btn.prop('disabled', true);
+                        $btn.addClass('btn-loading');
+                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
+
+                        // Make AJAX request with DELETE method
+                        $.ajax({
+                            url: deleteUrl,
+                            type: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: response.message || 'Student account has been permanently deleted from the system',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                // Reset button
+                                $btn.prop('disabled', false);
+                                $btn.removeClass('btn-loading');
+                                $btn.html(originalIcon);
+
+                                let errorMessage = 'Something went wrong!';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else if (xhr.status === 422) {
+                                    errorMessage = 'Invalid data provided';
+                                } else if (xhr.status === 404) {
+                                    errorMessage = 'Student account not found';
+                                } else if (xhr.status === 403) {
+                                    errorMessage = 'You do not have permission to perform this action';
+                                } else if (xhr.status === 500) {
+                                    errorMessage = 'Server error. Please try again later';
+                                }
+
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Optional: Add loading indicator when changing pages
+            $('#deletedStudentsTable').on('page.dt', function() {
+                $('.table-container-modern').css('opacity', '0.6');
+                setTimeout(function() {
+                    $('.table-container-modern').css('opacity', '1');
+                }, 300);
+            });
+
+            // Optional: Add loading indicator when searching
+            $('#deletedStudentsTable').on('search.dt', function() {
+                $('.table-container-modern').css('opacity', '0.6');
+                setTimeout(function() {
+                    $('.table-container-modern').css('opacity', '1');
+                }, 300);
             });
         });
     </script>

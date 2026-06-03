@@ -49,8 +49,8 @@
         }
 
         .logo-img {
-            max-width: 75px;
-            max-height: 75px;
+            max-width: 90px;
+            max-height: 90px;
         }
 
         .school-info-cell {

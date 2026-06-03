@@ -27,13 +27,13 @@
         }
 
         .logo-container {
-            width: 80px;
+            width: 90px;
             vertical-align: middle;
         }
 
         .logo {
-            max-width: 75px;
-            max-height: 65px;
+            max-width: 90px;
+            max-height: 90px;
         }
 
         .school-info {

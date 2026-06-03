@@ -388,6 +388,21 @@
         margin-bottom: 15px;
     }
 
+    /* Button loading spinner */
+    .btn-loading {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .btn-loading i {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
         .table-modern {
@@ -590,182 +605,230 @@
 
 <script>
     $(document).ready(function() {
-            // ============ DATATABLE INITIALIZATION ============
-            if ($.fn.DataTable.isDataTable('#deletedStaffsTable')) {
-                $('#deletedStaffsTable').DataTable().destroy();
+        // ============ DATATABLE INITIALIZATION ============
+        if ($.fn.DataTable.isDataTable('#deletedStaffsTable')) {
+            $('#deletedStaffsTable').DataTable().destroy();
+        }
+
+        $('#deletedStaffsTable').DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            ordering: true,
+            info: true,
+            searching: true,
+            autoWidth: false,
+            stateSave: false,
+            language: {
+                emptyTable: "No deleted records found",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                lengthMenu: "Show _MENU_ entries",
+                search: "Search:",
+                zeroRecords: "No matching records found",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "Next",
+                    previous: "Previous"
+                }
+            }
+        });
+
+        // ============ EVENT DELEGATION FOR RESTORE BUTTONS (FIX FOR PAGINATION) ============
+        $(document).on('click', '.restore-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const $btn = $(this);
+            const userName = $btn.data('name');
+            const restoreUrl = $btn.data('url');
+
+            // Validate URL exists
+            if (!restoreUrl) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Invalid restore URL. Please refresh the page and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
             }
 
-            $('#deletedStaffsTable').DataTable({
-                paging: true,
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                ordering: true,
-                info: true,
-                searching: true,
-                autoWidth: false,
-                stateSave: false,
-                language: {
-                    emptyTable: "No deleted records found",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    lengthMenu: "Show _MENU_ entries",
-                    search: "Search:",
-                    zeroRecords: "No matching records found",
-                    paginate: {
-                        first: "First",
-                        last: "Last",
-                        next: "Next",
-                        previous: "Previous"
-                    }
+            // Show confirmation dialog first
+            Swal.fire({
+                title: 'Restore Staff Account?',
+                html: `Are you sure you want to restore <strong>${userName}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, restore it!',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false,
+                allowEscapeKey: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading on button only
+                    const originalIcon = $btn.html();
+                    $btn.prop('disabled', true);
+                    $btn.addClass('btn-loading');
+                    $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
+
+                    // Make AJAX request
+                    $.ajax({
+                        url: restoreUrl,
+                        type: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message || 'Staff account restored successfully',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            // Reset button
+                            $btn.prop('disabled', false);
+                            $btn.removeClass('btn-loading');
+                            $btn.html(originalIcon);
+
+                            let errorMessage = 'Something went wrong!';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.status === 422) {
+                                errorMessage = 'Invalid data provided';
+                            } else if (xhr.status === 404) {
+                                errorMessage = 'Staff account not found';
+                            } else if (xhr.status === 403) {
+                                errorMessage = 'You do not have permission to perform this action';
+                            } else if (xhr.status === 500) {
+                                errorMessage = 'Server error. Please try again later';
+                            }
+
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
                 }
             });
+        });
 
-            // ============ RESTORE FUNCTION (No preloader overlap) ============
-            $('.restore-btn').on('click', function(e) {
-                e.preventDefault();
+        // ============ EVENT DELEGATION FOR PERMANENT DELETE BUTTONS (FIX FOR PAGINATION) ============
+        $(document).on('click', '.delete-permanent-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                const $btn = $(this);
-                const userName = $btn.data('name');
-                const restoreUrl = $btn.data('url');
+            const $btn = $(this);
+            const userName = $btn.data('name');
+            const deleteUrl = $btn.data('url');
 
-                // Show confirmation dialog first
+            // Validate URL exists
+            if (!deleteUrl) {
                 Swal.fire({
-                    title: 'Restore Staff Account?',
-                    html: `Are you sure you want to restore <strong>${userName}</strong>?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#dc3545',
-                    confirmButtonText: 'Yes, restore it!',
-                    cancelButtonText: 'Cancel',
-                    allowOutsideClick: false,
-                    allowEscapeKey: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show loading on button only
-                        const originalIcon = $btn.html();
-                        $btn.prop('disabled', true);
-                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
-
-                        // Make AJAX request
-                        $.ajax({
-                            url: restoreUrl,
-                            type: 'PUT',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: response.message || 'Staff account restored successfully',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                // Reset button
-                                $btn.prop('disabled', false);
-                                $btn.html(originalIcon);
-
-                                let errorMessage = 'Something went wrong!';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
-                                } else if (xhr.status === 422) {
-                                    errorMessage = 'Invalid data provided';
-                                } else if (xhr.status === 404) {
-                                    errorMessage = 'Staff account not found';
-                                }
-
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: errorMessage,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        });
-                    }
+                    title: 'Error!',
+                    text: 'Invalid delete URL. Please refresh the page and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
                 });
-            });
+                return;
+            }
 
-            // ============ PERMANENT DELETE FUNCTION (Using PUT Method) ============
-            $('.delete-permanent-btn').on('click', function(e) {
-                e.preventDefault();
+            // Show confirmation dialog first
+            Swal.fire({
+                title: 'Permanently Delete Staff Account?',
+                html: `Are you sure you want to permanently delete <strong>${userName}</strong>?<br><br><span style="color: #dc3545;">⚠️ This action cannot be undone! (This will update the account status)</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete permanently!',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false,
+                allowEscapeKey: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading on button only
+                    const originalIcon = $btn.html();
+                    $btn.prop('disabled', true);
+                    $btn.addClass('btn-loading');
+                    $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
 
-                const $btn = $(this);
-                const userName = $btn.data('name');
-                const deleteUrl = $btn.data('url');
+                    // Make AJAX request with PUT method
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'PUT', // Using PUT method as requested
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message || 'Staff account has been deactivated permanently',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            // Reset button
+                            $btn.prop('disabled', false);
+                            $btn.removeClass('btn-loading');
+                            $btn.html(originalIcon);
 
-                // Show confirmation dialog first
-                Swal.fire({
-                    title: 'Permanently Delete Staff Account?',
-                    html: `Are you sure you want to permanently delete <strong>${userName}</strong>?<br><br><span style="color: #dc3545;">⚠️ This action cannot be undone! (This will update the account status)</span>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, delete permanently!',
-                    cancelButtonText: 'Cancel',
-                    allowOutsideClick: false,
-                    allowEscapeKey: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show loading on button only
-                        const originalIcon = $btn.html();
-                        $btn.prop('disabled', true);
-                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
-
-                        // Make AJAX request with PUT method
-                        $.ajax({
-                            url: deleteUrl,
-                            type: 'PUT', // Using PUT method as requested
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: response.message || 'Staff account has been deactivated permanently',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                // Reset button
-                                $btn.prop('disabled', false);
-                                $btn.html(originalIcon);
-
-                                let errorMessage = 'Something went wrong!';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
-                                } else if (xhr.status === 422) {
-                                    errorMessage = 'Invalid data provided';
-                                } else if (xhr.status === 404) {
-                                    errorMessage = 'Staff account not found';
-                                } else if (xhr.status === 403) {
-                                    errorMessage = 'You do not have permission to perform this action';
-                                } else if (xhr.status === 500) {
-                                    errorMessage = 'Server error. Please try again later';
-                                }
-
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: errorMessage,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
+                            let errorMessage = 'Something went wrong!';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.status === 422) {
+                                errorMessage = 'Invalid data provided';
+                            } else if (xhr.status === 404) {
+                                errorMessage = 'Staff account not found';
+                            } else if (xhr.status === 403) {
+                                errorMessage = 'You do not have permission to perform this action';
+                            } else if (xhr.status === 500) {
+                                errorMessage = 'Server error. Please try again later';
                             }
-                        });
-                    }
-                });
+
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
             });
         });
+
+        // Optional: Add loading indicator when changing pages for better UX
+        $('#deletedStaffsTable').on('page.dt', function() {
+            $('.table-container-modern').css('opacity', '0.6');
+            setTimeout(function() {
+                $('.table-container-modern').css('opacity', '1');
+            }, 300);
+        });
+
+        // Optional: Add loading indicator when searching
+        $('#deletedStaffsTable').on('search.dt', function() {
+            $('.table-container-modern').css('opacity', '0.6');
+            setTimeout(function() {
+                $('.table-container-modern').css('opacity', '1');
+            }, 300);
+        });
+    });
 </script>
 @endsection

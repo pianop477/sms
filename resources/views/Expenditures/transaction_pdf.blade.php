@@ -36,14 +36,14 @@
         }
 
         .logo {
-            max-width: 70px;
-            max-height: 60px;
+            max-width: 90px;
+            max-height: 90px;
             display: block;
         }
 
         .logo-placeholder {
-            width: 70px;
-            height: 50px;
+            width: 90px;
+            height: 90px;
             border: 1px solid #bdc3c7;
             display: flex;
             align-items: center;

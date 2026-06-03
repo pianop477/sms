@@ -62,7 +62,6 @@
         from {
             transform: rotate(0deg);
         }
-
         to {
             transform: rotate(360deg);
         }
@@ -242,7 +241,7 @@
         letter-spacing: 0.5px;
         border: none;
         white-space: nowrap;
-        /* color: white; */
+        color: white;
     }
 
     .table-modern tbody td {
@@ -381,55 +380,7 @@
         margin-bottom: 15px;
     }
 
-    /* Responsive */
-    @media (max-width: 1200px) {
-        .table-modern {
-            display: block;
-            overflow-x: auto;
-        }
-
-        .action-icons {
-            justify-content: flex-start;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .header-content {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .nav-tabs-custom {
-            justify-content: center;
-        }
-    }
-
-    /* Dark Mode */
-    @media (prefers-color-scheme: dark) {
-        body {
-            background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
-        }
-
-        .modern-card {
-            background: rgba(33, 37, 41, 0.95);
-        }
-
-        .table-modern tbody td {
-            border-bottom-color: #495057;
-            color: #e9ecef;
-        }
-
-        .table-modern tbody tr:hover {
-            background: #343a40;
-        }
-
-        .status-deleted {
-            background: #742a2a;
-            color: #fed7d7;
-        }
-    }
-
-    /* Loading spinner on button */
+    /* Button loading spinner */
     .btn-loading {
         position: relative;
         pointer-events: none;
@@ -443,9 +394,50 @@
         0% {
             transform: rotate(0deg);
         }
-
         100% {
             transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .table-modern {
+            display: block;
+            overflow-x: auto;
+        }
+        .action-icons {
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .nav-tabs-custom {
+            justify-content: center;
+        }
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
+        }
+        .modern-card {
+            background: rgba(33, 37, 41, 0.95);
+        }
+        .table-modern tbody td {
+            border-bottom-color: #495057;
+            color: #e9ecef;
+        }
+        .table-modern tbody tr:hover {
+            background: #343a40;
+        }
+        .status-deleted {
+            background: #742a2a;
+            color: #fed7d7;
         }
     }
 </style>
@@ -581,187 +573,231 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <script>
-    $(document).ready(function() {
-            // ============ DATATABLE INITIALIZATION ============
-            if ($.fn.DataTable.isDataTable('#deletedTable')) {
-                $('#deletedTable').DataTable().destroy();
+$(document).ready(function() {
+    // ============ DATATABLE INITIALIZATION ============
+    if ($.fn.DataTable.isDataTable('#deletedTable')) {
+        $('#deletedTable').DataTable().destroy();
+    }
+
+    $('#deletedTable').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        ordering: true,
+        info: true,
+        searching: true,
+        autoWidth: false,
+        stateSave: false,
+        language: {
+            emptyTable: "No deleted records found",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            infoEmpty: "Showing 0 to 0 of 0 entries",
+            infoFiltered: "(filtered from _MAX_ total entries)",
+            lengthMenu: "Show _MENU_ entries",
+            search: "Search:",
+            zeroRecords: "No matching records found",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
             }
+        }
+    });
 
-            $('#deletedTable').DataTable({
-                paging: true,
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                ordering: true,
-                info: true,
-                searching: true,
-                autoWidth: false,
-                stateSave: false,
-                language: {
-                    emptyTable: "No deleted records found",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    lengthMenu: "Show _MENU_ entries",
-                    search: "Search:",
-                    zeroRecords: "No matching records found",
-                    paginate: {
-                        first: "First",
-                        last: "Last",
-                        next: "Next",
-                        previous: "Previous"
-                    }
-                }
+    // ============ EVENT DELEGATION FOR RESTORE BUTTONS (FIX FOR PAGINATION) ============
+    $(document).on('click', '.restore-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $btn = $(this);
+        const userName = $btn.data('name');
+        const restoreUrl = $btn.data('url');
+
+        // Validate required data
+        if (!restoreUrl) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Invalid restore URL',
+                icon: 'error',
+                confirmButtonText: 'OK'
             });
+            return;
+        }
 
-            // ============ RESTORE FUNCTION (Using PUT Method) ============
-            $('.restore-btn').on('click', function(e) {
-                e.preventDefault();
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Restore Account?',
+            html: `Are you sure you want to restore <strong>${userName}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, restore it!',
+            cancelButtonText: 'Cancel',
+            allowOutsideClick: false,
+            allowEscapeKey: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state on button
+                const originalIcon = $btn.html();
+                $btn.prop('disabled', true);
+                $btn.addClass('btn-loading');
+                $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
 
-                const $btn = $(this);
-                const userName = $btn.data('name');
-                const restoreUrl = $btn.data('url');
+                // Make AJAX request with PUT method
+                $.ajax({
+                    url: restoreUrl,
+                    type: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message || 'Account restored successfully',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        // Reset button
+                        $btn.prop('disabled', false);
+                        $btn.removeClass('btn-loading');
+                        $btn.html(originalIcon);
 
-                // Show confirmation dialog first (no preloader)
-                Swal.fire({
-                    title: 'Restore Account?',
-                    html: `Are you sure you want to restore <strong>${userName}</strong>?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#dc3545',
-                    confirmButtonText: 'Yes, restore it!',
-                    cancelButtonText: 'Cancel',
-                    allowOutsideClick: false,
-                    allowEscapeKey: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show loading state on button only
-                        const originalIcon = $btn.html();
-                        $btn.prop('disabled', true);
-                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
+                        let errorMessage = 'Something went wrong!';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.status === 422) {
+                            errorMessage = 'Invalid data provided';
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Account not found';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'You do not have permission to perform this action';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error. Please try again later';
+                        }
 
-                        // Make AJAX request with PUT method
-                        $.ajax({
-                            url: restoreUrl,
-                            type: 'PUT',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: response.message || 'Account restored successfully',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                // Reset button
-                                $btn.prop('disabled', false);
-                                $btn.html(originalIcon);
-
-                                let errorMessage = 'Something went wrong!';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
-                                } else if (xhr.status === 422) {
-                                    errorMessage = 'Invalid data provided';
-                                } else if (xhr.status === 404) {
-                                    errorMessage = 'Account not found';
-                                } else if (xhr.status === 403) {
-                                    errorMessage = 'You do not have permission to perform this action';
-                                } else if (xhr.status === 500) {
-                                    errorMessage = 'Server error. Please try again later';
-                                }
-
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: errorMessage,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
                         });
                     }
                 });
-            });
-
-            // ============ PERMANENT DELETE FUNCTION (Using PUT Method - Updates status) ============
-            $('.delete-permanent-btn').on('click', function(e) {
-                e.preventDefault();
-
-                const $btn = $(this);
-                const userName = $btn.data('name');
-                const deleteUrl = $btn.data('url');
-
-                // Show confirmation dialog first (no preloader)
-                Swal.fire({
-                    title: 'Permanently Delete Account?',
-                    html: `Are you sure you want to permanently delete <strong>${userName}</strong>?<br><br><span style="color: #dc3545;">⚠️ This action cannot be undone! (This will update the account status)</span>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, delete permanently!',
-                    cancelButtonText: 'Cancel',
-                    allowOutsideClick: false,
-                    allowEscapeKey: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show loading state on button only
-                        const originalIcon = $btn.html();
-                        $btn.prop('disabled', true);
-                        $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
-
-                        // Make AJAX request with PUT method
-                        $.ajax({
-                            url: deleteUrl,
-                            type: 'PUT', // Using PUT method as requested
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: response.message || 'Account has been deactivated permanently',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                // Reset button
-                                $btn.prop('disabled', false);
-                                $btn.html(originalIcon);
-
-                                let errorMessage = 'Something went wrong!';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
-                                } else if (xhr.status === 422) {
-                                    errorMessage = 'Invalid data provided';
-                                } else if (xhr.status === 404) {
-                                    errorMessage = 'Account not found';
-                                } else if (xhr.status === 403) {
-                                    errorMessage = 'You do not have permission to perform this action';
-                                } else if (xhr.status === 500) {
-                                    errorMessage = 'Server error. Please try again later';
-                                }
-
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: errorMessage,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        });
-                    }
-                });
-            });
+            }
         });
+    });
+
+    // ============ EVENT DELEGATION FOR PERMANENT DELETE BUTTONS (FIX FOR PAGINATION) ============
+    $(document).on('click', '.delete-permanent-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $btn = $(this);
+        const userName = $btn.data('name');
+        const deleteUrl = $btn.data('url');
+
+        // Validate required data
+        if (!deleteUrl) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Invalid delete URL',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Permanently Delete Account?',
+            html: `Are you sure you want to permanently delete <strong>${userName}</strong>?<br><br><span style="color: #dc3545;">⚠️ This action cannot be undone! (This will update the account status)</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete permanently!',
+            cancelButtonText: 'Cancel',
+            allowOutsideClick: false,
+            allowEscapeKey: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state on button
+                const originalIcon = $btn.html();
+                $btn.prop('disabled', true);
+                $btn.addClass('btn-loading');
+                $btn.html('<i class="fas fa-spinner fa-pulse"></i>');
+
+                // Make AJAX request with PUT method
+                $.ajax({
+                    url: deleteUrl,
+                    type: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message || 'Account has been deactivated permanently',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        // Reset button
+                        $btn.prop('disabled', false);
+                        $btn.removeClass('btn-loading');
+                        $btn.html(originalIcon);
+
+                        let errorMessage = 'Something went wrong!';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.status === 422) {
+                            errorMessage = 'Invalid data provided';
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Account not found';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'You do not have permission to perform this action';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error. Please try again later';
+                        }
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // Optional: Add loading indicator when changing pages
+    $('#deletedTable').on('page.dt', function() {
+        $('.table-container-modern').css('opacity', '0.6');
+        setTimeout(function() {
+            $('.table-container-modern').css('opacity', '1');
+        }, 300);
+    });
+
+    // Optional: Add loading indicator when searching
+    $('#deletedTable').on('search.dt', function() {
+        $('.table-container-modern').css('opacity', '0.6');
+        setTimeout(function() {
+            $('.table-container-modern').css('opacity', '1');
+        }, 300);
+    });
+});
 </script>
 @endsection

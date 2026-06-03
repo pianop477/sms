@@ -773,7 +773,7 @@
                 let logoPath = school.logo.replace(/^(public\/|storage\/|app\/public\/)/, '');
                 if (!logoPath.includes('logo/')) logoPath = `logo/${logoPath}`;
                 logoHtml =
-                    `<img src="/storage/${logoPath}" alt="Logo" style="max-height: 60px;" onerror="this.style.display='none'">`;
+                    `<img src="/storage/${logoPath}" alt="Logo" style="max-height: 90px;" onerror="this.style.display='none'">`;
             }
 
             const isPaid = response.summary.balance <= 0;

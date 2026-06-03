@@ -32,8 +32,8 @@
         }
 
         .school-logo {
-            max-height: 65px;
-            width: auto;
+            height: 90px;
+            width: 90px;
         }
 
         .school-info {

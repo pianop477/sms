@@ -142,8 +142,8 @@
 
     /* Logo Image - Fixed sizes (no percentages) */
     .school-logo-img {
-        width: 45px;
-        height: 45px;
+        width: 60px;
+        height: 60px;
         object-fit: cover;
         border-radius: 50%;
         border: 1.5px solid #e9ecef;
@@ -180,34 +180,34 @@
     /* Responsive adjustments */
     @media (max-width: 576px) {
         .school-logo-img {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
         }
         .profile-avatar {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
         }
     }
 
     @media (min-width: 768px) {
         .school-logo-img {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
         }
         .profile-avatar {
-            width: 42px;
-            height: 42px;
+            width: 45px;
+            height: 45px;
         }
     }
 
     @media (min-width: 992px) {
         .school-logo-img {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
         }
         .profile-avatar {
-            width: 44px;
-            height: 44px;
+            width: 50px;
+            height: 50px;
         }
     }
 

@@ -263,8 +263,8 @@
         }
 
         .school-logo {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;

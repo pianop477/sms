@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Barua ya Kukubaliwa</title>
+    <title>Barua</title>
     <style>
         .logo {
             position: absolute;
@@ -105,7 +105,7 @@
     <div class="container">
         @if ($contract['logo'])
             <div class="logo">
-                <img src="{{ $contract['logo'] }}" alt="School Logo" class="logo" style="max-width: 80px;">
+                <img src="{{ $contract['logo'] }}" alt="School Logo" class="logo" style="max-width: 90px;">
             </div>
         @endif
         <div class="header" style="">

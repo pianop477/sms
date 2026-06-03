@@ -28,8 +28,8 @@
         }
 
         .logo {
-            max-width: 80px;
-            max-height: 70px;
+            max-width: 90px;
+            max-height: 90px;
         }
 
         .school-info {
@@ -154,7 +154,7 @@
                 @if($logoBase64)
                     <img src="{{ $logoBase64 }}" alt="Logo" class="logo">
                 @else
-                    <div style="background:#f1f5f9; width:60px; height:60px; line-height:30px; text-align:center; font-size:9px; border:1px solid #cbd5e1;">LOGO</div>
+                    <div style="background:#f1f5f9; width:90px; height:90px; line-height:30px; text-align:center; font-size:9px; border:1px solid #cbd5e1;">LOGO</div>
                 @endif
             </td>
             <td class="school-info" style="border:none; padding:0;">

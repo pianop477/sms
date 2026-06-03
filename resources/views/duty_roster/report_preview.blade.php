@@ -53,8 +53,8 @@
         }
 
         .school-logo {
-            width: 120px;
-            height: 120px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
             border: 5px solid var(--secondary-color);

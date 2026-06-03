@@ -65,8 +65,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             margin-bottom: 20px;

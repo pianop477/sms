@@ -73,8 +73,8 @@
 
         .logo {
             position: absolute;
-            width: 70px;
-            left: 7px;
+            width: 90px;
+            left: 9px;
             top: 5px;
             color: inherit;
         }
@@ -229,7 +229,7 @@
                 <div class="container">
                     <div class="logo">
                         <img src="{{ storage_path('app/public/logo/' . $schoolInfo->logo) }}" alt=""
-                            style="max-width: 80px;">
+                            style="max-width: 90px;">
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
