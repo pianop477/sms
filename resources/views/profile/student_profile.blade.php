@@ -16,343 +16,310 @@
 
         body {
             background-color: #f8f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
             color: #333;
+            line-height: 1.5;
         }
 
+        /* SIMPLE CARD DESIGN - No complex transforms */
         .card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 25px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            background: white;
         }
 
-        .card:hover {
-            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
-        }
-
-        /* Profile Header */
+        /* PROFILE HEADER - Simplified */
         .profile-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 30px 20px;
-            border-radius: 15px 15px 0 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-header::before {
-            content: '👤';
-            font-size: 8rem;
-            position: absolute;
-            right: 10px;
-            bottom: -20px;
-            opacity: 0.1;
-            transform: rotate(10deg);
+            padding: 25px 20px;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
         }
 
         .profile-img {
-            width: 130px;
-            height: 130px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0.5rem 2rem 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .profile-img:hover {
-            transform: scale(1.05);
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
         }
 
         .profile-name {
-            font-weight: 700;
-            margin-top: 15px;
-            font-size: 1.6rem;
-            letter-spacing: -0.5px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+            color: #ffd700;
         }
 
-        /* Navigation Pills */
-        .nav-pills {
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .nav-pills .nav-link {
-            color: var(--dark-color);
+        /* SIMPLE BUTTONS - Large and clear */
+        .btn-simple {
             border-radius: 8px;
-            padding: 12px 20px;
+            padding: 10px 16px;
             font-weight: 500;
-            transition: all 0.3s ease;
-            margin: 0 2px;
-        }
-
-        .nav-pills .nav-link i {
-            margin-right: 8px;
-            font-size: 1.1rem;
-        }
-
-        .nav-pills .nav-link.active {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 10px rgba(78, 115, 223, 0.3);
-        }
-
-        .nav-pills .nav-link:hover:not(.active) {
-            background-color: #eaecf4;
-            transform: translateY(-2px);
-        }
-
-        /* Teacher Avatars */
-        .teacher-avatar-container,
-        .class-teacher-avatar-container {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .teacher-avatar {
-            width: 45px !important;
-            height: 45px !important;
-            min-width: 45px !important;
-            min-height: 45px !important;
-            object-fit: cover;
-            border: 3px solid var(--primary-color);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .class-teacher-avatar {
-            width: 100px !important;
-            height: 100px !important;
-            min-width: 100px !important;
-            min-height: 100px !important;
-            object-fit: cover;
-            border: 4px solid var(--primary-color);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-overlay,
-        .avatar-overlay-large {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar-overlay {
-            width: 45px;
-            height: 45px;
-        }
-
-        .avatar-overlay-large {
-            width: 100px;
-            height: 100px;
-        }
-
-        .teacher-avatar-container:hover .avatar-overlay,
-        .class-teacher-avatar-container:hover .avatar-overlay-large {
-            opacity: 1;
-        }
-
-        .teacher-avatar-container:hover .teacher-avatar,
-        .class-teacher-avatar-container:hover .class-teacher-avatar {
-            transform: scale(1.1);
-            filter: brightness(0.8);
-        }
-
-        /* Info Table */
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .info-table th {
-            width: 35%;
-            padding: 12px 15px;
-            background-color: #f8f9fc;
-            font-weight: 600;
-            color: var(--dark-color);
-            border-bottom: 1px solid #e3e6f0;
-        }
-
-        .info-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e3e6f0;
-            color: #333;
-        }
-
-        .info-table tr:last-child th,
-        .info-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Badges */
-        .badge-status {
-            padding: 0.4em 0.8em;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            display: inline-block;
-        }
-
-        .bg-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .bg-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .bg-secondary {
-            background-color: var(--dark-color);
-            color: white;
-        }
-
-        .bg-info {
-            background-color: var(--info-color);
-            color: white;
-        }
-
-        /* Buttons */
-        .btn-action {
-            border-radius: 8px;
-            padding: 8px 15px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-outline-danger {
-            border: 2px solid var(--danger-color);
-            color: var(--danger-color);
-        }
-
-        .btn-outline-danger:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .btn-outline-success {
-            border: 2px solid var(--success-color);
-            color: var(--success-color);
-        }
-
-        .btn-outline-success:hover {
-            background: var(--success-color);
-            color: white;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            border: none;
+            background: var(--primary-color);
             color: white;
         }
 
-        /* Teacher Card */
-        .teacher-card {
-            border: 2px solid #e3e6f0;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+
+        .btn-outline:hover {
+            background: #f5f5f5;
+        }
+
+        /* SIMPLE NAVIGATION TABS - Large touch targets */
+        .simple-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: #f8f9fc;
+            border-radius: 12px;
+            margin-bottom: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 8px;
             background: white;
-            transition: all 0.3s ease;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .teacher-card:hover {
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
             border-color: var(--primary-color);
-            box-shadow: 0 5px 20px rgba(78, 115, 223, 0.15);
         }
 
-        /* Package Table */
-        .package-table {
+        .tab-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        /* SIMPLE INFO TABLE - Easy to read */
+        .info-simple {
+            width: 100%;
+        }
+
+        .info-row {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            width: 140px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 576px) {
+            .info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .info-value {
+                width: 100%;
+            }
+        }
+
+        /* SIMPLE BADGES */
+        .badge-simple {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-active { background: var(--success-color); color: white; }
+        .badge-inactive { background: #adb5bd; color: white; }
+        .badge-info { background: var(--info-color); color: white; }
+
+        /* SUBJECTS GRID - Card based, no complex table */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .subject-card {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #eef2f6;
+            transition: all 0.2s ease;
+        }
+
+        .subject-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .subject-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eef2f6;
+        }
+
+        .teacher-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .teacher-details {
+            flex: 1;
+        }
+
+        .teacher-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .teacher-phone {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* CLASS TEACHER CARD - Prominent */
+        .class-teacher-card {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(78, 115, 223, 0.2);
+        }
+
+        .class-teacher-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .class-teacher-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            cursor: pointer;
+        }
+
+        /* ATTENDANCE & RESULTS - Large action buttons */
+        .action-center {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .action-icon {
+            font-size: 3rem;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+
+        .action-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .action-desc {
+            color: #6c757d;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .btn-large {
+            padding: 12px 28px;
+            font-size: 1rem;
+            border-radius: 50px;
+        }
+
+        /* PACKAGES TABLE - Simple scrollable */
+        .packages-container {
+            overflow-x: auto;
+        }
+
+        .packages-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.85rem;
         }
 
-        .package-table thead {
-            background: linear-gradient(135deg, var(--info-color) 0%, #2c9faf 100%);
-            color: white;
+        .packages-table th,
+        .packages-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eef2f6;
         }
 
-        .package-table th {
-            padding: 15px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .package-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e3e6f0;
-        }
-
-        .package-table tbody tr:hover {
+        .packages-table th {
             background: #f8f9fc;
+            font-weight: 600;
+            color: #555;
         }
 
-        /* Modals */
-        .photo-modal img {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 15px;
-            box-shadow: 0 0.5rem 2rem 0 rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: 15px 15px 0 0;
-            padding: 15px 20px;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
-        .modal-footer {
-            border-top: 1px solid #e3e6f0;
-            padding: 15px 20px;
-        }
-
-        /* Zoom effect for images */
-        #modalTeacherImage.zoomed {
-            transform: scale(1.5);
-            cursor: zoom-out;
-            transition: transform 0.3s ease;
-        }
-
-        /* Loading Spinner */
-        #imageLoading {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            padding: 20px;
-        }
-
-        /* Toast Notifications */
+        /* TOAST NOTIFICATIONS - Simple */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -360,228 +327,120 @@
             z-index: 9999;
         }
 
-        .toast-notification {
+        .toast-simple {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 14px 18px;
             margin-bottom: 10px;
-            min-width: 300px;
-            border-left: 4px solid;
-            animation: slideIn 0.3s ease;
+            min-width: 280px;
             display: flex;
             align-items: center;
             gap: 12px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
         }
 
-        .toast-notification.success {
-            border-left-color: var(--success-color);
-        }
-
-        .toast-notification.error {
-            border-left-color: var(--danger-color);
-        }
-
-        .toast-notification.warning {
-            border-left-color: var(--warning-color);
-        }
-
-        .toast-notification.info {
-            border-left-color: var(--info-color);
-        }
-
-        .toast-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .toast-icon.success {
-            background: var(--success-color);
-        }
-
-        .toast-icon.error {
-            background: var(--danger-color);
-        }
-
-        .toast-icon.warning {
-            background: var(--warning-color);
-        }
-
-        .toast-icon.info {
-            background: var(--info-color);
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .toast-message {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .toast-close {
-            cursor: pointer;
-            color: #6c757d;
-        }
+        .toast-simple.success { border-left-color: var(--success-color); }
+        .toast-simple.error { border-left-color: var(--danger-color); }
+        .toast-simple.warning { border-left-color: var(--warning-color); }
+        .toast-simple.info { border-left-color: var(--info-color); }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .profile-img {
-                width: 110px;
-                height: 110px;
-            }
-
-            .profile-name {
-                font-size: 1.4rem;
-            }
+        /* MODALS - Simple */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
 
+        .modal-content-simple {
+            background: white;
+            border-radius: 16px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            text-align: center;
+        }
+
+        .modal-content-simple img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            .profile-header {
-                padding: 20px 15px;
-            }
-
-            .profile-img {
-                width: 100px;
-                height: 100px;
-            }
-
-            .profile-name {
-                font-size: 1.2rem;
-            }
-
-            .nav-pills {
+            .simple-tabs {
                 flex-direction: column;
             }
-
-            .nav-pills .nav-link {
-                margin: 2px 0;
+            .tab-btn {
+                justify-content: center;
             }
-
-            .info-table th,
-            .info-table td {
-                display: block;
-                width: 100%;
+            .class-teacher-header {
+                flex-direction: column;
+                text-align: center;
             }
-
-            .info-table th {
-                background: none;
-                padding-bottom: 5px;
-            }
-
-            .info-table td {
-                padding-top: 0;
-                padding-bottom: 15px;
-            }
-
-            .teacher-card {
-                padding: 15px;
-            }
-
-            .class-teacher-avatar {
-                width: 80px !important;
-                height: 80px !important;
-                min-width: 80px !important;
-                min-height: 80px !important;
-            }
-
-            .package-table {
-                display: block;
-                overflow-x: auto;
+            .subjects-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 576px) {
-            .profile-header {
-                padding: 15px;
-            }
-
-            .profile-img {
-                width: 80px;
-                height: 80px;
-            }
-
-            .profile-name {
-                font-size: 1rem;
-            }
-
-            .btn-action {
-                padding: 6px 12px;
-                font-size: 0.85rem;
-            }
-
-            .teacher-avatar {
-                width: 35px !important;
-                height: 35px !important;
-                min-width: 35px !important;
-                min-height: 35px !important;
-            }
-
-            .class-teacher-avatar {
-                width: 60px !important;
-                height: 60px !important;
-                min-width: 60px !important;
-                min-height: 60px !important;
-            }
-
-            .avatar-overlay {
-                width: 35px;
-                height: 35px;
-            }
-
-            .avatar-overlay-large {
-                width: 60px;
-                height: 60px;
-            }
-        }
+        /* HELPER CLASSES */
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 16px; }
+        .mt-4 { margin-top: 24px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 16px; }
+        .mb-4 { margin-bottom: 24px; }
+        .fw-bold { font-weight: 700; }
+        .text-muted { color: #6c757d; }
+        .text-primary { color: var(--primary-color); }
     </style>
 
-    <!-- Toast Container -->
+    <!-- Simple Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <div class="py-4">
-        <!-- Header Section -->
-        <div class="row mb-4 align-items-center">
-            <div class="col-md-8">
-                <h4 class="text-primary fw-bold border-bottom pb-2">
-                    <i class="fas fa-user-graduate me-2"></i>Student Profile
-                </h4>
+    <!-- Simple Modal for Images -->
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content-simple" onclick="event.stopPropagation()">
+            <img id="modalImage" src="" alt="Full view">
+            <div style="padding: 12px;">
+                <button class="btn-simple btn-danger" onclick="closeModal()" style="width: auto; padding: 6px 20px;">
+                    <i class="fas fa-times"></i> Close
+                </button>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{{ route('home') }}" class="btn btn-secondary btn-action">
-                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-                </a>
-            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-3 px-md-4 py-3 py-md-4">
+        <!-- Header with Back Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h4 class="fw-bold text-primary mb-0">
+                <i class="fas fa-user-graduate me-2"></i>My Child's Profile
+            </h4>
+            <a href="{{ route('home') }}" class="btn-simple btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
         </div>
 
         <div class="row g-4">
-            <!-- Left Column - Profile Card -->
-            <div class="col-lg-3">
+            <!-- LEFT COLUMN - Student Profile Card -->
+            <div class="col-lg-4">
                 <div class="card">
-                    <div class="profile-header text-center">
+                    <div class="profile-header">
                         @php
                             $imageName = $students->image;
                             $imagePath = storage_path('app/public/students/' . $imageName);
@@ -593,1058 +452,378 @@
                                 $avatarImage = $defaultAvatar;
                             }
                         @endphp
-                        <img src="{{ $avatarImage }}" class="profile-img" alt="Student Photo" id="profileImage"
-                            onclick="openPhotoModal('{{ $avatarImage }}', '{{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}')"
-                            style="cursor: pointer;">
-                        <h5 class="profile-name mb-1" style="color: gold;">
-                            {{ ucwords(strtolower($students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name)) }}
+                        <img src="{{ $avatarImage }}" class="profile-img" alt="Student photo"
+                             onclick="showImage('{{ $avatarImage }}')" style="cursor: pointer;">
+                        <h5 class="profile-name">
+                            {{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}
                         </h5>
-                        <p class="mb-0 text-white">
-                            <i class="fas fa-id-card me-1"></i>
-                            Admission: <strong>{{ strtoupper($students->admission_number) }}</strong>
+                        <p class="mb-0 small text-warning">
+                            <i class="fas fa-id-card"></i>
+                            <strong>Admission No: {{ strtoupper($students->admission_number) }}</strong>
                         </p>
                     </div>
 
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center gap-2 mb-3">
-                            <button type="button" class="btn btn-outline-danger btn-action"
-                                onclick="openPhotoModal('{{ $avatarImage }}', '{{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}')">
-                                <i class="fas fa-image me-1"></i> View
+                    <div class="p-3">
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn-simple btn-danger flex-fill" onclick="showImage('{{ $avatarImage }}')">
+                                <i class="fas fa-image"></i> View Photo
                             </button>
                             <a href="{{ route('student.profile.picture', ['student' => Hashids::encode($students->id)]) }}"
-                                class="btn btn-outline-success btn-action">
-                                <i class="fas fa-download me-1"></i> Download
+                               class="btn-simple btn-success flex-fill text-decoration-none">
+                                <i class="fas fa-download"></i> Download
                             </a>
                         </div>
 
-                        <div class="profile-detail">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted"><i class="fas fa-venus-mars me-2"></i>Gender</span>
-                                <span class="text-capitalize fw-bold">{{ $students->gender }}</span>
+                        <!-- Student Details -->
+                        <div class="info-simple">
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-venus-mars"></i> Gender</div>
+                                <div class="info-value text-capitalize">{{ $students->gender }}</div>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted"><i class="fas fa-users me-2"></i>Stream</span>
-                                <span class="text-uppercase fw-bold">{{ $students->group }}</span>
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-users"></i> Class</div>
+                                <div class="info-value text-uppercase">{{ $students->class_name }} - {{ $students->group }}</div>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted"><i class="fas fa-circle me-2"></i>Status</span>
-                                @if ($students->status === 1)
-                                    <span class="badge-status bg-success">Active</span>
-                                @else
-                                    <span class="badge-status bg-secondary">Inactive</span>
-                                @endif
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-calendar"></i> Date of Birth</div>
+                                <div class="info-value">{{ \Carbon\Carbon::parse($students->dob)->format('d M, Y') }}</div>
                             </div>
-                            @if ($students->status === 0)
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted"><i class="fas fa-info-circle me-2"></i>Reason</span>
-                                    @if ($students->graduated_at == null)
-                                        <span class="badge-status bg-danger">Account Blocked</span>
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-circle"></i> Status</div>
+                                <div class="info-value">
+                                    @if ($students->status === 1)
+                                        <span class="badge-simple badge-active">Active</span>
                                     @else
-                                        <span class="badge-status bg-success">Graduated</span>
+                                        <span class="badge-simple badge-inactive">Inactive</span>
                                     @endif
                                 </div>
+                            </div>
+                            @if ($students->transport_id)
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-bus"></i> School Bus</div>
+                                <div class="info-value"><span class="badge-simple badge-info">Assigned</span></div>
+                            </div>
                             @endif
                         </div>
 
                         <hr class="my-3">
 
                         <a href="{{ route('parent.edit.student', ['students' => Hashids::encode($students->id)]) }}"
-                            class="btn btn-primary btn-action w-100">
-                            <i class="fas fa-edit me-2"></i> Edit Profile
+                           class="btn-simple btn-primary w-100">
+                            <i class="fas fa-edit"></i> Edit Information
                         </a>
+                    </div>
+                </div>
+
+                <!-- Parent Information Card -->
+                <div class="card mt-3">
+                    <div class="p-3">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-user-shield text-primary"></i> Parent/Guardian
+                        </h6>
+                        <div class="info-simple">
+                            <div class="info-row">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value">{{ ucwords(strtolower($students->parent_first_name . ' ' . $students->parent_last_name)) }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-phone"></i> Phone</div>
+                                <div class="info-value">
+                                    <a href="tel:{{ $students->phone }}" class="text-decoration-none">{{ $students->phone }}</a>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-envelope"></i> Email</div>
+                                <div class="info-value">{{ $students->email ?? 'Not provided' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label"><i class="fas fa-map-marker-alt"></i> Address</div>
+                                <div class="info-value text-capitalize">{{ ucwords(strtolower($students->address)) }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column - Details Card -->
-            <div class="col-lg-9">
+            <!-- RIGHT COLUMN - Main Content -->
+            <div class="col-lg-8">
                 <div class="card">
-                    <div class="card-header p-0">
-                        <ul class="nav nav-pills p-2" id="profileTabs" role="tablist">
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link active" id="student-tab" data-bs-toggle="pill"
-                                    data-bs-target="#student" type="button" role="tab">
-                                    <i class="fas fa-user-graduate me-1"></i> Profile
-                                </button>
-                            </li>
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="parents-tab" data-bs-toggle="pill" data-bs-target="#parents"
-                                    type="button" role="tab">
-                                    <i class="fas fa-user-shield me-1"></i> Parent
-                                </button>
-                            </li>
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="subjects-tab" data-bs-toggle="pill" data-bs-target="#subjects"
-                                    type="button" role="tab">
-                                    <i class="fas fa-book me-1"></i> Subjects
-                                </button>
-                            </li>
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="attendance-tab" data-bs-toggle="pill"
-                                    data-bs-target="#attendance" type="button" role="tab">
-                                    <i class="fas fa-calendar-check me-1"></i> Attendance
-                                </button>
-                            </li>
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="results-tab" data-bs-toggle="pill"
-                                    data-bs-target="#results" type="button" role="tab">
-                                    <i class="fas fa-chart-bar me-1"></i> Results
-                                </button>
-                            </li>
-                            @if ($students->transport_id != null)
-                                <li class="nav-item flex-fill text-center" role="presentation">
-                                    <button class="nav-link" id="transport-tab" data-bs-toggle="pill"
-                                        data-bs-target="#transport" type="button" role="tab">
-                                        <i class="fas fa-bus me-1"></i> Transport
-                                    </button>
-                                </li>
-                            @endif
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="package-tab" data-bs-toggle="pill"
-                                    data-bs-target="#package" type="button" role="tab">
-                                    <i class="fas fa-layer-group me-1"></i> E-Library
-                                </button>
-                            </li>
-                            @if (Auth::user()->school->package === 'premium')
-                                <li class="nav-item flex-fill text-center" role="presentation">
-                                    <button class="nav-link" id="payment-tab" data-bs-toggle="pill"
-                                        data-bs-target="#payment" type="button" role="tab">
-                                        <i class="fas fa-credit-card me-1"></i> Payment
-                                    </button>
-                                </li>
-                            @endif
-                        </ul>
+                    <!-- Simple Tabs -->
+                    <div class="simple-tabs">
+                        <button class="tab-btn active" data-tab="subjects">
+                            <i class="fas fa-book"></i> Subjects
+                        </button>
+                        <button class="tab-btn" data-tab="attendance">
+                            <i class="fas fa-calendar-check"></i> Attendance
+                        </button>
+                        <button class="tab-btn" data-tab="results">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </button>
+                        @if($students->transport_id)
+                        <button class="tab-btn" data-tab="transport">
+                            <i class="fas fa-bus"></i> Transport
+                        </button>
+                        @endif
+                        <button class="tab-btn" data-tab="library">
+                            <i class="fas fa-layer-group"></i> E-Library
+                        </button>
+                        @if(Auth::user()->school->package === 'premium')
+                        <button class="tab-btn" data-tab="payment">
+                            <i class="fas fa-credit-card"></i> Payments
+                        </button>
+                        @endif
                     </div>
 
-                    <div class="card-body">
-                        <div class="tab-content" id="profileTabsContent">
-                            <!-- Student Information Tab -->
-                            <div class="tab-pane fade show active" id="student" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-info-circle me-2 text-primary"></i>
-                                    Student Details
-                                </h5>
-                                <table class="info-table">
-                                    <tr>
-                                        <th><i class="fas fa-school me-2"></i>Class</th>
-                                        <td class="text-uppercase fw-bold">{{ $students->class_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-calendar me-2"></i>Date of Birth</th>
-                                        <td>{{ \Carbon\Carbon::parse($students->dob)->format('d F, Y') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-calendar-plus me-2"></i>Registered on</th>
-                                        <td>{{ \Carbon\Carbon::parse($students->created_at)->format('d F, Y') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-map-marker-alt me-2"></i>Street Address</th>
-                                        <td class="text-capitalize">{{ ucwords(strtolower($students->address)) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-bus me-2"></i>School Bus</th>
-                                        <td>
-                                            @if ($students->transport_id == null)
-                                                <span class="text-muted">Not Assigned</span>
-                                            @else
-                                                <span class="badge-status bg-success">Assigned</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+                    <div class="p-3">
+                        <!-- SUBJECTS TAB -->
+                        <div id="tab-subjects" class="tab-content active">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-book text-primary"></i> Enrolled Subjects</h6>
 
-                            <!-- Parents Information Tab -->
-                            <div class="tab-pane fade" id="parents" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-users me-2 text-primary"></i>
-                                    Parent/Guardian Details
-                                </h5>
-                                <table class="info-table">
-                                    <tr>
-                                        <th colspan="2" class="bg-light">
-                                            <i class="fas fa-user me-2"></i>
-                                            {{ strtolower($students->parent_gender) == 'male' ? "Father's" : "Mother's" }}
-                                            Information
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th>Full Name</th>
-                                        <td>{{ ucwords(strtolower($students->parent_first_name . ' ' . $students->parent_last_name)) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-phone-alt me-2"></i> Phone</th>
-                                        <td>
-                                            <a href="tel:{{ $students->phone }}" class="text-decoration-none">
-                                                <i class="fas fa-phone-alt me-1"></i>
-                                                {{ $students->phone }}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-envelope me-2"></i> Email</th>
-                                        <td>
-                                            @if ($students->email == null)
-                                                <span class="text-muted">Not provided</span>
-                                            @else
-                                                <a href="mailto:{{ $students->email }}" class="text-decoration-none">
-                                                    <i class="fas fa-envelope me-1"></i>
-                                                    {{ $students->email }}
-                                                </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-map-marker-alt me-2"></i> Address</th>
-                                        <td class="text-capitalize">{{ ucwords(strtolower($students->address)) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th><i class="fas fa-calendar-plus me-2"></i> Registered on</th>
-                                        <td>{{ \Carbon\Carbon::parse($students->parent_created_at)->format('d F, Y') }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <!-- Subjects Tab -->
-                            <div class="tab-pane fade" id="subjects" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-book me-2 text-primary"></i>
-                                    Subjects Enrollment
-                                </h5>
-
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-bordered">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Subject</th>
-                                                <th>Teacher</th>
-                                                <th>Phone</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($class_course as $course)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td class="text-capitalize fw-bold">
-                                                        {{ ucwords(strtolower($course->course_name)) }}
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            @php
-                                                                $teacherImage = $course->image ?? '';
-                                                                $teacherImagePath = storage_path(
-                                                                    'app/public/profile/' . $teacherImage,
-                                                                );
-                                                                $teacherName = ucwords(
-                                                                    strtolower(
-                                                                        $course->first_name . ' ' . $course->last_name,
-                                                                    ),
-                                                                );
-
-                                                                if (
-                                                                    !empty($teacherImage) &&
-                                                                    file_exists($teacherImagePath)
-                                                                ) {
-                                                                    $teacherAvatar = asset(
-                                                                        'storage/profile/' . $teacherImage,
-                                                                    );
-                                                                } else {
-                                                                    $teacherAvatar = asset(
-                                                                        'storage/profile/' .
-                                                                            (strtolower($course->gender) == 'male'
-                                                                                ? 'avatar.jpg'
-                                                                                : 'avatar-female.jpg'),
-                                                                    );
-                                                                }
-                                                            @endphp
-
-                                                            <!-- FIX: Onclick function call -->
-                                                            <div class="teacher-avatar-container"
-                                                                onclick="openTeacherModal('{{ $teacherAvatar }}', '{{ $teacherName }}', '{{ $course->course_name }}')"
-                                                                data-bs-toggle="tooltip"
-                                                                title="Click to view teacher photo"
-                                                                style="cursor: pointer;">
-                                                                <img src="{{ $teacherAvatar }}"
-                                                                    alt="{{ $teacherName }}" class="teacher-avatar me-3"
-                                                                    loading="lazy">
-                                                                <div class="avatar-overlay">
-                                                                    <i class="fas fa-search-plus"></i>
-                                                                </div>
-                                                            </div>
-                                                            <span>{{ $teacherName }}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <a href="tel:{{ $course->teacher_phone }}"
-                                                            class="text-decoration-none">
-                                                            <i class="fas fa-phone-alt me-1"></i>
-                                                            {{ $course->teacher_phone }}
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="4" class="text-center text-danger py-4">
-                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                        No subjects assigned yet!
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                            @if($class_course->isEmpty())
+                                <div class="text-center py-4">
+                                    <i class="fas fa-book-open fa-3x text-muted mb-2"></i>
+                                    <p class="text-muted">No subjects enrolled yet</p>
                                 </div>
-
-                                <hr class="my-4">
-
-                                <h6 class="mb-3">
-                                    <i class="fas fa-chalkboard-teacher me-2 text-primary"></i>
-                                    Class Teacher
-                                </h6>
-                                @forelse ($myClassTeacher as $classTeacher)
-                                    <div class="teacher-card">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-3 text-center">
-                                                @php
-                                                    $classTeacherImage = $classTeacher->image ?? '';
-                                                    $classTeacherImagePath = storage_path(
-                                                        'app/public/profile/' . $classTeacherImage,
-                                                    );
-                                                    $classTeacherName = strtoupper(
-                                                        $classTeacher->first_name . ' ' . $classTeacher->last_name,
-                                                    );
-
-                                                    if (
-                                                        !empty($classTeacherImage) &&
-                                                        file_exists($classTeacherImagePath)
-                                                    ) {
-                                                        $classTeacherAvatar = asset(
-                                                            'storage/profile/' . $classTeacherImage,
-                                                        );
-                                                    } else {
-                                                        $classTeacherAvatar = asset(
-                                                            'storage/profile/' .
-                                                                (strtolower($classTeacher->gender) == 'male'
-                                                                    ? 'avatar.jpg'
-                                                                    : 'avatar-female.jpg'),
-                                                        );
-                                                    }
-                                                @endphp
-
-                                                <!-- FIX: Onclick function call -->
-                                                <div class="class-teacher-avatar-container mx-auto"
-                                                    onclick="openTeacherModal('{{ $classTeacherAvatar }}', '{{ $classTeacherName }}', 'Class Teacher')"
-                                                    data-bs-toggle="tooltip" title="Click to view teacher photo"
-                                                    style="cursor: pointer;">
-                                                    <img src="{{ $classTeacherAvatar }}" alt="{{ $classTeacherName }}"
-                                                        class="class-teacher-avatar" loading="lazy">
-                                                    <div class="avatar-overlay-large">
-                                                        <i class="fas fa-search-plus fa-lg"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-9">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <p class="mb-2">
-                                                            <strong><i class="fas fa-user me-2"></i>Name:</strong>
-                                                            {{ $classTeacherName }}
-                                                        </p>
-                                                        <p class="mb-2">
-                                                            <strong><i class="fas fa-venus-mars me-2"></i>Gender:</strong>
-                                                            {{ strtoupper($classTeacher->gender) }}
-                                                        </p>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <p class="mb-2">
-                                                            <strong><i class="fas fa-phone-alt me-2"></i>Phone:</strong>
-                                                            <a href="tel:{{ $classTeacher->phone }}"
-                                                                class="text-decoration-none">
-                                                                {{ $classTeacher->phone }}
-                                                            </a>
-                                                        </p>
-                                                        <p class="mb-2">
-                                                            <strong><i class="fas fa-school me-2"></i>Class:</strong>
-                                                            {{ strtoupper($classTeacher->class_name) }} - Stream
-                                                            {{ strtoupper($classTeacher->group) }}
-                                                        </p>
-                                                    </div>
+                            @else
+                                <div class="subjects-grid">
+                                    @foreach($class_course as $course)
+                                    <div class="subject-card">
+                                        <div class="subject-name">{{ ucwords(strtolower($course->course_name)) }}</div>
+                                        <div class="teacher-info">
+                                            @php
+                                                $teacherImg = $course->image ?? '';
+                                                $teacherPath = storage_path('app/public/profile/' . $teacherImg);
+                                                if(!empty($teacherImg) && file_exists($teacherPath)) {
+                                                    $teacherAvatar = asset('storage/profile/' . $teacherImg);
+                                                } else {
+                                                    $teacherAvatar = asset('storage/profile/' . (strtolower($course->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                }
+                                                $teacherFullName = ucwords(strtolower($course->first_name . ' ' . $course->last_name));
+                                            @endphp
+                                            <img src="{{ $teacherAvatar }}" class="teacher-avatar-small"
+                                                 onclick="showImage('{{ $teacherAvatar }}')"
+                                                 style="cursor: pointer;" alt="Teacher">
+                                            <div class="teacher-details">
+                                                <div class="teacher-name">{{ $teacherFullName }}</div>
+                                                <div class="teacher-phone">
+                                                    <i class="fas fa-phone"></i>
+                                                    <a href="tel:{{ $course->teacher_phone }}" class="text-decoration-none">{{ $course->teacher_phone }}</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                @empty
-                                    <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                        No class teacher assigned!
-                                    </div>
-                                @endforelse
-                            </div>
-
-                            <!-- Attendance Tab -->
-                            <div class="tab-pane fade" id="attendance" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-calendar-check me-2 text-primary"></i>
-                                    Attendance Report
-                                </h5>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
-                                    <h5>View attendance records for {{ ucwords(strtolower($students->first_name)) }}</h5>
-                                    <p class="text-muted mb-4">Track daily attendance and generate reports</p>
-                                    <a href="{{ route('attendance.byYear', ['student' => Hashids::encode($students->id)]) }}"
-                                        class="btn btn-primary btn-action">
-                                        <i class="fas fa-chart-line me-2"></i> View Attendance Reports
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Results Tab -->
-                            <div class="tab-pane fade" id="results" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-chart-bar me-2 text-primary"></i>
-                                    Academic Results
-                                </h5>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
-                                    <h5>View results for {{ ucwords(strtolower($students->first_name)) }}</h5>
-                                    <p class="text-muted mb-4">Check exam results and academic progress</p>
-                                    <a href="{{ route('results.index', ['student' => Hashids::encode($students->id)]) }}"
-                                        class="btn btn-primary btn-action">
-                                        <i class="fas fa-file-alt me-2"></i> View Results Reports
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Transport Tab -->
-                            @if ($students->transport_id != null)
-                                <div class="tab-pane fade" id="transport" role="tabpanel">
-                                    <h5 class="mb-4">
-                                        <i class="fas fa-bus me-2 text-primary"></i>
-                                        Transport Information
-                                    </h5>
-                                    <table class="info-table">
-                                        <tr>
-                                            <th><i class="fas fa-user me-2"></i>Driver Name</th>
-                                            <td class="text-capitalize">{{ ucwords(strtolower($students->driver_name)) }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th><i class="fas fa-phone-alt me-2"></i> Phone</th>
-                                            <td>
-                                                <a href="tel:{{ $students->driver_phone }}" class="text-decoration-none">
-                                                    <i class="fas fa-phone me-1"></i>
-                                                    {{ $students->driver_phone }}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th><i class="fas fa-venus-mars me-2"></i>Gender</th>
-                                            <td class="text-capitalize">
-                                                {{ ucwords(strtolower($students->driver_gender)) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th><i class="fas fa-bus me-2"></i>Bus Number</th>
-                                            <td class="text-uppercase">{{ $students->bus_no }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th><i class="fas fa-route me-2"></i>Route</th>
-                                            <td class="text-capitalize">{{ ucwords(strtolower($students->routine)) }}</td>
-                                        </tr>
-                                    </table>
+                                    @endforeach
                                 </div>
                             @endif
 
-                            <!-- Packages Tab -->
-                            <div class="tab-pane fade" id="package" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-layer-group me-2 text-primary"></i>
-                                    Online Library & Academic Materials
-                                </h5>
-
-                                @if ($packages->isEmpty())
-                                    <div class="alert alert-info text-center py-4">
-                                        <i class="fas fa-info-circle fa-3x mb-3"></i>
-                                        <h5>No Resources Available</h5>
-                                        <p class="mb-0">Learning materials will appear here when uploaded.</p>
+                            <!-- Class Teacher Section -->
+                            <div class="class-teacher-card mt-4">
+                                <h6 class="fw-bold mb-3"><i class="fas fa-chalkboard-teacher text-primary"></i> Class Teacher</h6>
+                                @forelse($myClassTeacher as $classTeacher)
+                                @php
+                                    $ctImg = $classTeacher->image ?? '';
+                                    $ctPath = storage_path('app/public/profile/' . $ctImg);
+                                    if(!empty($ctImg) && file_exists($ctPath)) {
+                                        $ctAvatar = asset('storage/profile/' . $ctImg);
+                                    } else {
+                                        $ctAvatar = asset('storage/profile/' . (strtolower($classTeacher->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                    }
+                                    $ctName = strtoupper($classTeacher->first_name . ' ' . $classTeacher->last_name);
+                                @endphp
+                                <div class="class-teacher-header">
+                                    <img src="{{ $ctAvatar }}" class="class-teacher-avatar"
+                                         onclick="showImage('{{ $ctAvatar }}')" style="cursor: pointer;" alt="Class Teacher">
+                                    <div>
+                                        <div class="fw-bold mb-1">{{ $ctName }}</div>
+                                        <div class="small text-muted mb-2">
+                                            <i class="fas fa-venus-mars"></i> {{ ucfirst($classTeacher->gender) }} |
+                                            <i class="fas fa-phone"></i> <a href="tel:{{ $classTeacher->phone }}">{{ $classTeacher->phone }}</a>
+                                        </div>
+                                        <div class="small">
+                                            <span class="badge-simple badge-info">Class {{ strtoupper($classTeacher->class_name) }} - Stream {{ strtoupper($classTeacher->group) }}</span>
+                                        </div>
                                     </div>
-                                @else
-                                    <div class="table-responsive">
-                                        <table class="table table-hover package-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Description</th>
-                                                    <th>Term</th>
-                                                    <th>Status</th>
-                                                    <th>Released</th>
-                                                    <th>Expires</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($packages as $item)
-                                                    <tr>
-                                                        <td class="fw-bold">{{ ucwords(strtolower($item->title)) }}</td>
-                                                        <td>{{ ucwords(strtolower($item->description)) ?? 'N/A' }}</td>
-                                                        <td>Term {{ $item->term }}</td>
-                                                        <td>
-                                                            @if ($item->is_active)
-                                                                <span class="badge-status bg-success">Active</span>
-                                                            @else
-                                                                <span class="badge-status bg-secondary">Inactive</span>
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $item->release_date ? \Carbon\Carbon::parse($item->release_date)->format('d/m/Y') : 'N/A' }}
-                                                        </td>
-                                                        <td>{{ $item->due_date ? \Carbon\Carbon::parse($item->due_date)->format('d/m/Y') : 'N/A' }}
-                                                        </td>
-                                                        <td>
-                                                            @if ($item->is_active)
-                                                                <a href="{{ route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true]) }}"
-                                                                    target="_blank" class="btn btn-sm btn-success"
-                                                                    onclick="return confirm('Download this package?')">
-                                                                    <i class="fas fa-download me-1"></i> Download
-                                                                </a>
-                                                            @else
-                                                                <button class="btn btn-sm btn-danger" disabled>
-                                                                    <i class="fas fa-lock me-1"></i> Locked
-                                                                </button>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Payment Tab -->
-                            <div class="tab-pane fade" id="payment" role="tabpanel">
-                                <h5 class="mb-4">
-                                    <i class="fas fa-credit-card me-2 text-primary"></i>
-                                    Payment Information
-                                </h5>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-history fa-4x text-muted mb-3"></i>
-                                    <h5>Payment History</h5>
-                                    <p class="text-muted mb-4">View all payments and transaction records</p>
-                                    <a href="{{ route('student.payment.history', ['studentId' => Hashids::encode($students->id)]) }}"
-                                        class="btn btn-primary btn-action">
-                                        <i class="fas fa-history me-2"></i> View Payment History
-                                    </a>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Student Photo Modal -->
-    <div class="modal fade" id="studentPhotoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-user-graduate me-2"></i>
-                        <span id="studentPhotoName"></span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <img id="studentPhotoFull" src="" alt="Student Photo" class="photo-modal img-fluid">
-                </div>
-                <div class="modal-footer">
-                    <!-- FIX: Tumia button ya kawaida, si btn-close -->
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Teacher Image Modal -->
-    <div class="modal fade" id="teacherImageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-chalkboard-teacher me-2"></i>
-                        <span id="modalTeacherName"></span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div class="mb-3">
-                        <span class="badge bg-info text-white" id="modalTeacherRole"></span>
-                    </div>
-                    <div class="image-container position-relative">
-                        <!-- Loading Spinner -->
-                        <div id="imageLoading" class="position-absolute top-50 start-50 translate-middle"
-                            style="display: none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                @empty
+                                <p class="text-muted">No class teacher assigned yet</p>
+                                @endforelse
                             </div>
                         </div>
 
-                        <!-- Error Message -->
-                        <div id="imageError" class="alert alert-danger" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Failed to load image
+                        <!-- ATTENDANCE TAB -->
+                        <div id="tab-attendance" class="tab-content">
+                            <div class="action-center">
+                                <div class="action-icon"><i class="fas fa-calendar-check"></i></div>
+                                <div class="action-title">Attendance Records</div>
+                                <div class="action-desc">Track daily attendance and view reports</div>
+                                <a href="{{ route('attendance.byYear', ['student' => Hashids::encode($students->id)]) }}"
+                                   class="btn-simple btn-primary btn-large">
+                                    <i class="fas fa-chart-line"></i> View Attendance
+                                </a>
+                            </div>
                         </div>
 
-                        <!-- Image -->
-                        <img id="modalTeacherImage" src="" alt="Teacher Photo"
-                            class="img-fluid rounded shadow-lg"
-                            style="max-height: 70vh; max-width: 100%; object-fit: contain; cursor: pointer; transition: transform 0.3s ease;"
-                            onclick="zoomCurrentImage()">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <!-- FIX: Tumia button ya kawaida, si btn-close -->
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Close
-                    </button>
-                    <button type="button" class="btn btn-info" onclick="zoomCurrentImage()" id="zoomButton">
-                        <i class="fas fa-search-plus me-2"></i>Zoom
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="openFullScreenModal()">
-                        <i class="fas fa-expand me-2"></i>Full Screen
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <!-- RESULTS TAB -->
+                        <div id="tab-results" class="tab-content">
+                            <div class="action-center">
+                                <div class="action-icon"><i class="fas fa-file-alt"></i></div>
+                                <div class="action-title">Academic Results</div>
+                                <div class="action-desc">Check exam results and academic progress</div>
+                                <a href="{{ route('results.index', ['student' => Hashids::encode($students->id)]) }}"
+                                   class="btn-simple btn-primary btn-large">
+                                    <i class="fas fa-file-alt"></i> View Results
+                                </a>
+                            </div>
+                        </div>
 
-    <!-- Full Screen Image Modal -->
-    <div class="modal fade" id="fullScreenImageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content bg-dark">
-                <div class="modal-header border-0">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center justify-content-center">
-                    <img id="fullScreenImage" src="" alt="Full Screen" class="img-fluid"
-                        style="max-height: 90vh;">
-                </div>
-                <div class="modal-footer border-0 bg-dark">
-                    <!-- FIX: Ongeza close button chini pia -->
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Close
-                    </button>
+                        <!-- TRANSPORT TAB -->
+                        @if($students->transport_id)
+                        <div id="tab-transport" class="tab-content">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-bus text-primary"></i> Transport Information</h6>
+                            <div class="info-simple">
+                                <div class="info-row"><div class="info-label">Driver Name</div><div class="info-value">{{ ucwords(strtolower($students->driver_name)) }}</div></div>
+                                <div class="info-row"><div class="info-label">Driver Phone</div><div class="info-value"><a href="tel:{{ $students->driver_phone }}">{{ $students->driver_phone }}</a></div></div>
+                                <div class="info-row"><div class="info-label">Bus Number</div><div class="info-value text-uppercase">{{ $students->bus_no }}</div></div>
+                                <div class="info-row"><div class="info-label">Route</div><div class="info-value text-capitalize">{{ ucwords(strtolower($students->routine)) }}</div></div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- E-LIBRARY TAB -->
+                        <div id="tab-library" class="tab-content">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-layer-group text-primary"></i> Learning Materials</h6>
+                            @if($packages->isEmpty())
+                                <div class="text-center py-4">
+                                    <i class="fas fa-folder-open fa-3x text-muted mb-2"></i>
+                                    <p class="text-muted">No learning materials available yet</p>
+                                </div>
+                            @else
+                                <div class="packages-container">
+                                    <table class="packages-table">
+                                        <thead>
+                                            <tr><th>Title</th><th>Term</th><th>Status</th><th>Action</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($packages as $item)
+                                            <tr>
+                                                <td>{{ ucwords(strtolower($item->title)) }}</td>
+                                                <td>Term {{ $item->term }}</td>
+                                                <td>@if($item->is_active)<span class="badge-simple badge-active">Active</span>@else<span class="badge-simple badge-inactive">Locked</span>@endif</td>
+                                                <td>
+                                                    @if($item->is_active)
+                                                    <a href="{{ route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true]) }}"
+                                                       class="btn-simple btn-primary" style="padding: 6px 12px; font-size: 0.75rem;" target="_blank">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                    @else
+                                                    <button class="btn-simple btn-outline" disabled style="padding: 6px 12px; opacity: 0.5;"><i class="fas fa-lock"></i> Locked</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- PAYMENT TAB -->
+                        @if(Auth::user()->school->package === 'premium')
+                        <div id="tab-payment" class="tab-content">
+                            <div class="action-center">
+                                <div class="action-icon"><i class="fas fa-history"></i></div>
+                                <div class="action-title">Payment History</div>
+                                <div class="action-desc">View all payments and transaction records</div>
+                                <a href="{{ route('student.payment.history', ['studentId' => Hashids::encode($students->id)]) }}"
+                                   class="btn-simple btn-primary btn-large">
+                                    <i class="fas fa-history"></i> View Payments
+                                </a>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialize components
-            initializeComponents();
+        // Tab switching - Simple and reliable
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons and contents
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            // Setup image modals
-            setupImageModals();
+                // Add active class to clicked button
+                this.classList.add('active');
 
-            // Show any session messages as toasts
-            showSessionMessages();
-
-            // Setup manual modal close handlers
-            setupManualModalClose();
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                const content = document.getElementById(`tab-${tabId}`);
+                if (content) content.classList.add('active');
+            });
         });
 
-        // ============ MANUAL MODAL CLOSE HANDLERS (HAITEGEMEI BOOTSTRAP) ============
-        function setupManualModalClose() {
-            // Handle all close buttons
-            document.querySelectorAll(
-                '[data-bs-dismiss="modal"], .modal .btn-close, .modal .btn-secondary, .modal .btn-outline-secondary, .modal .btn-outline-light'
-                ).forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const modal = this.closest('.modal');
-                    if (modal) {
-                        closeModal(modal);
-                    }
-                });
-            });
-
-            // Handle backdrop click
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal(this);
-                    }
-                });
-            });
-
-            // Handle ESC key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    const openModal = document.querySelector('.modal.show');
-                    if (openModal) {
-                        closeModal(openModal);
-                    }
-                }
-            });
-        }
-
-        // Function to close modal manually
-        function closeModal(modal) {
-            if (!modal) return;
-
-            // Remove show class
-            modal.classList.remove('show');
-
-            // Set aria-hidden
-            modal.setAttribute('aria-hidden', 'true');
-
-            // Hide modal
-            modal.style.display = 'none';
-
-            // Remove modal-open class from body
-            document.body.classList.remove('modal-open');
-
-            // Remove padding-right from body (Bootstrap adds this)
-            document.body.style.removeProperty('padding-right');
-
-            // Remove backdrop
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-
-            // Return focus to the element that opened the modal
-            setTimeout(() => {
-                const opener = document.querySelector(
-                    '[onclick*="openTeacherModal"], [onclick*="openPhotoModal"], #profileImage');
-                if (opener) {
-                    opener.focus();
-                }
-            }, 100);
-        }
-
-        // Function to open modal manually
-        function openModal(modal) {
-            if (!modal) return;
-
-            // Add show class
-            modal.classList.add('show');
-
-            // Remove aria-hidden
-            modal.setAttribute('aria-hidden', 'false');
-
-            // Show modal
-            modal.style.display = 'block';
-
-            // Add modal-open class to body
-            document.body.classList.add('modal-open');
-
-            // Create backdrop if not exists
-            if (!document.querySelector('.modal-backdrop')) {
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade show';
-                document.body.appendChild(backdrop);
-            }
-
-            // Focus on modal title or close button
-            setTimeout(() => {
-                const title = modal.querySelector('.modal-title');
-                const closeBtn = modal.querySelector('.btn-close, [data-bs-dismiss="modal"]');
-                if (title) {
-                    title.setAttribute('tabindex', '-1');
-                    title.focus();
-                } else if (closeBtn) {
-                    closeBtn.focus();
-                }
-            }, 100);
-        }
-
-        // ============ TEACHER IMAGE MODAL FUNCTIONS ============
-        let currentImageUrl = '';
-        let isZoomed = false;
-
-        window.openTeacherModal = function(imageUrl, teacherName, teacherRole) {
-            console.log('Opening teacher modal:', teacherName);
-
-            const modal = document.getElementById('teacherImageModal');
-            if (!modal) {
-                console.error('Teacher modal element not found!');
-                return;
-            }
-
-            currentImageUrl = imageUrl;
-
-            // Set modal content
-            const nameElement = document.getElementById('modalTeacherName');
-            const roleElement = document.getElementById('modalTeacherRole');
-            if (nameElement) nameElement.textContent = teacherName;
-            if (roleElement) roleElement.textContent = teacherRole;
-
-            // Show loading
-            const loadingEl = document.getElementById('imageLoading');
-            const errorEl = document.getElementById('imageError');
-            const imageEl = document.getElementById('modalTeacherImage');
-
-            if (loadingEl) loadingEl.style.display = 'block';
-            if (errorEl) errorEl.style.display = 'none';
-            if (imageEl) {
-                imageEl.style.display = 'none';
-                imageEl.src = ''; // Clear previous image
-            }
-
-            // Load image
-            const img = new Image();
-            img.onload = function() {
-                if (imageEl) {
-                    imageEl.src = imageUrl;
-                    imageEl.style.display = 'block';
-                }
-                if (loadingEl) loadingEl.style.display = 'none';
-                resetZoom();
-            };
-            img.onerror = function() {
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (errorEl) errorEl.style.display = 'block';
-            };
-            img.src = imageUrl;
-
-            // Open modal
-            openModal(modal);
-        }
-
-        // ============ STUDENT PHOTO MODAL ============
-        window.openPhotoModal = function(imageUrl, studentName) {
-            console.log('Opening student photo modal:', studentName);
-
-            const modal = document.getElementById('studentPhotoModal');
-            if (!modal) {
-                console.error('Student photo modal element not found!');
-                return;
-            }
-
-            // Set image and name
-            const imageEl = document.getElementById('studentPhotoFull');
-            const nameEl = document.getElementById('studentPhotoName');
-
-            if (imageEl) imageEl.src = imageUrl;
-            if (nameEl) nameEl.textContent = studentName;
-
-            // Open modal
-            openModal(modal);
-        }
-
-        // ============ ZOOM FUNCTIONS ============
-        window.zoomCurrentImage = function() {
-            const image = document.getElementById('modalTeacherImage');
-            const zoomButton = document.getElementById('zoomButton');
-
-            if (!image) return;
-
-            if (!isZoomed) {
-                image.style.transform = 'scale(1.5)';
-                image.style.cursor = 'zoom-out';
-                if (zoomButton) {
-                    zoomButton.innerHTML = '<i class="fas fa-search-minus me-2"></i>Reset';
-                }
-                isZoomed = true;
-            } else {
-                resetZoom();
+        // Image Modal Functions
+        function showImage(imageUrl) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            if (modal && modalImg) {
+                modalImg.src = imageUrl;
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
         }
 
-        function resetZoom() {
-            const image = document.getElementById('modalTeacherImage');
-            const zoomButton = document.getElementById('zoomButton');
-
-            if (image) {
-                image.style.transform = 'scale(1)';
-                image.style.cursor = 'zoom-in';
-            }
-            if (zoomButton) {
-                zoomButton.innerHTML = '<i class="fas fa-search-plus me-2"></i>Zoom';
-            }
-            isZoomed = false;
-        }
-
-        // ============ FULL SCREEN FUNCTION ============
-        window.openFullScreenModal = function() {
-            if (currentImageUrl) {
-                const fullScreenImage = document.getElementById('fullScreenImage');
-                if (fullScreenImage) {
-                    fullScreenImage.src = currentImageUrl;
-                }
-
-                // Close teacher modal
-                const teacherModal = document.getElementById('teacherImageModal');
-                if (teacherModal && teacherModal.classList.contains('show')) {
-                    closeModal(teacherModal);
-                }
-
-                // Open full screen modal
-                setTimeout(() => {
-                    const fullScreenModal = document.getElementById('fullScreenImageModal');
-                    if (fullScreenModal) {
-                        openModal(fullScreenModal);
-                    }
-                }, 300);
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
             }
         }
 
-        // ============ CLOSE ALL MODALS ============
-        window.closeAllModals = function() {
-            document.querySelectorAll('.modal.show').forEach(modal => {
-                closeModal(modal);
-            });
-        }
-
-        // ============ INITIALIZE COMPONENTS ============
-        function initializeComponents() {
-            // Initialize tooltips (if using Bootstrap tooltips)
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl);
-                });
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
             }
+        });
 
-            // Initialize tabs (if using Bootstrap tabs)
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
-                var triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'));
-                triggerTabList.forEach(function(triggerEl) {
-                    new bootstrap.Tab(triggerEl);
-                });
-            }
-
-            // Activate tab from URL hash if present
-            if (window.location.hash) {
-                const tab = document.querySelector(`[data-bs-target="${window.location.hash}"]`);
-                if (tab && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
-                    new bootstrap.Tab(tab).show();
-                }
-            }
-        }
-
-        // ============ SETUP IMAGE MODALS ACCESSIBILITY ============
-        function setupImageModals() {
-            // Make teacher images keyboard accessible
-            document.querySelectorAll('.teacher-avatar-container, .class-teacher-avatar-container').forEach(container => {
-                container.setAttribute('tabindex', '0');
-                container.setAttribute('role', 'button');
-                container.setAttribute('aria-label', 'Click to view teacher photo');
-
-                container.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        // Find the image and get details
-                        const img = this.querySelector('img');
-                        if (!img) return;
-
-                        // Try to find teacher name
-                        let name = '';
-                        let role = '';
-
-                        if (this.closest('td')) {
-                            // Subject teacher
-                            const nameSpan = this.closest('.d-flex')?.querySelector('span');
-                            name = nameSpan ? nameSpan.textContent.trim() : 'Teacher';
-                            role = 'Subject Teacher';
-                        } else if (this.closest('.teacher-card')) {
-                            // Class teacher
-                            const strongEl = this.closest('.teacher-card')?.querySelector('strong');
-                            name = strongEl ? strongEl.nextSibling?.textContent?.trim() || 'Class Teacher' :
-                                'Class Teacher';
-                            role = 'Class Teacher';
-                        }
-
-                        openTeacherModal(img.src, name, role);
-                    }
-                });
-            });
-
-            // Make profile image accessible
-            const profileImage = document.getElementById('profileImage');
-            if (profileImage) {
-                profileImage.setAttribute('tabindex', '0');
-                profileImage.setAttribute('role', 'button');
-                profileImage.setAttribute('aria-label', 'Click to view student photo');
-
-                profileImage.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
-            }
-        }
-
-        // ============ TOAST NOTIFICATION SYSTEM ============
+        // Toast notifications
         function showToast(type, title, message) {
-            const toastContainer = document.getElementById('toastContainer');
-            if (!toastContainer) return;
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
 
             const toast = document.createElement('div');
-            toast.className = `toast-notification ${type}`;
-
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                warning: 'fa-exclamation-triangle',
-                info: 'fa-info-circle'
-            };
-
+            toast.className = `toast-simple ${type}`;
             toast.innerHTML = `
-            <div class="toast-icon ${type}">
-                <i class="fas ${icons[type]}"></i>
-            </div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <div class="toast-message">${message}</div>
-            </div>
-            <div class="toast-close" onclick="this.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </div>
-        `;
-
-            toastContainer.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.remove();
-                }
-            }, 5000);
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle')}"></i>
+                <div style="flex:1"><strong>${title}</strong><br><small>${message}</small></div>
+                <i class="fas fa-times" onclick="this.parentElement.remove()" style="cursor:pointer"></i>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
         }
 
-        function showSessionMessages() {
-            @if (session('success'))
-                showToast('success', 'Success', '{{ session('success') }}');
-            @endif
-
-            @if (session('error'))
-                showToast('error', 'Error', '{{ session('error') }}');
-            @endif
-
-            @if (session('warning'))
-                showToast('warning', 'Warning', '{{ session('warning') }}');
-            @endif
-
-            @if (session('info'))
-                showToast('info', 'Info', '{{ session('info') }}');
-            @endif
-        }
-
-        // ============ AUTHORIZATION CHECK ============
-        @if (Auth::user()->usertype != 4)
-            window.location.href = '/error-page';
+        // Session messages
+        @if(session('success'))
+            showToast('success', 'Success', '{{ session('success') }}');
+        @endif
+        @if(session('error'))
+            showToast('error', 'Error', '{{ session('error') }}');
         @endif
 
-        // ============ PREVENT FORM RESUBMISSION ============
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
+        // Authorization check
+        @if(Auth::user()->usertype != 4)
+            window.location.href = '/error-page';
+        @endif
     </script>
+
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
 @endsection
