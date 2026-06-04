@@ -10,15 +10,26 @@
             --border-color: #dee2e6;
             --text-color: #212529;
             --header-bg: #2c3e50;
-            --table-header-bg: #3a506b;
+            --table-header-bg: #1e3a5f;
             --table-row-alt: #f8f9fa;
             --total-row-bg: #e9ecef;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
             --gold-accent: #d4af37;
             --cream-bg: #fcfaf7;
             --header-gradient: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+
+            /* Enhanced table colors */
+            --th-bg-primary: #1e3a5f;
+            --th-bg-secondary: #2a5298;
+            --td-high: #22c55e;
+            --td-medium: #eab308;
+            --td-low: #ef4444;
+            --td-high-bg: #dcfce7;
+            --td-medium-bg: #fef9c3;
+            --td-low-bg: #fee2e2;
+            --border-dark: #334155;
         }
 
         body {
@@ -170,6 +181,9 @@
             /* font-style: italic; */
         }
 
+        /* ======================================== */
+        /* ENHANCED TABLE STYLES - ONLY TH AND TD */
+        /* ======================================== */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -179,34 +193,126 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        /* Enhanced TH Styles */
         table th {
-            background-color: var(--table-header-bg);
+            background: linear-gradient(135deg, var(--th-bg-primary) 0%, var(--th-bg-secondary) 100%);
             color: white;
-            padding: 5px 3px;
+            padding: 10px 5px;
             text-align: center;
             font-weight: bold;
-            border: 1px solid #495867;
+            border: 1px solid var(--border-dark);
             font-family: 'Helvetica', 'Arial', sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-size: 10px;
+            font-size: 11px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
+        /* Enhanced TD Styles */
         table td {
-            padding: 4px 3px;
+            padding: 8px 5px;
             text-align: center;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--border-color);
             font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11px;
+            transition: background-color 0.2s ease;
         }
 
-        table tr:nth-child(even) {
-            background-color: var(--table-row-alt);
+        /* Enhanced Alternating Row Colors */
+        table tr:nth-child(even) td {
+            background-color: #f8fafc;
         }
 
-        .total-row {
-            background-color: var(--total-row-bg) !important;
+        table tr:nth-child(odd) td {
+            background-color: #ffffff;
+        }
+
+        /* Enhanced Hover Effect for TD */
+        table tr:hover td {
+            background-color: #e0f2fe !important;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Enhanced Total Row */
+        .total-row td {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             font-weight: bold;
             font-family: 'Helvetica', 'Arial', sans-serif;
+            border-top: 2px solid var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .total-row:hover td {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%) !important;
+        }
+
+        /* Enhanced Attendance Rate Cells */
+        .attendance-high {
+            background: linear-gradient(135deg, var(--td-high) 0%, #15803d 100%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        .attendance-medium {
+            background: linear-gradient(135deg, var(--td-medium) 0%, #ca8a04 100%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        .attendance-low {
+            background: linear-gradient(135deg, var(--td-low) 0%, #b91c1c 100%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        /* Enhanced Class Name Column */
+        .class-name {
+            text-transform: uppercase;
+            text-align: left;
+            padding-left: 12px;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: #f1f5f9;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* Number Columns Styling */
+        table td:not(.class-name) {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* Enhanced Border for Table */
+        table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Print Styles - Maintain readability */
+        @media print {
+            table th {
+                background: #2c3e50 !important;
+                color: white !important;
+                border: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .attendance-high, .attendance-medium, .attendance-low {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            table td {
+                border: 1px solid #ccc !important;
+            }
         }
 
         .report-details {
@@ -312,21 +418,6 @@
             border: 1px solid #c3e6cb;
         }
 
-        .attendance-high {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .attendance-medium {
-            background-color: var(--warning-color);
-            color: #212529;
-        }
-
-        .attendance-low {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
         .watermark {
             position: fixed;
             bottom: 20px;
@@ -338,14 +429,6 @@
             pointer-events: none;
             z-index: -1;
             font-weight: bold;
-        }
-
-        .class-name {
-            text-transform: uppercase;
-            text-align: left;
-            padding-left: 12px;
-            font-weight: 600;
-            color: var(--primary-color);
         }
 
         /* Button Styles */
