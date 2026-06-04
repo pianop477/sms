@@ -250,7 +250,7 @@
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
-                        <h4>the president's office - ralg</h4>
+                        <h4>THE PRIME MINISTER OFFICE</h4>
                         <h4>{{ Auth::user()->school->school_name }}</h4>
                         <p style="font-size:14px; text-transform:capitalize;"><b>Email:</b> <span style="text-transform: lowercase; text-align:center">{{strtolower(Auth::user()->school->school_email ?? 'N/A')}}</span> |
                             <b>Phone:</b> {{Auth::user()->school->school_phone ?? 'N/A'}}

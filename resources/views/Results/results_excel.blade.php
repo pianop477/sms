@@ -43,7 +43,7 @@
     <!-- HEADER SECTION -->
     <div class="header-section">
         <h3>THE UNITED REPUBLIC OF TANZANIA</h3>
-        <h4>THE PRESIDENT'S OFFICE - RALG</h4>
+        <h4>THE PRIME MINISTER OFFICE</h4>
         <h4>{{ strtoupper(auth()->user()->school->school_name) }}</h4>
     </div>
 

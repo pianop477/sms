@@ -462,7 +462,7 @@
         <!-- Government Header -->
         <div class="government-header">
             <h5 class="government-text">THE UNITED REPUBLIC OF TANZANIA</h5>
-            <h6 class="government-text">PRESIDENT'S OFFICE - REGIONAL ADMINISTRATION AND LOCAL GOVERNMENT</h6>
+            <h6 class="government-text">THE PRIME MINISTER OFFICE</h6>
         </div>
 
         <!-- School Header -->

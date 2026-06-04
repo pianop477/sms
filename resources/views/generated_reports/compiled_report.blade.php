@@ -322,7 +322,7 @@
                 </td>
                 <td class="school-info-cell">
                     <div class="school-name">THE UNITED REPUBLIC OF TANZANIA</div>
-                    <div class="school-name">PRESIDENT'S OFFICE - TAMISEMI</div>
+                    <div class="school-name">THE PRIME MINISTER OFFICE</div>
                     <div class="school-name">
                         {{ strtoupper($schoolInfo->school_name ?? 'SCHOOL NAME') }}
                     </div>

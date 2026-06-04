@@ -233,7 +233,7 @@
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
-                        <h4>the president's office - tamisemi</h4>
+                        <h4>the PRIME MINISTER OFFICE</h4>
                         <h4>{{ $schoolInfo->school_name }}</h4>
                         <p style="font-size:14px; text-transform:capitalize;"><b>Email:</b> <span
                                 style="text-transform: lowercase; text-align:center">{{ strtolower($schoolInfo->school_email ?? 'N/A') }}</span>
