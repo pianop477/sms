@@ -1,3 +1,4 @@
+last blade is this:
 @extends('SRTDashboard.frame')
 
 @section('content')
@@ -12,10 +13,9 @@
             --danger: #f94144;
             --light: #f8f9fa;
             --dark: #212529;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-600: #6c757d;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -29,499 +29,467 @@
 
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* Mobile Container */
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -100px) scale(1.2); }
+            50% { transform: translate(200px, 0) scale(0.8); }
+            75% { transform: translate(100px, 100px) scale(1.1); }
+        }
+
+        /* Main Container */
         .dashboard-container {
-            max-width: 100%;
-            padding: 12px;
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
             position: relative;
             z-index: 1;
         }
 
-        /* Mobile Card */
-        .mobile-card {
-            background: white;
-            border-radius: 20px;
+        /* Modern Card */
+        .modern-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
             box-shadow: var(--shadow-lg);
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* Card Header */
-        .mobile-card-header {
+        .card-header-modern {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 16px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            padding: 20px 25px;
+            position: relative;
+            overflow: visible;
         }
 
-        .header-row {
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            /* animation: rotate 20s linear infinite; */
+        }
+
+        .card-header-modern::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--warning), var(--success), var(--accent));
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
 
-        .header-title-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .header-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 22px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .header-title-section h3 {
+        .header-title {
             color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
             margin: 0;
         }
 
+        .header-title h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .header-title p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         /* Add Button */
-        .btn-add-mobile {
+        .btn-add-modern {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
             padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.3s ease;
             cursor: pointer;
-            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
-        .btn-add-mobile:active {
-            transform: scale(0.97);
+        .btn-add-modern:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        /* Card Body */
+        .card-body-modern {
+            padding: 25px;
         }
 
-        .stat-card-mobile {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-card-mobile i {
-            font-size: 20px;
-            color: white;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .stat-card-mobile .stat-label {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 4px;
-        }
-
-        .stat-card-mobile .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-        }
-
-        /* Accountants Grid */
-        .accountants-grid {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Accountant Card */
-        .accountant-card {
+        /* Table Container */
+        .table-container-modern {
             background: white;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .accountant-card:active {
-            transform: scale(0.98);
+        /* Modern Table */
+        .table-modern {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        /* Card Header */
-        .accountant-card-header {
-            padding: 12px;
+        .table-modern thead th {
+            background: linear-gradient(135deg, #2b3d5c 0%, #1a2a44 100%);
+            /* color: white; */
+            font-weight: 600;
+            padding: 12px 12px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .table-modern tbody td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #edf2f7;
+            color: #4a5568;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        /* Accountant Info */
+        .accountant-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--gray-200);
-            background: linear-gradient(135deg, var(--gray-100) 0%, white 100%);
+            gap: 10px;
         }
 
-        .accountant-avatar-mobile {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+        .accountant-avatar-modern {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             object-fit: cover;
             border: 2px solid white;
             box-shadow: var(--shadow-sm);
         }
 
-        .accountant-info-header {
-            flex: 1;
-        }
-
-        .accountant-name-mobile {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        /* Status Badge */
-        .status-badge-card {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 10px;
+        .accountant-name {
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .status-active-card {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-inactive-card {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Card Body */
-        .accountant-card-body {
-            padding: 12px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .info-item-mobile {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-        }
-
-        .info-item-mobile i {
-            width: 28px;
-            height: 28px;
-            background: var(--gray-100);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 11px;
-        }
-
-        .info-item-mobile .info-label {
-            color: var(--gray-600);
-            font-size: 9px;
-        }
-
-        .info-item-mobile .info-value {
             color: var(--dark);
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         /* Gender Badge */
-        .gender-badge-mobile {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .gender-male-badge {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .gender-female-badge {
-            background: #fce4ec;
-            color: #c2185b;
-        }
-
-        /* Phone Link */
-        .phone-link-mobile {
-            color: var(--dark);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-        }
-
-        /* Card Actions */
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            padding-top: 12px;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 8px;
-        }
-
-        .card-action-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
+        .gender-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            border: none;
-            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .gender-male {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        }
+
+        .gender-female {
+            background: linear-gradient(135deg, #e83e8c 0%, #c2185b 100%);
+        }
+
+        /* Phone Link */
+        .phone-link {
+            color: var(--dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .phone-link i {
+            font-size: 0.8rem;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-blocked {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* Action Icons */
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             text-decoration: none;
             transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
-        .card-action-btn.view {
+        .action-icon.view {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
         }
 
-        .card-action-btn.warning {
+        .action-icon.warning {
             background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
-            color: white;
         }
 
-        .card-action-btn.success {
+        .action-icon.success {
             background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
-            color: white;
         }
 
-        .card-action-btn.danger {
+        .action-icon.danger {
             background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
-            color: white;
         }
 
-        .card-action-btn:active {
-            transform: scale(0.97);
+        .action-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Empty State */
-        .empty-state-mobile {
+        .empty-state-modern {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
             border-radius: 16px;
-            margin: 16px;
+            border: 2px dashed #ffc107;
         }
 
-        .empty-state-mobile i {
+        .empty-state-modern i {
             font-size: 50px;
             color: #ffc107;
             margin-bottom: 15px;
         }
 
-        /* Modal Mobile Optimized */
-        .modal-mobile .modal-content {
+        /* Modal Styles */
+        .modal-modern .modal-content {
             border-radius: 20px;
             border: none;
-            margin: 16px;
+            overflow: hidden;
         }
 
-        .modal-mobile .modal-header {
+        .modal-modern .modal-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            padding: 16px;
+            padding: 15px 20px;
         }
 
-        .modal-mobile .modal-body {
-            padding: 16px;
-            max-height: 70vh;
-            overflow-y: auto;
+        .modal-modern .modal-body {
+            padding: 20px;
         }
 
-        .modal-mobile .modal-footer {
+        .modal-modern .modal-footer {
             border: none;
-            padding: 12px 16px;
-            background: var(--gray-100);
+            padding: 15px 20px;
+            background: #f8f9fa;
         }
 
         /* Form Controls */
-        .form-group-mobile {
-            margin-bottom: 14px;
+        .form-group-modern {
+            margin-bottom: 15px;
         }
 
-        .form-label-mobile {
-            font-weight: 600;
-            font-size: 12px;
+        .form-label-modern {
+            font-weight: 500;
             color: var(--dark);
-            margin-bottom: 6px;
-            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
         }
 
-        .form-label-mobile .required {
+        .form-label-modern .required {
             color: var(--danger);
         }
 
-        .form-control-mobile {
+        .form-control-modern {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--gray-300);
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
         }
 
-        .form-control-mobile:focus {
+        .form-control-modern:focus {
             border-color: var(--primary);
-            outline: none;
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .form-select-mobile {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--gray-300);
-            border-radius: 10px;
-            font-size: 13px;
-            background: white;
-        }
-
-        .note-text {
-            font-size: 10px;
-            color: var(--gray-600);
-            margin-top: 4px;
-        }
-
-        /* Info Box */
-        .info-box-mobile {
-            background: var(--gray-100);
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-box-mobile i {
-            font-size: 18px;
-            color: var(--primary);
-        }
-
-        .info-box-mobile .small {
-            font-size: 11px;
-            color: var(--gray-600);
-        }
-
-        /* Toast Notification */
-        .toast-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: white;
-            border-radius: 12px;
-            padding: 12px 20px;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 10000;
-            transition: transform 0.3s ease;
-            min-width: 200px;
-            justify-content: center;
-        }
-
-        .toast-notification.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast-success {
-            border-left: 4px solid #28a745;
-        }
-
-        .toast-error {
-            border-left: 4px solid var(--danger);
+            outline: none;
         }
 
         /* Responsive */
-        @media (max-width: 480px) {
-            .dashboard-container {
-                padding: 8px;
+        @media (max-width: 1200px) {
+            .table-modern {
+                display: block;
+                overflow-x: auto;
             }
 
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
+            .action-icons {
+                justify-content: flex-start;
             }
+        }
 
-            .header-row {
+        @media (max-width: 768px) {
+            .header-content {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .btn-add-mobile {
+            .btn-add-modern {
+                width: 100%;
                 justify-content: center;
             }
+        }
 
-            .stats-grid {
-                gap: 6px;
+        @media (max-width: 576px) {
+            .card-header-modern {
+                padding: 15px;
             }
 
-            .stat-card-mobile {
-                padding: 8px;
+            .header-title h3 {
+                font-size: 1.2rem;
             }
 
-            .stat-value {
-                font-size: 16px;
-            }
-
-            .card-actions {
-                flex-wrap: wrap;
-            }
-
-            .card-action-btn {
-                min-width: calc(50% - 4px);
+            .card-body-modern {
+                padding: 15px;
             }
         }
 
@@ -531,329 +499,281 @@
                 background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
             }
 
-            .mobile-card {
-                background: #2d3748;
+            .modern-card {
+                background: rgba(33, 37, 41, 0.95);
             }
 
-            .accountant-card {
-                background: #2d3748;
-                border-color: #4a5568;
+            .table-modern tbody td {
+                color: #e9ecef;
+                border-bottom-color: #495057;
             }
 
-            .accountant-card-header {
-                background: #374151;
-                border-bottom-color: #4a5568;
+            .table-modern tbody tr:hover {
+                background: #343a40;
             }
 
-            .accountant-name-mobile {
-                color: #f8f9fa;
+            .accountant-name {
+                color: #e9ecef;
             }
 
-            .info-item-mobile i {
-                background: #374151;
-                color: var(--primary);
+            .status-active {
+                background: #22543d;
+                color: #c6f6d5;
             }
 
-            .info-item-mobile .info-value {
-                color: #f8f9fa;
+            .status-blocked {
+                background: #742a2a;
+                color: #fed7d7;
             }
 
-            .phone-link-mobile {
-                color: #f8f9fa;
-            }
-
-            .form-control-mobile,
-            .form-select-mobile {
-                background: #374151;
-                border-color: #4a5568;
-                color: #f8f9fa;
-            }
-
-            .form-label-mobile {
-                color: #f8f9fa;
-            }
-
-            .modal-mobile .modal-content {
-                background: #2d3748;
-            }
-
-            .modal-mobile .modal-footer {
-                background: #374151;
-            }
-
-            .info-box-mobile {
-                background: #374151;
-            }
-
-            .info-box-mobile .small {
-                color: #adb5bd;
-            }
-
-            .toast-notification {
-                background: #2d3748;
-                color: #f8f9fa;
+            .form-control-modern {
+                background: #2b3035;
+                border-color: #495057;
+                color: #e9ecef;
             }
         }
     </style>
 
+    <div class="animated-bg"></div>
+    <div class="particles"></div>
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
     <div class="dashboard-container">
-        <div class="mobile-card">
+        <div class="modern-card">
             <!-- Header -->
-            <div class="mobile-card-header">
-                <div class="header-row">
-                    <div class="header-title-section">
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <div class="header-left">
                         <div class="header-icon">
                             <i class="fas fa-calculator"></i>
                         </div>
-                        <div>
-                            <h3>Accountants</h3>
+                        <div class="header-title">
+                            <h3>Accountants Management</h3>
                         </div>
                     </div>
-                    <button type="button" class="btn-add-mobile" data-bs-toggle="modal" data-bs-target="#addAccountantModal">
-                        <i class="fas fa-user-plus"></i> Add Accountant
+                    <button type="button" class="btn-add-modern" data-bs-toggle="modal" data-bs-target="#addAccountantModal">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Accountant</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            @php
-                $activeCount = $accountant->filter(fn($a) => $a->status == 1)->count();
-                $maleCount = $accountant->filter(fn($a) => strtolower($a->gender) == 'male')->count();
-                $femaleCount = $accountant->filter(fn($a) => strtolower($a->gender) == 'female')->count();
-            @endphp
-            <div class="stats-grid">
-                <div class="stat-card-mobile">
-                    <i class="fas fa-user-check"></i>
-                    <div class="stat-label">Active</div>
-                    <div class="stat-value">{{ $activeCount }}</div>
-                </div>
-                <div class="stat-card-mobile">
-                    <i class="fas fa-male"></i>
-                    <div class="stat-label">Male</div>
-                    <div class="stat-value">{{ $maleCount }}</div>
-                </div>
-                <div class="stat-card-mobile">
-                    <i class="fas fa-female"></i>
-                    <div class="stat-label">Female</div>
-                    <div class="stat-value">{{ $femaleCount }}</div>
-                </div>
-            </div>
-
-            <!-- Accountants Grid -->
-            @if ($accountant->isEmpty())
-                <div class="empty-state-mobile">
-                    <i class="fas fa-calculator"></i>
-                    <h6 class="mt-2">No Accountants Found</h6>
-                    <p class="text-muted small">Tap "Add Accountant" to register</p>
-                </div>
-            @else
-                <div class="accountants-grid">
-                    @foreach ($accountant as $row)
-                        @php
-                            $imageName = $row->image;
-                            $imagePath = storage_path('app/public/profile/' . $imageName);
-                            $avatarImage = (!empty($imageName) && file_exists($imagePath))
-                                ? asset('storage/profile/' . $imageName)
-                                : asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
-                        @endphp
-
-                        <div class="accountant-card">
-                            <!-- Card Header -->
-                            <div class="accountant-card-header">
-                                <img src="{{ $avatarImage }}" alt="Avatar" class="accountant-avatar-mobile">
-                                <div class="accountant-info-header">
-                                    <div class="accountant-name-mobile">{{ ucwords(strtolower($row->first_name . ' ' . $row->last_name)) }}</div>
-                                </div>
-                                @if ($row->status == 1)
-                                    <span class="status-badge-card status-active-card">
-                                        <i class="fas fa-circle" style="font-size: 6px;"></i> Active
-                                    </span>
-                                @else
-                                    <span class="status-badge-card status-inactive-card">
-                                        <i class="fas fa-circle" style="font-size: 6px;"></i> Blocked
-                                    </span>
-                                @endif
-                            </div>
-
-                            <!-- Card Body -->
-                            <div class="accountant-card-body">
-                                <div class="info-grid">
-                                    <div class="info-item-mobile">
-                                        <i class="fas fa-venus-mars"></i>
-                                        <div>
-                                            <div class="info-label">Gender</div>
-                                            <div class="info-value">
-                                                <span class="gender-badge-mobile {{ $row->gender == 'male' ? 'gender-male-badge' : 'gender-female-badge' }}">
-                                                    <i class="fas {{ $row->gender == 'male' ? 'fa-mars' : 'fa-venus' }}"></i>
-                                                    {{ ucfirst($row->gender) }}
+            <!-- Body -->
+            <div class="card-body-modern">
+                @if ($accountant->isEmpty())
+                    <div class="empty-state-modern">
+                        <i class="fas fa-calculator"></i>
+                        <h6>No Accountants Found</h6>
+                        <p class="text-muted small">Click "Add Accountant" to register</p>
+                    </div>
+                @else
+                    <div class="table-container-modern">
+                        <table class="table-modern" id="myTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-white">#</th>
+                                    <th>Accountant information</th>
+                                    <th>Gender</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($accountant as $row)
+                                    <tr>
+                                        <td><span class="fw-bold">{{ $loop->iteration }}</span></td>
+                                        <td>
+                                            <div class="accountant-info">
+                                                @php
+                                                    $imageName = $row->image;
+                                                    $imagePath = storage_path('app/public/profile/' . $imageName);
+                                                    $avatarImage = (!empty($imageName) && file_exists($imagePath))
+                                                        ? asset('storage/profile/' . $imageName)
+                                                        : asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                @endphp
+                                                <img src="{{ $avatarImage }}" alt="Avatar" class="accountant-avatar-modern">
+                                                <span class="accountant-name">{{ ucwords(strtolower($row->first_name . ' ' . $row->last_name)) }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="gender-badge {{ $row->gender == 'male' ? 'gender-male' : 'gender-female' }}">
+                                                {{ strtoupper(substr($row->gender, 0, 1)) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="tel:{{ $row->phone }}" class="phone-link">
+                                                <i class="fas fa-phone-alt"></i>
+                                                {{ $row->phone }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @if ($row->status == 1)
+                                                <span class="status-badge status-active">
+                                                    <i class="fas fa-circle"></i> Active
                                                 </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="info-item-mobile">
-                                        <i class="fas fa-phone"></i>
-                                        <div>
-                                            <div class="info-label">Phone</div>
-                                            <div class="info-value">
-                                                <a href="tel:{{ $row->phone }}" class="phone-link-mobile">
-                                                    <i class="fas fa-phone-alt"></i> {{ $row->phone }}
+                                            @else
+                                                <span class="status-badge status-blocked">
+                                                    <i class="fas fa-circle"></i> Blocked
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="action-icons">
+                                                <a href="{{ route('Accountants.profile', ['id' => Hashids::encode($row->id)]) }}"
+                                                   class="action-icon view"
+                                                   title="View Profile">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="info-item-mobile">
-                                        <i class="fas fa-envelope"></i>
-                                        <div>
-                                            <div class="info-label">Email</div>
-                                            <div class="info-value">
-                                                @if($row->email)
-                                                    <a href="mailto:{{ $row->email }}" class="phone-link-mobile">
-                                                        <i class="fas fa-envelope"></i> {{ substr($row->email, 0, 20) }}{{ strlen($row->email) > 20 ? '...' : '' }}
-                                                    </a>
+
+                                                @if ($row->status == 1)
+                                                    <form action="{{ route('Accountants.block', ['id' => Hashids::encode($row->id)]) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Block {{ $row->first_name }} {{ $row->last_name }}?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="action-icon warning" title="Block">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                    </form>
                                                 @else
-                                                    <span class="text-muted">N/A</span>
+                                                    <form action="{{ route('Accountants.unblock', ['id' => Hashids::encode($row->id)]) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Unblock {{ $row->first_name }} {{ $row->last_name }}?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="action-icon success" title="Unblock">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
                                                 @endif
+
+                                                <form action="{{ route('Accountants.delete', ['id' => Hashids::encode($row->id)]) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Delete {{ $row->first_name }} {{ $row->last_name }}? This cannot be undone.')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="action-icon danger" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="info-item-mobile">
-                                        <i class="fas fa-id-card"></i>
-                                        <div>
-                                            <div class="info-label">Staff ID</div>
-                                            <div class="info-value">{{ strtoupper($row->member_id ?? 'N/A') }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="card-actions">
-                                    <a href="{{ route('Accountants.profile', ['id' => Hashids::encode($row->id)]) }}"
-                                       class="card-action-btn view">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-
-                                    @if ($row->status == 1)
-                                        <form action="{{ route('Accountants.block', ['id' => Hashids::encode($row->id)]) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              style="flex: 1"
-                                              onsubmit="return confirm('Block {{ $row->first_name }} {{ $row->last_name }}?')">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="card-action-btn warning">
-                                                <i class="fas fa-ban"></i> Block
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('Accountants.unblock', ['id' => Hashids::encode($row->id)]) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              style="flex: 1"
-                                              onsubmit="return confirm('Unblock {{ $row->first_name }} {{ $row->last_name }}?')">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="card-action-btn success">
-                                                <i class="fas fa-check"></i> Unblock
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    <form action="{{ route('Accountants.delete', ['id' => Hashids::encode($row->id)]) }}"
-                                          method="POST"
-                                          class="d-inline"
-                                          style="flex: 1"
-                                          onsubmit="return confirm('Delete {{ $row->first_name }} {{ $row->last_name }}? This cannot be undone.')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="card-action-btn danger">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
     <!-- Add Accountant Modal -->
-    <div class="modal fade modal-mobile" id="addAccountantModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal fade modal-modern" id="addAccountantModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Register Accountant</h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Accountant Registration Form
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form class="needs-validation" novalidate action="{{ route('Accountants.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">First Name <span class="required">*</span></label>
-                            <input type="text" name="fname" class="form-control-mobile" value="{{ old('fname') }}" required>
-                            @error('fname')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">Surname <span class="required">*</span></label>
-                            <input type="text" name="lname" class="form-control-mobile" value="{{ old('lname') }}" required>
-                            @error('lname')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">Email</label>
-                            <input type="email" name="email" class="form-control-mobile" value="{{ old('email') }}">
-                            @error('email')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">Gender <span class="required">*</span></label>
-                            <select name="gender" class="form-select-mobile" required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                            @error('gender')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">Phone <span class="required">*</span></label>
-                            <input type="tel" name="phone" class="form-control-mobile" value="{{ old('phone') }}" required>
-                            @error('phone')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group-mobile">
-                            <label class="form-label-mobile">Profile Picture</label>
-                            <input type="file" name="image" class="form-control-mobile" accept="image/*">
-                            <div class="note-text">Max: 2MB (JPG, PNG)</div>
-                            @error('image')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="info-box-mobile">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <div class="small fw-bold">Accountant Login Credentials</div>
-                                <div class="small">Login credentials will be sent via SMS after registration.</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        First Name <span class="required">*</span>
+                                    </label>
+                                    <input type="text" name="fname" class="form-control-modern" value="{{ old('fname') }}" required>
+                                    @error('fname')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        Surname <span class="required">*</span>
+                                    </label>
+                                    <input type="text" name="lname" class="form-control-modern" value="{{ old('lname') }}" required>
+                                    @error('lname')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Email</label>
+                                    <input type="email" name="email" class="form-control-modern" value="{{ old('email') }}">
+                                    @error('email')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        Gender <span class="required">*</span>
+                                    </label>
+                                    <select name="gender" class="form-control-modern" required>
+                                        <option value="">Select</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        Phone <span class="required">*</span>
+                                    </label>
+                                    <input type="text" name="phone" class="form-control-modern" value="{{ old('phone') }}" required>
+                                    @error('phone')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Profile Picture</label>
+                                    <input type="file" name="image" class="form-control-modern" accept="image/*">
+                                    <div class="note-text small text-muted mt-1">Max: 2MB (JPG, PNG)</div>
+                                    @error('image')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-2 text-info"></i>
+                                Accountant login credentials will be sent via SMS after registration.
+                            </small>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-success" id="saveButton">
-                            <i class="fas fa-save me-2"></i>Save Accountant
+                            <i class="fas fa-save me-2"></i>
+                            Save Accountant
                         </button>
                     </div>
                 </form>
@@ -866,21 +786,33 @@
             // Form handling
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton");
+            const loadingSpinner = document.getElementById('loadingSpinner');
 
             if (form && submitButton) {
                 form.addEventListener("submit", function(event) {
                     event.preventDefault();
 
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'block';
 
+                    // Disable button
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Saving...
+                    `;
+
+                    // Validate form
                     if (!form.checkValidity()) {
                         form.classList.add("was-validated");
+                        loadingSpinner.style.display = 'none';
                         submitButton.disabled = false;
                         submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Accountant';
 
+                        // Show error toast
                         showToast('Please fill all required fields', 'error');
 
+                        // Scroll to first invalid
                         const firstInvalid = form.querySelector(':invalid');
                         if (firstInvalid) {
                             firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -888,18 +820,38 @@
                         return;
                     }
 
+                    // Submit after delay
                     setTimeout(() => {
                         form.submit();
                     }, 500);
                 });
             }
 
+            // Create floating particles
+            function createParticles() {
+                const particlesContainer = document.querySelector('.particles');
+                if (!particlesContainer) return;
+
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.width = Math.random() * 10 + 3 + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 20 + 's';
+                    particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            createParticles();
+
             // Toast notification
             function showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.className = `toast-notification toast-${type}`;
                 toast.innerHTML = `
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} fa-2x"></i>
                     <span>${message}</span>
                 `;
                 document.body.appendChild(toast);
@@ -911,6 +863,16 @@
                 }, 3000);
             }
 
+            // Input animations
+            document.querySelectorAll('.form-control-modern').forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.style.transform = 'translateY(-2px)';
+                });
+                input.addEventListener('blur', () => {
+                    input.style.transform = 'translateY(0)';
+                });
+            });
+
             // Phone number formatting
             const phoneInput = document.querySelector('input[name="phone"]');
             if (phoneInput) {
@@ -921,19 +883,68 @@
                 });
             }
 
-            // Touch feedback for cards
-            const cards = document.querySelectorAll('.accountant-card');
-            cards.forEach(card => {
-                card.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.98)';
-                });
-                card.addEventListener('touchend', function() {
-                    this.style.transform = 'scale(1)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
+            // Reset button state on page show
+            window.addEventListener("pageshow", function() {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Accountant';
+                }
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
+                }
             });
         });
     </script>
+
+    <style>
+        /* Toast notification styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 10000;
+            border-left: 5px solid;
+        }
+
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left-color: #28a745;
+        }
+
+        .toast-error {
+            border-left-color: var(--danger);
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 9999;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
 @endsection
