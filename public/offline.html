@@ -3,37 +3,45 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4361ee">
     <title>ShuleApp | Offline Mode</title>
 
     <!-- Single Font Awesome import -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Google Fonts for better typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <style>
         :root {
             --primary: #4361ee;
+            --primary-dark: #3a0ca3;
             --danger: #e63946;
+            --danger-dark: #c1121f;
             --success: #4cc9f0;
+            --success-dark: #0096c7;
             --light: #f8f9fa;
             --dark: #212529;
             --gray: #6c757d;
-            --border-radius: 12px;
-            --box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --gray-light: #e9ecef;
+            --border-radius: 20px;
+            --box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             min-height: 100vh;
@@ -42,79 +50,156 @@
             justify-content: center;
             color: var(--dark);
             text-align: center;
-            line-height: 1.6;
-            padding: 20px;
+            line-height: 1.5;
+            padding: 16px;
+            position: relative;
         }
 
+        /* App-like Container */
         .offline-container {
             background: rgba(255, 255, 255, 0.98);
-            padding: 40px;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            max-width: 90%;
-            width: 500px;
-            transform: translateY(0);
-            animation: fadeInUp 0.6s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            overflow: hidden;
             backdrop-filter: blur(10px);
+            animation: slideUp 0.5s ease-out;
+            position: relative;
         }
 
-        .offline-icon {
-            font-size: 5rem;
-            color: var(--danger);
-            margin-bottom: 20px;
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-bar .time {
+            font-weight: 600;
+        }
+
+        .status-bar .battery {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Header Section */
+        .offline-header {
+            padding: 30px 24px 20px;
+            text-align: center;
+        }
+
+        .offline-icon-wrapper {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(230, 57, 70, 0.05));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
             animation: pulse 2s infinite;
         }
 
-        h1 {
-            color: var(--dark);
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        p {
-            font-size: 1rem;
-            color: var(--gray);
-            margin-bottom: 25px;
-        }
-
-        .connection-status {
-            display: inline-block;
-            padding: 8px 18px;
-            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(230, 57, 70, 0.05));
+        .offline-icon {
+            font-size: 48px;
             color: var(--danger);
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--gray);
             margin-bottom: 20px;
-            letter-spacing: 0.5px;
+        }
+
+        /* Connection Status Card */
+        .connection-card {
+            background: rgba(230, 57, 70, 0.08);
+            margin: 0 20px 20px;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             border: 1px solid rgba(230, 57, 70, 0.2);
         }
 
+        .connection-status {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--danger);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Message */
+        .message-card {
+            background: var(--light);
+            margin: 0 20px 20px;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        #mainMessage {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Retry Button */
         .retry-btn {
-            background: linear-gradient(135deg, var(--primary), #3a0ca3);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-size: 1rem;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            width: calc(100% - 40px);
+            margin: 0 auto 20px;
             box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
         }
 
-        .retry-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        .retry-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .retry-btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .retry-btn:disabled {
@@ -122,74 +207,87 @@
             cursor: not-allowed;
         }
 
+        /* Progress Bar */
         .progress-container {
-            width: 100%;
-            height: 4px;
-            background: rgba(0, 0, 0, 0.08);
-            border-radius: 2px;
-            margin-top: 25px;
+            width: calc(100% - 40px);
+            margin: 0 auto 20px;
+            background: var(--gray-light);
+            border-radius: 10px;
             overflow: hidden;
             display: none;
         }
 
         .progress-bar {
-            height: 100%;
-            width: 0;
+            height: 4px;
             background: linear-gradient(90deg, var(--primary), var(--success));
             transition: width 0.3s ease;
+            border-radius: 10px;
         }
 
+        /* Tips Section - Mobile Friendly */
         .tips {
-            margin-top: 30px;
+            margin: 0 20px 20px;
             text-align: left;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-            padding-top: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--gray-light);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .tips h3 {
-            font-size: 0.9rem;
-            color: var(--dark);
+            font-size: 14px;
+            color: var(--primary);
             margin-bottom: 12px;
-            font-weight: 600;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .tips ul {
-            padding-left: 20px;
+            list-style: none;
+            padding-left: 0;
             margin: 0;
         }
 
         .tips li {
-            font-size: 0.85rem;
+            font-size: 13px;
             color: var(--gray);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
         }
 
         .tips li i {
+            width: 20px;
             color: var(--primary);
-            margin-right: 8px;
-            font-size: 0.75rem;
+            font-size: 14px;
         }
 
+        /* Saved Pages Section */
         .saved-pages {
-            margin-top: 20px;
+            margin: 0 20px 20px;
             background: rgba(67, 97, 238, 0.05);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 12px;
             display: none;
+            animation: fadeIn 0.3s ease-out;
         }
 
         .saved-pages.show {
             display: block;
-            animation: fadeInUp 0.3s ease-out;
         }
 
         .saved-pages h4 {
-            font-size: 0.85rem;
+            font-size: 12px;
             color: var(--primary);
             margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .saved-pages ul {
@@ -198,17 +296,58 @@
         }
 
         .saved-pages li {
-            font-size: 0.8rem;
-            padding: 5px 0;
+            font-size: 12px;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes fadeInUp {
+        .saved-pages li:last-child {
+            border-bottom: none;
+        }
+
+        .saved-pages li i {
+            color: var(--primary);
+            font-size: 12px;
+        }
+
+        /* Bottom Navigation Mockup */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid var(--gray-light);
+            padding: 10px 20px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--gray);
+            opacity: 0.6;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -216,14 +355,22 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
             }
-
             50% {
-                transform: scale(1.1);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -237,23 +384,42 @@
             animation: spin 1s linear infinite;
         }
 
+        /* Mobile Optimizations */
         @media (max-width: 480px) {
-            .offline-container {
-                padding: 30px 20px;
-                width: 95%;
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 20px;
             }
 
-            h1 {
-                font-size: 1.5rem;
+            .offline-container {
+                border-radius: 24px;
+            }
+
+            .offline-header {
+                padding: 24px 20px 16px;
+            }
+
+            .offline-icon-wrapper {
+                width: 80px;
+                height: 80px;
             }
 
             .offline-icon {
-                font-size: 3.5rem;
+                font-size: 40px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 13px;
             }
 
             .retry-btn {
-                padding: 12px 24px;
-                font-size: 0.9rem;
+                padding: 14px 20px;
+                font-size: 15px;
             }
         }
 
@@ -263,18 +429,43 @@
                 background: rgba(33, 37, 41, 0.98);
             }
 
-            h1,
-            .tips h3 {
+            h1, .subtitle {
                 color: #f8f9fa;
             }
 
-            p,
-            .tips li {
+            .message-card {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            #mainMessage, .tips li {
                 color: #adb5bd;
             }
 
             .tips {
+                background: rgba(255, 255, 255, 0.03);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .bottom-nav {
+                background: rgba(33, 37, 41, 0.98);
                 border-top-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .progress-container {
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Touch-friendly adjustments */
+        .retry-btn, .nav-item {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        /* Safe area for notches */
+        @supports (padding: max(0px)) {
+            .offline-container {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
             }
         }
     </style>
@@ -282,35 +473,100 @@
 
 <body>
     <div class="offline-container">
-        <div class="connection-status" id="connectionStatus">
-            <i class="fas fa-circle"
-                style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px; color: #e63946;"></i>
-            OFFLINE MODE
+        <!-- Mock Status Bar -->
+        <div class="status-bar">
+            <span class="time" id="currentTime">9:41</span>
+            <span class="battery">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </span>
         </div>
-        <i class="fas fa-wifi-slash offline-icon"></i>
-        <h1>No Internet Connection</h1>
-        <p id="mainMessage">We can't connect to the internet right now. Please check your connection and try again.</p>
 
+        <!-- Header -->
+        <div class="offline-header">
+            <div class="offline-icon-wrapper">
+                <i class="fas fa-wifi-slash offline-icon"></i>
+            </div>
+            <h1>No Internet</h1>
+            <p class="subtitle">You're offline right now</p>
+        </div>
+
+        <!-- Connection Status Card -->
+        <div class="connection-card">
+            <i class="fas fa-circle" style="font-size: 8px; color: var(--danger);"></i>
+            <span class="connection-status" id="connectionStatus">OFFLINE MODE</span>
+        </div>
+
+        <!-- Message Card -->
+        <div class="message-card">
+            <p id="mainMessage">Please check your internet connection and try again.</p>
+        </div>
+
+        <!-- Retry Button -->
         <button class="retry-btn" id="retryBtn">
             <i class="fas fa-sync-alt"></i> Try Again
         </button>
 
+        <!-- Progress Bar -->
         <div class="progress-container" id="progressContainer">
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
+        <!-- Tips Card -->
         <div class="tips">
-            <h3><i class="fas fa-lightbulb"></i> Quick Fixes:</h3>
+            <h3><i class="fas fa-lightbulb"></i> Quick Fixes</h3>
             <ul>
-                <li><i class="fas fa-wifi"></i> Check your Wi-Fi or mobile data connection</li>
-                <li><i class="fas fa-sync-alt"></i> Toggle Airplane mode on/off</li>
-                <li><i class="fas fa-server"></i> Restart your router or modem</li>
-                <li><i class="fas fa-shield-alt"></i> Disable any VPN or proxy services</li>
+                <li><i class="fas fa-wifi"></i> Check Wi-Fi or mobile data</li>
+                <li><i class="fas fa-plane"></i> Toggle Airplane mode</li>
+                <li><i class="fas fa-server"></i> Restart your router</li>
+                <li><i class="fas fa-shield-alt"></i> Disable VPN/Proxy</li>
             </ul>
+        </div>
+
+        <!-- Saved Pages -->
+        <div class="saved-pages" id="savedPages">
+            <h4><i class="fas fa-download"></i> Available Offline</h4>
+            <ul id="savedPagesList"></ul>
+        </div>
+
+        <!-- Bottom Navigation Mockup -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-bell"></i>
+                <span>Alerts</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </div>
         </div>
     </div>
 
     <script>
+        // Update time in status bar
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            const timeString = `${hours}:${minutes} ${ampm}`;
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) timeElement.textContent = timeString;
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
         // Prevent any errors from affecting the page
         window.addEventListener('error', function (e) {
             console.warn('Caught error:', e.message);
@@ -356,7 +612,6 @@
 
                         for (const request of requests) {
                             const url = request.url;
-                            // Filter only important pages
                             if (url.includes('/dashboard') ||
                                 url.includes('/students') ||
                                 url.includes('/home') ||
@@ -369,7 +624,7 @@
                     }
 
                     if (savedUrls.length > 0) {
-                        savedPagesList.innerHTML = savedUrls.map(url =>
+                        savedPagesList.innerHTML = savedUrls.slice(0, 3).map(url =>
                             `<li><i class="fas fa-file-alt"></i> ${url.replace(window.location.origin, '') || 'Home'}</li>`
                         ).join('');
                         savedPagesDiv.classList.add('show');
@@ -381,23 +636,15 @@
             }
         }
 
-        // Call after a short delay
         setTimeout(checkSavedPages, 500);
 
-        // ============================================================
-        // FIXED: Connection checking with 30 second delay between retries
-        // ============================================================
+        // Connection checking with 30 second delay between retries
         let retryCount = 0;
-        const maxRetries = 5; // Increased max retries
+        const maxRetries = 5;
         let isChecking = false;
         let lastCheckTime = 0;
         let autoCheckInterval = null;
         let progressInterval = null;
-
-        // Clear any existing interval
-        if (autoCheckInterval) {
-            clearInterval(autoCheckInterval);
-        }
 
         function stopProgressAnimation() {
             if (progressInterval) {
@@ -422,21 +669,18 @@
 
             if (!progressContainer || !retryBtn) return;
 
-            // Prevent multiple simultaneous checks
             if (isChecking) {
                 safeLog('Connection check already in progress, skipping...');
                 return;
             }
 
-            // Check if enough time has passed since last check (30 seconds minimum)
             const now = Date.now();
             if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
                 const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
                 safeLog(`Please wait ${secondsLeft} seconds before retrying...`);
 
-                // Update UI to show waiting period
                 if (connectionStatus) {
-                    connectionStatus.innerHTML = `<i class="fas fa-hourglass-half"></i> WAIT ${secondsLeft}s BEFORE RETRY`;
+                    connectionStatus.innerHTML = `⏱️ WAIT ${secondsLeft}s`;
                 }
                 if (mainMessage) {
                     mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before trying again...`;
@@ -451,18 +695,15 @@
             retryBtn.disabled = true;
             progressContainer.style.display = 'block';
 
-            // Stop any existing progress animation
             stopProgressAnimation();
 
-            // Update status message
             if (connectionStatus) {
-                connectionStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CHECKING CONNECTION...';
+                connectionStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CHECKING...';
             }
             if (mainMessage) {
-                mainMessage.innerHTML = `Attempt ${retryCount} of ${maxRetries} - Checking connection... Please wait.`;
+                mainMessage.innerHTML = `Attempt ${retryCount} of ${maxRetries} - Checking connection...`;
             }
 
-            // Animate progress bar smoothly over 3 seconds
             let progress = 0;
             progressInterval = setInterval(() => {
                 progress += 5;
@@ -474,7 +715,6 @@
                     clearInterval(progressInterval);
                     progressInterval = null;
 
-                    // Final connection check after animation
                     setTimeout(() => {
                         if (navigator.onLine) {
                             safeLog('Connection restored! Redirecting...');
@@ -482,108 +722,45 @@
                             const redirectUrl = lastURL || window.location.origin;
                             window.location.href = redirectUrl;
                         } else {
-                            // Still offline
                             progressContainer.style.display = 'none';
                             resetProgressBar();
                             retryBtn.disabled = false;
                             isChecking = false;
 
                             if (connectionStatus) {
-                                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
+                                connectionStatus.innerHTML = '🔴 OFFLINE MODE';
                             }
 
                             if (mainMessage) {
                                 if (retryCount >= maxRetries) {
-                                    mainMessage.innerHTML = 'Still having trouble connecting. Please check your network settings and try again later.';
+                                    mainMessage.innerHTML = 'Still having trouble connecting. Please check your network settings.';
                                 } else {
-                                    const nextRetryIn = 30;
-                                    mainMessage.innerHTML = `Unable to connect. Will retry automatically in ${nextRetryIn} seconds. (Attempt ${retryCount}/${maxRetries})`;
+                                    mainMessage.innerHTML = `Unable to connect. Auto-retry in 30 seconds. (${retryCount}/${maxRetries})`;
                                 }
                             }
                             safeLog('Still offline after attempt ' + retryCount);
-
-                            // Schedule next auto retry after 30 seconds
-                            if (retryCount < maxRetries) {
-                                safeLog(`Next retry scheduled in 30 seconds...`);
-                                if (connectionStatus) {
-                                    connectionStatus.innerHTML = `<i class="fas fa-clock"></i> NEXT RETRY IN 30s`;
-                                }
-                            }
                         }
                     }, 500);
                 }
-            }, 30); // 30ms * 20 = 600ms for 60%, total ~3 seconds
+            }, 30);
         }
 
-        // New function: Schedule retry with delay
-        let scheduledRetry = null;
-
-        function scheduleRetry(delaySeconds = 30) {
-            if (scheduledRetry) {
-                clearTimeout(scheduledRetry);
-            }
-
-            const retryBtn = document.getElementById('retryBtn');
-            const connectionStatus = document.getElementById('connectionStatus');
-            const mainMessage = document.getElementById('mainMessage');
-
-            let timeLeft = delaySeconds;
-
-            // Update countdown in UI
-            const countdownInterval = setInterval(() => {
-                if (!navigator.onLine && timeLeft > 0) {
-                    if (connectionStatus) {
-                        connectionStatus.innerHTML = `<i class="fas fa-clock"></i> RETRY IN ${timeLeft}s`;
-                    }
-                    if (mainMessage && retryCount < maxRetries) {
-                        mainMessage.innerHTML = `No connection. Auto-retry in ${timeLeft} seconds... (Attempt ${retryCount}/${maxRetries})`;
-                    }
-                    timeLeft--;
-                } else {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
-
-            scheduledRetry = setTimeout(() => {
-                clearInterval(countdownInterval);
-                if (!navigator.onLine && retryCount < maxRetries) {
-                    safeLog('Executing scheduled retry...');
-                    checkConnection();
-                }
-                scheduledRetry = null;
-            }, delaySeconds * 1000);
-        }
-
-        // Manual retry button handler (FIXED: respects 30 second cooldown)
         const retryBtn = document.getElementById('retryBtn');
         if (retryBtn) {
             retryBtn.addEventListener('click', function () {
                 const now = Date.now();
                 if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
                     const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
-                    safeLog(`Manual retry blocked: ${secondsLeft}s remaining`);
-
                     const connectionStatus = document.getElementById('connectionStatus');
                     const mainMessage = document.getElementById('mainMessage');
 
                     if (connectionStatus) {
-                        connectionStatus.innerHTML = `<i class="fas fa-hourglass"></i> WAIT ${secondsLeft}s`;
-                        setTimeout(() => {
-                            if (connectionStatus && !navigator.onLine) {
-                                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
-                            }
-                        }, 2000);
+                        connectionStatus.innerHTML = `⏱️ WAIT ${secondsLeft}s`;
                     }
                     if (mainMessage) {
                         mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before trying again.`;
-                        setTimeout(() => {
-                            if (mainMessage && !navigator.onLine && retryCount < maxRetries) {
-                                mainMessage.innerHTML = `Unable to connect. Auto-retry in progress... (Attempt ${retryCount}/${maxRetries})`;
-                            }
-                        }, 3000);
                     }
                 } else {
-                    // Reset retry count if max reached and user manually retries
                     if (retryCount >= maxRetries) {
                         retryCount = 0;
                         safeLog('Retry count reset for manual retry');
@@ -593,9 +770,6 @@
             });
         }
 
-        // ============================================================
-        // FIXED: Auto-check every 30 seconds (not 15 seconds)
-        // ============================================================
         let redirectScheduled = false;
 
         setInterval(() => {
@@ -603,7 +777,6 @@
                 safeLog('Connection detected, preparing to redirect...');
                 redirectScheduled = true;
 
-                // Add small delay to ensure stable connection
                 setTimeout(() => {
                     const lastURL = sessionStorage.getItem('offline_lastURL');
                     if (navigator.onLine) {
@@ -615,25 +788,22 @@
                 }, 2000);
             }
 
-            // Auto retry when offline - after 30 seconds have passed
             if (!navigator.onLine && !isChecking && retryCount < maxRetries) {
                 const now = Date.now();
                 if (lastCheckTime === 0 || (now - lastCheckTime) >= 30000) {
-                    safeLog('Auto retry triggered by interval (30s passed)');
+                    safeLog('Auto retry triggered by interval');
                     checkConnection();
                 }
             }
-        }, 30000); // Changed from 15000 to 30000 (30 seconds)
+        }, 30000);
 
-        // Listen for online event (FIXED: no immediate redirect, small delay)
         window.addEventListener('online', () => {
             safeLog('Online event fired');
             const connectionStatus = document.getElementById('connectionStatus');
             if (connectionStatus) {
-                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #2ecc71;"></i> CONNECTION RESTORED!';
+                connectionStatus.innerHTML = '🟢 CONNECTION RESTORED!';
             }
 
-            // Wait 2 seconds before redirecting to ensure stable connection
             setTimeout(() => {
                 if (navigator.onLine) {
                     const lastURL = sessionStorage.getItem('offline_lastURL');
@@ -643,38 +813,26 @@
             }, 2000);
         });
 
-        // Listen for offline event
         window.addEventListener('offline', () => {
             safeLog('Offline event fired');
             const connectionStatus = document.getElementById('connectionStatus');
             if (connectionStatus) {
-                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
+                connectionStatus.innerHTML = '🔴 OFFLINE MODE';
             }
-
-            // Reset redirect flag
             redirectScheduled = false;
         });
 
-        // Add keyboard shortcut (press 'r' to retry) - but respect 30s cooldown
         document.addEventListener('keydown', function (e) {
             if (e.key === 'r' || e.key === 'R') {
                 const retryBtnElement = document.getElementById('retryBtn');
                 if (retryBtnElement && !retryBtnElement.disabled) {
                     e.preventDefault();
-
-                    // Check cooldown
                     const now = Date.now();
                     if (lastCheckTime > 0 && (now - lastCheckTime) < 30000) {
                         const secondsLeft = Math.ceil((30000 - (now - lastCheckTime)) / 1000);
-                        safeLog(`Keyboard retry blocked: ${secondsLeft}s remaining`);
                         const mainMessage = document.getElementById('mainMessage');
                         if (mainMessage) {
                             mainMessage.innerHTML = `Please wait ${secondsLeft} seconds before retrying.`;
-                            setTimeout(() => {
-                                if (mainMessage && !navigator.onLine) {
-                                    mainMessage.innerHTML = `Unable to connect. Auto-retry in progress... (Attempt ${retryCount}/${maxRetries})`;
-                                }
-                            }, 3000);
                         }
                     } else {
                         retryBtnElement.click();
@@ -683,9 +841,6 @@
             }
         });
 
-        // ============================================================
-        // FIXED: Initial check - wait 3 seconds before checking
-        // ============================================================
         setTimeout(() => {
             if (navigator.onLine) {
                 safeLog('Already online, redirecting after delay...');
@@ -696,27 +851,11 @@
                     }
                 }, 2000);
             } else {
-                safeLog('Initially offline, will retry in 30 seconds');
-                // Schedule first retry after 30 seconds
-                scheduleRetry(30);
+                safeLog('Initially offline');
             }
-        }, 3000); // Wait 3 seconds before initial check
+        }, 3000);
 
-        // Fix for the error you mentioned - prevent any undefined access
-        if (typeof Object.defineProperty === 'function') {
-            try {
-                window.recentTransactions = window.recentTransactions || [];
-                window.dashboardData = window.dashboardData || {};
-            } catch (e) {
-                safeLog('Error setting globals: ' + e.message);
-            }
-        }
-
-        // Cleanup function (optional - for SPA navigation)
         window.addEventListener('beforeunload', function () {
-            if (scheduledRetry) {
-                clearTimeout(scheduledRetry);
-            }
             if (progressInterval) {
                 clearInterval(progressInterval);
             }
