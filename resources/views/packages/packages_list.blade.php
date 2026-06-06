@@ -384,11 +384,11 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ \Carbon\Carbon::parse($recent->created_at ?? $recent->updated_at)->format('d M Y, H:i') }}
+                                                {{ \Carbon\Carbon::parse($recent->created_at ?? $recent->updated_at)->format('d M Y') }}
                                             </td>
                                             <td>
                                                 @if($recent->release_date)
-                                                    {{ \Carbon\Carbon::parse($recent->release_date)->format('d M Y, H:i') }}
+                                                    {{ \Carbon\Carbon::parse($recent->release_date)->format('d M Y') }}
                                                 @else
                                                     <span class="badge-warning-custom">Not Released</span>
                                                 @endif
