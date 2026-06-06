@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\ReportJob;
 use App\Models\Student;
-use App\Models\School;
+use App\Models\school;
 use App\Models\Examination_result;
 use Hashids;
 use Crypt;
@@ -59,7 +59,7 @@ class GenerateBulkStudentReportsJob implements ShouldQueue
             $class_id = Hashids::decode($this->class);
             $exam_id = Hashids::decode($this->examType);
 
-            $schools = School::find($school_id[0]);
+            $schools = school::find($school_id[0]);
 
             // Get marking style
             $marking_style = Examination_result::query()

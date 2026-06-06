@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\ReportJob;
 use App\Models\Student;
-use App\Models\School;
+use App\Models\school;
 use App\Models\Examination_result;
 use App\Models\generated_reports;
 use App\Models\Grade;
@@ -70,7 +70,7 @@ class GenerateBulkReportJob implements ShouldQueue
         $examId = Hashids::decode($this->params['examType'])[0];
         $date = $this->params['date'];
 
-        $schools = School::find($schoolId);
+        $schools = school::find($schoolId);
 
         $marking_style = Examination_result::query()
             ->where('school_id', $schoolId)
@@ -281,7 +281,7 @@ class GenerateBulkReportJob implements ShouldQueue
                 ->first();
             $markingStyle = $firstExamResult ? ($firstExamResult->marking_style ?? 2) : 2;
 
-            $schoolInfo = School::find($schoolId);
+            $schoolInfo = school::find($schoolId);
 
             $className = $reports->class_name;
             if (empty($className)) {
