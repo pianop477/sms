@@ -5413,14 +5413,21 @@ class ResultsController extends Controller
         return view('reports.status', compact('jobs', 'activeJob', 'completedJobs', 'failedJobs'));
     }
 
+    // In ResultsController.php - getJobStatus method
     public function getJobStatus($jobId)
     {
-        $job = ReportJob::where('job_id', $jobId)->where('user_id', Auth::id())->first();
-        if (!$job) return response()->json(['status' => 'not_found']);
+        $job = ReportJob::where('job_id', $jobId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$job) {
+            return response()->json(['status' => 'not_found']);
+        }
+
         return response()->json([
             'status' => $job->status,
-            'processed_students' => $job->processed_students,
-            'total_students' => $job->total_students,
+            'processed_students' => (int)$job->processed_students,
+            'total_students' => (int)$job->total_students,
             'error_message' => $job->error_message
         ]);
     }
@@ -5438,7 +5445,7 @@ class ResultsController extends Controller
         }
 
         if (!file_exists($job->file_path)) {
-            // Mark as failed and delete record
+            // Update job status to reflect missing file
             $job->status = 'failed';
             $job->error_message = 'File not found on server';
             $job->save();
@@ -5447,10 +5454,12 @@ class ResultsController extends Controller
             return redirect()->route('reports.status');
         }
 
+        // REMOVE deleteFileAfterSend(true) - Keep the file on server
         return response()->download($job->file_path, $job->file_name, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="' . $job->file_name . '"'
-        ])->deleteFileAfterSend(true);
+        ]);
+        // NO deleteFileAfterSend(true)
     }
 
     public function deleteReport($jobId)

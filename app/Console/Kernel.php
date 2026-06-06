@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
         $schedule->command('school:check-active-school')->daily();
         $schedule->command('results:delete-expired')->everyMinute();
-        // $schedule->command('students:delete-graduated-students')->daily();
+        $schedule->command('students:delete-graduated-students')->daily();
         $schedule->command('delete:old-exam-results')->daily();
         $schedule->command('delete:old-attendance-reports')->daily();
         $schedule->command('delete:student-old-reports')->daily();
@@ -92,6 +92,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('e-permit:auto-approve')
             ->everySecond()
             ->withoutOverlapping();
+
+        $schedule->command('reports:clean')->weekly();
     }
 
     /**

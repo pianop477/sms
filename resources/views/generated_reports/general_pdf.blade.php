@@ -189,6 +189,55 @@
     .custom-modal-btn-cancel:hover {
         background: #cbd5e1;
     }
+
+    /* Toast notification for queue info */
+    .queue-toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #0f3460;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 10001;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        animation: slideInRight 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* My Reports Button Style */
+    .btn-my-reports {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+    }
+
+    .btn-my-reports:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
 </style>
 
 <div class="card mt-2">
@@ -199,8 +248,20 @@
             </div>
             <div class="col-md-4">
                 <div class="btn-group float-right" role="group">
-                    <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="btn btn-info btn-sm me-4">
+                    <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="btn btn-info btn-sm me-2">
                         <i class="fas fa-arrow-circle-left"></i> Back
+                    </a>
+                    <a href="{{ route('reports.status') }}" class="btn btn-my-reports btn-sm me-2">
+                        <i class="fas fa-folder-open"></i>
+                        <span>My Reports</span>
+                        @php
+                            $pendingReports = App\Models\ReportJob::where('user_id', Auth::id())
+                                ->whereIn('status', ['pending', 'processing'])
+                                ->count();
+                        @endphp
+                        @if($pendingReports > 0)
+                            <span class="badge bg-warning text-dark ms-1">{{ $pendingReports }}</span>
+                        @endif
                     </a>
                     <button type="button" id="bulkReportBtn" class="btn btn-primary btn-sm">
                         <i class="fas fa-file-pdf"></i>
@@ -230,8 +291,13 @@
                 <li>✓ Class position with tie handling</li>
                 <li>✓ QR code for verification</li>
             </ul>
+            <div class="alert alert-info mt-3" style="font-size: 12px; padding: 10px;">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>How it works:</strong><br>
+                Reports will be generated in the background. You will be redirected to a status page where you can monitor progress and download when ready.
+            </div>
             <p style="margin-top: 12px; color: #e65100; font-size: 12px;">
-                ⚠️ <strong>Note:</strong> This may take a moment depending on the number of students.
+                ⚠️ <strong>Note:</strong> For large classes, this may take a few minutes. You can continue using the system while reports generate.
             </p>
         </div>
         <div class="custom-modal-footer">
@@ -246,7 +312,7 @@
 </div>
 
 <script>
-    // Bulk report URL
+    // Bulk report URL (redirects to queue processing)
     const bulkReportUrl = "{{ route('results.bulk.combined.reports', [
         'school' => $school,
         'year' => $year,
@@ -254,34 +320,7 @@
         'report' => $report
     ]) }}";
 
-    let loadingOverlay = null;
     let isProcessing = false;
-
-    function showLoadingOverlay() {
-        if (!loadingOverlay) {
-            loadingOverlay = document.createElement('div');
-            loadingOverlay.className = 'global-loading-overlay';
-            loadingOverlay.innerHTML = `
-                <div class="global-loading-content">
-                    <div class="global-spinner"></div>
-                    <div class="global-loading-text">Generating Bulk Combined Reports...</div>
-                    <div class="global-loading-subtext">Please wait, this may take a moment</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                    <p style="margin-top: 15px; font-size: 11px; color: #94a3b8;">Processing all students in this class</p>
-                </div>
-            `;
-            document.body.appendChild(loadingOverlay);
-        }
-        loadingOverlay.style.display = 'flex';
-    }
-
-    function hideLoadingOverlay() {
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-        }
-    }
 
     function showModal() {
         const modal = document.getElementById('confirmModal');
@@ -297,42 +336,46 @@
         }
     }
 
-    function startBulkDownload() {
+    function showToast(message) {
+        // Remove existing toast
+        const existingToast = document.querySelector('.queue-toast');
+        if (existingToast) existingToast.remove();
+
+        // Create new toast
+        const toast = document.createElement('div');
+        toast.className = 'queue-toast';
+        toast.innerHTML = `
+            <i class="fas fa-clock fa-spin" style="font-size: 18px;"></i>
+            <div>
+                <strong>Report Generation Started</strong><br>
+                <small>${message}</small>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast) toast.remove();
+        }, 5000);
+    }
+
+    function startBulkGeneration() {
         if (isProcessing) return;
         isProcessing = true;
 
         hideModal();
 
         const btn = document.getElementById('bulkReportBtn');
-
         if (btn) {
             btn.classList.add('btn-loading');
             btn.disabled = true;
         }
 
-        showLoadingOverlay();
+        // Show toast notification
+        showToast('Your reports are being generated in the background. You will be redirected to track progress...');
 
-        // Create hidden anchor for download
-        const downloadLink = document.createElement('a');
-        downloadLink.href = bulkReportUrl;
-        downloadLink.style.display = 'none';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-
-        // Clean up
-        setTimeout(() => {
-            document.body.removeChild(downloadLink);
-        }, 1000);
-
-        // Hide loading after delay
-        setTimeout(() => {
-            hideLoadingOverlay();
-            if (btn) {
-                btn.classList.remove('btn-loading');
-                btn.disabled = false;
-            }
-            isProcessing = false;
-        }, 8000);
+        // Redirect to queue processing (controller will handle redirect to status page)
+        window.location.href = bulkReportUrl;
     }
 
     // Set up event listeners
@@ -357,7 +400,7 @@
             confirmBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                startBulkDownload();
+                startBulkGeneration();
             });
         }
 

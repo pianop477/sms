@@ -274,6 +274,12 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
                     ->name('results.bulk.student.reports');
         Route::get('/results/bulk-combined-reports/{school}/{year}/{class}/{report}', [ResultsController::class, 'bulkCombinedReports'])
                 ->name('results.bulk.combined.reports');
+        Route::prefix('reports')->group(function () {
+            Route::get('/status', [ResultsController::class, 'reportStatus'])->name('reports.status');
+            Route::get('/job-status/{jobId}', [ResultsController::class, 'getJobStatus']);
+            Route::get('/download/{jobId}', [ResultsController::class, 'downloadReport'])->name('reports.download');
+            Route::delete('/delete/{jobId}', [ResultsController::class, 'deleteReport']);
+        });
 
         // packages management
         Route::get('/Packages/year', [PackagesController::class, 'packagesByYear'])->name('package.byYear');
