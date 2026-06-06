@@ -529,7 +529,26 @@
                     <td class="text-center"><span class="grade-{{ $result->grade ?? 'X' }}">{{ $result->grade ?? 'X'
                             }}</span></td>
                     <td class="text-center">{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
-                    <td class="text-center">{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
+                    <td class="text-center">
+                        @php
+                        $score = $result->score ?? null;
+                        $grade = $result->grade ?? null;
+
+                        if(empty($score) || $score == 0) {
+                        $remarks = 'ABSENT';
+                        } else {
+                        $remarks = match($grade) {
+                        'A' => 'Excellent',
+                        'B' => 'Good',
+                        'C' => 'Pass',
+                        'D' => 'Poor',
+                        'E', 'F' => 'Fail',
+                        default => '-'
+                        };
+                        }
+                        @endphp
+                        {{ $remarks }}
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
