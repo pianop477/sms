@@ -87,27 +87,70 @@
             }
         }
 
-        /* Card */
+        /* Card - Fixed height with scrollable content */
         .dashboard-card {
             background: white;
             border-radius: 12px;
-            padding: 15px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(78, 84, 200, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 550px;
+            overflow: hidden;
         }
 
-        @media (min-width: 768px) {
+        @media (max-width: 767px) {
             .dashboard-card {
-                padding: 20px;
+                height: 500px;
             }
         }
 
+        /* Card header - fixed, not scrollable */
         .card-header {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 0;
+            padding: 15px 15px 10px 15px;
             border-bottom: 1px solid rgba(78, 84, 200, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .card-header {
+                padding: 20px 20px 15px 20px;
+            }
+        }
+
+        /* Card body - scrollable area */
+        .card-body-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 15px 15px;
+        }
+
+        @media (min-width: 768px) {
+            .card-body-scroll {
+                padding: 0 20px 20px 20px;
+            }
+        }
+
+        /* Custom scrollbar */
+        .card-body-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-body-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .card-body-scroll::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .card-body-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
         }
 
         .card-icon {
@@ -362,7 +405,7 @@
             color: var(--primary);
         }
 
-        /* SMS History - Card View for Mobile */
+        /* SMS History - Scrollable */
         .sms-history {
             margin-top: 15px;
         }
@@ -374,6 +417,11 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
             gap: 8px;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 5;
+            padding-bottom: 5px;
         }
 
         .history-title {
@@ -484,12 +532,13 @@
             background: rgba(78, 84, 200, 0.1);
         }
 
-        /* Desktop Table View */
+        /* Desktop Table View - with limited height and scroll */
         .sms-table-container {
             display: none;
             border-radius: 8px;
             border: 1px solid #e9ecef;
-            overflow-x: auto;
+            overflow: auto;
+            max-height: 380px;
         }
 
         @media (min-width: 768px) {
@@ -510,6 +559,9 @@
 
         .sms-table thead {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .sms-table th {
@@ -705,7 +757,7 @@
         <form class="dashboard-grid" id="smsForm" novalidate action="{{ route('Send.message.byNext') }}" method="POST">
             @csrf
 
-            <!-- Left Column - Recipients -->
+            <!-- Left Column - Recipients (with scrollable content) -->
             <div class="dashboard-card">
                 <div class="card-header">
                     <div class="card-icon">
@@ -716,109 +768,109 @@
                         <p class="card-subtitle">Select message recipients</p>
                     </div>
                 </div>
-
-                <!-- Classes Selection -->
-                <div class="classes-section">
-                    <div class="section-title">
-                        <i class="fas fa-graduation-cap me-2"></i> Classes
+                <div class="card-body-scroll">
+                    <!-- Classes Selection -->
+                    <div class="classes-section">
+                        <div class="section-title">
+                            <i class="fas fa-graduation-cap me-2"></i> Classes
+                        </div>
+                        <div class="classes-grid">
+                            @forelse ($classes as $class)
+                                <div class="class-option">
+                                    <input type="checkbox" class="class-checkbox" name="classes[]" value="{{ $class->id }}"
+                                        id="class{{ $class->id }}"
+                                        {{ in_array($class->id, old('classes', [])) ? 'checked' : '' }}>
+                                    <label class="class-label" for="class{{ $class->id }}">
+                                        {{ strtoupper($class->class_code) }}
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="text-center py-4" style="grid-column: 1 / -1;">
+                                    <i class="fas fa-inbox fa-lg text-muted mb-2"></i>
+                                    <p class="text-muted mb-0">No classes available</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
-                    <div class="classes-grid">
-                        @forelse ($classes as $class)
-                            <div class="class-option">
-                                <input type="checkbox" class="class-checkbox" name="classes[]" value="{{ $class->id }}"
-                                    id="class{{ $class->id }}"
-                                    {{ in_array($class->id, old('classes', [])) ? 'checked' : '' }}>
-                                <label class="class-label" for="class{{ $class->id }}">
-                                    {{ strtoupper($class->class_code) }}
-                                </label>
-                            </div>
-                        @empty
-                            <div class="text-center py-4" style="grid-column: 1 / -1;">
-                                <i class="fas fa-inbox fa-lg text-muted mb-2"></i>
-                                <p class="text-muted mb-0">No classes available</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
 
-                <!-- Groups Selection -->
-                <div>
-                    <div class="section-title">
-                        <i class="fas fa-layer-group me-2"></i> Groups
-                    </div>
-                    <div class="group-grid">
-                        <label class="group-option">
-                            <input type="checkbox" name="send_to_all" value="1" {{ old('send_to_all') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>All Parents</h6>
-                                <small>All students from all classes</small>
-                            </div>
-                        </label>
+                    <!-- Groups Selection -->
+                    <div>
+                        <div class="section-title">
+                            <i class="fas fa-layer-group me-2"></i> Groups
+                        </div>
+                        <div class="group-grid">
+                            <label class="group-option">
+                                <input type="checkbox" name="send_to_all" value="1" {{ old('send_to_all') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>All Parents</h6>
+                                    <small>All students from all classes</small>
+                                </div>
+                            </label>
 
-                        <label class="group-option">
-                            <input type="checkbox" name="send_with_transport" value="1" {{ old('send_with_transport') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-bus"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>With Transport</h6>
-                                <small>Parents whose children use school transport</small>
-                            </div>
-                        </label>
+                            <label class="group-option">
+                                <input type="checkbox" name="send_with_transport" value="1" {{ old('send_with_transport') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>With Transport</h6>
+                                    <small>Parents whose children use school transport</small>
+                                </div>
+                            </label>
 
-                        <label class="group-option">
-                            <input type="checkbox" name="send_without_transport" value="1" {{ old('send_without_transport') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-walking"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>Without Transport</h6>
-                                <small>Parents whose children don't use transport</small>
-                            </div>
-                        </label>
+                            <label class="group-option">
+                                <input type="checkbox" name="send_without_transport" value="1" {{ old('send_without_transport') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>Without Transport</h6>
+                                    <small>Parents whose children don't use transport</small>
+                                </div>
+                            </label>
 
-                        <label class="group-option">
-                            <input type="checkbox" name="send_to_teachers" value="1" {{ old('send_to_teachers') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>Teaching Staff</h6>
-                                <small>All teachers and academic staff</small>
-                            </div>
-                        </label>
+                            <label class="group-option">
+                                <input type="checkbox" name="send_to_teachers" value="1" {{ old('send_to_teachers') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>Teaching Staff</h6>
+                                    <small>All teachers and academic staff</small>
+                                </div>
+                            </label>
 
-                        <label class="group-option">
-                            <input type="checkbox" name="send_to_other_staff" value="1" {{ old('send_to_other_staff') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>Non-Teaching Staff</h6>
-                                <small>All support staff</small>
-                            </div>
-                        </label>
+                            <label class="group-option">
+                                <input type="checkbox" name="send_to_other_staff" value="1" {{ old('send_to_other_staff') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>Non-Teaching Staff</h6>
+                                    <small>All support staff</small>
+                                </div>
+                            </label>
 
-                        <label class="group-option">
-                            <input type="checkbox" name="send_to_drivers" value="1" {{ old('send_to_drivers') ? 'checked' : '' }}>
-                            <div class="group-icon">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="group-info">
-                                <h6>Drivers</h6>
-                                <small>School transport drivers only</small>
-                            </div>
-                        </label>
+                            <label class="group-option">
+                                <input type="checkbox" name="send_to_drivers" value="1" {{ old('send_to_drivers') ? 'checked' : '' }}>
+                                <div class="group-icon">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="group-info">
+                                    <h6>Drivers</h6>
+                                    <small>School transport drivers only</small>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column - Message & History -->
+            <!-- Right Column - Message & History (with scrollable content) -->
             <div class="dashboard-card">
-                <!-- Message Section -->
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-comment-alt"></i>
@@ -828,172 +880,173 @@
                         <p class="card-subtitle">Write your announcement message</p>
                     </div>
                 </div>
+                <div class="card-body-scroll">
+                    <!-- Message Container -->
+                    <div class="message-container">
+                        @php
+                            $school = Auth::user()->school;
+                            $isBasicPackage = $school && $school->package === 'basic';
+                            $maxChars = $isBasicPackage ? 306 : 459;
+                            $smsCount = $isBasicPackage ? 2 : 3;
+                        @endphp
 
-                <!-- Message Container -->
-                <div class="message-container">
-                    @php
-                        $school = Auth::user()->school;
-                        $isBasicPackage = $school && $school->package === 'basic';
-                        $maxChars = $isBasicPackage ? 306 : 459;
-                        $smsCount = $isBasicPackage ? 2 : 3;
-                    @endphp
+                        <textarea name="message_content" id="message_content"
+                            class="message-textarea @error('message_content') is-invalid @enderror"
+                            placeholder="Type your message here..."
+                            required maxlength="{{ $maxChars }}">{{ old('message_content') }}</textarea>
 
-                    <textarea name="message_content" id="message_content"
-                        class="message-textarea @error('message_content') is-invalid @enderror"
-                        placeholder="Type your message here..."
-                        required maxlength="{{ $maxChars }}">{{ old('message_content') }}</textarea>
+                        @error('message_content')
+                            <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
+                        @enderror
 
-                    @error('message_content')
-                        <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
-                    @enderror
-
-                    <div class="char-counter">
-                        <div class="char-info">
-                            <span class="char-count" id="charCount">0</span>
-                            <span class="text-muted">/ {{ $maxChars }} characters</span>
-                        </div>
-                        <div>
-                            <span class="badge" style="background: {{ $isBasicPackage ? '#e17055' : '#4e54c8' }}; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem;">
-                                <i class="fas fa-{{ $isBasicPackage ? 'star' : 'crown' }} me-1"></i>
-                                {{ $isBasicPackage ? 'Basic' : 'Premium' }} - Max {{ $smsCount }} SMS
-                            </span>
+                        <div class="char-counter">
+                            <div class="char-info">
+                                <span class="char-count" id="charCount">0</span>
+                                <span class="text-muted">/ {{ $maxChars }} characters</span>
+                            </div>
+                            <div>
+                                <span class="badge" style="background: {{ $isBasicPackage ? '#e17055' : '#4e54c8' }}; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem;">
+                                    <i class="fas fa-{{ $isBasicPackage ? 'star' : 'crown' }} me-1"></i>
+                                    {{ $isBasicPackage ? 'Basic' : 'Premium' }} - Max {{ $smsCount }} SMS
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- SMS History -->
-                <div class="sms-history">
-                    <div class="history-header">
-                        <h6 class="history-title">
-                            <i class="fas fa-history me-2"></i> Recent Messages
-                        </h6>
-                        <span class="history-stats">{{ count($smsContents) }} total</span>
-                    </div>
-
-                    @if (count($smsContents) > 0)
-                        <!-- Mobile Cards View -->
-                        <div class="sms-cards-view">
-                            @foreach ($smsContents as $sms)
-                                <div class="sms-card">
-                                    <div class="sms-card-header">
-                                        <div class="sms-recipient-info">
-                                            <div class="sms-phone">
-                                                <i class="fas fa-phone-alt me-1" style="font-size: 0.7rem;"></i>
-                                                {{ substr($sms['to'], -4) }}...
-                                            </div>
-                                            <div class="sms-time">
-                                                <i class="far fa-clock me-1"></i>
-                                                {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
-                                            </div>
-                                        </div>
-                                        <div class="sms-status">
-                                            @if ($sms['status']['groupName'] == 'DELIVERED')
-                                                <span class="status-badge status-delivered">
-                                                    <i class="fas fa-check-circle"></i>
-                                                </span>
-                                            @elseif ($sms['status']['groupName'] == 'PENDING')
-                                                <span class="status-badge status-pending">
-                                                    <i class="fas fa-clock"></i>
-                                                </span>
-                                            @else
-                                                <span class="status-badge status-sent">
-                                                    <i class="fas fa-exclamation-circle"></i>
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="sms-card-body">
-                                        <div class="sms-message-preview">
-                                            {{ \Illuminate\Support\Str::limit($sms['text'], 60) }}
-                                        </div>
-                                    </div>
-                                    <div class="sms-card-footer">
-                                        <div class="sms-count">
-                                            <i class="fas fa-envelope"></i> {{ $sms['smsCount'] }} SMS
-                                        </div>
-                                        <button type="button" class="view-details-btn" data-bs-toggle="modal"
-                                            data-bs-target="#smsModal"
-                                            data-full-text="{{ htmlspecialchars($sms['text']) }}"
-                                            data-to="{{ $sms['to'] }}"
-                                            data-from="{{ $sms['from'] }}"
-                                            data-status="{{ $sms['delivery'] }}"
-                                            data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
-                                            data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
-                                            <i class="fas fa-eye me-1"></i> View Details
-                                        </button>
-                                    </div>
-                                </div>
-                            @endforeach
+                    <!-- SMS History -->
+                    <div class="sms-history">
+                        <div class="history-header">
+                            <h6 class="history-title">
+                                <i class="fas fa-history me-2"></i> Recent Messages
+                            </h6>
+                            <span class="history-stats">{{ count($smsContents) }} total</span>
                         </div>
 
-                        <!-- Desktop Table View -->
-                        <div class="sms-table-container">
-                            <table class="sms-table">
-                                <thead>
-                                    <tr>
-                                        <th>Sent At</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Message</th>
-                                        <th>Count</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($smsContents as $sms)
-                                        <tr>
-                                            <td style="white-space: nowrap;">
-                                                {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
-                                            </td>
-                                            <td>{{ $sms['from'] }}</td>
-                                            <td>{{ substr($sms['to'], -4) }}...</td>
-                                            <td>
-                                                <div class="sms-preview">
-                                                    <div class="sms-icon">
-                                                        <i class="fas fa-sms"></i>
-                                                    </div>
-                                                    <div class="sms-text">
-                                                        <a href="#" class="sms-preview-link" data-bs-toggle="modal"
-                                                            data-bs-target="#smsModal"
-                                                            data-full-text="{{ htmlspecialchars($sms['text']) }}"
-                                                            data-to="{{ $sms['to'] }}"
-                                                            data-from="{{ $sms['from'] }}"
-                                                            data-status="{{ $sms['status']['groupName'] }}"
-                                                            data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
-                                                            data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
-                                                            {{ \Illuminate\Support\Str::limit($sms['text'], 30) }}
-                                                        </a>
-                                                    </div>
+                        @if (count($smsContents) > 0)
+                            <!-- Mobile Cards View -->
+                            <div class="sms-cards-view">
+                                @foreach ($smsContents as $sms)
+                                    <div class="sms-card">
+                                        <div class="sms-card-header">
+                                            <div class="sms-recipient-info">
+                                                <div class="sms-phone">
+                                                    <i class="fas fa-phone-alt me-1" style="font-size: 0.7rem;"></i>
+                                                    {{ substr($sms['to'], -4) }}...
                                                 </div>
-                                            </td>
-                                            <td style="text-align: center;">{{ $sms['smsCount'] }}</td>
-                                            <td>
+                                                <div class="sms-time">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
+                                                </div>
+                                            </div>
+                                            <div class="sms-status">
                                                 @if ($sms['status']['groupName'] == 'DELIVERED')
                                                     <span class="status-badge status-delivered">
-                                                        <i class="fas fa-check-circle"></i> Delivered
+                                                        <i class="fas fa-check-circle"></i>
                                                     </span>
                                                 @elseif ($sms['status']['groupName'] == 'PENDING')
                                                     <span class="status-badge status-pending">
-                                                        <i class="fas fa-clock"></i> Pending
+                                                        <i class="fas fa-clock"></i>
                                                     </span>
                                                 @else
                                                     <span class="status-badge status-sent">
-                                                        <i class="fas fa-exclamation-circle"></i> Sent
+                                                        <i class="fas fa-exclamation-circle"></i>
                                                     </span>
                                                 @endif
-                                            </td>
+                                            </div>
+                                        </div>
+                                        <div class="sms-card-body">
+                                            <div class="sms-message-preview">
+                                                {{ \Illuminate\Support\Str::limit($sms['text'], 60) }}
+                                            </div>
+                                        </div>
+                                        <div class="sms-card-footer">
+                                            <div class="sms-count">
+                                                <i class="fas fa-envelope"></i> {{ $sms['smsCount'] }} SMS
+                                            </div>
+                                            <button type="button" class="view-details-btn" data-bs-toggle="modal"
+                                                data-bs-target="#smsModal"
+                                                data-full-text="{{ htmlspecialchars($sms['text']) }}"
+                                                data-to="{{ $sms['to'] }}"
+                                                data-from="{{ $sms['from'] }}"
+                                                data-status="{{ $sms['delivery'] }}"
+                                                data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
+                                                data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <!-- Desktop Table View -->
+                            <div class="sms-table-container">
+                                <table class="sms-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sent At</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Message</th>
+                                            <th>Count</th>
+                                            <th>Status</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                             </table>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h6>No messages yet</h6>
-                            <p class="text-muted">Your sent messages will appear here</p>
-                        </div>
-                    @endif
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($smsContents as $sms)
+                                            <tr>
+                                                <td style="white-space: nowrap;">
+                                                    {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
+                                                </td>
+                                                <td>{{ $sms['from'] }}</td>
+                                                <td>{{ substr($sms['to'], -4) }}...</td>
+                                                <td>
+                                                    <div class="sms-preview">
+                                                        <div class="sms-icon">
+                                                            <i class="fas fa-sms"></i>
+                                                        </div>
+                                                        <div class="sms-text">
+                                                            <a href="#" class="sms-preview-link" data-bs-toggle="modal"
+                                                                data-bs-target="#smsModal"
+                                                                data-full-text="{{ htmlspecialchars($sms['text']) }}"
+                                                                data-to="{{ $sms['to'] }}"
+                                                                data-from="{{ $sms['from'] }}"
+                                                                data-status="{{ $sms['status']['groupName'] }}"
+                                                                data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
+                                                                data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
+                                                                {{ \Illuminate\Support\Str::limit($sms['text'], 30) }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align: center;">{{ $sms['smsCount'] }}</td>
+                                                <td>
+                                                    @if ($sms['status']['groupName'] == 'DELIVERED')
+                                                        <span class="status-badge status-delivered">
+                                                            <i class="fas fa-check-circle"></i> Delivered
+                                                        </span>
+                                                    @elseif ($sms['status']['groupName'] == 'PENDING')
+                                                        <span class="status-badge status-pending">
+                                                            <i class="fas fa-clock"></i> Pending
+                                                        </span>
+                                                    @else
+                                                        <span class="status-badge status-sent">
+                                                            <i class="fas fa-exclamation-circle"></i> Sent
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h6>No messages yet</h6>
+                                <p class="text-muted">Your sent messages will appear here</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </form>
