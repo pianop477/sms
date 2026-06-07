@@ -209,6 +209,79 @@
         }
 
         /* ============ SUMMARY SECTION - Relaxed ============ */
+        .grade-A,
+        .grade-B,
+        .grade-C,
+        .grade-D,
+        .grade-E,
+        .grade-F {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .grade-A {
+            background-color: #e8f5e9;
+            border: 1px solid #2e7d32;
+        }
+
+        .grade-B {
+            background-color: #e3f2fd;
+            border: 1px solid #1565c0;
+        }
+
+        .grade-C {
+            background-color: #fff3e0;
+            border: 1px solid #e65100;
+        }
+
+        .grade-D {
+            background-color: #ffebee;
+            border: 1px solid #c62828;
+        }
+
+        .grade-E,
+        .grade-F {
+            background-color: #fce4ec;
+            border: 1px solid #b71c1c;
+        }
+
+        .remark-EXCELLENT,
+        .remark-GOOD,
+        .remark-PASS,
+        .remark-POOR,
+        .remark-FAIL {
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .remark-EXCELLENT {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .remark-GOOD {
+            background-color: #1565c0;
+            color: white;
+        }
+
+        .remark-PASS {
+            background-color: #e65100;
+            color: white;
+        }
+
+        .remark-POOR {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .remark-FAIL {
+            background-color: #b71c1c;
+            color: white;
+        }
         .summary-section {
             width: 100%;
             margin: 8px 0;
@@ -315,6 +388,31 @@
             body {
                 padding: 0;
                 margin: 0;
+            }
+            .grade-A,
+            .grade-B,
+            .grade-C,
+            .grade-D,
+            .grade-E,
+            .grade-F,
+            .remark-EXCELLENT,
+            .remark-GOOD,
+            .remark-PASS,
+            .remark-POOR,
+            .remark-FAIL {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .report-table th {
+                background-color: #e0e0e0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section-header {
+                background: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .footer {
                 position: fixed;
@@ -482,7 +580,7 @@
                         {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.
                     </td>
                     <td class="bold">{{ $result->score ?? 'X' }}</td>
-                    <td class="grade-text">{{ $result->grade ?? 'X' }}</td>
+                    <td class="grade-text"><span class="grade-{{ $result->grade ?? 'X' }}">{{ $result->grade ?? 'X' }}</span></td>
                     <td>{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
                     <td>{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
                 </tr>
@@ -498,7 +596,7 @@
                     <td class="summary-label" width="25%">TOTAL MARKS</td>
                     <td class="summary-value" width="25%"><strong>{{ number_format($totalScore ?? 0, 2) }}</strong></td>
                     <td class="summary-label" width="25%">CLASS POSITION</td>
-                    <td class="summary-value" width="25%"><strong>{{ $studentRank ?? 1 }} / {{ $rankings->count() ?? 1 }}</strong></td>
+                    <td class="summary-value" width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
                 </tr>
                 <tr>
                     <td class="summary-label">GENERAL AVERAGE</td>
@@ -511,25 +609,27 @@
                     <td colspan="3">
                         <strong class="remark-text">
                             @php
+                                $averageGrade = null;
                                 if ($marking_style == 3 && isset($division)) {
                                     echo 'Division ' . ($division === '0' ? '0' : $division);
                                 } else {
                                     $avg = $averageScore ?? 0;
                                     if ($marking_style == 1) {
-                                        if ($avg >= 40.5) echo 'A (Excellent)';
-                                        elseif ($avg >= 30.5) echo 'B (Good)';
-                                        elseif ($avg >= 20.5) echo 'C (Pass)';
-                                        elseif ($avg >= 10.5) echo 'D (Poor)';
-                                        else echo 'E (Fail)';
+                                        if ($avg >= 40.5) { $averageGrade = 'A'; }
+                                        elseif ($avg >= 30.5) { $averageGrade = 'B';}
+                                        elseif ($avg >= 20.5) { $averageGrade = 'C';}
+                                        elseif ($avg >= 10.5) { $averageGrade = 'D';}
+                                        else { $averageGrade = 'E';}
                                     } else {
-                                        if ($avg >= 80.5) echo 'A (Excellent)';
-                                        elseif ($avg >= 60.5) echo 'B (Good)';
-                                        elseif ($avg >= 40.5) echo 'C (Pass)';
-                                        elseif ($avg >= 20.5) echo 'D (Poor)';
-                                        else echo 'E (Fail)';
+                                        if ($avg >= 80.5) {$averageGrade = 'A';}
+                                        elseif ($avg >= 60.5) {$averageGrade ='B';}
+                                        elseif ($avg >= 40.5) {$averageGrade = 'C';}
+                                        elseif ($avg >= 20.5) {$averageGrade = 'D';}
+                                        else {$averageGrade = 'E';}
                                     }
                                 }
                             @endphp
+                            <span class="grade-{{ $averageGrade ?? 'X' }}">{{ $averageGrade }}</span>
                         </strong>
                     </td>
                 </tr>
@@ -539,28 +639,29 @@
                         <strong class="remark-text">
                             @php
                                 if ($marking_style == 3 && isset($division)) {
-                                    if ($division == 'I') echo 'EXCELLENT';
-                                    elseif ($division == 'II') echo 'GOOD';
-                                    elseif ($division == 'III') echo 'PASS';
-                                    elseif ($division == 'IV') echo 'POOR';
-                                    else echo 'FAIL';
+                                    if ($division == 'I') {$remark = 'EXCELLENT';}
+                                    elseif ($division == 'II') {$remark = 'GOOD';}
+                                    elseif ($division == 'III') {$remark = 'PASS';}
+                                    elseif ($division == 'IV') {$remark = 'POOR';}
+                                    else {$remark = 'FAIL';}
                                 } else {
                                     $avg = $averageScore ?? 0;
                                     if ($marking_style == 1) {
-                                        if ($avg >= 40.5) echo 'EXCELLENT';
-                                        elseif ($avg >= 30.5) echo 'GOOD';
-                                        elseif ($avg >= 20.5) echo 'PASS';
-                                        elseif ($avg >= 10.5) echo 'POOR';
-                                        else echo 'FAIL';
+                                        if ($avg >= 40.5) {$remark = 'EXCELLENT';}
+                                        elseif ($avg >= 30.5) {$remark = 'GOOD';}
+                                        elseif ($avg >= 20.5) {$remark = 'PASS';}
+                                        elseif ($avg >= 10.5) {$remark = 'POOR';}
+                                        else {$remark = 'FAIL';}
                                     } else {
-                                        if ($avg >= 80.5) echo 'EXCELLENT';
-                                        elseif ($avg >= 60.5) echo 'GOOD';
-                                        elseif ($avg >= 40.5) echo 'PASS';
-                                        elseif ($avg >= 20.5) echo 'POOR';
-                                        else echo 'FAIL';
+                                        if ($avg >= 80.5) {$remark = 'EXCELLENT';}
+                                        elseif ($avg >= 60.5) {$remark = 'GOOD';}
+                                        elseif ($avg >= 40.5) {$remark = 'PASS';}
+                                        elseif ($avg >= 20.5) {$remark = 'POOR';}
+                                        else {$remark = 'FAIL';}
                                     }
                                 }
                             @endphp
+                            <span class="remark-{{ $remark ?? 'X' }}">{{ $remark ?? 'X' }}</span>
                         </strong>
                     </td>
                 </tr>
@@ -580,11 +681,6 @@
                     <span>
                         {{ $division === '0' ? '0' : $division }}
                     </span>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <strong>Division Guide:</strong> I (Excellent) | II (Good) | III (Pass) | IV (Poor) | 0 (Fail)
                 </td>
             </tr>
         </table>
