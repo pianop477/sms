@@ -26,8 +26,8 @@ class GenerateBulkReportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
-    public $timeout = 3600;
-    public $tries = 1;
+    public $timeout = 7200;
+    public $tries = 3;
 
     protected $jobId;
     protected $params;
