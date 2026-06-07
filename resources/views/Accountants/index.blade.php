@@ -1,4 +1,3 @@
-last blade is this:
 @extends('SRTDashboard.frame')
 
 @section('content')
