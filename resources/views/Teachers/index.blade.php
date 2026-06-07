@@ -1,4 +1,3 @@
-and this too same problem:
 @extends('SRTDashboard.frame')
 
 @section('content')
