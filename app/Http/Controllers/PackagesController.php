@@ -393,10 +393,10 @@ class PackagesController extends Controller
         $timeFrame = now()->subHours(24); // 24-hour window
 
         // 3. Check download limit using existing column
-        if ($package->download_count >= $maxDownloads) {
-            Alert::info('info', 'You have reached your download limit for this package (max ' . $maxDownloads . ' downloads per 24 hours)');
-            return back();
-        }
+        // if ($package->download_count >= $maxDownloads) {
+        //     Alert::info('info', 'You have reached your download limit for this package (max ' . $maxDownloads . ' downloads per 24 hours)');
+        //     return back();
+        // }
 
         // 4. Scan for viruses
         $filePath = Storage::path($package->file_path);
