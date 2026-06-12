@@ -739,6 +739,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             // Installment management
             Route::get('/{feeStructure}/installments', [FeeStructureController::class, 'manageInstallments'])->name('fee-structures.installments');
             Route::post('/{feeStructure}/installments', [FeeStructureController::class, 'storeInstallment'])->name('fee-structures.installments.store');
+            Route::get('/gatepass/tokens', [TokenController::class, 'getStudentTokens'])->name('gatepass.tokens');
 
             // IMPORTANT: These routes must be AFTER the routes with {feeStructure} parameter
             // and BEFORE the routes with {installment} parameter to avoid conflicts
