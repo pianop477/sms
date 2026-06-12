@@ -581,7 +581,7 @@
                     <td width="25%">TOTAL MARKS</td>
                     <td width="25%"><strong>{{ number_format($totalScore ?? 0, 2) }}</strong></td>
                     <td width="25%">CLASS POSITION</td>
-                    <td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
+                    <td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings ?? 1 }}</strong></td>
                 </tr>
                 <tr class="summary-row">
                     <td class="summary-label">GENERAL AVERAGE</td>

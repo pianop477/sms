@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Gate Pass Verification</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS (lightweight only for grid & utilities if needed) -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
@@ -21,212 +21,222 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #5B66E8 0%, #8B5CF6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
         }
 
+        /* Main container - full width mobile friendly */
         .gateway-container {
             width: 100%;
-            max-width: 550px;
+            max-width: 560px;
             margin: 0 auto;
         }
 
+        /* Card design */
         .gateway-card {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.25);
             width: 100%;
-            padding: 24px 20px;
-            animation: slideUp 0.4s ease;
+            padding: 24px 20px 28px;
+            transition: all 0.2s ease;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Header area */
         .gateway-header {
             text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .gateway-header h2 {
-            color: #2d3748;
-            font-weight: 700;
-            margin-bottom: 6px;
-            font-size: 1.5rem;
-        }
-
-        .gateway-header p {
-            color: #718096;
-            font-size: 0.85rem;
+            margin-bottom: 28px;
         }
 
         .gateway-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #5B66E8 0%, #8B5CF6 100%);
+            border-radius: 35px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 14px rgba(91, 102, 232, 0.25);
         }
 
         .gateway-icon i {
-            font-size: 36px;
+            font-size: 32px;
             color: white;
         }
 
+        .gateway-header h2 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2d3a5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .gateway-header p {
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Token input area - BEST mobile optimization */
         .token-input-container {
-            margin: 20px 0;
+            margin: 10px 0 16px;
         }
 
         .token-input-group {
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
         }
 
         .token-box {
             display: flex;
-            gap: 16px;
+            gap: 14px;
+            flex-wrap: nowrap;
+            justify-content: center;
         }
 
-        /* LARGER TOKEN INPUTS - Enhanced for better visibility */
+        /* LARGE, TAPPABLE TOKEN INPUTS */
         .token-input {
-            width: 100px;
-            height: 100px;
+            width: 85px;
+            height: 85px;
             text-align: center;
             font-size: 48px;
             font-weight: 800;
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
             border: 3px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 22px;
             background: #ffffff;
-            text-transform: uppercase;
-            font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+            color: #0f172a;
             transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            letter-spacing: 2px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            letter-spacing: 4px;
         }
 
-        /* Hide number input spinners */
+        /* Remove spinners */
         .token-input::-webkit-outer-spin-button,
         .token-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
+
         .token-input[type=number] {
             -moz-appearance: textfield;
             appearance: textfield;
         }
 
         .token-input:focus {
-            border-color: #667eea;
+            border-color: #5B66E8;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-            transform: scale(1.03);
+            box-shadow: 0 0 0 4px rgba(91, 102, 232, 0.2);
+            transform: scale(1.02);
         }
 
         .token-input.error {
-            border-color: #e53e3e;
-            background: #fff5f5;
+            border-color: #dc2626;
+            background: #fef2f2;
             animation: shake 0.3s ease;
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
-        .token-separator {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-            padding: 0 8px;
-        }
-
+        /* Buttons - high tappable area */
         .btn-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-top: 10px;
+            margin: 12px 0 8px;
         }
 
         .btn-submit {
             width: 100%;
-            max-width: 280px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            max-width: 320px;
+            padding: 15px 20px;
+            background: linear-gradient(105deg, #5B66E8 0%, #8B5CF6 100%);
             color: white;
             border: none;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 44px;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.25s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 12px;
+            box-shadow: 0 6px 14px rgba(91, 102, 232, 0.3);
         }
 
-        .btn-submit:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        .btn-submit:active {
+            transform: scale(0.97);
         }
 
         .btn-submit:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
+            transform: none;
             cursor: not-allowed;
         }
 
         .btn-reset {
-            background: none;
-            border: none;
-            color: #667eea;
-            font-size: 0.85rem;
-            margin-top: 16px;
-            cursor: pointer;
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 8px 16px;
+            padding: 10px 20px;
+            border-radius: 40px;
             width: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            transition: 0.2s;
         }
 
-        .btn-reset:hover {
-            text-decoration: underline;
+        .btn-reset:active {
+            background: #f1f5f9;
         }
 
+        /* Alert messages */
         .alert {
-            padding: 12px 16px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-            line-height: 1.4;
+            padding: 14px 18px;
+            border-radius: 24px;
+            margin-bottom: 22px;
+            font-size: 0.9rem;
+            font-weight: 500;
             display: none;
-            animation: slideIn 0.3s ease;
+            backdrop-filter: blur(4px);
+            animation: fadeSlide 0.2s ease;
         }
 
-        @keyframes slideIn {
+        @keyframes fadeSlide {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(-8px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -234,73 +244,63 @@
         }
 
         .alert-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border-left: 4px solid #38a169;
+            background: #dff9e6;
+            color: #0a3b2a;
+            border-left: 5px solid #22c55e;
         }
 
         .alert-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border-left: 4px solid #e53e3e;
+            background: #ffe5e5;
+            color: #7f1a1a;
+            border-left: 5px solid #ef4444;
         }
 
         .alert-info {
-            background: #bee3f8;
-            color: #2c5282;
-            border-left: 4px solid #3182ce;
+            background: #e0f2fe;
+            color: #075985;
+            border-left: 5px solid #0ea5e9;
         }
 
         .alert-warning {
-            background: #feebc8;
-            color: #7b341e;
-            border-left: 4px solid #ed8936;
+            background: #fff1e6;
+            color: #9a3412;
+            border-left: 5px solid #f97316;
         }
 
+        /* Loading state */
         .loading-state {
             text-align: center;
-            padding: 30px 20px;
+            padding: 36px 20px;
         }
 
         .spinner {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            border: 3px solid #e2e8f0;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #5B66E8;
             border-radius: 50%;
-            border-top-color: #667eea;
             animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
+        /* Student success card - Mobile first readability */
         .success-card {
             background: white;
-            border-radius: 24px;
-            padding: 0;
-            margin-top: 20px;
-            animation: fadeInUp 0.4s ease;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            border-radius: 28px;
+            overflow: hidden;
+            margin-top: 6px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         .success-header {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            border-radius: 24px 24px 0 0;
-            padding: 16px;
+            background: linear-gradient(115deg, #22c55e, #15803d);
+            padding: 18px 12px;
             text-align: center;
         }
 
@@ -311,139 +311,78 @@
         }
 
         .success-header h2 {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 800;
             margin: 0;
             color: white;
-            display: inline-block;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .success-header p {
-            font-size: 12px;
-            margin: 4px 0 0;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 6px 0 0;
             color: rgba(255, 255, 255, 0.9);
         }
 
+        /* Identity & photo */
         .identity-verification-section {
-            background: white;
-            border-radius: 20px;
-            padding: 16px;
-            margin: 16px;
-            border: 1px solid #e2e8f0;
+            padding: 20px 16px 12px;
         }
 
         .student-photo-container {
             text-align: center;
-            position: relative;
         }
 
         .photo-frame {
-            position: relative;
             display: inline-block;
             cursor: pointer;
-            border-radius: 16px;
+            border-radius: 24px;
             overflow: hidden;
             border: 3px solid #e2e8f0;
-            transition: all 0.2s;
+            transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .photo-frame:hover {
-            border-color: #667eea;
-            transform: scale(1.01);
+        .photo-frame:active {
+            transform: scale(0.98);
         }
 
         .student-large-photo {
-            width: 180px;
-            height: 180px;
+            width: 160px;
+            height: 160px;
             object-fit: cover;
             display: block;
         }
 
-        @media (min-width: 640px) {
-            .student-large-photo {
-                width: 200px;
-                height: 200px;
-            }
-        }
-
-        .zoom-icon {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 6px;
-            border-radius: 50%;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .photo-frame:hover .zoom-icon {
-            opacity: 1;
-        }
-
-        .photo-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .photo-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .photo-modal img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
         .face-match-instruction {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 12px;
-            display: flex;
+            background: #fef9e3;
+            border-radius: 40px;
+            padding: 10px 14px;
+            margin: 14px auto 8px;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #92400e;
+            gap: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #b45309;
+            max-width: 95%;
         }
 
-        .face-match-instruction i {
-            font-size: 16px;
-            color: #f59e0b;
-        }
-
+        /* Student details grid */
         .student-details-panel {
             background: #f8fafc;
-            border-radius: 16px;
-            padding: 12px;
-            margin-top: 12px;
+            border-radius: 24px;
+            padding: 14px 16px;
+            margin: 12px 0 8px;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2edf2;
         }
 
         .detail-row:last-child {
@@ -451,129 +390,109 @@
         }
 
         .detail-label {
-            font-weight: 600;
-            color: #475569;
-            font-size: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            gap: 8px;
+            letter-spacing: -0.2px;
         }
 
         .detail-label i {
-            width: 16px;
-            font-size: 12px;
-            color: #667eea;
+            width: 20px;
+            color: #5B66E8;
+            font-size: 0.9rem;
         }
 
         .detail-value {
-            font-weight: 600;
+            font-weight: 700;
             color: #0f172a;
-            font-size: 12px;
+            font-size: 0.9rem;
             text-align: right;
-            text-transform: uppercase;
+            max-width: 60%;
+            word-break: break-word;
         }
 
+        /* Transport status */
         .transport-status-card {
-            background: #f8fafc;
-            margin: 0 16px 16px 16px;
-            padding: 10px 16px;
-            border-radius: 12px;
+            background: #f1f5f9;
+            margin: 4px 16px 16px;
+            padding: 10px 18px;
+            border-radius: 50px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .transport-status-card .label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .transport-status-card .value {
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-transform: uppercase;
-        }
-
+        /* Double action buttons */
         .confirm-access-section {
-            padding: 0 16px 16px 16px;
+            padding: 8px 16px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .btn-confirm {
-            background: #22c55e;
-            max-width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-confirm:hover {
             background: #16a34a;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+            max-width: 100%;
+            padding: 14px;
+            font-size: 1rem;
         }
 
         .btn-new-verify {
-            background: #64748b;
-            max-width: 100%;
-            margin-top: 8px;
-            padding: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-new-verify:hover {
             background: #475569;
+            max-width: 100%;
+            padding: 14px;
+            font-size: 0.95rem;
+            box-shadow: none;
         }
 
+        /* Resend button area */
         .resend-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid #eef2f6;
         }
 
         .resend-btn {
-            background: none;
-            border: 2px solid #e2e8f0;
-            color: #4a5568;
+            background: white;
+            border: 2px solid #cbd5e1;
+            color: #2c3e66;
             width: 100%;
-            padding: 12px;
-            border-radius: 14px;
+            padding: 14px 12px;
+            border-radius: 60px;
+            font-weight: 700;
             font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .resend-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            background: #f7fafc;
+        .resend-btn:active {
+            background: #f8fafc;
+            border-color: #5B66E8;
         }
 
+        /* Modal for resend token */
         .resend-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 1100;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: 0.25s;
         }
 
         .resend-modal.active {
@@ -583,11 +502,11 @@
 
         .resend-modal-content {
             background: white;
-            border-radius: 28px;
-            max-width: 400px;
-            width: 90%;
+            border-radius: 40px;
+            max-width: 380px;
+            width: 88%;
             padding: 28px 24px;
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.3);
         }
 
         .resend-modal-header {
@@ -597,118 +516,137 @@
 
         .resend-modal-header i {
             font-size: 52px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5B66E8, #8B5CF6);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 12px;
         }
 
-        .resend-modal-header h4 {
-            font-weight: 700;
-            color: #2d3748;
-            font-size: 1.4rem;
-            margin-bottom: 4px;
-        }
-
-        .resend-modal-header p {
-            color: #718096;
-            font-size: 0.8rem;
-        }
-
-        .resend-modal .form-control {
-            border-radius: 12px;
+        .form-control {
+            border-radius: 60px;
             border: 2px solid #e2e8f0;
-            padding: 12px 16px;
+            padding: 14px 18px;
             font-size: 1rem;
-            transition: all 0.2s;
+            width: 100%;
         }
 
-        .resend-modal .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        .form-control:focus {
+            border-color: #5B66E8;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(91, 102, 232, 0.2);
         }
 
-        .resend-close {
-            color: #a0aec0;
-            text-decoration: none;
-            font-size: 0.85rem;
+        /* Photo zoom modal */
+        .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
         }
 
-        .resend-close:hover {
-            color: #718096;
+        .photo-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 24px;
+            object-fit: contain;
         }
 
         .footer {
             text-align: center;
             margin-top: 20px;
             color: rgba(255, 255, 255, 0.85);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .footer a {
             color: white;
-            text-decoration: none;
             font-weight: 500;
+            text-decoration: none;
         }
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
+        /* === RESPONSIVE: super mobile tweaks === */
+        @media (max-width: 520px) {
+            .gateway-card {
+                padding: 20px 16px;
+            }
 
-        /* Enhanced Responsive Styles for Larger Inputs */
-        @media (max-width: 560px) {
             .token-input {
-                width: 75px;
-                height: 75px;
-                font-size: 36px;
-                border-radius: 16px;
+                width: 70px;
+                height: 70px;
+                font-size: 42px;
+                border-radius: 20px;
             }
+
             .token-box {
-                gap: 12px;
-            }
-            .token-input-group {
                 gap: 10px;
+            }
+
+            .student-large-photo {
+                width: 130px;
+                height: 130px;
+            }
+
+            .detail-value {
+                font-size: 0.8rem;
             }
         }
 
         @media (max-width: 440px) {
             .token-input {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
-                border-radius: 14px;
+                width: 62px;
+                height: 62px;
+                font-size: 36px;
+                border-radius: 18px;
             }
+
             .token-box {
-                gap: 10px;
-            }
-            .token-input-group {
                 gap: 8px;
+            }
+
+            .gateway-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .btn-submit {
+                padding: 12px 18px;
+                font-size: 0.95rem;
             }
         }
 
         @media (max-width: 380px) {
             .token-input {
-                width: 52px;
-                height: 52px;
-                font-size: 24px;
-                border-radius: 12px;
+                width: 55px;
+                height: 55px;
+                font-size: 32px;
             }
-            .token-box {
-                gap: 8px;
-            }
-            .student-large-photo { width: 130px !important; height: 130px !important; }
-        }
 
-        @media (max-width: 340px) {
-            .token-input {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-                border-radius: 10px;
-            }
             .token-box {
                 gap: 6px;
+            }
+
+            .student-large-photo {
+                width: 110px;
+                height: 110px;
+            }
+
+            .face-match-instruction {
+                font-size: 0.7rem;
+                padding: 6px 10px;
             }
         }
     </style>
@@ -721,8 +659,8 @@
                 <div class="gateway-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h2>GATE PASS VERIFICATION</h2>
-                <p>Ingiza msimbo wa namba 4 uliopokea kwenye simu yako</p>
+                <h2>VERIFY GATE PASS</h2>
+                <p>Weka msimbo wa tarakimu 4 uliotumwa</p>
             </div>
 
             <div id="alertBox" class="alert"></div>
@@ -741,19 +679,19 @@
 
                 <div class="btn-container">
                     <button id="verifyBtn" class="btn-submit" disabled>
-                        <i class="fas fa-check-circle"></i> Hakiki Token
+                        <i class="fas fa-check-circle"></i> HAKIKI TOKEN
                     </button>
                 </div>
 
                 <div class="text-center">
                     <button id="resetBtn" class="btn-reset">
-                        <i class="fas fa-undo-alt"></i> Futa
+                        <i class="fas fa-eraser"></i> Futa namba
                     </button>
                 </div>
 
                 <div class="resend-section">
                     <button id="showResendModalBtn" class="resend-btn">
-                        <i class="fas fa-redo-alt me-2"></i> Umepoteza Token? Omba Tena
+                        <i class="fas fa-envelope-open-text"></i> Sijapata token? Tuma tena
                     </button>
                 </div>
             </div>
@@ -761,15 +699,15 @@
             <div id="studentSection" style="display: none;"></div>
             <div id="loadingSection" style="display: none;" class="loading-state">
                 <div class="spinner"></div>
-                <p class="mt-2 mb-0" style="color: #718096;">Inachakata...</p>
+                <p class="mt-2" style="color: #475569; font-weight: 500;">Inathibitisha ...</p>
             </div>
         </div>
 
         <div class="footer">
             <p><a href="{{ route('welcome') }}"><i class="fas fa-home"></i> Nyumbani</a> |
-                <a href="{{ route('tokens.verify') }}"><i class="fas fa-sync-alt"></i> Refresh</a>
+                <a href="{{ route('tokens.verify') }}"><i class="fas fa-sync-alt"></i> Onyesha upya</a>
             </p>
-            <p>© {{ date('Y') }} ShuleApp. Haki zote zimehifadhiwa</p>
+            <p>© {{ date('Y') }} ShuleApp</p>
         </div>
     </div>
 
@@ -783,8 +721,8 @@
         <div class="resend-modal-content">
             <div class="resend-modal-header">
                 <i class="fas fa-paper-plane"></i>
-                <h4>OMBA TOKEN TENA</h4>
-                <p>Token itatumwa kwa simu ya mzazi</p>
+                <h3 class="mt-2">Omba Token upya</h3>
+                <p class="text-muted">Tumia namba ya usajili ya mwanafunzi</p>
             </div>
 
             <div id="modalAlert" class="alert" style="display: none;"></div>
@@ -792,19 +730,18 @@
             <form id="resendForm">
                 @csrf
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Namba ya Usajili (Admission Number)</label>
+                    <label class="fw-bold mb-1">Namba ya Usajili</label>
                     <input type="text" id="modalAdmissionInput" class="form-control text-uppercase"
-                        placeholder="Mfano: SSC-001, TCH-001" autocomplete="off" required>
-                    <small class="text-muted">Ingiza namba ya usajili ya mwanafunzi</small>
+                        placeholder="mfano: SSC-001" autocomplete="off" required>
                 </div>
 
                 <div class="btn-container">
-                    <button type="submit" id="modalSubmitBtn" class="btn-submit" style="margin-top: 0;">
-                        <i class="fas fa-paper-plane me-2"></i> Tuma Ombi
+                    <button type="submit" id="modalSubmitBtn" class="btn-submit" style="max-width: 100%;">
+                        <i class="fas fa-paper-plane"></i> Tuma ombi
                     </button>
                 </div>
                 <div class="text-center mt-3">
-                    <button type="button" id="closeModalBtn" class="resend-close btn btn-link">
+                    <button type="button" id="closeModalBtn" class="resend-close btn btn-link text-muted">
                         <i class="fas fa-times"></i> Funga
                     </button>
                 </div>
@@ -812,10 +749,10 @@
         </div>
     </div>
 
-    <script src="{{asset('assets/js/scripts.js')}}"></script>
+    <script src="{{ asset('assets/js/scripts.js') }}"></script>
     <script>
         (function() {
-            // DOM Elements
+            // DOM elements
             const tokenInputs = document.querySelectorAll('.token-input');
             const verifyBtn = document.getElementById('verifyBtn');
             const resetBtn = document.getElementById('resetBtn');
@@ -824,7 +761,7 @@
             const studentSection = document.getElementById('studentSection');
             const loadingSection = document.getElementById('loadingSection');
 
-            // Modal Elements
+            // Modal refs
             const resendModal = document.getElementById('resendModal');
             const showResendModalBtn = document.getElementById('showResendModalBtn');
             const closeModalBtn = document.getElementById('closeModalBtn');
@@ -832,145 +769,120 @@
             const resendForm = document.getElementById('resendForm');
             const modalSubmitBtn = document.getElementById('modalSubmitBtn');
             const modalAdmissionInput = document.getElementById('modalAdmissionInput');
-
-            // Photo Zoom Elements
             const photoZoomModal = document.getElementById('photoZoomModal');
             const zoomedPhoto = document.getElementById('zoomedPhoto');
 
             let isLoading = false;
             let verificationTimeout = null;
             let currentStudentId = null;
-            let currentTokenData = null;
 
-            // --- CONFIGURATION ---
-            const ALERT_DURATION_MS = 3000;           // 3 seconds
-            const VERIFY_SESSION_DURATION_MS = 60000;  // 60 seconds
-            const SUCCESS_CONFIRM_DURATION_MS = 3000;  // 3 seconds
+            // Settings
+            const ALERT_DURATION = 3500;
+            const VERIFY_SESSION_DURATION = 60000;
 
             function init() {
-                setupTokenInputs();
-                setupModal();
+                setupTokenEvents();
+                setupModalEvents();
                 setupPhotoZoom();
-                setupOfflineDetection();
                 focusFirstInput();
             }
 
-            function setupTokenInputs() {
-                tokenInputs.forEach(input => {
-                    input.addEventListener('input', handleTokenInput);
-                    input.addEventListener('keydown', handleTokenKeydown);
-                    input.addEventListener('paste', handleTokenPaste);
-                    // Force numeric only by intercepting keypress
-                    input.addEventListener('keypress', handleNumericOnly);
+            function setupTokenEvents() {
+                tokenInputs.forEach((input, idx) => {
+                    input.addEventListener('input', (e) => handleInput(e, idx));
+                    input.addEventListener('keydown', handleKeydown);
+                    input.addEventListener('paste', handlePaste);
+                    input.addEventListener('keypress', onlyNumbers);
                 });
                 verifyBtn.addEventListener('click', verifyToken);
                 resetBtn.addEventListener('click', resetAll);
             }
 
-            // Enforce only numeric characters (0-9)
-            function handleNumericOnly(e) {
-                const char = String.fromCharCode(e.which);
-                if (!/[0-9]/.test(char)) {
-                    e.preventDefault();
-                }
+            function onlyNumbers(e) {
+                if (!/[0-9]/.test(String.fromCharCode(e.which))) e.preventDefault();
             }
 
-            function handleTokenInput(e) {
-                const input = e.target;
-                const idx = parseInt(input.dataset.idx);
-                // Get only the last digit (in case user types multiple or non-numeric)
-                let val = input.value.replace(/[^0-9]/g, '').slice(-1);
-                input.value = val;
-
+            function handleInput(e, idx) {
+                let val = e.target.value.replace(/[^0-9]/g, '').slice(-1);
+                e.target.value = val;
                 if (val && idx < tokenInputs.length - 1) {
                     tokenInputs[idx + 1].focus();
                 }
                 updateVerifyButton();
                 hideAlert();
-                removeErrorStyling();
+                removeError();
+                // Auto-submit if the last box gets filled or all are filled
+                if (idx === tokenInputs.length - 1 || Array.from(tokenInputs).every(inp => inp.value.length === 1)) {
+                    autoSubmitIfComplete();
+                }
             }
 
-            function handleTokenKeydown(e) {
-                const input = e.target;
-                const idx = parseInt(input.dataset.idx);
-                if (e.key === 'Backspace' && !input.value && idx > 0) {
+            function handleKeydown(e) {
+                const idx = parseInt(e.target.dataset.idx);
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
                     tokenInputs[idx - 1].focus();
                     tokenInputs[idx - 1].value = '';
                     updateVerifyButton();
                 }
             }
 
-            function handleTokenPaste(e) {
+            function handlePaste(e) {
                 e.preventDefault();
-                const text = (e.clipboardData || window.clipboardData).getData('text');
-                // Extract only numeric characters, limit to 4
-                const clean = text.replace(/[^0-9]/g, '').substring(0, 4);
-                for (let i = 0; i < clean.length && i < tokenInputs.length; i++) {
-                    tokenInputs[i].value = clean[i];
+                const text = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').substring(0, 4);
+                for (let i = 0; i < text.length && i < tokenInputs.length; i++) {
+                    tokenInputs[i].value = text[i];
                 }
-                if (clean.length < tokenInputs.length) {
-                    tokenInputs[clean.length].focus();
-                } else {
-                    tokenInputs[3].focus();
-                }
+                if (text.length < tokenInputs.length) tokenInputs[text.length].focus();
+                else tokenInputs[3].focus();
                 updateVerifyButton();
                 hideAlert();
-                removeErrorStyling();
+                removeError();
+                autoSubmitIfComplete();
             }
 
             function focusFirstInput() {
                 setTimeout(() => tokenInputs[0]?.focus(), 100);
             }
 
-            function removeErrorStyling() {
-                tokenInputs.forEach(input => input.classList.remove('error'));
+            function removeError() {
+                tokenInputs.forEach(inp => inp.classList.remove('error'));
             }
 
-            function addErrorStyling() {
-                tokenInputs.forEach(input => {
-                    if (input.value) input.classList.add('error');
+            function addError() {
+                tokenInputs.forEach(inp => {
+                    if (inp.value) inp.classList.add('error');
                 });
-                setTimeout(() => tokenInputs.forEach(input => input.classList.remove('error')), 500);
+                setTimeout(() => tokenInputs.forEach(inp => inp.classList.remove('error')), 500);
             }
 
             function resetAll() {
-                tokenInputs.forEach(input => input.value = '');
+                tokenInputs.forEach(inp => inp.value = '');
                 focusFirstInput();
                 updateVerifyButton();
                 hideAlert();
                 studentSection.style.display = 'none';
                 tokenSection.style.display = 'block';
                 verifyBtn.disabled = true;
-                removeErrorStyling();
-                if (verificationTimeout) {
-                    clearTimeout(verificationTimeout);
-                    verificationTimeout = null;
-                }
+                if (verificationTimeout) clearTimeout(verificationTimeout);
                 currentStudentId = null;
-                currentTokenData = null;
+                removeError();
             }
 
             function updateVerifyButton() {
-                const allFilled = Array.from(tokenInputs).every(input => input.value.length === 1);
+                const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
                 verifyBtn.disabled = !allFilled || isLoading;
             }
 
             function getFullToken() {
-                return Array.from(tokenInputs).map(input => input.value).join('');
+                return Array.from(tokenInputs).map(inp => inp.value).join('');
             }
 
-            function showAlert(message, type, autoHide = true, duration = ALERT_DURATION_MS) {
+            function showAlert(message, type, autoHide = true, duration = ALERT_DURATION) {
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type}`;
                 alertBox.style.display = 'block';
                 alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                if (autoHide) {
-                    setTimeout(() => {
-                        if (alertBox.style.display === 'block') {
-                            alertBox.style.display = 'none';
-                        }
-                    }, duration);
-                }
+                if (autoHide) setTimeout(() => { if (alertBox.style.display === 'block') alertBox.style.display = 'none'; }, duration);
             }
 
             function hideAlert() {
@@ -978,14 +890,20 @@
             }
 
             function setupPhotoZoom() {
-                photoZoomModal.addEventListener('click', () => {
-                    photoZoomModal.classList.remove('active');
-                });
+                photoZoomModal.addEventListener('click', () => photoZoomModal.classList.remove('active'));
             }
 
-            function showPhotoZoom(imageSrc) {
-                zoomedPhoto.src = imageSrc;
+            window.showPhotoZoom = (src) => {
+                zoomedPhoto.src = src;
                 photoZoomModal.classList.add('active');
+            };
+
+            function autoSubmitIfComplete() {
+                const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
+                if (allFilled && !isLoading) {
+                    // Small delay to allow UI update before submitting
+                    setTimeout(() => verifyToken(), 50);
+                }
             }
 
             function showStudentInfo(data) {
@@ -993,106 +911,89 @@
                 const installment = data.installment;
                 const token = data.token;
                 const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
-
                 const hasTransport = student.has_transport;
-                const transportIcon = hasTransport ? 'fa-bus' : 'fa-walking';
-                const transportColor = hasTransport ? '#22c55e' : '#ef4444';
+                const transportIcon = hasTransport ? 'fa-bus' : 'fa-person-walking';
+                const transportColor = hasTransport ? '#22c55e' : '#dc2626';
                 const transportText = hasTransport ? 'ANATUMIA' : 'HATUMII';
 
                 currentStudentId = student.id;
-                currentTokenData = token;
+
+                // Format names to uppercase for better readability
+                const firstName = student.first_name ? student.first_name.toUpperCase() : '';
+                const lastName = student.last_name ? student.last_name.toUpperCase() : '';
+                const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
+                const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A';
 
                 studentSection.innerHTML = `
                     <div class="success-card">
                         <div class="success-header">
-                            <div>
-                                <i class="fas fa-check-circle"></i>
-                                <h2>HALALI</h2>
-                                <p>GATE PASS NI SAHIHI</p>
-                            </div>
+                            <i class="fas fa-check-circle"></i>
+                            <h2>HALALI</h2>
+                            <p>GATE PASS INATAMBULIKA</p>
                         </div>
-
                         <div class="identity-verification-section">
                             <div class="student-photo-container">
                                 <div class="photo-frame" onclick="showPhotoZoom('${studentImage}')">
-                                    <img src="${studentImage}" class="student-large-photo"
-                                         onerror="this.src='/storage/students/student.jpg'"
-                                         alt="Student Photo">
-                                    <div class="zoom-icon">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
+                                    <img src="${studentImage}" class="student-large-photo" onerror="this.src='/storage/students/student.jpg'" alt="Student">
                                 </div>
-
                                 <div class="face-match-instruction">
-                                    <i class="fas fa-user-check"></i>
-                                    <span><strong>KUMBUKA:</strong> Linganisha sura ya mwanafunzi aliye mbele yako na picha hii</span>
+                                    <i class="fas fa-id-card"></i> Linganisha uso na picha hii
                                 </div>
                             </div>
-
                             <div class="student-details-panel">
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-user-graduate"></i> JINA KAMILI</div>
-                                    <div class="detail-value">${escapeHtml(student.first_name)} ${escapeHtml(student.last_name)}</div>
+                                    <div class="detail-label"><i class="fas fa-user"></i> JINA KAMILI</div>
+                                    <div class="detail-value">${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-id-card"></i> NAMBA YA USAJILI</div>
-                                    <div class="detail-value">${escapeHtml(student.admission_number || 'N/A')}</div>
+                                    <div class="detail-label"><i class="fas fa-hashtag"></i> NA. USAJILI</div>
+                                    <div class="detail-value">${escapeHtml(admissionNum)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-chalkboard-user"></i> DARASA</div>
-                                    <div class="detail-value text-uppercase">${student.class ? escapeHtml(student.class.class_name) : 'N/A'}</div>
+                                    <div class="detail-label"><i class="fas fa-school"></i> DARASA</div>
+                                    <div class="detail-value">${escapeHtml(className)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-calendar-week"></i> AWAMU YA MALIPO</div>
-                                    <div class="detail-value text-capitalize">${escapeHtml(installment.name)}</div>
+                                    <div class="detail-label"><i class="fas fa-coins"></i> AWAMU YA MALIPO</div>
+                                    <div class="detail-value">${escapeHtml(installment.name)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-clock"></i> MUDA WA KUISHA</div>
+                                    <div class="detail-label"><i class="fas fa-hourglass-end"></i> TOKEN INAISHA</div>
                                     <div class="detail-value">${formatDate(token.expires_at)}</div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="transport-status-card">
-                            <div class="label">USAFIRI</div>
-                            <div class="value" style="color: ${transportColor};">
-                                <i class="fas ${transportIcon}"></i>
-                                ${transportText}
-                            </div>
+                            <span class="detail-label"><i class="fas fa-truck-moving"></i> USAFIRI</span>
+                            <span style="color: ${transportColor}; font-weight:800;"><i class="fas ${transportIcon}"></i> ${transportText}</span>
                         </div>
-
                         <div class="confirm-access-section">
-                            <button id="confirmAccessBtn" class="btn-submit btn-confirm">
-                                <i class="fas fa-check-double"></i> THIBITISHA NA RUHUSU
-                            </button>
-                            <button id="newVerifyBtn" class="btn-submit btn-new-verify">
-                                <i class="fas fa-search"></i> HAKIKI MWANAFUNZI MWINGINE
-                            </button>
+                            <button id="confirmAccessBtn" class="btn-submit btn-confirm"><i class="fas fa-door-open"></i> RUHUSU KUINGIA</button>
+                            <button id="newVerifyBtn" class="btn-submit btn-new-verify"><i class="fas fa-qrcode"></i> VERIFY MWINGINE</button>
                         </div>
                     </div>
                 `;
-
                 studentSection.style.display = 'block';
                 tokenSection.style.display = 'none';
 
                 if (verificationTimeout) clearTimeout(verificationTimeout);
                 verificationTimeout = setTimeout(() => {
                     if (studentSection.style.display === 'block') {
-                        showAlert('Kipindi cha verification kimeisha. Tafadhali verify tena.', 'warning', true, 4000);
+                        showAlert('Muda wa verification umekwisha, tafadhali ingiza token upya.', 'warning');
                         resetAll();
                     }
-                }, VERIFY_SESSION_DURATION_MS);
+                }, VERIFY_SESSION_DURATION);
 
-                document.getElementById('confirmAccessBtn').addEventListener('click', () => confirmAccess());
-                document.getElementById('newVerifyBtn').addEventListener('click', () => resetAll());
+                document.getElementById('confirmAccessBtn')?.addEventListener('click', () => confirmAccess());
+                document.getElementById('newVerifyBtn')?.addEventListener('click', () => resetAll());
             }
 
             function confirmAccess() {
-                showAlert('✅ RUHUSA IMETOLEWA! Mwanafunzi anaweza kuingia.', 'success', true, SUCCESS_CONFIRM_DURATION_MS);
+                showAlert('✅ IMERUHUSIWA! Mwanafunzi anaweza kupita.', 'success', true, 2800);
                 setTimeout(() => {
                     resetAll();
-                    showAlert('TAYARI KWA VERIFICATION NYINGINE', 'info', true, 2500);
-                }, SUCCESS_CONFIRM_DURATION_MS);
+                    showAlert('Tayari kwa verification nyingine', 'info', true, 2000);
+                }, 2800);
             }
 
             function escapeHtml(str) {
@@ -1102,141 +1003,93 @@
 
             function formatDate(dateStr) {
                 try {
-                    return new Date(dateStr).toLocaleDateString('sw-TZ', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                } catch (e) {
-                    return dateStr;
-                }
+                    return new Date(dateStr).toLocaleString('sw-TZ', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                } catch (e) { return dateStr; }
             }
 
-            function setupModal() {
-                showResendModalBtn.addEventListener('click', () => {
+            // Modal handlers
+            function setupModalEvents() {
+                showResendModalBtn?.addEventListener('click', () => {
                     resendModal.classList.add('active');
-                    resetModalForm();
+                    modalAdmissionInput.value = '';
+                    modalAlert.style.display = 'none';
+                    modalSubmitBtn.disabled = false;
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
                 });
-                closeModalBtn.addEventListener('click', () => {
-                    resendModal.classList.remove('active');
-                });
-                resendModal.addEventListener('click', (e) => {
-                    if (e.target === resendModal) resendModal.classList.remove('active');
-                });
-                resendForm.addEventListener('submit', handleResendToken);
-            }
-
-            function resetModalForm() {
-                modalAdmissionInput.value = '';
-                modalAlert.style.display = 'none';
-                modalSubmitBtn.disabled = false;
-                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Ombi';
-            }
-
-            function showModalAlert(message, type) {
-                modalAlert.textContent = message;
-                modalAlert.className = `alert alert-${type}`;
-                modalAlert.style.display = 'block';
-                setTimeout(() => {
-                    if (modalAlert.style.display === 'block') modalAlert.style.display = 'none';
-                }, ALERT_DURATION_MS);
+                closeModalBtn?.addEventListener('click', () => resendModal.classList.remove('active'));
+                resendModal?.addEventListener('click', (e) => { if (e.target === resendModal) resendModal.classList.remove('active'); });
+                resendForm?.addEventListener('submit', handleResendToken);
             }
 
             async function handleResendToken(e) {
                 e.preventDefault();
-
-                const admissionNumber = modalAdmissionInput.value.trim();
-
-                if (!admissionNumber) {
-                    showModalAlert('Tafadhali ingiza namba ya usajili', 'error');
+                const admission = modalAdmissionInput.value.trim();
+                if (!admission) {
+                    showModalAlert('Ingiza namba ya usajili', 'error');
                     return;
                 }
-
                 modalSubmitBtn.disabled = true;
-                modalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Inachakata...';
-
+                modalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inachakata...';
                 try {
-                    const response = await fetch('{{ route('tokens.resend') }}', {
+                    const resp = await fetch('{{ route("tokens.resend") }}', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            admission_number: admissionNumber
-                        })
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                        body: JSON.stringify({ admission_number: admission })
                     });
-
-                    const data = await response.json();
-
+                    const data = await resp.json();
                     if (data.success) {
                         showModalAlert(data.message, 'success');
-                        setTimeout(() => {
-                            resendModal.classList.remove('active');
-                            resetModalForm();
-                        }, 3000);
+                        setTimeout(() => resendModal.classList.remove('active'), 2000);
                     } else {
                         showModalAlert(data.message, 'error');
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showModalAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error');
+                } catch (err) {
+                    showModalAlert('Hitilafu ya mtandao, jaribu tena', 'error');
                 } finally {
                     modalSubmitBtn.disabled = false;
-                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> TUMA OMBI';
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
                 }
             }
 
-            function setupOfflineDetection() {
-                window.addEventListener('online', () => {
-                    const alert = document.getElementById('alertBox');
-                    if (alert && alert.classList.contains('alert-warning')) alert.style.display = 'none';
-                });
-                window.addEventListener('offline', () => {
-                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.', 'warning', true, 4000);
-                });
+            function showModalAlert(msg, type) {
+                modalAlert.textContent = msg;
+                modalAlert.className = `alert alert-${type}`;
+                modalAlert.style.display = 'block';
+                setTimeout(() => modalAlert.style.display = 'none', 3000);
             }
 
             async function verifyToken() {
-                const tokenCode = getFullToken();
-                if (tokenCode.length !== 4) {
-                    showAlert('Tafadhali ingiza token kamili (namba 4)', 'error', true, 2500);
-                    addErrorStyling();
+                const token = getFullToken();
+                if (token.length !== 4) {
+                    showAlert('Tafadhali weka token kamili (namba 4)', 'error');
+                    addError();
                     return;
                 }
-
+                // Prevent multiple calls
+                if (isLoading) return;
                 isLoading = true;
                 verifyBtn.disabled = true;
                 tokenSection.style.display = 'none';
                 loadingSection.style.display = 'block';
                 hideAlert();
-
                 try {
-                    const response = await fetch('{{ route('tokens.verify.submit') }}', {
+                    const response = await fetch('{{ route("tokens.verify.submit") }}', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ token: tokenCode })
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Accept': 'application/json' },
+                        body: JSON.stringify({ token: token })
                     });
                     const data = await response.json();
-
                     if (response.ok && data.success) {
-                        showAlert(data.message, 'success', true, 2000);
+                        showAlert(data.message, 'success', true, 1800);
                         showStudentInfo(data.data);
                     } else {
-                        showAlert(data.message || 'Token si sahihi au imekwisha muda wake.', 'error', true, 3500);
-                        addErrorStyling();
-                        setTimeout(() => resetAll(), 4000);
+                        showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
+                        addError();
+                        setTimeout(() => resetAll(), 3500);
                     }
                 } catch (error) {
-                    console.error('Verification error:', error);
-                    showAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error', true, 3500);
-                    addErrorStyling();
+                    showAlert('Hitilafu ya mtandao, hakikisha umeunganishwa', 'error');
+                    addError();
                     setTimeout(() => resetAll(), 4000);
                 } finally {
                     isLoading = false;
@@ -1245,10 +1098,8 @@
                 }
             }
 
-            window.showPhotoZoom = showPhotoZoom;
             init();
         })();
     </script>
 </body>
-
 </html>

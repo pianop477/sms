@@ -401,6 +401,7 @@
                                     <ul class="submenu">
                                         <li><a href="{{ route('services.index') }}"><i class="fas fa-wrench"></i> Services</a></li>
                                         <li><a href="{{ route('fee-structures.index') }}"><i class="fas fa-table-list"></i> Fee structure</a></li>
+                                        <li><a href="{{ route('gatepass.tokens') }}"><i class="fas fa-id-card"></i> Gatepass Token</a></li>
                                     </ul>
                                 </li>
 

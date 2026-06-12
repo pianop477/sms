@@ -20,6 +20,8 @@
         "maatwebsite/excel": "^3.1",
         "phpoffice/phpword": "^1.4",
         "realrashid/sweet-alert": "^7.1",
+        "setasign/fpdf": "^1.9",
+        "setasign/fpdi": "^2.6",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spomky-labs/base64url": "^2.0",
         "vernes/yiimailer": "^4.0",

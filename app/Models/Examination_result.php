@@ -23,4 +23,34 @@ class Examination_result extends Model
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    public function subject()
+    {
+        return $this->hasMany(Examination_result::class, 'course_id');
+    }
+
+    public function Student()
+    {
+        return $this->hasMany(Examination_result::class, 'student_id');
+    }
+
+    public function class()
+    {
+        return $this->hasMany(Examination_result::class, 'class_id');
+    }
+
+    public function school()
+    {
+        return $this->hasMany(Examination_result::class, 'school_id');
+    }
+
+    public function Teacher()
+    {
+        return $this->hasMany(Examination_result::class, 'teacher_id');
+    }
+
+    public function Examination()
+    {
+        return $this->hasMany(Examination_result::class, 'exam_type_id');
+    }
 }

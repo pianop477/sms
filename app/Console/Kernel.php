@@ -69,19 +69,19 @@ class Kernel extends ConsoleKernel
         // ========== PWA VERSION UPDATE ==========
         // Update PWA version weekly on Sunday at 2 AM
         $schedule->command('pwa:version')
-            ->dailyAt('02:00')
+            ->dailyAt('00:10')
             ->withoutOverlapping();
 
         // Add to schedule() method
         $schedule->command('tokens:auto-expire')
-            ->dailyAt('02:30')  // Run daily at 12:30 AM
+            ->dailyAt('00:30')  // Run daily at 12:30 AM
             ->withoutOverlapping();
 
         // Cleanup old tokens (older than 365 days / 1 year)
         $schedule->command('tokens:clean-expired --days=365')
             ->weekly()
             ->mondays()
-            ->at('01:00')
+            ->at('00:01')
             ->withoutOverlapping();
 
         // Sync tokens after payment corrections - run every hour
@@ -94,6 +94,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('reports:clean')->weekly();
+        $schedule->command('payments:backfill-academic-year --chunk=100')
+                    ->everyThirtyMinutes()
+                    ->withoutOverlapping()
+                    ->appendOutputTo(storage_path('logs/backfill-academic-year.log'));
     }
 
     /**

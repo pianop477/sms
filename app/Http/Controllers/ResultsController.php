@@ -2097,7 +2097,7 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name.' Results '.$month.' '.$year.'.pdf' : 'Report_'.$year.'.pdf');
+        return $pdf->download($results->isNotEmpty() ? $results->first()->first_name.' Results '.$month.' '.$year.'.pdf' : 'Report_'.$year.'.pdf');
     }
 
     //Re-send sms results individually
@@ -3583,7 +3583,7 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->stream("{$studentData->first_name}_{$reports->title}.pdf");
+        return $pdf->download("{$studentData->first_name}_{$reports->title}.pdf");
     }
     /**
      * Get marking style for combined report
@@ -4608,7 +4608,7 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->stream("{$studentData->first_name}_{$reports->title}.pdf");
+        return $pdf->download("{$studentData->first_name}_{$reports->title}.pdf");
     }
 
     // function to delete compiled results*************************************************

@@ -102,7 +102,7 @@ class TokenController extends Controller
                         ],
                         'token' => [
                             'token' => $result['token']->token,
-                            'expires_at' => $result['expires_at']
+                            'expires_at' => Carbon::parse($result['expires_at'])->format('d-F-Y')
                         ]
                     ]
                 ]);
@@ -116,7 +116,7 @@ class TokenController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Token si sahihi au imekwisha muda wake. Tafadhali wasiliana na ofisi ya shule.'
+                    'message' => 'Token si sahihi au imekwisha muda wake.'
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -147,7 +147,7 @@ class TokenController extends Controller
     public function resendToken(Request $request)
     {
         $request->validate([
-            'admission_number' => 'required|string|min:3'
+            'admission_number' => 'required|string|min:9'
         ]);
 
         try {
@@ -317,5 +317,16 @@ class TokenController extends Controller
                 'message' => 'Hitilafu katika kutuma token. Tafadhali jaribu tena.'
             ], 500);
         }
+    }
+
+    public function getStudentTokens()
+    {
+        $currentAcademicYear = Carbon::now('Y');
+        $tokens = FeeClearanceToken::with(['student'])
+                                    // ->whereYear('academic_year', $currentAcademicYear)
+                                    ->orderBy('created_at', 'desc')
+                                    ->orderBy('updated_at', 'desc')
+                                    ->paginate(15);
+        return view('tokens.student_tokens', compact('tokens'));
     }
 }

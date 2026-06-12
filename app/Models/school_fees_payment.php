@@ -19,7 +19,8 @@ class school_fees_payment extends Model
         'payment_mode',
         'installment',
         'approved_by',
-        'approved_at'
+        'approved_at',
+        'academic_year'
     ];
 
     protected $guarded = ['id'];
