@@ -326,7 +326,7 @@ class TokenController extends Controller
                                     // ->whereYear('academic_year', $currentAcademicYear)
                                     ->orderBy('created_at', 'desc')
                                     ->orderBy('updated_at', 'desc')
-                                    ->paginate(15);
+                                    ->get();
         return view('tokens.student_tokens', compact('tokens'));
     }
 }
