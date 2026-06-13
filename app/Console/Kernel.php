@@ -55,11 +55,11 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('students:assign-fee-structure --force --chunk=100')
-            ->everyFifteenMinutes()
+            ->everyFiveMinutes()
             ->withoutOverlapping();
 
         $schedule->command('tokens:send-existing --chunk=100')
-            ->hourly()
+            ->everyFiveMinutes()
             ->withoutOverlapping();
 
         $schedule->command('tokens:sync-offline')
