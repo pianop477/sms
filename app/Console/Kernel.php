@@ -54,13 +54,15 @@ class Kernel extends ConsoleKernel
             ->dailyAt('08:00')
             ->withoutOverlapping();
 
-        $schedule->command('students:assign-fee-structure --force --chunk=100')
+        $schedule->command('students:assign-fee-structure --chunk=100')
             ->everyFiveMinutes()
-            ->withoutOverlapping();
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/fee-structure-assignment.log'));
 
         $schedule->command('tokens:send-existing --chunk=100')
             ->everyFiveMinutes()
-            ->withoutOverlapping();
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/existing-tokens.log'));
 
         $schedule->command('tokens:sync-offline')
             ->everyThirtyMinutes()
