@@ -373,12 +373,13 @@ class SendExistingTokens extends Command
             if ($parent && $parent->user && $parent->user->phone) {
                 $formattedToken = $token->token;
                 $link = $this->appBaseUrl . '/tokens/verify';
+                $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
 
                 $formattedPhone = $this->formatPhoneNumberForSms($parent->user->phone);
                 $message = "GATE PASS No: {$formattedToken}\n" .
                     "Jina: {$student->first_name} {$student->last_name}\n" .
                     "Awamu: {$currentInstallment->name}\n" .
-                    "Expiry: " . Carbon::parse($currentInstallment->end_date)->format('d/m/Y') . "\n" .
+                    "Expiry: " . Carbon::parse($expiryDate)->format('d/m/Y') . "\n" .
                     "Hakiki hapa: {$link}\n";
 
                 try {

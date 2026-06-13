@@ -64,14 +64,14 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/existing-tokens.log'));
 
-        $schedule->command('tokens:sync-offline')
+        $schedule->command('tokens:sync-offline --clean-expired')
             ->everyThirtyMinutes()
             ->withoutOverlapping();
 
         // ========== PWA VERSION UPDATE ==========
         // Update PWA version weekly on Sunday at 2 AM
-        $schedule->command('pwa:version')
-            ->dailyAt('00:10')
+        $schedule->command('pwa:version --force')
+            ->hourly()
             ->withoutOverlapping();
 
         // Add to schedule() method
