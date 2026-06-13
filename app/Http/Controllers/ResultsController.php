@@ -3138,14 +3138,11 @@ class ResultsController extends Controller
 
                 // ==== REKEDISHA: Create better formatted message ====
                 $message = "MATOKEO YA {$studentName}\n";
-                $message .= "==========================\n";
                 $message .= 'Ripoti: '.strtoupper($reports->title)."\n";
                 $message .= "Tarehe: {$reportDate}\n";
                 $message .= "Darasa: {$studentData->class_name}\n";
-                $message .= "==========================\n";
                 $message .= "MATOKEO YA MASOMO:\n";
                 $message .= $subjectResultsText;
-                $message .= "==========================\n";
                 $message .= "Jumla: {$studentTotal}\n";
                 $message .= 'Wastani: '.number_format($studentAverage, 1)."\n";
 
@@ -3154,8 +3151,6 @@ class ResultsController extends Controller
                 } else {
                     $message .= "Nafasi: N/A\n";
                 }
-
-                $message .= "==========================\n";
                 $message .= "Pakua ripoti: {$link}";
 
                 // Check message length
