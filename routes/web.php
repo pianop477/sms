@@ -783,8 +783,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 });
 
 // Token Verification Routes
-Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])->name('tokens.verify');
-Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])->name('tokens.verify.submit');
+Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])->name('tokens.verify')->middleware('throttle:30,1');
+Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])->name('tokens.verify.submit')->middleware('throttle:30,1');
+Route::get('/offline/tokens', [OfflineTokenController::class, 'getAllTokens'])->middleware('throttle:30,1');
 
 // Token resend routes
 Route::post('/tokens/resend', [TokenController::class, 'resendToken'])->name('tokens.resend');
