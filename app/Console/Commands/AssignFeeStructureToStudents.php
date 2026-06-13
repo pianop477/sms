@@ -35,7 +35,7 @@ class AssignFeeStructureToStudents extends Command
     {
         $startTime = microtime(true);
 
-        // ✅ AUTOMATIC: Determine academic year from existing bills
+        // ✅ AUTOMATIC: Determine academic year from existing bills (with future-year guard)
         $academicYear = $this->determineAcademicYear();
 
         $this->info("🚀 Starting fee structure assignment for academic year {$academicYear}...");
@@ -70,7 +70,7 @@ class AssignFeeStructureToStudents extends Command
         $this->newLine();
 
         // Display available structures for the determined academic year
-        $this->displayAvailableStructures($academicYear);
+        $this->displayAvailableStructures();
 
         $dryRun = $this->option('dry-run');
         $force = $this->option('force');
@@ -85,10 +85,10 @@ class AssignFeeStructureToStudents extends Command
         $shouldCheckClass = !$skipClassCheck;
 
         $this->info('🔍 DETECTION SETTINGS:');
-        $this->line("   ✓ Academic Year: {$academicYear} (AUTO-DETECTED FROM EXISTING BILLS)");
+        $this->line("   ✓ Academic Year: {$academicYear} (AUTO-DETECTED FROM EXISTING BILLS, overridable with --academic-year)");
         $this->line("   ✓ Transport status changes: " . ($shouldCheckTransport ? 'ENABLED' : 'DISABLED'));
         $this->line("   ✓ Class changes: " . ($shouldCheckClass ? 'ENABLED' : 'DISABLED'));
-        $this->line("   ✓ Full sync mode: " . ($fullSync ? 'YES (recheck all)' : 'NO (only changed)'));
+        $this->line("   ✓ Full sync mode: " . ($fullSync ? 'YES (recheck all, including students without bills)' : 'NO (only changed)'));
         $this->newLine();
 
         if ($dryRun) {
@@ -129,11 +129,17 @@ class AssignFeeStructureToStudents extends Command
                         $stats['has_bills']++;
                     } else {
                         $stats['no_bills']++;
-                        if ($showDetails) {
-                            $this->line("\n   ⏭️  {$student->admission_number} - No existing bills for year {$academicYear}, skipping assignment");
+                        // 🔧 FIX: Only skip if NOT in full-sync mode and NOT forced
+                        if (!$fullSync && !$force) {
+                            if ($showDetails) {
+                                $this->line("\n   ⏭️  {$student->admission_number} - No existing bills for year {$academicYear}, skipping assignment (use --full-sync to assign anyway)");
+                            }
+                            $progressBar->advance();
+                            continue;
                         }
-                        $progressBar->advance();
-                        continue;
+                        if ($showDetails) {
+                            $this->warn("\n   🔄 FULL SYNC: {$student->admission_number} - No bills for {$academicYear} but assigning fee structure anyway");
+                        }
                     }
 
                     // Get current eligibility criteria
@@ -202,7 +208,7 @@ class AssignFeeStructureToStudents extends Command
     }
 
     /**
-     * ✅ AUTOMATICALLY determine academic year from existing bills
+     * ✅ AUTOMATICALLY determine academic year from existing bills, but avoid future years
      */
     private function determineAcademicYear(): int
     {
@@ -212,9 +218,17 @@ class AssignFeeStructureToStudents extends Command
             return (int) $this->option('academic-year');
         }
 
+        $currentYear = (int) date('Y');
+
         // 2. Check school_fees table for latest academic year with bills
         $latestBillYear = school_fees::max('academic_year');
         if ($latestBillYear) {
+            // If the detected year is in the future, warn and use current year instead
+            if ($latestBillYear > $currentYear) {
+                $this->warn("⚠️  Found bills for future year {$latestBillYear}. Likely test data. Using current year {$currentYear} instead.");
+                $this->line("   💡 To force assignment for {$latestBillYear}, use --academic-year={$latestBillYear}");
+                return $currentYear;
+            }
             $this->info("📅 Detected academic year from existing bills: {$latestBillYear}");
             return (int) $latestBillYear;
         }
@@ -227,7 +241,6 @@ class AssignFeeStructureToStudents extends Command
         }
 
         // 4. Default to current year
-        $currentYear = (int) date('Y');
         $this->info("📅 No existing bills found. Using current year: {$currentYear}");
         return $currentYear;
     }
@@ -250,7 +263,7 @@ class AssignFeeStructureToStudents extends Command
                 return ['status' => 'skipped', 'type' => 'no_class'];
             }
 
-            // Find appropriate fee structure
+            // Find appropriate fee structure (FIXED: hostel priority)
             $selectedStructure = $this->findBestFeeStructure($student->school_id, $classId, $hasTransport);
 
             if (!$selectedStructure) {
@@ -376,44 +389,38 @@ class AssignFeeStructureToStudents extends Command
 
     /**
      * Find the best fee structure for a student
+     * Returns null if no exact match found (no fallback)
      */
     private function findBestFeeStructure($schoolId, $classId, $hasTransport)
     {
-        // Priority 1: Class-specific with matching transport
+        // PRIORITY 1: Hostel class structure (ignores transport because hostel overrides)
+        $structure = FeeStructure::where('school_id', $schoolId)
+            ->where('class_id', $classId)
+            ->where('is_hostel_class', true)
+            ->first();
+        if ($structure) return $structure;
+
+        // PRIORITY 2: Class-specific non-hostel with matching transport
         $structure = FeeStructure::where('school_id', $schoolId)
             ->where('class_id', $classId)
             ->where('transport_applies', $hasTransport)
             ->where('is_hostel_class', false)
             ->first();
-
         if ($structure) return $structure;
 
-        // Priority 2: General structure with matching transport
+        // PRIORITY 3: General structure with matching transport (non-hostel)
         $structure = FeeStructure::where('school_id', $schoolId)
             ->whereNull('class_id')
             ->where('transport_applies', $hasTransport)
             ->where('is_hostel_class', false)
             ->first();
-
         if ($structure) return $structure;
 
-        // Priority 3: Hostel class structure
-        $structure = FeeStructure::where('school_id', $schoolId)
-            ->where('class_id', $classId)
-            ->where('is_hostel_class', true)
-            ->first();
-
-        if ($structure) return $structure;
-
-        // Priority 4: Any structure with matching transport (fallback)
-        $structure = FeeStructure::where('school_id', $schoolId)
-            ->where('transport_applies', $hasTransport)
-            ->first();
-
-        return $structure;
+        // NO MATCH FOUND – return null (student will be skipped)
+        return null;
     }
 
-    private function displayAvailableStructures($academicYear)
+    private function displayAvailableStructures()
     {
         $schoolId = $this->option('school-id');
 
@@ -438,7 +445,8 @@ class AssignFeeStructureToStudents extends Command
             $this->line("   🌍 GENERAL STRUCTURES (Apply to all classes):");
             foreach ($general as $s) {
                 $type = $s->transport_applies ? '🚌 With Transport' : '🚶 Without Transport';
-                $this->line("      • {$type}: {$s->name} - " . number_format($s->total_amount, 0) . " TZS");
+                $hostel = $s->is_hostel_class ? ' [HOSTEL]' : '';
+                $this->line("      • {$type}{$hostel}: {$s->name} - " . number_format($s->total_amount, 0) . " TZS");
             }
             $this->newLine();
         }
@@ -486,6 +494,12 @@ class AssignFeeStructureToStudents extends Command
 
         if ($dryRun) {
             $this->warn('⚠️  DRY RUN - No changes made');
+        }
+
+        $currentYear = (int) date('Y');
+        if ($academicYear != $currentYear) {
+            $this->warn("⚠️  NOTE: Assigned for year {$academicYear} which is different from current year {$currentYear}");
+            $this->line("   Use --academic-year={$currentYear} if you meant this year");
         }
     }
 }
