@@ -205,7 +205,7 @@
                                                         {{ \Carbon\Carbon::parse($row->expires_at)->format('d-m-Y') ?? 'N/A' }}
                                                     </td>
                                                     <td>
-                                                        @if($row->status == 'active')
+                                                        @if($row->expires_at > now())
                                                             <span class="badge bg-success">Active</span>
 
                                                         @else
