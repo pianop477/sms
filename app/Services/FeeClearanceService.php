@@ -21,17 +21,11 @@ class FeeClearanceService
         $this->tokenGenerator = new TokenGeneratorService();
     }
 
-    /**
-     * Get current academic year
-     */
     private function getCurrentAcademicYear()
     {
         return date('Y');
     }
 
-    /**
-     * ✅ IMPROVED: Get student's fee assignment for a specific year
-     */
     private function getStudentFeeAssignment(Student $student, int $academicYear)
     {
         return StudentFeeAssignment::where('student_id', $student->id)
@@ -42,11 +36,8 @@ class FeeClearanceService
 
     private function getTotalPaidForAcademicYear(Student $student, $academicYear)
     {
-        // ✅ Use cache to avoid repeated queries
         $cacheKey = "total_paid_{$student->id}_{$academicYear}";
-
         return cache()->remember($cacheKey, 60, function () use ($student, $academicYear) {
-            // ✅ Use 'bill' instead of 'schoolFee'
             return school_fees_payment::whereHas('bill', function ($q) use ($student, $academicYear) {
                 $q->where('student_id', $student->id)
                     ->where('academic_year', $academicYear);
@@ -54,13 +45,9 @@ class FeeClearanceService
         });
     }
 
-    /**
-     * ✅ IMPROVED: Get the target installment based on total paid and academic year
-     */
     private function getTargetInstallment(Student $student, $feeStructureId, $academicYear)
     {
         $totalPaid = $this->getTotalPaidForAcademicYear($student, $academicYear);
-
         $installments = FeeInstallment::where('fee_structure_id', $feeStructureId)
             ->where('academic_year', $academicYear)
             ->orderBy('order')
@@ -70,7 +57,6 @@ class FeeClearanceService
             return null;
         }
 
-        // Find the highest installment the student has qualified for
         $targetInstallment = null;
         foreach ($installments as $installment) {
             if ($totalPaid >= $installment->cumulative_required) {
@@ -80,7 +66,6 @@ class FeeClearanceService
             }
         }
 
-        // If no installment reached, take the first one
         if (!$targetInstallment) {
             $targetInstallment = $installments->first();
         }
@@ -88,14 +73,10 @@ class FeeClearanceService
         return $targetInstallment;
     }
 
-    /**
-     * ✅ IMPROVED: Evaluate if student qualifies for token (with academic_year)
-     */
     public function evaluate(Student $student, ?int $academicYear = null)
     {
         $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
         $totalPaid = $this->getTotalPaidForAcademicYear($student, $academicYear);
-
         $assignment = $this->getStudentFeeAssignment($student, $academicYear);
 
         if (!$assignment) {
@@ -119,7 +100,6 @@ class FeeClearanceService
             ];
         }
 
-        // Check if student has reached cumulative required for this installment
         if ($totalPaid < $targetInstallment->cumulative_required) {
             return [
                 'eligible' => false,
@@ -142,7 +122,8 @@ class FeeClearanceService
     }
 
     /**
-     * ✅ IMPROVED: Process token with academic_year awareness
+     * Generate or update token only if student qualifies for the current installment period.
+     * Resets notification_sent flag whenever token is created or updated.
      */
     public function process(Student $student, ?int $academicYear = null)
     {
@@ -150,54 +131,70 @@ class FeeClearanceService
         $evaluation = $this->evaluate($student, $academicYear);
 
         if (!$evaluation['eligible']) {
-            // Log::info("Student {$student->id} not eligible for year {$academicYear}: {$evaluation['reason']}");
             return null;
         }
 
         $targetInstallment = $evaluation['installment'];
 
-        // Check if student already has an active token for this academic year
+        // Check if the reached installment is the CURRENT installment (by date)
+        $today = Carbon::today();
+        $isCurrent = $today->between(
+            Carbon::parse($targetInstallment->start_date),
+            Carbon::parse($targetInstallment->end_date)
+        );
+
+        if (!$isCurrent) {
+            // Student may have paid ahead or behind, but no token for non‑current period
+            return null;
+        }
+
+        // Find existing token (unique per student/year thanks to DB constraint)
         $existingToken = FeeClearanceToken::where('student_id', $student->id)
             ->where('academic_year', $academicYear)
-            ->where('status', 'active')
             ->first();
 
         if ($existingToken) {
-            // Check if the existing token is for a different installment
+            // Check which fields need update
+            $changed = false;
+
             if ($existingToken->installment_id != $targetInstallment->id) {
-                // Update the expiry date to the new installment's end date
-                $newExpiry = $targetInstallment->end_date;
-
-                $existingToken->update([
-                    'fee_structure_id' => $targetInstallment->fee_structure_id,
-                    'installment_id' => $targetInstallment->id,
-                    'expires_at' => $newExpiry,
-                    'updated_at' => now()
-                ]);
-
-                // Log::info("Token updated for student {$student->id} for year {$academicYear}");
-                return $existingToken;
-            } else {
-                // Token already exists for the correct installment
-                return $existingToken;
+                $existingToken->installment_id = $targetInstallment->id;
+                $changed = true;
             }
+            if ($existingToken->fee_structure_id != $targetInstallment->fee_structure_id) {
+                $existingToken->fee_structure_id = $targetInstallment->fee_structure_id;
+                $changed = true;
+            }
+            if ($existingToken->expires_at != $targetInstallment->end_date) {
+                $existingToken->expires_at = $targetInstallment->end_date;
+                $changed = true;
+            }
+            if ($existingToken->status != 'active') {
+                $existingToken->status = 'active';
+                $changed = true;
+            }
+
+            if ($changed) {
+                // Reset notification flag so SMS will be sent again
+                $existingToken->notification_sent = false;
+                $existingToken->save();
+            }
+
+            return $existingToken;
         }
 
-        // No active token exists - create new one
+        // Create new token (with notification_sent = false)
         return DB::transaction(function () use ($student, $targetInstallment, $academicYear) {
-            // Double check no token was created in between
-            $existingToken = FeeClearanceToken::where('student_id', $student->id)
+            // Double‑check to avoid race condition
+            $checkAgain = FeeClearanceToken::where('student_id', $student->id)
                 ->where('academic_year', $academicYear)
-                ->where('status', 'active')
                 ->first();
-
-            if ($existingToken) {
-                return $existingToken;
+            if ($checkAgain) {
+                return $checkAgain;
             }
 
             $token = $this->tokenGenerator->generateUniqueToken();
-
-            $newToken = FeeClearanceToken::create([
+            return FeeClearanceToken::create([
                 'student_id' => $student->id,
                 'academic_year' => $academicYear,
                 'fee_structure_id' => $targetInstallment->fee_structure_id,
@@ -205,15 +202,81 @@ class FeeClearanceService
                 'token' => $token,
                 'expires_at' => $targetInstallment->end_date,
                 'status' => 'active',
+                'notification_sent' => false,
             ]);
-
-            // Log::info("New token created for student {$student->id} for year {$academicYear}");
-            return $newToken;
         });
     }
 
     /**
-     * ✅ IMPROVED: Verify token with academic_year
+     * Sync token after payment correction – resets notification_sent if token is updated.
+     */
+    public function syncTokenAfterPaymentCorrection(Student $student, ?int $academicYear = null)
+    {
+        $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
+        $evaluation = $this->evaluate($student, $academicYear);
+
+        if (!$evaluation['eligible']) {
+            // Student no longer qualifies: expire any active token
+            $activeToken = FeeClearanceToken::where('student_id', $student->id)
+                ->where('academic_year', $academicYear)
+                ->where('status', 'active')
+                ->first();
+
+            if ($activeToken) {
+                $activeToken->update(['status' => 'expired']);
+                Log::warning('Token expired after payment correction', [
+                    'student_id' => $student->id,
+                    'academic_year' => $academicYear,
+                    'token' => $activeToken->token,
+                ]);
+            }
+            return null;
+        }
+
+        $targetInstallment = $evaluation['installment'];
+
+        // Look for any token (any status) for this student/year
+        $existingToken = FeeClearanceToken::where('student_id', $student->id)
+            ->where('academic_year', $academicYear)
+            ->first();
+
+        if ($existingToken) {
+            // Update existing token and reset notification flag
+            $existingToken->update([
+                'installment_id' => $targetInstallment->id,
+                'fee_structure_id' => $targetInstallment->fee_structure_id,
+                'expires_at' => $targetInstallment->end_date,
+                'status' => 'active',
+                'notification_sent' => false,
+                'updated_at' => now(),
+            ]);
+            return $existingToken;
+        } else {
+            // Create new token (will also set notification_sent = false)
+            return $this->process($student, $academicYear);
+        }
+    }
+
+    /**
+     * Mark token as notified (SMS sent).
+     */
+    public function markNotificationSent($token)
+    {
+        if ($token && !$token->notification_sent) {
+            $token->update(['notification_sent' => true]);
+        }
+    }
+
+    /**
+     * Check if token needs notification (i.e., exists and not yet sent).
+     */
+    public function needsNotification($token)
+    {
+        return $token && !$token->notification_sent;
+    }
+
+    /**
+     * Verify token – fixed regex to keep alphanumeric.
      */
     public function verifyToken($inputToken, ?int $academicYear = null)
     {
@@ -259,9 +322,6 @@ class FeeClearanceService
         }
     }
 
-    /**
-     * ✅ IMPROVED: Get eligibility details with academic_year
-     */
     public function getEligibilityDetails(Student $student, ?int $academicYear = null)
     {
         $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
@@ -317,68 +377,12 @@ class FeeClearanceService
         ];
     }
 
-    /**
-     * ✅ IMPROVED: Sync token after payment correction
-     */
-    public function syncTokenAfterPaymentCorrection(Student $student, ?int $academicYear = null)
-    {
-        $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
-        $evaluation = $this->evaluate($student, $academicYear);
-
-        $activeToken = FeeClearanceToken::where('student_id', $student->id)
-            ->where('academic_year', $academicYear)
-            ->where('status', 'active')
-            ->first();
-
-        if (!$evaluation['eligible']) {
-            // Student no longer qualifies - expire token
-            if ($activeToken) {
-                $activeToken->update(['status' => 'expired']);
-                Log::warning('Token expired after payment correction', [
-                    'student_id' => $student->id,
-                    'academic_year' => $academicYear,
-                    'token' => $activeToken->token,
-                    'reason' => 'payment_correction'
-                ]);
-            }
-            return null;
-        }
-
-        $targetInstallment = $evaluation['installment'];
-
-        if ($activeToken) {
-            // Update existing token if needed
-            if ($activeToken->installment_id != $targetInstallment->id) {
-                $activeToken->update([
-                    'installment_id' => $targetInstallment->id,
-                    'fee_structure_id' => $targetInstallment->fee_structure_id,
-                    'expires_at' => $targetInstallment->end_date
-                ]);
-                // Log::info('Token updated after payment correction', [
-                //     'student_id' => $student->id,
-                //     'academic_year' => $academicYear,
-                //     'token' => $activeToken->token,
-                //     'new_installment' => $targetInstallment->name
-                // ]);
-            }
-            return $activeToken;
-        } else {
-            // Create new token
-            return $this->process($student, $academicYear);
-        }
-    }
-
-    /**
-     * ✅ NEW: Process tokens for all students in a given year
-     */
     public function processTokensForYear(int $academicYear, ?int $schoolId = null): array
     {
         $query = Student::query();
-
         if ($schoolId) {
             $query->where('school_id', $schoolId);
         }
-
         $students = $query->get();
         $results = [
             'total' => $students->count(),
@@ -398,10 +402,12 @@ class FeeClearanceService
                 $results['errors'][] = "Student {$student->admission_number}: " . $e->getMessage();
             }
         }
-
         return $results;
     }
 
+    /**
+     * Helper to know if token was just created (useful for controllers).
+     */
     public function isNewlyCreatedToken($token): bool
     {
         return $token->wasRecentlyCreated ?? false;
@@ -411,11 +417,5 @@ class FeeClearanceService
     {
         $cacheKey = "total_paid_{$studentId}_{$academicYear}";
         cache()->forget($cacheKey);
-
-        // Log::info('Cleared payment cache', [
-        //     'student_id' => $studentId,
-        //     'academic_year' => $academicYear,
-        //     'cache_key' => $cacheKey
-        // ]);
     }
 }

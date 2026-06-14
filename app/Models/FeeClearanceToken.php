@@ -12,7 +12,7 @@ class FeeClearanceToken extends Model
         'installment_id',
         'token',
         'expires_at', 'academic_year',
-        'status',
+        'status', 'notification_sent'
     ];
 
     protected $dates = ['expires_at'];

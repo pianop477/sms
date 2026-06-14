@@ -956,7 +956,7 @@
             const firstName = student.first_name ? student.first_name.toUpperCase() : '';
             const lastName = student.last_name ? student.last_name.toUpperCase() : '';
             const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-            const className = student.class_name ? student.class_name.toUpperCase() : 'N/A';
+            const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A';
 
             studentSection.innerHTML = `
                 <div class="success-card">
