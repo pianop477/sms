@@ -23,9 +23,6 @@ class SyncTokensAfterCorrection extends Command
 
     protected $description = 'Sync all tokens after payment corrections for a specific academic year';
 
-    /**
-     * Get current academic year
-     */
     private function getCurrentAcademicYear()
     {
         if ($this->option('academic-year')) {
@@ -47,7 +44,6 @@ class SyncTokensAfterCorrection extends Command
         $this->info("📅 Academic Year: {$academicYear}");
         $this->newLine();
 
-        // ✅ IMPROVED: Get students with fee assignments for this academic year
         $studentIdsFromAssignments = StudentFeeAssignment::where('academic_year', $academicYear)
             ->where('is_active', true)
             ->pluck('student_id');
@@ -57,7 +53,6 @@ class SyncTokensAfterCorrection extends Command
         if ($studentId) {
             $query->where('id', $studentId);
         }
-
         if ($schoolId) {
             $query->where('school_id', $schoolId);
         }
@@ -107,7 +102,6 @@ class SyncTokensAfterCorrection extends Command
 
         $progressBar->finish();
         $this->newLine(2);
-
         $this->displaySummary($stats, $academicYear, $dryRun);
 
         return 0;
@@ -116,7 +110,6 @@ class SyncTokensAfterCorrection extends Command
     private function syncStudentToken($student, $service, $academicYear, $dryRun, $showDetails, $force, &$stats)
     {
         try {
-            // ✅ Get assignment for this academic year
             $assignment = StudentFeeAssignment::where('student_id', $student->id)
                 ->where('academic_year', $academicYear)
                 ->where('is_active', true)
@@ -136,9 +129,7 @@ class SyncTokensAfterCorrection extends Command
             }
 
             if ($dryRun) {
-                // ✅ Dry run - just evaluate without changes
                 $evaluation = $service->evaluate($student, $academicYear);
-
                 if ($showDetails) {
                     $this->line("      Eligible: " . ($evaluation['eligible'] ? 'Yes' : 'No'));
                     if (isset($evaluation['total_paid']) && isset($evaluation['required'])) {
@@ -149,32 +140,22 @@ class SyncTokensAfterCorrection extends Command
                 return 'no_change';
             }
 
-            // ✅ Get current active token
-            $activeToken = FeeClearanceToken::where('student_id', $student->id)
-                ->where('academic_year', $academicYear)
-                ->where('status', 'active')
-                ->first();
-
-            // ✅ Evaluate current eligibility
+            // Get current eligibility
             $evaluation = $service->evaluate($student, $academicYear);
 
             if (!$evaluation['eligible']) {
-                // Student no longer qualifies - expire token if exists
+                // Expire any active token
+                $activeToken = FeeClearanceToken::where('student_id', $student->id)
+                    ->where('academic_year', $academicYear)
+                    ->where('status', 'active')
+                    ->first();
+
                 if ($activeToken) {
                     $activeToken->update(['status' => 'expired']);
-
                     if ($showDetails) {
                         $this->line("      🔄 Token expired - Student no longer qualifies");
                         $this->line("         Reason: {$evaluation['reason']}");
                     }
-
-                    // Log::info('Token expired after payment correction', [
-                    //     'student_id' => $student->id,
-                    //     'academic_year' => $academicYear,
-                    //     'token' => $activeToken->token,
-                    //     'reason' => $evaluation['reason']
-                    // ]);
-
                     return 'expired';
                 }
 
@@ -186,43 +167,63 @@ class SyncTokensAfterCorrection extends Command
 
             $targetInstallment = $evaluation['installment'];
 
-            // ✅ Check if token exists and is correct
-            if ($activeToken) {
-                if ($activeToken->installment_id == $targetInstallment->id && !$force) {
-                    if ($showDetails) {
-                        $this->line("      ✅ Token already correct for {$targetInstallment->name}");
-                    }
-                    return 'no_change';
-                }
+            // ========== FIX: Check for ANY token with same student+installment ==========
+            $existingToken = FeeClearanceToken::where('student_id', $student->id)
+                ->where('academic_year', $academicYear)
+                ->where('installment_id', $targetInstallment->id)
+                ->first();
 
-                // Update existing token
-                $oldInstallment = $activeToken->installment->name ?? 'Unknown';
-                $activeToken->update([
-                    'installment_id' => $targetInstallment->id,
-                    'fee_structure_id' => $targetInstallment->fee_structure_id,
+            if ($existingToken) {
+                // Token already exists (even if expired). Update it.
+                $oldStatus = $existingToken->status;
+                $oldExpiry = $existingToken->expires_at;
+
+                $existingToken->update([
+                    'status' => 'active',
                     'expires_at' => $targetInstallment->end_date,
-                    'updated_at' => now()
+                    'fee_structure_id' => $targetInstallment->fee_structure_id,
+                    'updated_at' => now(),
                 ]);
 
                 if ($showDetails) {
-                    $this->line("      🔄 Token updated");
-                    $this->line("         Old: {$oldInstallment}");
-                    $this->line("         New: {$targetInstallment->name}");
-                    $this->line("         New Expiry: " . Carbon::parse($targetInstallment->end_date)->format('d/m/Y'));
+                    $this->line("      🔄 Token updated (was {$oldStatus})");
+                    $this->line("         Installment: {$targetInstallment->name}");
+                    $this->line("         Expiry: " . Carbon::parse($targetInstallment->end_date)->format('d/m/Y'));
                 }
 
-                // Log::info('Token updated after payment correction', [
-                //     'student_id' => $student->id,
-                //     'academic_year' => $academicYear,
-                //     'token' => $activeToken->token,
-                //     'old_installment_id' => $activeToken->installment_id,
-                //     'new_installment_id' => $targetInstallment->id
-                // ]);
+                // Also, if there was any other active token for a different installment, expire it
+                $otherActive = FeeClearanceToken::where('student_id', $student->id)
+                    ->where('academic_year', $academicYear)
+                    ->where('status', 'active')
+                    ->where('installment_id', '!=', $targetInstallment->id)
+                    ->first();
+
+                if ($otherActive) {
+                    $otherActive->update(['status' => 'expired']);
+                    if ($showDetails) {
+                        $this->line("      ⚠️  Expired previous token for different installment");
+                    }
+                }
 
                 return 'updated';
             }
 
-            // ✅ Create new token
+            // ========== No existing token for this installment ==========
+            // Check if there is any active token for a different installment
+            $activeTokenForOther = FeeClearanceToken::where('student_id', $student->id)
+                ->where('academic_year', $academicYear)
+                ->where('status', 'active')
+                ->first();
+
+            if ($activeTokenForOther && $activeTokenForOther->installment_id != $targetInstallment->id) {
+                // Expire the old one before creating new
+                $activeTokenForOther->update(['status' => 'expired']);
+                if ($showDetails) {
+                    $this->line("      ⚠️  Expired old token for installment {$activeTokenForOther->installment->name}");
+                }
+            }
+
+            // Now create new token using service or direct creation
             $tokenResult = $service->process($student, $academicYear);
 
             if ($tokenResult) {
@@ -232,14 +233,6 @@ class SyncTokensAfterCorrection extends Command
                     $this->line("         Installment: {$targetInstallment->name}");
                     $this->line("         Expires: " . Carbon::parse($targetInstallment->end_date)->format('d/m/Y'));
                 }
-
-                // Log::info('New token created after payment correction', [
-                //     'student_id' => $student->id,
-                //     'academic_year' => $academicYear,
-                //     'token' => $tokenResult->token,
-                //     'installment_id' => $targetInstallment->id
-                // ]);
-
                 return 'created';
             }
 
