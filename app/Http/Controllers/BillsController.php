@@ -653,97 +653,69 @@ class BillsController extends Controller
 
             $bill->save();
 
-            // 🔥 Process fee clearance and send token if eligible
+            // Process fee clearance and send token if eligible
             $student = $bill->student;
-            $tokenSent = false;
-            $tokenData = null;
+            $smsSent = false;
 
             if ($student) {
                 $service = new FeeClearanceService();
 
-                // Process token (only if eligible and not already sent)
-                $token = $service->process($student);
+                // Process token (returns array with 'token' and 'action')
+                $result = $service->process($student, $currentAcademicYear);
+                $token = $result['token'];
+                $action = $result['action']; // 'created', 'updated', or 'none'
 
-                if ($token) {
-                    // Check if this is a newly created token
-                    $isNewToken = $service->isNewlyCreatedToken($token);
+                // Send SMS only if token was created or updated (installment changed)
+                if ($token && in_array($action, ['created', 'updated'])) {
+                    $smsSent = true;
 
-                    if ($isNewToken) {
-                        // New token was created - send SMS
-                        $tokenSent = true;
-                        $tokenData = $token;
+                    // Get parent details
+                    $parent = Parents::with('user')->find($student->parent_id);
+                    $school = school::find($student->school_id);
 
-                        // Get parent details - correct relationship: parents.user
-                        $parent = Parents::with('user')
-                            ->where('id', $student->parent_id)
-                            ->first();
-
-                        $school = school::find($student->school_id);
-
-                        // Get installment name and details safely
-                        $installmentName = 'Current Term';
-                        $installmentOrder = null;
-                        $academicYear = null;
-
-                        if ($token->relationLoaded('installment') && $token->installment) {
-                            $installmentName = $token->installment->name;
-                            $installmentOrder = $token->installment->order;
-                            $academicYear = $token->installment->academic_year;
-                        } else {
-                            $token->load('installment');
-                            if ($token->installment) {
-                                $installmentName = $token->installment->name;
-                                $installmentOrder = $token->installment->order;
-                                $academicYear = $token->installment->academic_year;
-                            }
-                        }
-
-                        // Format token for SMS (add dash for readability)
-                        $formattedToken = $token->token;
-                        $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
-
-                        // Check parent phone - correct path: parent->user->phone
-                        if ($parent && $parent->user && $parent->user->phone) {
-                            $parentPhone = $parent->user->phone;
-
-                            // Prepare message
-                            $link = $this->appBaseUrl . '/tokens/verify';
-                            $message = "Gate Pass No yako ni:\n" .
-                                "{$formattedToken}\n" .
-                                "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
-                                "Malipo ya: {$installmentName}\n" .
-                                "Expiry: {$expiryDate}\n" .
-                                "Hakiki hapa: {$link}\n\n";
-
-                            // Send SMS
-                            $this->sendGatepassToken($school, $parentPhone, $message);
-                        } else {
-                            Log::warning('Cannot send SMS - parent phone not found', [
-                                'student_id' => $student->id,
-                                'parent_id' => $student->parent_id,
-                                'has_parent' => !is_null($parent),
-                                'has_user' => $parent ? !is_null($parent->user) : false,
-                                'has_phone' => $parent && $parent->user ? !empty($parent->user->phone) : false
-                            ]);
-                        }
+                    // Get installment name
+                    $installmentName = 'Current Term';
+                    if ($token->relationLoaded('installment') && $token->installment) {
+                        $installmentName = $token->installment->name;
                     } else {
+                        $token->load('installment');
+                        if ($token->installment) {
+                            $installmentName = $token->installment->name;
+                        }
                     }
-                } else {
+
+                    $formattedToken = $token->token;
+                    $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
+                    $link = $this->appBaseUrl . '/tokens/verify';
+
+                    // Prepare SMS message
+                    $message = "Gate Pass No yako ni:\n" .
+                        "{$formattedToken}\n" .
+                        "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
+                        "Malipo ya: {$installmentName}\n" .
+                        "Expiry: {$expiryDate}\n" .
+                        "Hakiki hapa: {$link}\n\n";
+
+                    // Send SMS if parent phone exists
+                    if ($parent && $parent->user && $parent->user->phone) {
+                        $this->sendGatepassToken($school, $parent->user->phone, $message);
+                    } else {
+                        Log::warning('Cannot send SMS - parent phone not found', [
+                            'student_id' => $student->id,
+                            'parent_id' => $student->parent_id,
+                        ]);
+                    }
                 }
             }
 
-            // Prepare success message
             $successMessage = 'Payment recorded successfully';
-            if ($tokenSent) {
-                $successMessage .= '';
-            } elseif ($tokenData) {
-                $successMessage .= '';
-            } else {
-                $successMessage .= '';
+            if ($smsSent) {
+                $successMessage .= ' and gate pass token sent to parent.';
             }
 
             Alert()->toast($successMessage, 'success');
             return back();
+
         } catch (Exception $e) {
             Log::error('Payment recording failed', [
                 'error' => $e->getMessage(),
@@ -1553,6 +1525,7 @@ class BillsController extends Controller
     public function updateBill(Request $request, $billId)
     {
         $decodedBill = Hashids::decode($billId);
+        $currentAcademicYear = $this->getCurrentAcademicYear();
 
         $this->validate($request, [
             'amount' => 'required|numeric',
@@ -1563,13 +1536,10 @@ class BillsController extends Controller
         try {
             $bill = school_fees_payment::find($decodedBill[0]);
 
-            if (! $bill) {
+            if (!$bill) {
                 Alert()->toast('Invalid bill or missing parameter', 'error');
                 return back();
             }
-
-            // Store old amount for comparison if needed
-            $oldAmount = $bill->amount;
 
             // Update the payment record
             $bill->update([
@@ -1578,113 +1548,76 @@ class BillsController extends Controller
                 'payment_mode' => $request->payment,
             ]);
 
-            // 🔥 Check if student is now eligible for gate pass token
-            $tokenSent = false;
-            $tokenData = null;
-
-            // Get the student through the fee bill
+            // Check if student is now eligible for gate pass token
+            $smsSent = false;
             $studentFee = school_fees::find($bill->student_fee_id);
 
             if ($studentFee && $studentFee->student) {
                 $student = $studentFee->student;
-
-                // Initialize the fee clearance service
                 $service = new FeeClearanceService();
 
-                // Process token (checks eligibility and sends if applicable)
-                $token = $service->process($student);
+                // Process token (returns array with 'token' and 'action')
+                $result = $service->process($student, $currentAcademicYear);
+                $token = $result['token'];
+                $action = $result['action']; // 'created', 'updated', or 'none'
 
-                if ($token) {
-                    // Check if this is a newly created token
-                    $isNewToken = $service->isNewlyCreatedToken($token);
+                // Send SMS only if token was created or updated (installment changed)
+                if ($token && in_array($action, ['created', 'updated'])) {
+                    $smsSent = true;
 
-                    if ($isNewToken) {
-                        // New token was created - send SMS notification
-                        $tokenSent = true;
-                        $tokenData = $token;
+                    // Get parent details
+                    $parent = Parents::with('user')->find($student->parent_id);
+                    $school = school::find($student->school_id);
 
-                        // Get parent details - using the correct relationship
-                        $parent = Parents::with('user')
-                            ->where('id', $student->parent_id)
-                            ->first();
-
-                        $school = school::find($student->school_id);
-
-                        // Get installment details safely
-                        $installmentName = 'Current Term';
-                        $installmentOrder = null;
-                        $academicYear = null;
-
-                        if ($token->relationLoaded('installment') && $token->installment) {
-                            $installmentName = $token->installment->name;
-                            $installmentOrder = $token->installment->order;
-                            $academicYear = $token->installment->academic_year;
-                        } else {
-                            $token->load('installment');
-                            if ($token->installment) {
-                                $installmentName = $token->installment->name;
-                                $installmentOrder = $token->installment->order;
-                                $academicYear = $token->installment->academic_year;
-                            }
-                        }
-
-                        // Format token for SMS (add dash for readability if needed)
-                        $formattedToken = $token->token;
-                        $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
-
-                        // Check if parent has a valid phone number
-                        if ($parent && $parent->user && $parent->user->phone) {
-                            $parentPhone = $parent->user->phone;
-
-                            // Prepare SMS message
-                            $link = $this->appBaseUrl . '/tokens/verify';
-                            $message = "Gate Pass No yako ni:\n" .
-                                "{$formattedToken}\n" .
-                                "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
-                                "Malipo ya: {$installmentName}\n" .
-                                "Expiry: {$expiryDate}\n" .
-                                "Hakiki hapa: {$link}\n\n" .
-                                "Imetolewa: " . Carbon::now()->format('d/m/Y H:i');
-
-                            // Send SMS
-                            $this->sendGatepassToken($school, $parentPhone, $message);
-
-                            Log::info('Gate pass token sent after bill update', [
-                                'student_id' => $student->id,
-                                'token' => $token->token,
-                                'bill_id' => $bill->id,
-                                'phone' => $parentPhone
-                            ]);
-                        } else {
-                            Log::warning('Cannot send SMS after bill update - parent phone not found', [
-                                'student_id' => $student->id,
-                                'parent_id' => $student->parent_id,
-                                'bill_id' => $bill->id,
-                                'has_parent' => !is_null($parent),
-                                'has_user' => $parent ? !is_null($parent->user) : false,
-                                'has_phone' => $parent && $parent->user ? !empty($parent->user->phone) : false
-                            ]);
-                        }
+                    // Get installment name
+                    $installmentName = 'Current Term';
+                    if ($token->relationLoaded('installment') && $token->installment) {
+                        $installmentName = $token->installment->name;
                     } else {
-                        // Token already existed - log for tracking
-                        Log::info('Token already exists for student after bill update', [
+                        $token->load('installment');
+                        if ($token->installment) {
+                            $installmentName = $token->installment->name;
+                        }
+                    }
+
+                    $formattedToken = $token->token;
+                    $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
+                    $link = $this->appBaseUrl . '/tokens/verify';
+
+                    $message = "Gate Pass No yako ni:\n" .
+                        "{$formattedToken}\n" .
+                        "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
+                        "Malipo ya: {$installmentName}\n" .
+                        "Expiry: {$expiryDate}\n" .
+                        "Hakiki hapa: {$link}\n\n" .
+                        "Imetolewa: " . Carbon::now()->format('d/m/Y H:i');
+
+                    if ($parent && $parent->user && $parent->user->phone) {
+                        $this->sendGatepassToken($school, $parent->user->phone, $message);
+                        Log::info('Gate pass token sent after bill update', [
                             'student_id' => $student->id,
                             'token' => $token->token,
-                            'expires_at' => $token->expires_at
+                            'bill_id' => $bill->id,
+                            'action' => $action
+                        ]);
+                    } else {
+                        Log::warning('Cannot send SMS after bill update - parent phone not found', [
+                            'student_id' => $student->id,
+                            'parent_id' => $student->parent_id,
+                            'bill_id' => $bill->id
                         ]);
                     }
                 } else {
-                    // Student not eligible for token
-                    Log::info('Student not eligible for gate pass token after bill update', [
-                        'student_id' => $student->id,
-                        'bill_id' => $bill->id
+                    Log::info('No SMS sent after bill update', [
+                        'student_id' => $student->id ?? null,
+                        'action' => $action ?? 'none',
+                        'has_token' => !is_null($token)
                     ]);
                 }
             }
 
-            // Prepare success message based on token status
             $successMessage = 'Payment has been updated successfully';
-            if ($tokenSent) {
+            if ($smsSent) {
                 $successMessage .= ' and gate pass token has been sent to parent';
             }
 
