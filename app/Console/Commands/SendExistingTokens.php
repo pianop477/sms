@@ -121,7 +121,7 @@ class SendExistingTokens extends Command
             }
 
             $phone = $this->formatPhoneNumberForSms($parent->user->phone);
-            $message = "GATEPASS NA. ni: {$token->token}\nJina la Mtoto: {$student->first_name} {$student->last_name}\nAwamu: " . ($token->installment->name ?? 'Current') . "\Mwisho wa Awamu: " . Carbon::parse($token->expires_at)->format('d/m/Y') . "\nHakiki uwapo shuleni/kwenye Basi";
+            $message = "GATEPASS NA. ni: {$token->token}\nJina la Mtoto: {$student->first_name} {$student->last_name}\nAwamu: " . ($token->installment->name ?? 'Current') . "\nMwisho wa Awamu: " . Carbon::parse($token->expires_at)->format('d/m/Y') . "\nHakiki uwapo shuleni/kwenye Basi";
 
             $smsService = new NextSmsService();
             $payload = [
