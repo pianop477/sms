@@ -127,11 +127,11 @@ class SyncTokensAfterCorrection extends Command
 
             if ($parent && $parent->user && $parent->user->phone) {
                 $phone = $this->formatPhoneNumberForSms($parent->user->phone);
-                $message = "GATE PASS No: {$token->token}\n" .
-                    "Jina: {$student->first_name} {$student->last_name}\n" .
+                $message = "GATEPASS NA. ni: {$token->token}\n" .
+                    "Jina la Mtoto: {$student->first_name} {$student->last_name}\n" .
                     "Awamu: " . ($token->installment->name ?? 'Current') . "\n" .
-                    "Expiry: " . Carbon::parse($token->expires_at)->format('d/m/Y') . "\n" .
-                    "Hakiki: " . $this->appBaseUrl . "/tokens/verify\n";
+                    "Mwisho wa Awamu: " . Carbon::parse($token->expires_at)->format('d/m/Y') . "\n" .
+                    "Hakiki uwapo shuleni/kwenye Basi";
 
                 $smsService = new NextSmsService();
                 $payload = [

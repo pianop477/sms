@@ -992,7 +992,7 @@
                                 <div class="detail-value">${escapeHtml(installment.name)}</div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-hourglass-end"></i> TOKEN INAISHA</div>
+                                <div class="detail-label"><i class="fas fa-hourglass-end"></i> MWISHO WA MUHULA</div>
                                 <div class="detail-value">${formatDate(token.expires_at)}</div>
                             </div>
                         </div>

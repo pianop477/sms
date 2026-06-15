@@ -689,12 +689,11 @@ class BillsController extends Controller
                     $link = $this->appBaseUrl . '/tokens/verify';
 
                     // Prepare SMS message
-                    $message = "Gate Pass No yako ni:\n" .
-                        "{$formattedToken}\n" .
-                        "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
-                        "Malipo ya: {$installmentName}\n" .
-                        "Expiry: {$expiryDate}\n" .
-                        "Hakiki hapa: {$link}\n\n";
+                    $message = "GATEPASS NA. ni: {$formattedToken}\n" .
+                        "Jina la Mtoto: {$student->first_name} {$student->last_name}\n" .
+                        "Awamu: {$installmentName}\n" .
+                        "Mwisho wa Awamu: {$expiryDate}\n" .
+                        "Hakiki uwapo shuleni/kwenye Basi";
 
                     // Send SMS if parent phone exists
                     if ($parent && $parent->user && $parent->user->phone) {

@@ -254,11 +254,13 @@ class TokenController extends Controller
             $formattedToken = $activeToken->token;
             $expiryDate = Carbon::parse($activeToken->expires_at)->format('d/m/Y');
             $link = $this->appBaseUrl . '/tokens/verify';
+            $installmentName = $activeToken->installment->name;
 
-            $message = "GATE PASS No: {$formattedToken}\n" .
-                "Jina: {$student->first_name} {$student->last_name}\n" .
-                "Expiry: {$expiryDate}\n" .
-                "Hakiki hapa: {$link}\n" ;
+            $message = "GATEPASS NA. ni: {$formattedToken}\n" .
+                "Jina la Mtoto: {$student->first_name} {$student->last_name}\n" .
+                "Awamu: {$installmentName}\n" .
+                "Mwisho wa Awamu: {$expiryDate}\n" .
+                "Hakiki uwapo shuleni/kwenye Basi" ;
 
             try {
                 $smsService = new NextSmsService();
