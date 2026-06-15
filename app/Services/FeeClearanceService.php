@@ -20,17 +20,11 @@ class FeeClearanceService
         $this->tokenGenerator = new TokenGeneratorService();
     }
 
-    /**
-     * Get current academic year (fallback)
-     */
     private function getCurrentAcademicYear(): int
     {
         return (int) date('Y');
     }
 
-    /**
-     * Get student's fee assignment for a specific academic year
-     */
     private function getStudentFeeAssignment(Student $student, int $academicYear)
     {
         return StudentFeeAssignment::where('student_id', $student->id)
@@ -39,9 +33,6 @@ class FeeClearanceService
             ->first();
     }
 
-    /**
-     * Get total paid for a student in a given academic year (cached)
-     */
     private function getTotalPaidForAcademicYear(Student $student, int $academicYear): float
     {
         $cacheKey = "total_paid_{$student->id}_{$academicYear}";
@@ -53,9 +44,6 @@ class FeeClearanceService
         });
     }
 
-    /**
-     * Determine the highest installment the student has reached based on cumulative paid amount.
-     */
     private function getTargetInstallment(Student $student, int $feeStructureId, int $academicYear)
     {
         $totalPaid = $this->getTotalPaidForAcademicYear($student, $academicYear);
@@ -76,14 +64,9 @@ class FeeClearanceService
                 break;
             }
         }
-
-        // If no installment reached (payments below first installment), return the first installment
         return $target ?? $installments->first();
     }
 
-    /**
-     * Evaluate whether a student qualifies for a token in the given academic year.
-     */
     public function evaluate(Student $student, ?int $academicYear = null): array
     {
         $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
@@ -132,48 +115,26 @@ class FeeClearanceService
 
     /**
      * Main method: generate or update token for a student.
-     *
-     * Returns an array with:
-     * - 'token'  => FeeClearanceToken|null
-     * - 'action' => 'created' | 'updated' | 'none'
-     *
-     * Rules:
-     * - Token is only created/updated if the student has reached the current installment (by date).
-     * - If a token already exists (any status), it is updated instead of creating a new one.
-     * - 'created' action triggers an SMS (first time the student gets a token).
-     * - 'updated' action triggers an SMS when the installment changes (student moves to next installment).
+     * NO isCurrent check – token always based on the highest installment reached.
+     * Returns ['token' => Token|null, 'action' => 'created'|'updated'|'none'].
      */
     public function process(Student $student, ?int $academicYear = null): array
     {
         $academicYear = $academicYear ?? $this->getCurrentAcademicYear();
-
-        // 1. Evaluate eligibility
         $evaluation = $this->evaluate($student, $academicYear);
+
         if (!$evaluation['eligible']) {
             return ['token' => null, 'action' => 'none'];
         }
 
         $targetInstallment = $evaluation['installment'];
 
-        // 2. Check if the target installment is the current one (by date)
-        $today = Carbon::today();
-        $isCurrent = $today->between(
-            Carbon::parse($targetInstallment->start_date),
-            Carbon::parse($targetInstallment->end_date)
-        );
-        if (!$isCurrent) {
-            // Student may have paid ahead/behind, but token is only for current period.
-            return ['token' => null, 'action' => 'none'];
-        }
-
-        // 3. Look for existing token (any status) for this student & year
-        //    Unique constraint (student_id, academic_year) ensures at most one.
+        // Look for existing token (any status) for this student & year
         $existingToken = FeeClearanceToken::where('student_id', $student->id)
             ->where('academic_year', $academicYear)
             ->first();
 
         if ($existingToken) {
-            // 4. Update existing token if needed
             $oldInstallmentId = $existingToken->installment_id;
             $changed = false;
 
@@ -196,18 +157,14 @@ class FeeClearanceService
 
             if ($changed) {
                 $existingToken->save();
-                // Determine action: 'updated' only if the installment changed
                 $action = ($oldInstallmentId != $targetInstallment->id) ? 'updated' : 'none';
                 return ['token' => $existingToken, 'action' => $action];
             }
-
-            // No changes needed
             return ['token' => $existingToken, 'action' => 'none'];
         }
 
-        // 5. No token exists – create new one
+        // Create new token
         $newToken = DB::transaction(function () use ($student, $targetInstallment, $academicYear) {
-            // Double-check race condition
             $checkAgain = FeeClearanceToken::where('student_id', $student->id)
                 ->where('academic_year', $academicYear)
                 ->first();
