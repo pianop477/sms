@@ -326,8 +326,8 @@ class TokenController extends Controller
         $currentAcademicYear = Carbon::now('Y');
         $tokens = FeeClearanceToken::with(['student'])
                                     // ->whereYear('academic_year', $currentAcademicYear)
-                                    ->orderBy('created_at', 'desc')
                                     ->orderBy('updated_at', 'desc')
+                                    ->orderBy('created_at', 'desc')
                                     ->get();
         return view('tokens.student_tokens', compact('tokens'));
     }
