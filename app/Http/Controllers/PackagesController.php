@@ -360,12 +360,12 @@ class PackagesController extends Controller
         }
 
         // For PDF preview in browser
-        if (request()->has('preview')) {
-            $fileContent = Storage::get($package->file_path);
-            return response($fileContent)
-                ->header('Content-Type', 'application/pdf')
-                ->header('Content-Disposition', 'inline; filename="' . $package->title . '.pdf"');
-        }
+        // if (request()->has('preview')) {
+        //     $fileContent = Storage::get($package->file_path);
+        //     return response($fileContent)
+        //         ->header('Content-Type', 'application/pdf')
+        //         ->header('Content-Disposition', 'inline; filename="' . $package->title . '.pdf"');
+        // }
 
         // For direct download
         return Storage::download($package->file_path, $package->title . '.pdf');
