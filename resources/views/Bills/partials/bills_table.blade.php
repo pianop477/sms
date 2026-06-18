@@ -17,128 +17,125 @@
         </thead>
         <tbody>
             @forelse ($bills as $row)
-                @php
-                    $billed = $row->amount ?? 0;
-                    $paid = $row->total_paid ?? 0;
-                    $balance = $billed - $paid;
-                @endphp
-                <tr>
-                    <td>{{ strtoupper($row->control_number) }}</td>
-                    <td>
-                        {{ ucwords(strtolower($row->student_first_name ?? 'N/A')) }}
-                        {{ ucwords(strtolower($row->student_middle_name ?? '')) }}
-                        {{ ucwords(strtolower($row->student_last_name ?? '')) }}
-                    </td>
-                    <td>{{ strtoupper($row->class_code) }}</td>
-                    <td>{{ $row->parent_phone }}</td>
-                    <td>{{ ucwords(strtolower($row->service_name)) }}</td>
-                    <td>{{ number_format($billed) }}</td>
-                    <td>{{ number_format($paid) }}</td>
-                    <td>{{ number_format($balance) }}</td>
-                    <td>
-                        @if ($row->status == 'active')
-                            <span class="badge bg-primary text-white">{{ strtoupper($row->status) }}</span>
-                        @elseif ($row->status == 'cancelled')
-                            <span class="badge bg-warning text-primary">{{ strtoupper($row->status) }}</span>
-                        @elseif ($row->status == 'expired')
-                            <span class="badge bg-danger text-white">{{ strtoupper($row->status) }}</span>
-                        @elseif ($row->status == 'full paid')
-                            <span class="badge bg-success text-white">{{ strtoupper($row->status) }}</span>
-                        @else
-                            <span class="badge bg-info text-white">{{ strtoupper($row->status) }}</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($row->due_date)
-                            {{ \Carbon\Carbon::parse($row->due_date)->format('Y-m-d') }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <ul class="d-flex justify-content-center">
-                                <li class="me-3">
-                                    <button class="btn btn-action btn-xs dropdown-toggle mr-2" type="button"
-                                        id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-cog me-1"></i> Manage
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                        <li>
-                                            <a class="dropdown-item text-sm" href="javascript:void(0)"
-                                                onclick="viewBill('{{ Hashids::encode($row->id) }}')"
-                                                title="view bill">
-                                                <i class="fas fa-eye text-primary"></i>
-                                                View Bill
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-sm" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#editBillModal"
-                                                onclick="openEditBillModal('{{ Hashids::encode($row->id) }}')">
-                                                <i class="fas fa-pencil text-info"></i>
-                                                Edit Bill
-                                            </a>
-                                        </li>
-                                        @if ($row->total_paid == 0 && $row->status == 'active')
-                                            <li>
-                                                <a href="#" class="dropdown-item cancel-btn"
-                                                    data-id="{{ Hashids::encode($row->id) }}"
-                                                    data-control="{{ strtoupper($row->control_number) }}"
-                                                    data-service="{{ $row->service_name }}"
-                                                    data-amount="{{ number_format($billed) }}" data-bs-toggle="modal"
-                                                    data-bs-target="#cancelBillModal">
-                                                    <i class="fas fa-ban text-danger"></i> Cancel Bill
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if ($row->status == 'active')
-                                            <li>
-                                                <form
-                                                    action="{{ route('bills.resend', ['bill' => Hashids::encode($row->id)]) }}"
-                                                    class="dropdown-item" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn p-1 m-0 text-sm"
-                                                        onclick="return confirm('Are you sure you want to resend this bill?')">
-                                                        <i class="fas fa-refresh text-success"></i>
-                                                        Resend SMS
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </li>
-                                @if ($row->status == 'active')
+            @php
+            $billed = $row->amount ?? 0;
+            $paid = $row->total_paid ?? 0;
+            $balance = $billed - $paid;
+            @endphp
+            <tr>
+                <td>{{ strtoupper($row->control_number) }}</td>
+                <td>
+                    {{ ucwords(strtolower($row->student_first_name ?? 'N/A')) }}
+                    {{ ucwords(strtolower($row->student_middle_name ?? '')) }}
+                    {{ ucwords(strtolower($row->student_last_name ?? '')) }}
+                </td>
+                <td>{{ strtoupper($row->class_code) }}</td>
+                <td>{{ $row->parent_phone }}</td>
+                <td>{{ ucwords(strtolower($row->service_name)) }}</td>
+                <td>{{ number_format($billed) }}</td>
+                <td>{{ number_format($paid) }}</td>
+                <td>{{ number_format($balance) }}</td>
+                <td>
+                    @if ($row->status == 'active')
+                    <span class="badge bg-primary text-white">{{ strtoupper($row->status) }}</span>
+                    @elseif ($row->status == 'cancelled')
+                    <span class="badge bg-warning text-primary">{{ strtoupper($row->status) }}</span>
+                    @elseif ($row->status == 'expired')
+                    <span class="badge bg-danger text-white">{{ strtoupper($row->status) }}</span>
+                    @elseif ($row->status == 'full paid')
+                    <span class="badge bg-success text-white">{{ strtoupper($row->status) }}</span>
+                    @else
+                    <span class="badge bg-info text-white">{{ strtoupper($row->status) }}</span>
+                    @endif
+                </td>
+                <td>
+                    @if ($row->due_date)
+                    {{ \Carbon\Carbon::parse($row->due_date)->format('Y-m-d') }}
+                    @else
+                    N/A
+                    @endif
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <ul class="d-flex justify-content-center">
+                            <li class="me-3">
+                                <button class="btn btn-action btn-xs dropdown-toggle mr-2" type="button"
+                                    id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog me-1"></i> Manage
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                                     <li>
-                                        <button type="button" class="btn btn-info btn-pay btn-xs"
-                                            data-bs-toggle="modal" data-bs-target="#addPaymentModal"
-                                            data-bill-id="{{ Hashids::encode($row->id) }}"
-                                            data-student-id="{{ $row->student_id }}"
-                                            data-student-name="{{ ucwords(strtolower($row->student_first_name . ' ' . $row->student_middle_name . ' ' . $row->student_last_name)) }}"
-                                            data-control-number="{{ strtoupper($row->control_number) }}"
-                                            data-academic-year="{{ $row->academic_year }}"
-                                            data-class="{{ strtoupper($row->class_code) }}"
-                                            data-service="{{ ucwords(strtolower($row->service_name)) }}"
-                                            data-billed="{{ $billed }}" data-paid="{{ $paid }}"
-                                            data-balance="{{ $balance }}">
-                                            <i class="fas fa-credit-card"></i> Pay
-                                        </button>
+                                        <a class="dropdown-item text-sm" href="javascript:void(0)"
+                                            onclick="viewBill('{{ Hashids::encode($row->id) }}')" title="view bill">
+                                            <i class="fas fa-eye text-primary"></i>
+                                            View Bill
+                                        </a>
                                     </li>
-                                @endif
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                                    <li>
+                                        <a class="dropdown-item text-sm" href="#" data-bs-toggle="modal"
+                                            data-bs-target="#editBillModal"
+                                            onclick="openEditBillModal('{{ Hashids::encode($row->id) }}')">
+                                            <i class="fas fa-pencil text-info"></i>
+                                            Edit Bill
+                                        </a>
+                                    </li>
+                                    @if ($row->total_paid == 0 && $row->status == 'active')
+                                    <li>
+                                        <a href="#" class="dropdown-item cancel-btn"
+                                            data-id="{{ Hashids::encode($row->id) }}"
+                                            data-control="{{ strtoupper($row->control_number) }}"
+                                            data-service="{{ $row->service_name }}"
+                                            data-amount="{{ number_format($billed) }}" data-bs-toggle="modal"
+                                            data-bs-target="#cancelBillModal">
+                                            <i class="fas fa-ban text-danger"></i> Cancel Bill
+                                        </a>
+                                    </li>
+                                    @endif
+                                    @if ($row->status == 'active')
+                                    <li>
+                                        <form
+                                            action="{{ route('bills.resend', ['bill' => Hashids::encode($row->id)]) }}"
+                                            class="dropdown-item" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn p-1 m-0 text-sm"
+                                                onclick="return confirm('Are you sure you want to resend this bill?')">
+                                                <i class="fas fa-refresh text-success"></i>
+                                                Resend SMS
+                                            </button>
+                                        </form>
+                                    </li>
+                                    @endif
+                                </ul>
+                            </li>
+                            @if ($row->status == 'active')
+                            <li>
+                                <button type="button" class="btn btn-info btn-pay btn-xs" data-bs-toggle="modal"
+                                    data-bs-target="#addPaymentModal" data-bill-id="{{ Hashids::encode($row->id) }}"
+                                    data-student-id="{{ $row->student_id }}"
+                                    data-student-name="{{ ucwords(strtolower($row->student_first_name . ' ' . $row->student_middle_name . ' ' . $row->student_last_name)) }}"
+                                    data-control-number="{{ strtoupper($row->control_number) }}"
+                                    data-academic-year="{{ $row->academic_year }}"
+                                    data-class="{{ strtoupper($row->class_code) }}"
+                                    data-service="{{ ucwords(strtolower($row->service_name)) }}"
+                                    data-billed="{{ $billed }}" data-paid="{{ $paid }}" data-balance="{{ $balance }}">
+                                    <i class="fas fa-credit-card"></i> Pay
+                                </button>
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="11" class="text-center py-4">
-                        @if (request('search'))
-                            No records found for "{{ request('search') }}"
-                        @else
-                            No records found
-                        @endif
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="11" class="text-center py-4">
+                    @if (request('search'))
+                    No records found for "{{ request('search') }}"
+                    @else
+                    No records found
+                    @endif
+                </td>
+            </tr>
             @endforelse
 
             <style>
@@ -180,6 +177,9 @@
                             <label>Control Number</label>
                             <input type="text" class="form-control-custom" name="control_number"
                                 id="edit_control_number">
+                            @error('control_number')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Student</label>
@@ -187,25 +187,37 @@
                                 name="student_id" required>
                                 <option value="">-- Select Student --</option>
                             </select>
+                            @error('student_id')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Service</label>
-                            <select class="form-control-custom text-capitalize" id="edit_service_id"
-                                name="service_id" required>
+                            <select class="form-control-custom text-capitalize" id="edit_service_id" name="service_id"
+                                required>
                                 <option value="">-- Select Service --</option>
                             </select>
+                            @error('service_id')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label>Billed Amount</label>
                             <input type="number" class="form-control-custom" id="edit_amount" name="amount">
+                            @error('amount')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Due Date</label>
                             <input type="date" class="form-control-custom" id="edit_due_date" name="due_date">
+                            @error('due_date')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label>Status</label>
@@ -216,17 +228,25 @@
                                 <option value="expired">Expired</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
+                            @error('status')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Academic Year</label>
-                            <input type="text" class="form-control-custom" id="academic_year"
-                                name="academic_year">
+                            <input type="text" class="form-control-custom" id="academic_year" name="academic_year">
+                            @error('academic_year')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label for="description">Bill Description</label>
-                            <input type="text" name="description" class="form-control-custom" id="description">
+                            <input type="text" required name="description" class="form-control-custom" id="description">
+                            @error('description')
+                            <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -261,8 +281,11 @@
                     <input type="hidden" id="cancelBillId">
                     <div class="mb-3">
                         <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
-                        <input type="text" name="reason" class="form-control-custom"
-                            placeholder="Enter cancel reason" required>
+                        <input type="text" name="reason" class="form-control-custom" placeholder="Enter cancel reason"
+                            required>
+                        @error('reason')
+                        <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                     <div class="small text-muted" id="billPreview"></div>
                     <div class="mb-3">
@@ -280,8 +303,7 @@
 </div>
 
 <!-- Bill Details Modal -->
-<div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white py-2">
@@ -290,8 +312,8 @@
                     Bill Details
                 </h6>
                 <div>
-                    <button type="button" class="btn btn-xs btn-light me-2" id="printBillBtn"
-                        style="display: none;" onclick="printInvoice()">
+                    <button type="button" class="btn btn-xs btn-light me-2" id="printBillBtn" style="display: none;"
+                        onclick="printInvoice()">
                         <i class="fas fa-print me-1"></i> Print
                     </button>
                     <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">

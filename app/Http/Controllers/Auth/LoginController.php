@@ -108,7 +108,7 @@ class LoginController extends Controller
                     Auth::logout();
                     Session::invalidate();
                     // Log::error("Finance token acquisition failed for user: {$user->id}");
-                    return to_route('login')->with('error', 'Unable to connect to finance service. Please try again.');
+                    return back()->with('error', 'Unable to connect to finance service. Please try again.');
                 }
 
                 // Log::info("Finance API token acquired for user: {$user->id}");

@@ -2361,7 +2361,7 @@ class BillsController extends Controller
             'status' => 'required',
             'control_number' => 'nullable|string',
             'academic_year' => 'required|date_format:Y',
-            'description' => 'nullable|string|max:100',
+            'description' => 'required|string',
         ]);
 
         $date = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');

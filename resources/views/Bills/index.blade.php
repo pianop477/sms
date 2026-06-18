@@ -473,7 +473,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="description" class="form-label">Bill Description </label>
-                                <input type="text" name="description" class="form-control-custom" id="description"
+                                <input type="text" required name="description" class="form-control-custom" id="description"
                                     placeholder="Enter Description" value="{{ old('description') }}">
                                 @error('description')
                                     <div class="text-danger small">{{ $message }}</div>
