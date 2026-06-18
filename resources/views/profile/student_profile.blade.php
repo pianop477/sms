@@ -59,15 +59,15 @@
 
         /* SIMPLE BUTTONS - Large and clear */
         .btn-simple {
-            border-radius: 8px;
-            padding: 10px 16px;
+            border-radius: 6px;
+            padding: 5px 8px;
             font-weight: 500;
             font-size: 0.9rem;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 2px;
             cursor: pointer;
             border: none;
         }
@@ -457,7 +457,7 @@
                         <h5 class="profile-name">
                             {{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}
                         </h5>
-                        <p class="mb-0 small text-warning">
+                        <p class="mb-0 small text-white">
                             <i class="fas fa-id-card"></i>
                             <strong>Admission No: {{ strtoupper($students->admission_number) }}</strong>
                         </p>
@@ -466,12 +466,12 @@
                     <div class="p-3">
                         <!-- Action Buttons -->
                         <div class="d-flex gap-2 mb-3">
-                            <button class="btn-simple btn-danger flex-fill" onclick="showImage('{{ $avatarImage }}')">
+                            <button class="btn-simple btn-danger flex-fill btn-xs" onclick="showImage('{{ $avatarImage }}')">
                                 <i class="fas fa-image"></i> View Photo
                             </button>
                             <a href="{{ route('student.profile.picture', ['student' => Hashids::encode($students->id)]) }}"
-                               class="btn-simple btn-success flex-fill text-decoration-none">
-                                <i class="fas fa-download"></i> Download
+                               class="btn-simple btn-success btn-xs flex-fill text-decoration-none">
+                                <i class="fas fa-download"></i> Download Photo
                             </a>
                         </div>
 
@@ -692,28 +692,29 @@
 
                         <!-- E-LIBRARY TAB -->
                         <div id="tab-library" class="tab-content">
-                            <h6 class="fw-bold mb-3"><i class="fas fa-layer-group text-primary"></i> Learning Materials</h6>
+                            <h6 class="fw-bold mb-3"><i class="fas fa-layer-group text-primary"></i> Holiday Packages and other Materials</h6>
                             @if($packages->isEmpty())
                                 <div class="text-center py-4">
                                     <i class="fas fa-folder-open fa-3x text-muted mb-2"></i>
-                                    <p class="text-muted">No learning materials available yet</p>
+                                    <p class="text-muted text-danger">No resources are found!</p>
                                 </div>
                             @else
                                 <div class="packages-container">
                                     <table class="packages-table">
                                         <thead>
-                                            <tr><th>Title</th><th>Term</th><th>Status</th><th>Action</th></tr>
+                                            <tr><th>Title</th><th>Term</th><th>Year</th><th>Status</th><th>Action</th></tr>
                                         </thead>
                                         <tbody>
                                             @foreach($packages as $item)
                                             <tr>
                                                 <td>{{ ucwords(strtolower($item->title)) }}</td>
-                                                <td>Term {{ $item->term }}</td>
+                                                <td>Term {{ strtoupper($item->term) }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('F, Y') }}</td>
                                                 <td>@if($item->is_active)<span class="badge-simple badge-active">Active</span>@else<span class="badge-simple badge-inactive">Locked</span>@endif</td>
                                                 <td>
                                                     @if($item->is_active)
                                                     <a href="{{ route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true]) }}"
-                                                       class="btn-simple btn-primary" style="padding: 6px 12px; font-size: 0.75rem;" target="_blank">
+                                                       class="btn-simple btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">
                                                         <i class="fas fa-download"></i> Download
                                                     </a>
                                                     @else

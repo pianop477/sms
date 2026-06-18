@@ -1387,8 +1387,8 @@ class StudentsController extends Controller
         // fetch active holiday package
         $packages = holiday_package::where('school_id', $user->school_id)
             ->where('class_id', $class->id)
-            // ->where('is_active', true)
-            ->whereYear('year', date('Y'))
+            ->where('is_active', true)
+            // ->whereYear('year', date('Y'))
             ->orderBy('created_at', 'DESC')
             ->orderBy('updated_at', 'DESC')
             ->take(6)
