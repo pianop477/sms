@@ -33,6 +33,7 @@ use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SalarySlipVerificationController;
 use App\Http\Controllers\SchoolsController;
+use App\Http\Controllers\Api\OfflineTokenController;
 use App\Http\Controllers\SendMessageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SmsController;
@@ -508,8 +509,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     // 6. ROUTE ACCESS FOR CLASS TEACHER ONLY ============================================================================================
     Route::middleware(['CheckUsertype:3'])->group(function () {
         Route::middleware('CheckRoleType:4')->group(function () {
-            Route::get('{class}/Student-list', [AttendanceController::class, 'index'])->name('get.student.list');
-            Route::post('{student_class}/Create-Attendance', [AttendanceController::class, 'store'])->name('store.attendance');
+            Route::get('attendance/{class}/student-list', [AttendanceController::class, 'index'])->name('get.student.list');
+            Route::post('attendance/{student_class}/create', [AttendanceController::class, 'store'])->name('store.attendance');
             Route::get('{class}/Class-attendance', [AttendanceController::class, 'teacherAttendance'])->name('teachers.show.attendance');
             Route::get('{class}/Download-Attendance-PDF', [AttendanceController::class, 'downloadAttendancePDF'])->name('download.attendance.pdf');
             Route::get('{class}/Generate-attendance-report', [AttendanceController::class, 'getFormReport'])->name('attendance.get.form');
@@ -785,7 +786,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 // Token Verification Routes
 Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])->name('tokens.verify')->middleware('throttle:30,1');
 Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])->name('tokens.verify.submit')->middleware('throttle:30,1');
-Route::get('/offline/tokens', [OfflineTokenController::class, 'getAllTokens'])->middleware('throttle:30,1');
+Route::get('/offline/tokens', [Api\OfflineTokenController::class, 'getAllTokens'])->middleware('throttle:30,1');
 
 // Token resend routes
 Route::post('/tokens/resend', [TokenController::class, 'resendToken'])->name('tokens.resend');

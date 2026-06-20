@@ -41,6 +41,29 @@
         gap: 10px;
     }
 
+    .class-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .class-selector select {
+        border: 1px solid #e9ecef;
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-weight: 600;
+        background: white;
+        color: #2b2d42;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .class-selector select:focus {
+        outline: none;
+        border-color: var(--primary-hex);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
     .student-entry {
         background: white;
         border-radius: 14px;
@@ -196,7 +219,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 9999;
         display: none;
         justify-content: center;
@@ -210,10 +233,20 @@
         text-align: center;
     }
 
-    /* Date picker disabled style */
     input[type="date"]:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+
+    /* Debugging banner - remove in production */
+    .debug-banner {
+        background: #fff3cd;
+        color: #856404;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        display: none;
     }
 </style>
 
@@ -223,7 +256,13 @@
         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:12px;">
         <div>
             <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill">ATTENDANCE MODULE</span>
-            <h1 class="fw-800 display-6 m-0 text-white">{{ strtoupper($student_class->class_name) }}</h1>
+            <h1 class="fw-800 display-6 m-0 text-white">
+                @if($myClasses->count() > 1)
+                    <span id="classDisplayName">{{ strtoupper($student_class->class_name) }}</span>
+                @else
+                    {{ strtoupper($student_class->class_name) }}
+                @endif
+            </h1>
             <p class="text-white mt-1">Manage and track daily student Attendance</p>
         </div>
         <div class="text-end">
@@ -232,10 +271,39 @@
         </div>
     </div>
 
-    @if (!$attendanceExists)
-        {{-- Floating Action Bar --}}
-        <div class="action-bar px-4">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
+    {{-- Filter Bar - Always visible --}}
+    <div class="action-bar px-4">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <!-- Class Selector Dropdown (Always visible) -->
+            <div class="class-selector">
+                <i class="fas fa-chalkboard text-muted"></i>
+                <select id="classSelector" onchange="switchClass(this.value)">
+                    @foreach($myClasses as $cls)
+                        @php
+                            $grade = $cls->grade;
+                            $encodedClassTeacherId = \Vinkla\Hashids\Facades\Hashids::encode($cls->id);
+                        @endphp
+                        <option value="{{ $encodedClassTeacherId }}"
+                            {{ $selectedClassTeacher->id == $cls->id ? 'selected' : '' }}>
+                            {{ strtoupper($grade->class_name ?? 'Unknown') }} ({{ strtoupper($cls->group) }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Date Picker --}}
+            <form action="{{ route('get.student.list', ['class' => $class]) }}"
+                method="GET" id="dateForm" class="me-2">
+                <input type="date"
+                       name="attendance_date"
+                       value="{{ $selectedDate }}"
+                       min="{{ $minDate }}"
+                       max="{{ $maxDate }}"
+                       class="form-control form-control-sm border-0 bg-transparent fw-bold text-primary"
+                       onchange="validateAndSubmit(this)">
+            </form>
+
+            @if (!$attendanceExists)
                 <div class="d-flex align-items-center bg-light rounded-pill px-3 py-1">
                     <i class="fas fa-users text-muted me-2 small"></i>
                     <span class="fw-bold small">{{ count($studentList) }} Students</span>
@@ -244,27 +312,24 @@
                     <span id="pCount">0</span> marked present |
                     <span id="unselectedCount" class="text-danger">0</span> pending
                 </div>
-            </div>
+            @endif
 
-            <div class="d-flex gap-2 align-items-center flex-wrap">
-                <form action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->id)]) }}"
-                    method="GET" id="dateForm" class="me-2">
-                    <input type="date"
-                           name="attendance_date"
-                           value="{{ $selectedDate }}"
-                           min="{{ $minDate }}"
-                           max="{{ $maxDate }}"
-                           class="form-control form-control-sm border-0 bg-transparent fw-bold text-primary"
-                           onchange="validateAndSubmit(this)">
-                </form>
+            {{-- Status badge --}}
+            @if($attendanceExists)
+                <span class="badge bg-success text-white px-3 py-2">
+                    <i class="fas fa-check-circle me-1"></i> Attendance Submitted
+                </span>
+            @endif
+        </div>
 
-                <!-- Desktop Select All Button -->
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            @if (!$attendanceExists)
+                <!-- Select All Buttons -->
                 <button class="btn btn-link text-dark text-decoration-none fw-bold small select-all-desktop"
                     id="markAllBtn" type="button">
                     <i class="fas fa-check-double"></i> Select All Present
                 </button>
 
-                <!-- Mobile Select All Button -->
                 <button class="btn btn-outline-success btn-sm select-all-mobile"
                     id="markAllBtnMobile" type="button">
                     <i class="fas fa-check-double"></i> All Present
@@ -273,9 +338,16 @@
                 <button type="button" id="submitBtn" class="btn btn-titan shadow-sm" disabled>
                     <i class="fas fa-send"></i> Submit Report
                 </button>
-            </div>
+            @else
+                <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Dashboard
+                </a>
+            @endif
         </div>
+    </div>
 
+    {{-- Main Content --}}
+    @if (!$attendanceExists)
         {{-- Loading Overlay --}}
         <div class="loading-overlay" id="loadingOverlay">
             <div class="loading-spinner">
@@ -339,13 +411,8 @@
             </div>
             <h2 class="fw-800">Attendance Already Submitted!</h2>
             <p class="text-muted">The attendance report for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('l, F d, Y') }}</strong> has already been synchronized with the database.</p>
-            <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{{ route('get.student.list', ['class' => $class]) }}" class="btn btn-titan px-4">
-                    <i class="fas fa-calendar-day me-2"></i> Today
-                </a>
-                <a href="{{ route('home') }}" class="btn btn-outline-secondary px-4">
-                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-                </a>
+            <div class="mt-3">
+                <small class="text-muted">You can still change the date or class using the filters above.</small>
             </div>
         </div>
     @endif
@@ -353,6 +420,83 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Debugging - show class info
+    document.addEventListener("DOMContentLoaded", function() {
+        const debugBanner = document.getElementById('debugBanner');
+        const debugInfo = document.getElementById('debugInfo');
+
+        // Show debug info (remove in production)
+        const selectedClassId = "{{ $class }}";
+        const selectedDate = "{{ $selectedDate }}";
+        const attendanceExists = {{ $attendanceExists ? 'true' : 'false' }};
+        const studentCount = {{ count($studentList) }};
+
+        debugInfo.innerHTML = `
+            Class: ${selectedClassId} |
+            Date: ${selectedDate} |
+            Attendance: ${attendanceExists ? 'Submitted' : 'Not Submitted'} |
+            Students: ${studentCount}
+        `;
+        debugBanner.style.display = 'block';
+
+        // Auto-hide debug after 5 seconds
+        setTimeout(() => {
+            debugBanner.style.display = 'none';
+        }, 5000);
+    });
+
+    // Switch class function - FIXED
+    function switchClass(classTeacherId) {
+        // Get current date from the form
+        const dateInput = document.querySelector('input[name="attendance_date"]');
+        const currentDate = dateInput ? dateInput.value : '';
+
+        // Build URL with class teacher ID as route parameter
+        let url = "{{ route('get.student.list', ['class' => '__CLASS_ID__']) }}";
+        url = url.replace('__CLASS_ID__', classTeacherId);
+
+        // Add date parameter if exists
+        if (currentDate) {
+            url += '?attendance_date=' + currentDate;
+        }
+
+        console.log('Switching to class:', classTeacherId, 'URL:', url);
+        window.location.href = url;
+    }
+
+    // Date validation
+    function validateAndSubmit(input) {
+        const selectedDate = new Date(input.value + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate.getDay() === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date',
+                text: 'Attendance cannot be taken on Sundays (school holiday). Please select another date.',
+                confirmButtonColor: '#4361ee'
+            });
+            input.value = '';
+            return false;
+        }
+
+        const diffDays = Math.floor((today - selectedDate) / (1000 * 60 * 60 * 24));
+        if (diffDays > 7) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Date Too Old',
+                text: 'You can only take attendance for dates within the last 7 days.',
+                confirmButtonColor: '#4361ee'
+            });
+            input.value = '';
+            return false;
+        }
+
+        input.form.submit();
+    }
+
+    // Rest of your JavaScript (updateStats, selectAll, submit, etc.)
     document.addEventListener("DOMContentLoaded", function() {
         const inputs = document.querySelectorAll('.status-input');
         const pCountLabel = document.getElementById('pCount');
@@ -364,6 +508,8 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
 
         function updateStats() {
+            if (!inputs.length) return;
+
             const presentCount = document.querySelectorAll('.status-input[value="present"]:checked').length;
             const absentCount = document.querySelectorAll('.status-input[value="absent"]:checked').length;
             const permitCount = document.querySelectorAll('.status-input[value="permission"]:checked').length;
@@ -371,12 +517,9 @@
             const totalStudents = {{ count($studentList) }};
             const unselectedCount = totalStudents - totalSelected;
 
-            pCountLabel.innerText = presentCount;
-            if (unselectedCountSpan) {
-                unselectedCountSpan.innerText = unselectedCount;
-            }
+            if (pCountLabel) pCountLabel.innerText = presentCount;
+            if (unselectedCountSpan) unselectedCountSpan.innerText = unselectedCount;
 
-            // Highlight unselected student rows
             document.querySelectorAll('.student-entry').forEach(entry => {
                 const radioGroup = entry.querySelectorAll('.status-input');
                 let isSelected = false;
@@ -391,7 +534,6 @@
                 }
             });
 
-            // Enable/disable submit button based on all selections
             if (submitBtn) {
                 if (unselectedCount === 0 && totalStudents > 0) {
                     submitBtn.disabled = false;
@@ -407,7 +549,6 @@
             input.addEventListener('change', updateStats);
         });
 
-        // Select All as Present
         function selectAllPresent() {
             document.querySelectorAll('.status-input[value="present"]').forEach(radio => {
                 radio.checked = true;
@@ -442,7 +583,6 @@
             });
         }
 
-        // Form submission
         if (submitBtn && mainForm) {
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -486,42 +626,8 @@
             });
         }
 
-        updateStats();
+        if (inputs.length) updateStats();
     });
-
-    // Date validation on change
-    function validateAndSubmit(input) {
-        const selectedDate = new Date(input.value + 'T00:00:00');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // Check if Sunday (day 0)
-        if (selectedDate.getDay() === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Date',
-                text: 'Attendance cannot be taken on Sundays (school holiday). Please select another date.',
-                confirmButtonColor: '#4361ee'
-            });
-            input.value = '';
-            return false;
-        }
-
-        // Check if more than 7 days ago
-        const diffDays = Math.floor((today - selectedDate) / (1000 * 60 * 60 * 24));
-        if (diffDays > 7) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Date Too Old',
-                text: 'You can only take attendance for dates within the last 7 days.',
-                confirmButtonColor: '#4361ee'
-            });
-            input.value = '';
-            return false;
-        }
-
-        input.form.submit();
-    }
 </script>
 
 @endsection

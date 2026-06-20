@@ -29,20 +29,34 @@ class AttendanceController extends Controller
 
     public function index($class, Request $request)
     {
-        $id = Hashids::decode($class);
+        // Decode class_teacher ID from URL
+        $decoded = Hashids::decode($class);
+        if (empty($decoded)) {
+            Alert()->toast('Invalid class identifier.', 'error');
+            return redirect()->route('home');
+        }
+        $classTeacherId = $decoded[0];
+
         $user = Auth::user();
         $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
 
-        // Get class teacher record
-        $myClass = Class_teacher::findOrFail($id[0]);
-        $teacher = Teacher::findOrFail($myClass->teacher_id);
+        // Get the specific class teacher record
+        $myClass = Class_teacher::with('grade')
+            ->where('id', $classTeacherId)
+            ->where('teacher_id', $teacherLoggedIn->id)
+            ->first();
 
-        // Verify teacher is the class teacher
-        if ($teacherLoggedIn->id != $teacher->id) {
-            Alert()->toast('You are not the class teacher for this class', 'error');
-            return back();
+        if (!$myClass) {
+            Alert()->toast('You are not assigned to this class.', 'error');
+            return redirect()->route('home');
         }
 
+        // Get all classes assigned to this teacher (for dropdown)
+        $myClasses = Class_teacher::where('teacher_id', '=', $teacherLoggedIn->id)
+            ->with('grade')
+            ->get();
+
+        $teacher = Teacher::findOrFail($myClass->teacher_id);
         $student_class = Grade::findOrFail($myClass->class_id);
 
         // Get selected date from request, default to today
@@ -51,22 +65,18 @@ class AttendanceController extends Controller
         $today = Carbon::now();
 
         // ============ DATE VALIDATIONS ============
-        // 1. Check if date is in the future
-        if ($selectedCarbon->isFuture()) {
-            Alert()->toast('You cannot take attendance for future dates.', 'error');
-            return redirect()->route('get.student.list', ['class' => $class]);
-        }
+        $dateError = null;
+        // if ($selectedCarbon->isFuture()) {
+        //     $dateError = 'You cannot take attendance for future dates.';
+        // } elseif ($selectedCarbon->dayOfWeek == 0) {
+        //     $dateError = 'Attendance cannot be taken on Sundays (school holiday).';
+        // } elseif ($selectedCarbon->diffInDays($today) > 7) {
+        //     $dateError = 'You can only take attendance for dates within the last 7 days.';
+        // }
 
-        // 2. Check if date is Sunday (day of week = 0)
-        if ($selectedCarbon->dayOfWeek == 0) {
-            Alert()->toast('Attendance cannot be taken on Sundays (school holiday).', 'error');
-            return redirect()->route('get.student.list', ['class' => $class]);
-        }
-
-        // 3. Check if date is more than 7 days ago
-        if ($selectedCarbon->diffInDays($today) > 7) {
-            Alert()->toast('You can only take attendance for dates within the last 7 days.', 'error');
-            return redirect()->route('get.student.list', ['class' => $class]);
+        if ($dateError) {
+            Alert()->toast($dateError, 'error');
+            return redirect()->route('home');  // ← FIXED: Redirect to home, not back to itself
         }
         // ============ END VALIDATIONS ============
 
@@ -98,7 +108,8 @@ class AttendanceController extends Controller
         $maxDate = Carbon::now()->format('Y-m-d');
 
         return view('Attendance.index', [
-            'myClass' => $myClass,
+            'myClasses' => $myClasses,
+            'selectedClassTeacher' => $myClass,
             'teacher' => $teacher,
             'student_class' => $student_class,
             'studentList' => $studentList,
@@ -111,19 +122,9 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating the resource.
-     */
-    public function create(): never
-    {
-        abort(404);
-    }
-
-    /**
-     * Store the newly created resource in storage.
-     */
     public function store(Request $request, $student_class)
     {
+        // ... (store method unchanged, but include it for completeness)
         $id = Hashids::decode($student_class);
         $user = Auth::user();
 
@@ -133,30 +134,23 @@ class AttendanceController extends Controller
         $logged_user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
 
-        // ============ DATE VALIDATIONS ============
+        // Date validations
         $selectedCarbon = Carbon::parse($attendanceDate);
         $today = Carbon::now();
 
-        // 1. Check if date is in the future
         if ($selectedCarbon->isFuture()) {
             Alert()->toast('You cannot submit attendance for future dates.', 'error');
             return back();
         }
-
-        // 2. Check if date is Sunday
         if ($selectedCarbon->dayOfWeek == 0) {
             Alert()->toast('Attendance cannot be submitted for Sundays.', 'error');
             return back();
         }
-
-        // 3. Check if date is more than 7 days ago
         if ($selectedCarbon->diffInDays($today) > 7) {
             Alert()->toast('You can only submit attendance for dates within the last 7 days.', 'error');
             return back();
         }
-        // ============ END VALIDATIONS ============
 
-        // Check if the teacher logged in is the class teacher
         $class_teacher = Class_teacher::where('class_id', '=', $class_id)
             ->where('teacher_id', '=', $teacher->id)
             ->first();
@@ -166,7 +160,6 @@ class AttendanceController extends Controller
             return back();
         }
 
-        // Get the students in the class
         $students = Student::where('class_id', '=', $class_id)
             ->where('school_id', $user->school_id)
             ->where('graduated', 0)
@@ -178,7 +171,6 @@ class AttendanceController extends Controller
             return back();
         }
 
-        // Validate the request data
         $validator = Validator::make($request->all(), [
             'student_id' => 'required|array',
             'student_id.*' => 'required|integer|exists:students,id',
@@ -191,7 +183,6 @@ class AttendanceController extends Controller
         $attendance_status = $request->input('attendance_status');
         $class_group = $request->input('group');
 
-        // Ensure each student has a status
         foreach ($student_ids as $student_id) {
             if (!isset($attendance_status[$student_id])) {
                 $validator->errors()->add('attendance_status.' . $student_id, 'The attendance status for student ' . $student_id . ' is required.');
@@ -202,7 +193,6 @@ class AttendanceController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Check if attendance already exists
         $existingAttendance = Attendance::whereIn('student_id', $student_ids)
             ->where('attendance_date', '=', $attendanceDate)
             ->pluck('student_id')
@@ -213,7 +203,7 @@ class AttendanceController extends Controller
             return back();
         }
 
-        // ============ E-PERMIT LOGIC ============
+        // E-Permit logic
         $activePermits = EPermit::whereIn('student_id', $student_ids)
             ->where('status', 'approved')
             ->whereDate('departure_date', '<=', $attendanceDate)
@@ -222,19 +212,13 @@ class AttendanceController extends Controller
             ->get()
             ->keyBy('student_id');
 
-        $overrides = [];
-
-        // Save the attendance data
         $attendanceData = [];
         foreach ($student_ids as $studentId) {
             $selectedStatus = $attendance_status[$studentId];
             $finalStatus = $selectedStatus;
 
-            // Check if student has an ACTIVE permit
             if (isset($activePermits[$studentId])) {
-                $permit = $activePermits[$studentId];
                 $finalStatus = 'permission';
-                $overrides[] = $permit->permit_number;
             }
 
             $attendanceData[] = [

@@ -2175,13 +2175,16 @@
                             <div class="stat-card bg-student text-white">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Students</div>
-                                            @foreach ($classData as $data)
-                                                <div class="card-value">{{ $data['maleCount'] + $data['femaleCount'] }}
-                                                </div>
-                                            @endforeach
-                                        </div>
+                                        @php
+                                                $totalMale = collect($classData)->sum('maleCount');
+                                                $totalFemale = collect($classData)->sum('femaleCount');
+                                                $totalStudents = $totalMale + $totalFemale;
+                                            @endphp
+
+                                            <div class="col mr-2">
+                                                <div class="card-title">Total students</div>
+                                                <div class="card-value">{{ $totalStudents }}</div>
+                                            </div>
                                         <div class="col-auto">
                                             <i class="fas fa-users card-icon"></i>
                                         </div>
@@ -2316,53 +2319,6 @@
                                             @endforelse
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts for Class Teacher with Fixed Heights -->
-                <div class="col-lg-12 mb-4">
-                    <div class="row">
-                        <div class="col-xl-6 mb-4">
-                            <div class="chart-container chart-card-fixed">
-                                <div class="chart-header">
-                                    <h5 class="chart-title">
-                                        <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
-                                    </h5>
-                                    <p class="chart-subtitle">Male vs Female students in your class</p>
-                                </div>
-                                <div class="chart-wrapper">
-                                    <canvas id="genderDistributionChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-6 mb-4">
-                            <div class="chart-container chart-card-fixed">
-                                <div class="chart-header">
-                                    <h5 class="chart-title">
-                                        <i class="fas fa-calendar-check me-2"></i> Today's Attendance
-                                        @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                                            <span class="badge bg-success text-white ms-2">Live</span>
-                                        @else
-                                            <span class="badge bg-secondary ms-2 text-white">No Data</span>
-                                        @endif
-                                    </h5>
-                                    <p class="chart-subtitle">{{ \Carbon\Carbon::today()->format('d-m-Y') }}</p>
-                                </div>
-                                <div class="chart-wrapper" style="min-height: 250px;">
-                                    @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                                        <canvas id="attendanceChart"></canvas>
-                                    @else
-                                        <div
-                                            class="no-data-placeholder d-flex flex-column align-items-center justify-content-center h-100 py-5">
-                                            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
-                                            <p class="text-muted text-center mb-0">No attendance records for today</p>
-                                            <small class="text-muted">Collect attendance now</small>
-                                        </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>

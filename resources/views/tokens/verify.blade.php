@@ -769,7 +769,7 @@
         async function refreshOfflineTokens() {
             if (!navigator.onLine) return;
             try {
-                const response = await fetch('/api/offline/tokens');
+                const response = await fetch('/offline/tokens');
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success && data.tokens && navigator.serviceWorker.controller) {
