@@ -338,8 +338,9 @@
                 </td>
                 <td class="photo-cell">
                     @php
-                        $studentImage = storage_path('app/public/students/' . ($students->image ?? 'student.jpg'));
-                        $hasImage = file_exists($studentImage) && !empty($students->image);
+                        $studentImage = storage_path('app/public/students/' . ($studentData->image ?? 'student.jpg'));
+                        $hasImage = file_exists($studentImage) && !empty($studentData->image);
+
                     @endphp
                     <img src="{{ $studentImage }}" class="student-photo" alt="Student Photo">
                 </td>

@@ -43,7 +43,7 @@ class RolesController extends Controller
             ->where('teachers.status', '=', 1)
             ->where('users.status', '=', 1)
             ->where('teachers.school_id', '=', Auth::user()->school_id)
-            ->whereNotIn('role_id', [2, 3, 4])
+            ->whereNotIn('role_id', [2, 3])
             ->orderBy('users.first_name')
             ->get();
 
@@ -98,13 +98,13 @@ class RolesController extends Controller
         ]);
 
         // Check if the selected teacher is already assigned to another class in the same school
-        $ifExisting = Class_teacher::where('teacher_id', $request->teacher)
-            ->where('school_id', Auth::user()->school_id)
-            ->exists();
-        if ($ifExisting) {
-            Alert()->toast('Selected Teacher already assigned in another class', 'error');
-            return back();
-        }
+        // $ifExisting = Class_teacher::where('teacher_id', $request->teacher)
+        //     ->where('school_id', Auth::user()->school_id)
+        //     ->exists();
+        // if ($ifExisting) {
+        //     Alert()->toast('Selected Teacher already assigned in another class', 'error');
+        //     return back();
+        // }
 
         // Check if the selected teacher has a conflicting role
         $ifTeacherHasRole = Teacher::where('id', $request->teacher)
@@ -120,8 +120,8 @@ class RolesController extends Controller
             ->where('group', $request->group)
             ->where('school_id', Auth::user()->school_id)
             ->count();
-        if ($teacherCount >= 2) {
-            Alert()->toast('Maximum number of class teachers has reached to 2', 'error');
+        if ($teacherCount >= 3) {
+            Alert()->toast('Maximum number of class teachers has reached to 3 per class', 'error');
             return back();
         }
 

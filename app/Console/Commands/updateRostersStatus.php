@@ -375,12 +375,12 @@ class updateRostersStatus extends Command
                         continue;
                     }
 
-                    $response = $sms->sendSmsByNext(
-                        $school->sender_id ?? 'SHULE APP',
-                        $formattedPhone,
-                        $message,
-                        'academic_' . $type . '_' . time() . '_' . $user->id
-                    );
+                    // $response = $sms->sendSmsByNext(
+                    //     $school->sender_id ?? 'SHULE APP',
+                    //     $formattedPhone,
+                    //     $message,
+                    //     'academic_' . $type . '_' . time() . '_' . $user->id
+                    // );
 
                     $this->line("  ✓ SMS imetumwa kwa {$user->first_name} ({$formattedPhone})");
                     $successCount++;

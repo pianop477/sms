@@ -33,10 +33,11 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
 
+        // Get class teacher record
         $myClass = Class_teacher::findOrFail($id[0]);
         $teacher = Teacher::findOrFail($myClass->teacher_id);
 
-        // Hakikisha mwalimu aliyeingia ndiye class teacher
+        // Verify teacher is the class teacher
         if ($teacherLoggedIn->id != $teacher->id) {
             Alert()->toast('You are not the class teacher for this class', 'error');
             return back();
@@ -44,28 +45,57 @@ class AttendanceController extends Controller
 
         $student_class = Grade::findOrFail($myClass->class_id);
 
-        // Chagua tarehe kutoka kwa request, default iwe leo
+        // Get selected date from request, default to today
         $selectedDate = $request->input('attendance_date', Carbon::now()->format('Y-m-d'));
+        $selectedCarbon = Carbon::parse($selectedDate);
+        $today = Carbon::now();
 
-        // Angalia kama attendance ipo tayari kwa hiyo tarehe
+        // ============ DATE VALIDATIONS ============
+        // 1. Check if date is in the future
+        if ($selectedCarbon->isFuture()) {
+            Alert()->toast('You cannot take attendance for future dates.', 'error');
+            return redirect()->route('get.student.list', ['class' => $class]);
+        }
+
+        // 2. Check if date is Sunday (day of week = 0)
+        if ($selectedCarbon->dayOfWeek == 0) {
+            Alert()->toast('Attendance cannot be taken on Sundays (school holiday).', 'error');
+            return redirect()->route('get.student.list', ['class' => $class]);
+        }
+
+        // 3. Check if date is more than 7 days ago
+        if ($selectedCarbon->diffInDays($today) > 7) {
+            Alert()->toast('You can only take attendance for dates within the last 7 days.', 'error');
+            return redirect()->route('get.student.list', ['class' => $class]);
+        }
+        // ============ END VALIDATIONS ============
+
+        // Check if attendance already exists for this date
         $attendanceExists = Attendance::where('class_id', $student_class->id)
             ->where('class_group', $myClass->group)
             ->where('attendance_date', $selectedDate)
             ->where('school_id', $user->school_id)
             ->exists();
 
-        // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
-        $studentList = Student::query()
-            ->join('grades', 'grades.id', '=', 'students.class_id')
-            ->select('students.*', 'grades.class_code')
-            ->where('class_id', '=', $student_class->id)
-            ->where('group', '=', $myClass->group)
-            ->where('students.status', '=', 1)
-            ->where('students.school_id', '=', $user->school_id)
-            ->where('graduated', 0)
-            ->orderBy('gender', 'ASC')
-            ->orderBy('first_name', 'ASC')
-            ->get();
+        // Get students only if attendance doesn't exist
+        $studentList = [];
+        if (!$attendanceExists) {
+            $studentList = Student::query()
+                ->join('grades', 'grades.id', '=', 'students.class_id')
+                ->select('students.*', 'grades.class_code')
+                ->where('class_id', '=', $student_class->id)
+                ->where('group', '=', $myClass->group)
+                ->where('students.status', '=', 1)
+                ->where('students.school_id', '=', $user->school_id)
+                ->where('graduated', 0)
+                ->orderBy('gender', 'ASC')
+                ->orderBy('first_name', 'ASC')
+                ->get();
+        }
+
+        // Prepare min and max dates for the date picker
+        $minDate = Carbon::now()->subDays(7)->format('Y-m-d');
+        $maxDate = Carbon::now()->format('Y-m-d');
 
         return view('Attendance.index', [
             'myClass' => $myClass,
@@ -75,6 +105,9 @@ class AttendanceController extends Controller
             'class' => $class,
             'attendanceExists' => $attendanceExists,
             'selectedDate' => $selectedDate,
+            'today' => $today,
+            'minDate' => $minDate,
+            'maxDate' => $maxDate,
         ]);
     }
 
@@ -99,6 +132,29 @@ class AttendanceController extends Controller
         $attendanceDate = $request->input('attendance_date');
         $logged_user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
+
+        // ============ DATE VALIDATIONS ============
+        $selectedCarbon = Carbon::parse($attendanceDate);
+        $today = Carbon::now();
+
+        // 1. Check if date is in the future
+        if ($selectedCarbon->isFuture()) {
+            Alert()->toast('You cannot submit attendance for future dates.', 'error');
+            return back();
+        }
+
+        // 2. Check if date is Sunday
+        if ($selectedCarbon->dayOfWeek == 0) {
+            Alert()->toast('Attendance cannot be submitted for Sundays.', 'error');
+            return back();
+        }
+
+        // 3. Check if date is more than 7 days ago
+        if ($selectedCarbon->diffInDays($today) > 7) {
+            Alert()->toast('You can only submit attendance for dates within the last 7 days.', 'error');
+            return back();
+        }
+        // ============ END VALIDATIONS ============
 
         // Check if the teacher logged in is the class teacher
         $class_teacher = Class_teacher::where('class_id', '=', $class_id)
@@ -158,12 +214,6 @@ class AttendanceController extends Controller
         }
 
         // ============ E-PERMIT LOGIC ============
-        // Get all permits that are active on this attendance date
-        // A permit is active if:
-        // 1. Status is 'approved' (head teacher approved)
-        // 2. Attendance date falls between departure_date and expected_return_date
-        // 3. Student hasn't returned yet (verified_at is null)
-
         $activePermits = EPermit::whereIn('student_id', $student_ids)
             ->where('status', 'approved')
             ->whereDate('departure_date', '<=', $attendanceDate)
@@ -172,35 +222,20 @@ class AttendanceController extends Controller
             ->get()
             ->keyBy('student_id');
 
-        // Get students who have completed return (already back)
-        $completedReturns = EPermit::whereIn('student_id', $student_ids)
-            ->where('status', 'completed')
-            ->whereDate('verified_at', '<=', $attendanceDate)
-            ->pluck('student_id')
-            ->toArray();
-
-        // Track overrides for summary
         $overrides = [];
-        $overriddenStudents = [];
 
         // Save the attendance data
         $attendanceData = [];
         foreach ($student_ids as $studentId) {
             $selectedStatus = $attendance_status[$studentId];
             $finalStatus = $selectedStatus;
-            $overrideReason = null;
 
             // Check if student has an ACTIVE permit
             if (isset($activePermits[$studentId])) {
                 $permit = $activePermits[$studentId];
                 $finalStatus = 'permission';
-                $overrideReason = "Active e-Permit: {$permit->permit_number} (Departure: {$permit->departure_date->format('d/m/Y')}, Return: {$permit->expected_return_date->format('d/m/Y')})";
-                $overrides[] = $overrideReason;
-                $overriddenStudents[] = $studentId;
+                $overrides[] = $permit->permit_number;
             }
-
-            // If student has completed return, use selected status (no override)
-            // This is automatically handled since $finalStatus remains $selectedStatus
 
             $attendanceData[] = [
                 'student_id' => $studentId,
@@ -216,24 +251,6 @@ class AttendanceController extends Controller
         }
 
         Attendance::insert($attendanceData);
-
-        // Prepare success message
-        // $overriddenCount = count($overrides);
-        // if ($overriddenCount > 0) {
-        //     $studentNames = Student::whereIn('id', $overriddenStudents)
-        //         ->get()
-        //         ->map(function ($student) {
-        //             return $student->first_name . ' ' . $student->last_name;
-        //         })
-        //         ->implode(', ');
-
-        //     Alert()->toast(
-        //         "Attendance saved. $overriddenCount student(s) with active e-Permit were automatically marked as 'permission': $studentNames",
-        //         'info'
-        //     );
-        // } else {
-
-        // }
 
         Alert()->toast('Attendance Submitted and Saved successfully', 'success');
         return redirect()->back();

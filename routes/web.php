@@ -861,9 +861,9 @@ Route::get('/verify-slip/{token}', [SalarySlipVerificationController::class, 've
     ->name('verify-slip');
 
 // Optional: Route for scanner page (if user manually goes to /verify-slip)
-Route::get('/verify-slip', function () {
-    return redirect()->route('scan.qr');
-});
+// Route::get('/verify-slip', function () {
+//     return redirect()->route('scan.qr');
+// });
 
 // Parent routes (no authentication required for submission)
 Route::prefix('e-permit')->name('parent.e-permit.')->group(function () {

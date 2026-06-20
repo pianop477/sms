@@ -16,10 +16,11 @@ use App\Models\school;
 use App\Models\Examination_result;
 use App\Models\generated_reports;
 use App\Models\Grade;
-use Hashids;
+// use Hashids;
+use Vinkla\Hashids\Facades\Hashids;
 use setasign\Fpdi\Fpdi;
-use Crypt;
-use DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -94,7 +95,7 @@ class GenerateBulkReportJob implements ShouldQueue
 
         // Temp folder for individual PDFs
         $tempDir = storage_path('app/temp_pdfs/' . uniqid());
-        if (!File::exists($tempDir)) File::makeDirectory($tempDir, 0777, true);
+        if (!File::exists($tempDir)) File::makeDirectory($tempDir, 0755, true);
 
         // ------------------- Pre-calculate rankings (once) -------------------
         $allResults = Examination_result::query()
@@ -329,7 +330,7 @@ class GenerateBulkReportJob implements ShouldQueue
 
         // Temp folder
         $tempDir = storage_path('app/temp_pdfs/' . uniqid());
-        if (!File::exists($tempDir)) File::makeDirectory($tempDir, 0777, true);
+        if (!File::exists($tempDir)) File::makeDirectory($tempDir, 0755, true);
 
         $processedCount = 0;
         foreach ($studentIds as $studentId) {
@@ -429,7 +430,7 @@ class GenerateBulkReportJob implements ShouldQueue
         }
 
         $mergedDir = storage_path('app/temp_merged');
-        if (!File::exists($mergedDir)) File::makeDirectory($mergedDir, 0777, true);
+        if (!File::exists($mergedDir)) File::makeDirectory($mergedDir, 0755, true);
         $mergedFile = $mergedDir . '/' . uniqid('merged_') . '.pdf';
         $pdf->Output($mergedFile, 'F');
         return $mergedFile;

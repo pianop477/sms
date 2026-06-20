@@ -3547,6 +3547,7 @@ class ResultsController extends Controller
         // Add class_name to studentData if not exists
         $studentData->class_name = $studentData->class_name ?? $results->first()->class_name ?? 'N/A';
         $studentData->school_name = $schoolInfo->school_name;
+        $studentData->image = $results->first()->image;
 
         // Generate QR code
         $qrPng = $this->generateQRForCombined($studentData, $reports, $schoolInfo, $totalScoreForStudent, $studentGeneralAverage, $generalPosition, $totalStudentsCount, $markingStyle, $division, $aggregatePoints);
@@ -3578,7 +3579,7 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->download("{$studentData->first_name}_{$reports->title}.pdf");
+        return $pdf->stream("{$studentData->first_name}_{$reports->title}.pdf");
     }
     /**
      * Get marking style for combined report
@@ -4572,6 +4573,7 @@ class ResultsController extends Controller
         // Add class_name to studentData if not exists
         $studentData->class_name = $studentData->class_name ?? $results->first()->class_name ?? 'N/A';
         $studentData->school_name = $schoolInfo->school_name;
+        $studentData->image = $results->first()->image;
 
         // Generate QR code
         $qrPng = $this->generateQRForCombined($studentData, $reports, $schoolInfo, $totalScoreForStudent, $studentGeneralAverage, $generalPosition, $totalStudentsCount, $markingStyle, $division, $aggregatePoints);
@@ -4927,7 +4929,6 @@ class ResultsController extends Controller
         }
     }
 
-
     private function getRemarksForGrade($grade, $marking_style, $score = null)
     {
         if ($score === null || $score === 0) {
@@ -4946,7 +4947,6 @@ class ResultsController extends Controller
 
         return $remarks[$grade] ?? '-';
     }
-
 
     private function getMonthNumber($month)
     {
@@ -5393,8 +5393,6 @@ class ResultsController extends Controller
         return '0';
     }
 
-    // In ResultsController.php
-
     public function reportStatus()
     {
         $jobs = ReportJob::where('user_id', Auth::id())
@@ -5408,7 +5406,6 @@ class ResultsController extends Controller
         return view('reports.status', compact('jobs', 'activeJob', 'completedJobs', 'failedJobs'));
     }
 
-    // In ResultsController.php - getJobStatus method
     public function getJobStatus($jobId)
     {
         $job = ReportJob::where('job_id', $jobId)
