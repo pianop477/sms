@@ -481,7 +481,7 @@ class EPermitService
         $message = "Habari " . strtoupper($parent_info->user->first_name) . "\n";
         $message .= "Mtoto wako " . strtoupper($student->first_name . ' ' . $student->last_name) . "\n";
         $message .= "Amepewa Ruhusa yenye Kibali Na.{$request->permit_number} \n";
-        $message .= "Inayoanza " . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y');
+        $message .= "Inayoanza " . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y') ."\n";
         $message .= "Ruhusa imeombwa na " . strtoupper($request->guardian_name) . "\n";
         $message .= "Sababu ya Ruhusa " . strtoupper($reasonText) . "\n";
         $message .= "Kama hutambui ombi hili Tafadhali Piga {$school->school_phone}. Asante";
