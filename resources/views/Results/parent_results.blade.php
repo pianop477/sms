@@ -739,7 +739,7 @@
 
         <!-- ==================== FOOTER ==================== -->
         <div class="footer">
-            &copy; {{ date('Y') }} - {{ strtoupper($results->first()->school_name ?? 'SCHOOL') }} |
+            &copy; {{ date('Y') }} - {{ ucwords(strtolower($results->first()->school_name ?? 'SCHOOL')) }} |
             Printed: {{ now()->format('d-M-Y H:i') }} |
             Powered by ShuleApp System
         </div>
