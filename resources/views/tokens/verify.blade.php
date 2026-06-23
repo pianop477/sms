@@ -976,33 +976,32 @@
                         </div>
                         <div class="student-details-panel">
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-user"></i> JINA KAMILI</div>
+                                <div class="detail-label"><i class="fas fa-user"></i> JINA:</div>
                                 <div class="detail-value">${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-hashtag"></i> NA. USAJILI</div>
+                                <div class="detail-label"><i class="fas fa-hashtag"></i> NA. USAJILI:</div>
                                 <div class="detail-value">${escapeHtml(admissionNum)}</div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-school"></i> DARASA</div>
+                                <div class="detail-label"><i class="fas fa-school"></i> DARASA:</div>
                                 <div class="detail-value">${escapeHtml(className)}</div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-coins"></i> AWAMU YA MALIPO</div>
+                                <div class="detail-label"><i class="fas fa-coins"></i> AWAMU: </div>
                                 <div class="detail-value">${escapeHtml(installment.name)}</div>
                             </div>
                             <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-hourglass-end"></i> MWISHO WA MUHULA</div>
+                                <div class="detail-label"><i class="fas fa-hourglass-end"></i> MWISHO:</div>
                                 <div class="detail-value">${formatDate(token.expires_at)}</div>
                             </div>
                         </div>
                     </div>
                     <div class="transport-status-card">
-                        <span class="detail-label"><i class="fas fa-truck-moving"></i> USAFIRI</span>
+                        <span class="detail-label"><i class="fas fa-truck-moving"></i> USAFIRI:</span>
                         <span style="color: ${transportColor}; font-weight:800;"><i class="fas ${transportIcon}"></i> ${transportText}</span>
                     </div>
                     <div class="confirm-access-section">
-                        <button id="confirmAccessBtn" class="btn-submit btn-confirm"><i class="fas fa-door-open"></i> RUHUSU KUINGIA</button>
                         <button id="newVerifyBtn" class="btn-submit btn-new-verify"><i class="fas fa-qrcode"></i> VERIFY MWINGINE</button>
                     </div>
                 </div>
