@@ -266,7 +266,7 @@
                         <p class="text-muted mb-0">View and manage payroll batch</p>
                     </div>
                     <a href="{{ route('payroll.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left mr-1"></i> Back to List
+                        <i class="fas fa-arrow-left mr-1"></i> Back
                     </a>
                 </div>
 
