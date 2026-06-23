@@ -23,8 +23,8 @@ trait ResolveApplicantTrait
         $teacher = DB::table('teachers')
             ->join('users', 'users.id', '=', 'teachers.user_id')
             ->where('teachers.member_id', $identifier)
-            ->where('teachers.status', 1)
-            ->where('users.status', 1)
+            // ->where('teachers.status', 1)
+            // ->where('users.status', 1)
             ->select(
                 'users.first_name',
                 'users.last_name',
@@ -60,7 +60,7 @@ trait ResolveApplicantTrait
 
         $transport = DB::table('transports')
             ->where('staff_id', $identifier)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->select(
                 'driver_name as first_name',
                 DB::raw("'' as last_name"),
@@ -96,7 +96,7 @@ trait ResolveApplicantTrait
 
         $otherStaff = DB::table('other_staffs')
             ->where('staff_id', $identifier)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->select(
                 'first_name',
                 'last_name',
@@ -135,8 +135,8 @@ trait ResolveApplicantTrait
             $teacherByUserId = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
                 ->where('teachers.user_id', $identifier)
-                ->where('teachers.status', 1)
-                ->where('users.status', 1)
+                // ->where('teachers.status', 1)
+                // ->where('users.status', 1)
                 ->select(
                     'users.first_name',
                     'users.last_name',
