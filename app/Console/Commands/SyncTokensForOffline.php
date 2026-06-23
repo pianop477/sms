@@ -186,13 +186,9 @@ class SyncTokensForOffline extends Command
     private function prepareOfflineData($tokens)
     {
         $data = [];
-
         foreach ($tokens as $token) {
             $student = $token->student;
-
-            if (!$student) {
-                continue;
-            }
+            if (!$student) continue;
 
             $data[] = [
                 'token' => $token->token,
@@ -204,6 +200,8 @@ class SyncTokensForOffline extends Command
                     'last_name' => $student->last_name,
                     'full_name' => $student->first_name . ' ' . $student->last_name,
                     'class_name' => $student->class->class_name ?? 'N/A',
+                    'has_transport' => !is_null($student->transport_id),
+                    'image' => $student->image,
                     'school_id' => $student->school_id
                 ],
                 'installment' => [
@@ -217,7 +215,6 @@ class SyncTokensForOffline extends Command
                 'is_valid' => Carbon::parse($token->expires_at)->isFuture()
             ];
         }
-
         return $data;
     }
 

@@ -55,7 +55,7 @@
               action="{{ route('attendance.generate.report', ['classTeacher' => Hashids::encode($classTeacher->id)]) }}"
               method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
             @csrf
-            <div class="form-row">
+            <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="font-weight-bold">Class</label>
                     <input type="text" disabled name="class"
@@ -84,6 +84,7 @@
                     @enderror
                 </div>
             </div>
+            <hr>
             <div class="col-md-12 mb-3">
                 <button class="btn btn-primary float-right" type="submit">
                     <i class="fas fa-cogs"></i> Generate

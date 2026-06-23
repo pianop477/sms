@@ -133,8 +133,8 @@ class PayrollController extends Controller
         $teachers = DB::table('teachers')
             ->join('users', 'users.id', '=', 'teachers.user_id')
             ->where('teachers.school_id', $schoolId)
-            ->where('teachers.status', 1)
-            ->where('users.status', 1)
+            // ->where('teachers.status', 1)
+            // ->where('users.status', 1)
             ->where(function ($q) use ($query) {
                 $q->where('teachers.member_id', 'LIKE', "%{$query}%")
                     ->orWhere('users.first_name', 'LIKE', "%{$query}%")
@@ -163,7 +163,7 @@ class PayrollController extends Controller
         // Search transports
         $transports = DB::table('transports')
             ->where('school_id', $schoolId)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->where(function ($q) use ($query) {
                 $q->where('staff_id', 'LIKE', "%{$query}%")
                     ->orWhere('driver_name', 'LIKE', "%{$query}%");
@@ -191,7 +191,7 @@ class PayrollController extends Controller
         // Search other staff
         $otherStaff = DB::table('other_staffs')
             ->where('school_id', $schoolId)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->where(function ($q) use ($query) {
                 $q->where('staff_id', 'LIKE', "%{$query}%")
                     ->orWhere('first_name', 'LIKE', "%{$query}%")
@@ -237,7 +237,7 @@ class PayrollController extends Controller
         $teacher = DB::table('teachers')
             ->where('id', $sourceTableId)
             ->where('school_id', $schoolId)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->first();
 
         if ($teacher) {
@@ -247,7 +247,7 @@ class PayrollController extends Controller
         $transport = DB::table('transports')
             ->where('id', $sourceTableId)
             ->where('school_id', $schoolId)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->first();
 
         if ($transport) {
@@ -257,7 +257,7 @@ class PayrollController extends Controller
         $otherStaff = DB::table('other_staffs')
             ->where('id', $sourceTableId)
             ->where('school_id', $schoolId)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->first();
 
         if ($otherStaff) {
@@ -1160,8 +1160,8 @@ class PayrollController extends Controller
             $teachers = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
                 ->where('teachers.school_id', $schoolId)
-                ->where('teachers.status', 1)
-                ->where('users.status', 1)
+                // ->where('teachers.status', 1)
+                // ->where('users.status', 1)
                 ->whereIn('teachers.member_id', $staffIds)  // Direct match (lowercase)
                 ->select(
                     'teachers.member_id as staff_id',
@@ -1188,7 +1188,7 @@ class PayrollController extends Controller
             if (!empty($remainingIds)) {
                 $transports = DB::table('transports')
                     ->where('school_id', $schoolId)
-                    ->where('status', 1)
+                    // ->where('status', 1)
                     ->whereIn('staff_id', $remainingIds)  // Direct match (lowercase)
                     ->select(
                         'staff_id',
@@ -1218,7 +1218,7 @@ class PayrollController extends Controller
             if (!empty($stillRemaining)) {
                 $otherStaffs = DB::table('other_staffs')
                     ->where('school_id', $schoolId)
-                    ->where('status', 1)
+                    // ->where('status', 1)
                     ->whereIn('staff_id', $stillRemaining)  // Direct match (lowercase)
                     ->select(
                         'staff_id',

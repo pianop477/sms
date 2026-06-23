@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-const APP_VERSION = '2026.06.14.00';
-=======
-const APP_VERSION = '2026.06.14.02';
->>>>>>> 0d0b6956b09b3d21acad8937092709499e8abba2
+const APP_VERSION = '2026.06.20.02';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
