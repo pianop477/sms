@@ -2097,7 +2097,7 @@ class ResultsController extends Controller
             'division'
         ));
 
-        return $pdf->download($results->isNotEmpty() ? $results->first()->first_name.' Results '.$month.' '.$year.'.pdf' : 'Report_'.$year.'.pdf');
+        return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name.' Results '.$month.' '.$year.'.pdf' : 'Report_'.$year.'.pdf');
     }
 
     //Re-send sms results individually
