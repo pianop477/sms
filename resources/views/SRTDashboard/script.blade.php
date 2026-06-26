@@ -127,6 +127,26 @@
             });
         }
 
+        // disable button function
+        function disableSubmitButtons(form) {
+
+                const buttons = form.querySelectorAll(
+                    'button[type="submit"], input[type="submit"]'
+                );
+
+                buttons.forEach(button => {
+
+                    button.disabled = true;
+
+                    if (button.tagName === 'BUTTON') {
+                        button.dataset.originalText = button.innerHTML;
+                        button.innerHTML = 'Submitting...';
+                    }
+
+                });
+
+            }
+
         table.on('draw', function() {
             table.rows({ page: 'current' }).every(function() {
                 var checkbox = $(this.node()).find('input[name="student[]"]');

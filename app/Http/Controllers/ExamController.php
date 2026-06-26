@@ -791,7 +791,6 @@ class ExamController extends Controller
         $examTypeId = $request->exam_type_id;
         $examDate = $request->exam_date;
         $examTerm = $request->term;
-
         $markingStyle = $request->marking_style;
 
         $user = Auth::user();
@@ -892,36 +891,39 @@ class ExamController extends Controller
             DB::beginTransaction();
             try {
                 foreach ($scores as $studentId => $score) {
-                    temporary_results::updateOrCreate(
-                        [
-                            'student_id' => $studentId,
-                            'course_id' => $courseId,
-                            'teacher_id' => $teacherId,
-                            'exam_type_id' => $examTypeId,
-                            'exam_date' => $examDate,
-                        ],
-                        [
-                            'class_id' => $classId,
-                            'school_id' => $schoolId,
-                            'exam_term' => $examTerm,
-                            'score' => $score,
-                            'marking_style' => $markingStyle,
-                            'expiry_date' => now()->addHours(72)
-                        ]
-                    );
+                    // 1. Futa rekodi zilizopo za mwanafunzi huyu kwa vigezo hivi (bila tarehe)
+                    temporary_results::where('student_id', $studentId)
+                        ->where('course_id', $courseId)
+                        ->where('teacher_id', $teacherId)
+                        ->where('exam_type_id', $examTypeId)
+                        ->where('class_id', $classId)
+                        ->where('school_id', $schoolId)
+                        ->delete();
+
+                    // 2. Unda rekodi mpya kwa tarehe mpya
+                    temporary_results::create([
+                        'student_id'    => $studentId,
+                        'course_id'     => $courseId,
+                        'teacher_id'    => $teacherId,
+                        'exam_type_id'  => $examTypeId,
+                        'class_id'      => $classId,
+                        'school_id'     => $schoolId,
+                        'exam_date'     => $examDate,         // tarehe mpya
+                        'exam_term'     => $examTerm,
+                        'score'         => $score,
+                        'marking_style' => $markingStyle,
+                        'expiry_date'   => now()->addHours(72)
+                    ]);
                 }
                 DB::commit();
-
                 Alert()->toast('Results saved successfully, remember to submit before due date.', 'success');
                 return redirect()->route('score.prepare.form', ['id' => $id]);
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Update draft save failed', ['error' => $e->getMessage()]);
                 Alert()->toast('Network error! Data saved locally. Please try again.', 'error');
                 return back()->withInput();
             }
-
         } elseif ($action === 'submit') {
             DB::beginTransaction();
             try {
@@ -959,7 +961,7 @@ class ExamController extends Controller
                     ->where('teacher_id', $teacherId)
                     ->where('exam_type_id', $examTypeId)
                     ->where('class_id', $classId)
-                    ->where('exam_date', $examDate)
+                    // ->where('exam_date', $examDate)
                     ->where('school_id', $schoolId)
                     ->delete();
 
