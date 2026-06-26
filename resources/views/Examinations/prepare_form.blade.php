@@ -556,19 +556,35 @@
             // Form validation
             (function() {
                 'use strict';
-                window.addEventListener('load', function() {
+                window.addEventListener('submit', function() {
                     var forms = document.getElementsByClassName('needs-validation');
                     var validation = Array.prototype.filter.call(forms, function(form) {
                         form.addEventListener('submit', function(event) {
                             if (form.checkValidity() === false) {
                                 event.preventDefault();
                                 event.stopPropagation();
+                            } else {
+                                disableSubmitButtons(this);
                             }
                             form.classList.add('was-validated');
                         }, false);
                     });
                 }, false);
             })();
+
+            document.querySelectorAll("form").forEach(form => {
+
+                form.addEventListener("submit", function (e) {
+
+                    if (!this.checkValidity()) {
+                        return;
+                    }
+
+                    disableSubmitButtons(this);
+
+                });
+
+            });
 
             // ============================================
             // CHECK FOR CLEAR STORAGE FLAG FROM SERVER

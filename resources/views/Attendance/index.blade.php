@@ -410,9 +410,9 @@
                 <i class="fas fa-check fa-2x"></i>
             </div>
             <h2 class="fw-800">Attendance Already Submitted!</h2>
-            <p class="text-muted">The attendance report for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('l, F d, Y') }}</strong> has already been synchronized with the database.</p>
+            <p class="text-muted">The attendance report for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('l, F d, Y') }}</strong> has already been submitted.</p>
             <div class="mt-3">
-                <small class="text-muted">You can still change the date or class using the filters above.</small>
+                <small class="text-muted">You can change the date or class using the filters above.</small>
             </div>
         </div>
     @endif

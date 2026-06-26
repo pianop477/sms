@@ -839,12 +839,18 @@
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">First Name</label>
                                     <input type="text" name="fname" class="form-control-modern" required>
+                                    @error('fname')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Other Names</label>
                                     <input type="text" name="lname" class="form-control-modern" required>
+                                    @error('lname')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -854,6 +860,9 @@
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Email</label>
                                     <input type="email" name="email" class="form-control-modern">
+                                    @error('email')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -864,6 +873,9 @@
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
+                                    @error('gender')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -873,6 +885,9 @@
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Phone</label>
                                     <input type="text" name="phone" class="form-control-modern" required>
+                                    @error('phone')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -885,6 +900,9 @@
                                         <option value="3">Diploma</option>
                                         <option value="4">Certificate</option>
                                     </select>
+                                    @error('qualification')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -894,6 +912,9 @@
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Date of Birth</label>
                                     <input type="date" name="dob" class="form-control-modern" required>
+                                    @error('dob')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -905,6 +926,9 @@
                                             <option value="{{ $year }}">{{ $year }}</option>
                                         @endfor
                                     </select>
+                                    @error('joined')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
