@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.06.27.00';
+const APP_VERSION = '2026.06.27.02';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
@@ -53,7 +53,7 @@ async function getTokenFromIndexedDB(tokenCode) {
 
 async function fetchAndCacheTokens() {
     try {
-        const response = await fetch('/offline/tokens');
+        const response = await fetch('offline/tokens');
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.tokens) {
