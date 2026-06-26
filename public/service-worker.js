@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.06.20.02';
+const APP_VERSION = '2026.06.26.02'; // <-- Toleo jipya
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
@@ -53,7 +53,7 @@ async function getTokenFromIndexedDB(tokenCode) {
 
 async function fetchAndCacheTokens() {
     try {
-        const response = await fetch('/api/offline/tokens');
+        const response = await fetch('offline/tokens');
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.tokens) {
@@ -76,7 +76,8 @@ const STATIC_ASSETS = [
     '/assets/js/scripts.js',
     '/icons/new_icon1.png',
     '/icons/new_icon2.png',
-    '/icons/new_icon3.png'
+    '/icons/new_icon3.png',
+    '/icons/wifi-slash.svg'  // <-- Ongeza hii
 ];
 
 // ========== INSTALL ==========
@@ -121,7 +122,7 @@ self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
     // API requests - don't cache other APIs
-    if (url.pathname.startsWith('/api/') && url.pathname !== '/api/offline/tokens') {
+    if (url.pathname !== '/offline/tokens') {
         event.respondWith(fetch(event.request));
         return;
     }
@@ -149,33 +150,38 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // HTML pages - network first
+    // HTML pages - network first (including offline.html)
+    if (url.pathname === '/' || url.pathname === '/offline.html' || url.pathname.match(/\.html$/i)) {
+        event.respondWith(
+            fetch(event.request).then(res => {
+                if (res && res.status === 200) {
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, res.clone()));
+                }
+                return res;
+            }).catch(() => caches.match('/offline.html'))
+        );
+        return;
+    }
+
+    // Fallback: network first for everything else
     event.respondWith(
-        fetch(event.request).then(res => {
-            if (res && res.status === 200) {
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, res.clone()));
-            }
-            return res;
-        }).catch(() => caches.match('/offline.html'))
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
 // ========== TOKEN VERIFICATION (OFFLINE CAPABLE) ==========
 async function handleTokenVerification(request) {
     try {
-        // Try network first
         const response = await fetch(request.clone());
         if (response.ok) {
             const data = await response.clone().json();
             if (data.success && data.data) {
-                // Cache the token for future offline use
                 await saveSingleTokenToIndexedDB(data.data);
             }
             return response;
         }
         throw new Error('Network failed');
     } catch (error) {
-        // Offline mode: check IndexedDB
         const requestData = await request.clone().json();
         const tokenCode = requestData.token;
         const cachedToken = await getTokenFromIndexedDB(tokenCode);
