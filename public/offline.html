@@ -65,8 +65,10 @@
             color: var(--primary);
         }
 
-        .icon-container i {
-            font-size: 32px;
+        .icon-container img {
+            width: 40px;
+            height: 40px;
+            fill: #3498db
         }
 
         h1 {
@@ -158,7 +160,8 @@
 
     <div class="offline-card">
         <div class="icon-container" id="iconContainer">
-            <i class="fas fa-wifi" id="mainIcon"></i>
+            <!-- <i class="fas fa-wifi" id="mainIcon"></i> -->
+             <img src="icons/wifi-slash.svg" alt="">
         </div>
 
         <div class="status-badge" id="statusBadge">
@@ -166,10 +169,10 @@
         </div>
 
         <h1 id="titleText">No Connection</h1>
-        <p class="message" id="messageText">Tafadhali kagua muunganisho wako wa mtandao kisha ujaribu tena ili kuendelea kutumia ShuleApp.</p>
+        <p class="message" id="messageText">Please, check your device internet connection and try again to use ShuleApp.</p>
 
         <button class="retry-btn" id="retryBtn">
-            <i class="fas fa-rotate-right" id="btnIcon"></i> Try Again
+            <i class="fas fa-rotate-right" id="btnIcon"></i> Retry
         </button>
     </div>
 
@@ -194,7 +197,7 @@
                     statusBadge.style.background = "rgba(76, 201, 240, 0.1)";
                     statusBadge.style.color = "#0096c7";
                     statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size: 8px;"></i> Connected!';
-                    messageText.textContent = "Mtandao umerejea! Inapakia upya ukurasa...";
+                    messageText.textContent = "Connection restored! Loading files...";
 
                     const lastUrl = document.referrer || window.location.origin;
                     window.location.href = lastUrl;
@@ -202,7 +205,7 @@
                     // Fail state resetting smoothly
                     retryBtn.disabled = false;
                     btnIcon.classList.remove('spin');
-                    messageText.textContent = "Bado haujaunganishwa. Tafadhali thibitisha data au Wi-Fi yako na ujaribu tena.";
+                    messageText.textContent = "No connection. Please check your mobile data or Wi-fi and try again";
                 }
             }, 1200); // Quick natural delay for better UX
         }
