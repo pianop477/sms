@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-const APP_VERSION = '2026.06.27.00';
-=======
 const APP_VERSION = '2026.06.26.02'; // <-- Toleo jipya
->>>>>>> 8c75dfd3179f603be370f413be3c824d74bdef1f
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
