@@ -161,7 +161,7 @@
     <div class="offline-card">
         <div class="icon-container" id="iconContainer">
             <!-- <i class="fas fa-wifi" id="mainIcon"></i> -->
-             <img src="icons/wifi-slash.svg" alt="">
+             <img src="/icons/wifi-slash.svg" alt="">
         </div>
 
         <div class="status-badge" id="statusBadge">
@@ -188,7 +188,7 @@
             // Disable button and add loading states
             retryBtn.disabled = true;
             btnIcon.classList.add('spin');
-            messageText.textContent = "Inajadili muunganisho wa mtandao...";
+            messageText.textContent = "Trying to restore connection...";
 
             // Check navigator status or perform a quick fetch check
             setTimeout(() => {
