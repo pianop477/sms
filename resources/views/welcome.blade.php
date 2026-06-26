@@ -907,8 +907,8 @@
                 'stats-label-students':'Students','stats-sub-students':'Registered','stats-label-teachers':'Teachers',
                 'stats-sub-teachers':'Using System','stats-label-parents':'Parents','stats-sub-parents':'Connected',
                 'features-tagline':'Complete System Modules','features-title':'All ShuleApp Modules','features-description':'9 core modules with 20+ sub-modules',
-                'feature-1-title':'Users Management','feature-1-desc':'Complete role-based access.','feature-1-point-1':'Teachers','feature-1-point-2':'Students',
-                'feature-1-point-3':'Parents','feature-1-point-4':'Accountant','feature-1-point-5':'Non-teaching Staff',
+                'feature-1-title':'Users Management','feature-1-desc':'Complete role-based access.','feature-1-point-1':'Teachers',
+                'feature-1-point-2':'Students','feature-1-point-3':'Parents','feature-1-point-4':'Accountant','feature-1-point-5':'Non-teaching Staff',
                 'feature-2-title':'Academic Management','feature-2-desc':'Full control over classes and results.','feature-2-point-1':'Class Management',
                 'feature-2-point-2':'Course Management','feature-2-point-3':'Assessment Management','feature-2-point-4':'Results Management',
                 'feature-3-title':'Reports & Analytics','feature-3-desc':'Comprehensive reports.','feature-3-point-1':'Attendance Report',
@@ -1100,22 +1100,75 @@
             }
         },500);
 
-        // ==================== LOGIN FORM - WITH LOADING STATE ====================
+        // ==================== CSRF TOKEN REFRESH FUNCTION (NEW) ====================
+        /**
+         * Fetch a fresh CSRF token from the server and update all forms and meta tag.
+         * Returns a promise that resolves with the new token.
+         */
+        function refreshCsrfToken() {
+            return fetch('{{ route('refresh-csrf') }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to refresh CSRF token');
+                return response.json();
+            })
+            .then(data => {
+                if (data.token) {
+                    // Update all forms
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = data.token;
+                    });
+                    // Update meta tag for AJAX requests
+                    const metaTag = document.querySelector('meta[name="csrf-token"]');
+                    if (metaTag) metaTag.content = data.token;
+                    return data.token;
+                } else {
+                    throw new Error('No token in response');
+                }
+            })
+            .catch(error => {
+                console.warn('CSRF refresh failed:', error);
+                // Return null so we can fall back to existing token
+                return null;
+            });
+        }
+
+        // ==================== LOGIN FORM - WITH CSRF REFRESH AND LOADING STATE ====================
         const loginForm = document.getElementById('loginForm');
         const loginSubmitBtn = document.getElementById('loginSubmitBtn');
         const loginBtnText = document.getElementById('loginBtnText');
 
         if (loginForm) {
-            loginForm.addEventListener('submit', function() {
-                // Show loading spinner on button when submitting
+            // Replace the original submit handler with one that refreshes token first
+            loginForm.addEventListener('submit', function(e) {
+                // Prevent default to handle token refresh
+                e.preventDefault();
+
+                // Show loading spinner on button
                 if (loginSubmitBtn) {
                     loginSubmitBtn.disabled = true;
                     if (loginBtnText) {
                         loginBtnText.innerHTML = '<span class="spinner"></span> Authenticating...';
                     }
                 }
-                // Form will submit normally - page will reload
-                // The spinner will show until page reloads
+
+                // Get a fresh CSRF token, then submit the form
+                refreshCsrfToken()
+                    .then(newToken => {
+                        // If we got a new token, it's already updated in the input.
+                        // If not, we'll use the existing token.
+                        // Submit the form programmatically
+                        loginForm.submit();
+                    })
+                    .catch(() => {
+                        // On error, still attempt to submit with whatever token is there
+                        loginForm.submit();
+                    });
             });
         }
 

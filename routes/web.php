@@ -79,6 +79,10 @@ Route::get('/home', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/refresh-csrf', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('refresh-csrf')->middleware('web');
+
 Route::get('/check-session', function () {
     return response()->json(['active' => auth()->check()]);
 });
