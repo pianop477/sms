@@ -10,7 +10,6 @@
     <title>ShuleApp | Offline Mode</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -65,10 +64,12 @@
             color: var(--primary);
         }
 
-        .icon-container img {
+        /* NEW: Force SVG size and color */
+        .icon-container svg {
             width: 40px;
             height: 40px;
-            fill: #3498db
+            display: block;
+            stroke: #4361ee;
         }
 
         h1 {
@@ -128,15 +129,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .spin {
@@ -144,9 +138,7 @@
         }
 
         @keyframes rotate {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         /* Dark mode support */
@@ -155,18 +147,17 @@
                 background-color: #121212;
                 color: #f8f9fa;
             }
-
             .offline-card {
                 background: #1e1e1e;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             }
-
-            h1 {
-                color: #f8f9fa;
+            h1 { color: #f8f9fa; }
+            .message { color: #a0a0a0; }
+            .icon-container svg {
+                stroke: #a0a0a0 !important; /* Better contrast in dark mode */
             }
-
-            .message {
-                color: #a0a0a0;
+            .icon-container {
+                background: rgba(160, 160, 160, 0.08);
             }
         }
     </style>
@@ -176,7 +167,7 @@
 
     <div class="offline-card">
         <div class="icon-container" id="iconContainer">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4361ee" stroke-width="2"
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path
                     d="M12 20v.01M5 12.859a10 10 0 0 1 14 0M8.5 9.429a5.5 5.5 0 0 1 7 0M3 6.289a14 14 0 0 1 18 0M22 22L2 2" />
@@ -189,8 +180,7 @@
         </div>
 
         <h1 id="titleText">No Connection</h1>
-        <p class="message" id="messageText">Please, check your device internet connection and try again to use ShuleApp.
-        </p>
+        <p class="message" id="messageText">Please, check your device internet connection and try again to use ShuleApp.</p>
 
         <button class="retry-btn" id="retryBtn">
             <i class="fas fa-rotate-right" id="btnIcon"></i> Retry
@@ -202,41 +192,30 @@
         const btnIcon = document.getElementById('btnIcon');
         const statusBadge = document.getElementById('statusBadge');
         const messageText = document.getElementById('messageText');
-        const mainIcon = document.getElementById('mainIcon');
 
-        // Function to attempt reconnection
         function tryReconnect() {
-            // Disable button and add loading states
             retryBtn.disabled = true;
             btnIcon.classList.add('spin');
             messageText.textContent = "Trying to restore connection...";
 
-            // Check navigator status or perform a quick fetch check
             setTimeout(() => {
                 if (navigator.onLine) {
-                    // Success redirection
                     statusBadge.style.background = "rgba(76, 201, 240, 0.1)";
                     statusBadge.style.color = "#0096c7";
                     statusBadge.innerHTML = '<i class="fas fa-circle" style="font-size: 8px;"></i> Connected!';
                     messageText.textContent = "Connection restored! Loading files...";
-
                     const lastUrl = document.referrer || window.location.origin;
                     window.location.href = lastUrl;
                 } else {
-                    // Fail state resetting smoothly
                     retryBtn.disabled = false;
                     btnIcon.classList.remove('spin');
                     messageText.textContent = "No connection. Please check your mobile data or Wi-fi and try again";
                 }
-            }, 1200); // Quick natural delay for better UX
+            }, 1200);
         }
 
         retryBtn.addEventListener('click', tryReconnect);
-
-        // Auto-detect when network comes back automatically
-        window.addEventListener('online', () => {
-            tryReconnect();
-        });
+        window.addEventListener('online', tryReconnect);
     </script>
 </body>
 
