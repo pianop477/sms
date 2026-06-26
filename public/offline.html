@@ -128,8 +128,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .spin {
@@ -137,7 +144,9 @@
         }
 
         @keyframes rotate {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Dark mode support */
@@ -146,12 +155,19 @@
                 background-color: #121212;
                 color: #f8f9fa;
             }
+
             .offline-card {
                 background: #1e1e1e;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             }
-            h1 { color: #f8f9fa; }
-            .message { color: #a0a0a0; }
+
+            h1 {
+                color: #f8f9fa;
+            }
+
+            .message {
+                color: #a0a0a0;
+            }
         }
     </style>
 </head>
@@ -160,8 +176,12 @@
 
     <div class="offline-card">
         <div class="icon-container" id="iconContainer">
-            <!-- <i class="fas fa-wifi" id="mainIcon"></i> -->
-             <img src="/icons/wifi-slash.svg" alt="">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4361ee" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M12 20v.01M5 12.859a10 10 0 0 1 14 0M8.5 9.429a5.5 5.5 0 0 1 7 0M3 6.289a14 14 0 0 1 18 0M22 22L2 2" />
+                <line x1="2" y1="2" x2="22" y2="22" />
+            </svg>
         </div>
 
         <div class="status-badge" id="statusBadge">
@@ -169,7 +189,8 @@
         </div>
 
         <h1 id="titleText">No Connection</h1>
-        <p class="message" id="messageText">Please, check your device internet connection and try again to use ShuleApp.</p>
+        <p class="message" id="messageText">Please, check your device internet connection and try again to use ShuleApp.
+        </p>
 
         <button class="retry-btn" id="retryBtn">
             <i class="fas fa-rotate-right" id="btnIcon"></i> Retry
