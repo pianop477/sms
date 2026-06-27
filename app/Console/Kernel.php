@@ -91,9 +91,7 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->withoutOverlapping();
 
-        $schedule->command('e-permit:auto-approve')
-            ->everySecond()
-            ->withoutOverlapping();
+        $schedule->command('e-permit:auto-approve')->everySecond();
 
         $schedule->command('reports:clean')->weekly();
         $schedule->command('payments:backfill-academic-year --chunk=100')
