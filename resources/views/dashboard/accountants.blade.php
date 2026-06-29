@@ -712,8 +712,8 @@
                             </div>
                         @endif
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 table-responsive-md"
+                    <div class="">
+                        <table class="table table-hover table-responsive-md"
                             id="recentTransactionsTable">
                             <thead>
                                 <tr>
