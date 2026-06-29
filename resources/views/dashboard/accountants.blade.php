@@ -712,7 +712,7 @@
                             </div>
                         @endif
                     </div>
-                    <div class="">
+                    <div class="table-responsive">
                         <table class="table table-hover table-responsive-md"
                             id="recentTransactionsTable">
                             <thead>
