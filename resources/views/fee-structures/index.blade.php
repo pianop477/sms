@@ -370,7 +370,8 @@
                     <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i> Create New Fee Structure</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('fee-structures.store') }}" method="POST">
+                {{-- ADDED ID to form --}}
+                <form action="{{ route('fee-structures.store') }}" method="POST" id="addStructureForm">
                     @csrf
                     <div class="modal-body">
                         <div class="alert alert-info">
@@ -521,6 +522,21 @@
 
             // Use jQuery in no-conflict mode
             jQuery(document).ready(function($) {
+                // ============================================
+                // NEW: Disable submit buttons & show spinner to prevent double submission
+                // ============================================
+                $('#addStructureForm, #editStructureForm').on('submit', function() {
+                    var btn = $(this).find('button[type="submit"]');
+                    // Only if not already disabled
+                    if (!btn.prop('disabled')) {
+                        btn.prop('disabled', true);
+                        var originalText = btn.text().trim();
+                        var action = originalText.toLowerCase().includes('update') ? 'Updating' : 'Creating';
+                        btn.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> ' + action + '...');
+                    }
+                });
+
+                // DataTable initialization code (existing)...
                 let table = null;
 
                 // Check if DataTables is loaded
