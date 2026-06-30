@@ -302,7 +302,8 @@
                         {{ $feeStructure->name }}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('fee-structures.installments.store', $feeStructure->id) }}" method="POST">
+                {{-- ADDED ID to form --}}
+                <form action="{{ route('fee-structures.installments.store', $feeStructure->id) }}" method="POST" id="addInstallmentForm">
                     @csrf
                     <div class="modal-body">
                         <div class="alert alert-info small">
@@ -418,8 +419,22 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // ============================================
+            // NEW: Disable submit buttons & show spinner to prevent double submission
+            // ============================================
+            $('#addInstallmentForm, #editInstallmentForm').on('submit', function() {
+                var btn = $(this).find('button[type="submit"]');
+                if (!btn.prop('disabled')) {
+                    btn.prop('disabled', true);
+                    var originalText = btn.text().trim();
+                    var action = originalText.toLowerCase().includes('update') ? 'Updating' : 'Adding';
+                    btn.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> ' + action + '...');
+                }
+            });
+
             // Year filter functionality without page reload
             $('.year-btn').click(function(e) {
                 e.preventDefault();
