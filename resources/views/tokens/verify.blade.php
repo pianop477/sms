@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Gate Pass Verification</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
@@ -66,8 +67,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
         }
 
         .btn-sync-offline {
@@ -806,10 +816,14 @@
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off"
+                                inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off"
+                                inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off"
+                                inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off"
+                                inputmode="numeric" pattern="[0-9]">
                         </div>
                     </div>
                 </div>
@@ -1155,14 +1169,14 @@
                 focusFirstInput();
                 initOfflineStatus();
 
-                // Notify user if page is offline and has no tokens
+                // ✅ Check if page is being served from cache (offline)
                 if (!navigator.onLine) {
                     setTimeout(async () => {
                         const count = await getOfflineTokenCount();
                         if (count === 0) {
-                            showAlert('Huna token zilizohifadhiwa. Unganisha mtandao kupakua token.', 'warning', true, 5000);
+                            showAlert('Huna token zilizohifadhiwa offline. Unganisha mtandao kupakua token.', 'warning', true, 5000);
                         } else {
-                            showAlert('Una token ' + count + ' zilizohifadhiwa. Verification inawezekana offline.', 'info', true, 3000);
+                            showAlert(`Una token ${count} zilizohifadhiwa. Verification inawezekana offline.`, 'info', true, 3000);
                         }
                     }, 1000);
                 }
@@ -1304,6 +1318,7 @@
                 hideAlert();
 
                 try {
+                    // ✅ Use AbortController for timeout
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -1335,37 +1350,57 @@
                         setTimeout(() => resetAll(), 3500);
                     }
                 } catch (error) {
-                    // Handle offline/network failure gracefully
+                    // ✅ Network failed - try offline verification via SW message
                     if (error.name === 'AbortError') {
                         showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
                     } else {
-                        // Try offline verification via Service Worker
+                        showAlert('Hakuna mtandao. Inajaribu kuthibitisha token offline...', 'info', true, 2000);
+
+                        // Try offline verification via Service Worker message
                         try {
-                            const registration = await navigator.serviceWorker.ready;
-                            if (registration.active) {
-                                const result = await new Promise((resolve) => {
-                                    const channel = new MessageChannel();
-                                    channel.port1.onmessage = (event) => {
-                                        resolve(event.data);
-                                    };
-                                    registration.active.postMessage({
-                                        type: 'VERIFY_TOKEN_OFFLINE',
-                                        token: token
-                                    }, [channel.port2]);
-                                    setTimeout(() => resolve({ success: false, error: 'Timeout' }), 5000);
-                                });
-                                if (result && result.success) {
-                                    showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
-                                    showStudentInfo(result.data);
-                                    return;
+                            if ('serviceWorker' in navigator) {
+                                const registration = await navigator.serviceWorker.ready;
+                                if (registration.active) {
+                                    const result = await new Promise((resolve) => {
+                                        const channel = new MessageChannel();
+                                        channel.port1.onmessage = (event) => {
+                                            resolve(event.data);
+                                        };
+                                        registration.active.postMessage({
+                                            type: 'VERIFY_TOKEN_OFFLINE',
+                                            token: token
+                                        }, [channel.port2]);
+                                        setTimeout(() => resolve({ success: false, error: 'Timeout' }), 5000);
+                                    });
+
+                                    if (result && result.success) {
+                                        showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
+                                        showStudentInfo(result.data);
+                                        isLoading = false;
+                                        loadingSection.style.display = 'none';
+                                        verifyBtn.disabled = false;
+                                        return;
+                                    } else {
+                                        showAlert('Token haipatikani offline. Unganisha mtandao.', 'error');
+                                        addError();
+                                        setTimeout(() => resetAll(), 4000);
+                                    }
+                                } else {
+                                    showAlert('Service Worker haijaanza. Unganisha mtandao.', 'error');
+                                    addError();
+                                    setTimeout(() => resetAll(), 4000);
                                 }
+                            } else {
+                                showAlert('Huduma ya offline haipatikani. Unganisha mtandao.', 'error');
+                                addError();
+                                setTimeout(() => resetAll(), 4000);
                             }
                         } catch (swError) {
-                            console.warn('SW offline verification failed:', swError);
+                            console.error('SW offline verification error:', swError);
+                            showAlert('Hitilafu ya verification offline. Unganisha mtandao.', 'error');
+                            addError();
+                            setTimeout(() => resetAll(), 4000);
                         }
-                        showAlert('Hakuna mtandao. Hakikisha token imehifadhiwa offline.', 'error', true, 4000);
-                        addError();
-                        setTimeout(() => resetAll(), 4000);
                     }
                 } finally {
                     isLoading = false;

@@ -1,5 +1,5 @@
 // public/service-worker.js
-const APP_VERSION = '2026.07.02.02';
+const APP_VERSION = '2026.07.02.03';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
@@ -43,7 +43,6 @@ async function saveTokensToIndexedDB(tokens) {
     }
     return new Promise((resolve, reject) => {
         tx.oncomplete = () => {
-            // Store last sync time in cache
             const lastSyncData = JSON.stringify({ lastSync: new Date().toISOString() });
             caches.open(CACHE_NAME).then(cache => {
                 cache.put('/offline/last-sync', new Response(lastSyncData, {
@@ -226,6 +225,48 @@ self.addEventListener('message', event => {
         );
         return;
     }
+
+    // ✅ New: Handle offline token verification via message
+    if (data.type === 'VERIFY_TOKEN_OFFLINE') {
+        event.waitUntil(
+            (async () => {
+                try {
+                    const tokenCode = data.token;
+                    if (!tokenCode) {
+                        if (event.ports && event.ports.length) {
+                            event.ports[0].postMessage({ success: false, error: 'No token provided' });
+                        }
+                        return;
+                    }
+                    const cachedToken = await getTokenFromIndexedDB(tokenCode);
+                    if (cachedToken && cachedToken.student) {
+                        if (event.ports && event.ports.length) {
+                            event.ports[0].postMessage({
+                                success: true,
+                                data: {
+                                    student: cachedToken.student,
+                                    installment: cachedToken.installment || { name: 'School Fees', order: 1 },
+                                    token: {
+                                        token: cachedToken.token,
+                                        expires_at: cachedToken.expires_at
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        if (event.ports && event.ports.length) {
+                            event.ports[0].postMessage({ success: false, error: 'Token not found or expired' });
+                        }
+                    }
+                } catch (e) {
+                    if (event.ports && event.ports.length) {
+                        event.ports[0].postMessage({ success: false, error: e.message });
+                    }
+                }
+            })()
+        );
+        return;
+    }
 });
 
 // ========== FETCH HANDLER ==========
@@ -234,6 +275,11 @@ self.addEventListener('fetch', event => {
 
     // Skip non-GET requests
     if (event.request.method !== 'GET') {
+        return;
+    }
+
+    // ✅ Skip chrome-extension requests
+    if (url.protocol === 'chrome-extension:') {
         return;
     }
 
@@ -270,7 +316,6 @@ self.addEventListener('fetch', event => {
                     }
                     return response;
                 }).catch(() => {
-                    // Fallback to offline.html if page not cached
                     return caches.match('/offline.html');
                 });
             })
@@ -306,7 +351,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 4. TOKEN VERIFICATION POST - intercept for offline support
+    // 4. ✅ TOKEN VERIFICATION POST - intercept for offline support
     if (url.pathname === '/tokens/verify' && event.request.method === 'POST') {
         event.respondWith(handleTokenVerification(event.request));
         return;
@@ -343,7 +388,6 @@ self.addEventListener('fetch', event => {
             }
             return res;
         }).catch(() => {
-            // For any page, try to serve cached version first, then offline.html
             return caches.match(event.request).then(cached => {
                 if (cached) return cached;
                 return caches.match('/offline.html');
@@ -355,13 +399,9 @@ self.addEventListener('fetch', event => {
 // ========== TOKEN VERIFICATION HANDLER ==========
 async function handleTokenVerification(request) {
     try {
-        // Clone request before reading body
         const requestClone = request.clone();
-
-        // Try network first
         const response = await fetch(requestClone);
         if (response.ok) {
-            // Clone response before reading body
             const responseClone = response.clone();
             const data = await responseClone.json();
             if (data.success && data.data) {
@@ -374,26 +414,20 @@ async function handleTokenVerification(request) {
                     academic_year: new Date().getFullYear().toString(),
                     is_valid: true
                 };
-                // Save to IndexedDB in background
                 saveTokensToIndexedDB([tokenData]).catch(() => {});
             }
             return response;
         }
         throw new Error('Network request failed with status: ' + response.status);
     } catch (error) {
-        // Network failed - try offline verification
         try {
-            // Clone request before reading body
             const requestClone = request.clone();
             const requestData = await requestClone.json();
             const tokenCode = requestData.token;
-
             if (!tokenCode) {
                 throw new Error('No token provided');
             }
-
             const cachedToken = await getTokenFromIndexedDB(tokenCode);
-
             if (cachedToken && cachedToken.student) {
                 const responseData = {
                     success: true,
