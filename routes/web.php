@@ -787,14 +787,29 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     // end of auth
 });
 
-// Token Verification Routes
-Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])->name('tokens.verify')->middleware('throttle:30,1');
-Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])->name('tokens.verify.submit')->middleware('throttle:30,1');
-Route::get('/offline/tokens', [Api\OfflineTokenController::class, 'getAllTokens'])->middleware('throttle:30,1');
+Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])
+    ->name('tokens.verify')
+    ->middleware('throttle:30,1');
+
+Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])
+    ->name('tokens.verify.submit')
+    ->middleware('throttle:30,1');
+
+// Offline tokens endpoint (used by Service Worker)
+Route::get('/offline/tokens', [OfflineTokenController::class, 'getAllTokens'])
+    ->middleware('throttle:30,1');
 
 // Token resend routes
-Route::post('/tokens/resend', [TokenController::class, 'resendToken'])->name('tokens.resend');
-Route::get('/tokens/resend/form', [TokenController::class, 'showResendForm'])->name('tokens.resend.form');
+Route::post('/tokens/resend', [TokenController::class, 'resendToken'])
+    ->name('tokens.resend');
+Route::get('/tokens/resend/form', [TokenController::class, 'showResendForm'])
+    ->name('tokens.resend.form');
+
+// Optional: Manual sync trigger (for testing)
+Route::post('/tokens/sync-offline', function() {
+    Artisan::call('tokens:sync-offline');
+    return response()->json(['success' => true, 'message' => 'Sync triggered']);
+})->name('tokens.sync.offline');
 
 // ===== PUBLIC GATEWAY ROUTES (No Auth) =====
 Route::prefix('contract-gateway')->name('contract.gateway.')->group(function () {

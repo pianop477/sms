@@ -1,8 +1,8 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-
     <style>
+        /* [Mistari yako ya CSS hapa - nimeihifadhi kama ilivyo] */
         :root {
             --primary-color: #4e73df;
             --secondary-color: #6f42c1;
@@ -246,7 +246,6 @@
             box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.25);
         }
 
-        /* Status badges enhancement */
         .status-badge {
             padding: 8px 16px;
             border-radius: 25px;
@@ -256,7 +255,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Back button styling */
         .btn-back {
             background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             border: none;
@@ -275,7 +273,6 @@
             color: white;
         }
 
-        /* Report Form Styles */
         .report-form .form-label {
             font-weight: 600;
             color: #495057;
@@ -337,13 +334,11 @@
             }
         }
 
-        /* Loading animation */
         .spinner-border-sm {
             width: 1rem;
             height: 1rem;
         }
 
-        /* Custom scrollbar for table */
         .table-responsive::-webkit-scrollbar {
             height: 8px;
         }
@@ -362,7 +357,6 @@
             background: #2e59d9;
         }
 
-        /* Timeline Styles */
         .timeline {
             position: relative;
             padding-left: 30px;
@@ -399,18 +393,6 @@
             font-size: 0.875rem;
             margin-top: 5px;
             display: block;
-        }
-
-        /* Loading animation improvements */
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        /* Success message styling */
-        .alert-success {
-            border-radius: 10px;
-            border: none;
         }
     </style>
 
@@ -606,11 +588,6 @@
                                                             <span class="text-muted">N/A</span>
                                                         @else
                                                             <div class="d-flex align-items-center">
-                                                                {{-- <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-1" style="width: 35px; height: 35px;">
-                                                                    <span class="text-white fw-bold small">
-                                                                        {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
-                                                                    </span>
-                                                                </div> --}}
                                                                 <span class="ms-2 fw-semibold">
                                                                     {{ ucwords(strtolower($user->first_name. '. '. $user->last_name[0]))}}
                                                                 </span>
@@ -686,7 +663,6 @@
                         </div>
 
                         <div class="row">
-                            <!-- Category Filter -->
                             <div class="col-md-6 mb-3">
                                 <label for="start_date" class="form-label">Start Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
@@ -695,7 +671,6 @@
                                 <span class="text-danger error-message" id="start_date_error"></span>
                             </div>
 
-                            <!-- End Date -->
                             <div class="col-md-6 mb-3">
                                 <label for="end_date" class="form-label">End Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
@@ -706,7 +681,6 @@
                         </div>
 
                         <div class="row">
-                            <!-- Start Date -->
                             <div class="col-md-6 mb-3">
                                 <label for="category" class="form-label">Account</label>
                                 <select name="category" id="category" class="form-select form-control-custom">
@@ -721,7 +695,6 @@
                                 </select>
                                 <span class="text-danger error-message" id="category_error"></span>
                             </div>
-                            <!-- Status Filter -->
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select name="status" id="status" class="form-select form-control-custom">
@@ -735,7 +708,6 @@
                         </div>
 
                         <div class="row">
-                            <!-- Payment Mode -->
                             <div class="col-md-6 mb-3">
                                 <label for="payment_mode" class="form-label">Payment Mode</label>
                                 <select name="payment_mode" id="payment_mode" class="form-select form-control-custom">
@@ -747,14 +719,12 @@
                                 <span class="text-danger error-message" id="payment_mode_error"></span>
                             </div>
 
-                            <!-- Export Format -->
                             <div class="col-md-6 mb-3">
                                 <label for="export_format" class="form-label">Export Format <i class="text-danger">*</i></label>
                                 <select name="export_format" required id="export_format" class="form-select form-control-custom" required>
                                     <option value="">--Select Format--</option>
                                     <option value="pdf"><i class="fas fa-file-pdf"></i> pdf</option>
                                     <option value="excel"><i class="fas fa-file-excel"></i> Excel</option>
-                                    {{-- <option value="word">Word</option> --}}
                                     <option value="csv"><i class="fas fa-file-csv"></i> csv</option>
                                 </select>
                                 <span class="text-danger error-message" id="export_format_error"></span>
@@ -896,294 +866,292 @@
         </div>
     </div>
 
-        <!-- Existing Modals Section - Placed OUTSIDE the table -->
-        <!-- Modals Section - Placed OUTSIDE the table -->
-        @if (!empty($transactions))
-            @foreach ($transactions as $row)
-                <!-- View Modal -->
-                <div class="modal fade" id="viewModal{{$row['reference_number']}}" tabindex="-1" aria-labelledby="viewModalLabel{{$row['reference_number']}}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title" id="viewModalLabel{{$row['reference_number']}}">
-                                    <i class="fas fa-receipt me-2"></i> Expense Details
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
+    <!-- Existing Modals Section -->
+    @if (!empty($transactions))
+        @foreach ($transactions as $row)
+            <!-- View Modal -->
+            <div class="modal fade" id="viewModal{{$row['reference_number']}}" tabindex="-1" aria-labelledby="viewModalLabel{{$row['reference_number']}}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="viewModalLabel{{$row['reference_number']}}">
+                                <i class="fas fa-receipt me-2"></i> Expense Details
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
+                        </div>
+                        <div class="modal-body p-0">
+                            <!-- Header with Reference & Status -->
+                            <div class="bg-light p-4 border-bottom">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted mb-1">Reference Number</h6>
+                                        <h4 class="text-primary fw-bold">{{strtoupper($row['reference_number'])}}</h4>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <h6 class="text-muted mb-1">Status</h6>
+                                        @if ($row['status'] == 'active')
+                                            <span class="badge bg-success text-white fs-6">{{ucwords($row['status'])}}</span>
+                                        @elseif ($row['status'] == 'pending')
+                                            <span class="badge bg-warning text-white fs-6">{{ucwords($row['status'])}}</span>
+                                        @else
+                                            <span class="badge bg-danger text-white fs-6">{{ucwords($row['status'])}}</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                            <div class="modal-body p-0">
-                                <!-- Header with Reference & Status -->
-                                <div class="bg-light p-4 border-bottom">
+
+                            <!-- Tabs Navigation -->
+                            <ul class="nav nav-tabs nav-justified" id="transactionTabs{{$row['reference_number']}}" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="details-tab{{$row['reference_number']}}" data-bs-toggle="tab"
+                                            data-bs-target="#details{{$row['reference_number']}}" type="button" role="tab">
+                                        <i class="fas fa-info-circle me-2"></i> Details
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="payment-tab{{$row['reference_number']}}" data-bs-toggle="tab"
+                                            data-bs-target="#payment{{$row['reference_number']}}" type="button" role="tab">
+                                        <i class="fas fa-credit-card me-2"></i> Payment
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="timeline-tab{{$row['reference_number']}}" data-bs-toggle="tab"
+                                            data-bs-target="#timeline{{$row['reference_number']}}" type="button" role="tab">
+                                        <i class="fas fa-history me-2"></i> Timeline
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="attachment-table{{$row['reference_number']}}" data-bs-toggle="tab"
+                                        data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
+                                        <i class="fas fa-paperclip me-2"></i> Attachments
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <!-- Tabs Content -->
+                            <div class="tab-content p-4" id="transactionTabsContent{{$row['reference_number']}}">
+                                <!-- Details Tab -->
+                                <div class="tab-pane fade show active" id="details{{$row['reference_number']}}" role="tabpanel">
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <h6 class="text-muted mb-1">Reference Number</h6>
-                                            <h4 class="text-primary fw-bold">{{strtoupper($row['reference_number'])}}</h4>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small mb-1">Account</label>
+                                            <p class="fw-semibold">{{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}</p>
                                         </div>
-                                        <div class="col-md-6 text-end">
-                                            <h6 class="text-muted mb-1">Status</h6>
-                                            @if ($row['status'] == 'active')
-                                                <span class="badge bg-success text-white fs-6">{{ucwords($row['status'])}}</span>
-                                            @elseif ($row['status'] == 'pending')
-                                                <span class="badge bg-warning text-white fs-6">{{ucwords($row['status'])}}</span>
-                                            @else
-                                                <span class="badge bg-danger text-white fs-6">{{ucwords($row['status'])}}</span>
-                                            @endif
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small mb-1">Amount</label>
+                                            <p class="fw-bold fs-5 text-primary">TZS {{number_format($row['amount'])}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label text-muted small mb-1">Description</label>
+                                            <p class="fw-semibold">{{$row['description'] ?? 'No description provided'}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            @php
+                                                $user = \App\Models\User::where('id', $row['user_id'])->first();
+                                            @endphp
+                                            <label class="form-label text-muted small mb-1">Issued By</label>
+                                            <p class="fw-semibold">
+                                                @if ($user == null)
+                                                    N/A
+                                                @else
+                                                    {{ ucwords(strtolower($user->first_name. ' '. $user->last_name))}}
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small mb-1">Created Date</label>
+                                            <p class="fw-semibold">
+                                                @if(isset($row['expense_date']))
+                                                    {{\Carbon\Carbon::parse($row['expense_date'])->format('d-m-Y')}}
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Tabs Navigation -->
-                                <ul class="nav nav-tabs nav-justified" id="transactionTabs{{$row['reference_number']}}" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="details-tab{{$row['reference_number']}}" data-bs-toggle="tab"
-                                                data-bs-target="#details{{$row['reference_number']}}" type="button" role="tab">
-                                            <i class="fas fa-info-circle me-2"></i> Details
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="payment-tab{{$row['reference_number']}}" data-bs-toggle="tab"
-                                                data-bs-target="#payment{{$row['reference_number']}}" type="button" role="tab">
-                                            <i class="fas fa-credit-card me-2"></i> Payment
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="timeline-tab{{$row['reference_number']}}" data-bs-toggle="tab"
-                                                data-bs-target="#timeline{{$row['reference_number']}}" type="button" role="tab">
-                                            <i class="fas fa-history me-2"></i> Timeline
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="attachment-table{{$row['reference_number']}}" data-bs-toggle="tab"
-                                            data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
-                                            <i class="fas fa-paperclip me-2"></i> Attachments
-                                        </button>
-                                    </li>
-                                </ul>
-
-                                <!-- Tabs Content -->
-                                <div class="tab-content p-4" id="transactionTabsContent{{$row['reference_number']}}">
-                                    <!-- Details Tab -->
-                                    <div class="tab-pane fade show active" id="details{{$row['reference_number']}}" role="tabpanel">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Account</label>
-                                                <p class="fw-semibold">{{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}</p>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Amount</label>
-                                                <p class="fw-bold fs-5 text-primary">TZS {{number_format($row['amount'])}}</p>
-                                            </div>
+                                <!-- Payment Tab -->
+                                <div class="tab-pane fade" id="payment{{$row['reference_number']}}" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small mb-1">Payment Mode</label>
+                                            <p class="fw-semibold">
+                                                @if ($row['payment_mode'] == 'cash')
+                                                    <span class="text-success fs-6">{{ucwords($row['payment_mode'])}}</span>
+                                                @elseif($row['payment_mode'] == 'mobile_money')
+                                                    <span class="text-primary fs-6">{{ucwords($row['payment_mode'])}}</span>
+                                                @else
+                                                    <span class="text-danger fs-6">{{ucwords($row['payment_mode'])}}</span>
+                                                @endif
+                                            </p>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-12 mb-3">
-                                                <label class="form-label text-muted small mb-1">Description</label>
-                                                <p class="fw-semibold">{{$row['description'] ?? 'No description provided'}}</p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                @php
-                                                    $user = \App\Models\User::where('id', $row['user_id'])->first();
-                                                @endphp
-                                                <label class="form-label text-muted small mb-1">Issued By</label>
-                                                <p class="fw-semibold">
-                                                    @if ($user == null)
-                                                        N/A
-                                                    @else
-                                                        {{ ucwords(strtolower($user->first_name. ' '. $user->last_name))}}
-                                                    @endif
-                                                </p>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Created Date</label>
-                                                <p class="fw-semibold">
-                                                    @if(isset($row['created_at']))
-                                                        {{\Carbon\Carbon::parse($row['expense_date'])->format('d-m-Y')}}
-                                                    @else
-                                                        N/A
-                                                    @endif
-                                                </p>
-                                            </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small mb-1">Bill Type</label>
+                                            <p class="fw-semibold">
+                                                <span class="badge bg-info fs-6 text-white">Expense</span>
+                                            </p>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Payment Tab -->
-                                    <div class="tab-pane fade" id="payment{{$row['reference_number']}}" role="tabpanel">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Payment Mode</label>
-                                                <p class="fw-semibold">
-                                                    @if ($row['payment_mode'] == 'cash')
-                                                        <span class="text-success fs-6">{{ucwords($row['payment_mode'])}}</span>
-                                                    @elseif($row['payment_mode'] == 'mobile_money')
-                                                        <span class="text-primary fs-6">{{ucwords($row['payment_mode'])}}</span>
-                                                    @else
-                                                        <span class="text-danger fs-6">{{ucwords($row['payment_mode'])}}</span>
-                                                    @endif
-                                                </p>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Bill Type</label>
-                                                <p class="fw-semibold">
-                                                    <span class="badge bg-info fs-6 text-white">Expense</span>
-                                                </p>
+                                <!-- Timeline Tab -->
+                                <div class="tab-pane fade" id="timeline{{$row['reference_number']}}" role="tabpanel">
+                                    <div class="timeline">
+                                        @if(isset($row['expense_date']))
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker bg-success"></div>
+                                            <div class="timeline-content">
+                                                <h6 class="fw-bold">Expense Created</h6>
+                                                <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['expense_date'])->format('M d, Y h:i A')}}</p>
                                             </div>
                                         </div>
-                                    </div>
+                                        @endif
 
-                                    <!-- Timeline Tab -->
-                                    <div class="tab-pane fade" id="timeline{{$row['reference_number']}}" role="tabpanel">
-                                        <div class="timeline">
-                                            @if(isset($row['created_at']))
+                                        @if(isset($row['updated_at']) && isset($row['expense_date']) && $row['expense_date'] != $row['updated_at'])
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker bg-primary"></div>
+                                            <div class="timeline-content">
+                                                <h6 class="fw-bold">Expense Updated</h6>
+                                                <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if($row['status'] == 'cancelled')
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker bg-danger"></div>
+                                            <div class="timeline-content">
+                                                <h6 class="fw-bold">Expense Cancelled</h6>
+                                                <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
+                                                @if(isset($row['cancel_reason']))
+                                                <p>Reason: <span class="small text-danger">{{$row['cancel_reason']}}</span></p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- attachment Tab -->
+                                <div class="tab-pane fade" id="attachment{{$row['reference_number']}}" role="tabpanel">
+                                    <div class="timeline">
+                                        @if(isset($row['attachment']))
                                             <div class="timeline-item">
                                                 <div class="timeline-marker bg-success"></div>
                                                 <div class="timeline-content">
-                                                    <h6 class="fw-bold">Expense Created</h6>
-                                                    <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['expense_date'])->format('M d, Y h:i A')}}</p>
-                                                </div>
-                                            </div>
-                                            @endif
+                                                    <h6 class="fw-bold">Expense Bill Receipt</h6>
 
-                                            @if(isset($row['updated_at']) && $row['created_at'] != $row['updated_at'])
-                                            <div class="timeline-item">
-                                                <div class="timeline-marker bg-primary"></div>
-                                                <div class="timeline-content">
-                                                    <h6 class="fw-bold">Expense Updated</h6>
-                                                    <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
-                                                </div>
-                                            </div>
-                                            @endif
+                                                        @if(!empty($row['attachment_url']))
+                                                            @php
+                                                                $extension = strtolower(pathinfo($row['attachment'], PATHINFO_EXTENSION));
+                                                                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
+                                                            @endphp
 
-                                            @if($row['status'] == 'cancelled')
-                                            <div class="timeline-item">
-                                                <div class="timeline-marker bg-danger"></div>
-                                                <div class="timeline-content">
-                                                    <h6 class="fw-bold">Expense Cancelled</h6>
-                                                    <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
-                                                    @if(isset($row['cancel_reason']))
-                                                    <p>Reason: <span class="small text-danger">{{$row['cancel_reason']}}</span></p>
-                                                    @endif
+                                                            @if($isImage)
+                                                                <!-- Display Image -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank">
+                                                                    <img src="{{ $row['attachment_url'] }}"
+                                                                        alt="Receipt"
+                                                                        style="max-width: 100px; max-height: 100px; border-radius: 5px;">
+                                                                </a>
+                                                            @elseif($extension === 'pdf')
+                                                                <!-- Display PDF -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-file-pdf"></i> View PDF Receipt
+                                                                </a>
+                                                            @else
+                                                                <!-- Other file types -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-secondary">
+                                                                    <i class="fas fa-file"></i> View File
+                                                                </a>
+                                                            @endif
+                                                        @else
+                                                            <span class="text-muted">No attachment</span>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                @else
+                                                    <span class="text-muted">No attachment</span>
                                             @endif
                                         </div>
-                                    </div>
-                                    <!-- attachment Tab -->
-                                    <div class="tab-pane fade" id="attachment{{$row['reference_number']}}" role="tabpanel">
-                                        <div class="timeline">
-                                            @if(isset($row['attachment']))
-                                                <div class="timeline-item">
-                                                    <div class="timeline-marker bg-success"></div>
-                                                    <div class="timeline-content">
-                                                        <h6 class="fw-bold">Expense Bill Receipt</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i> Close
+                            </button>
+                            @if($row['status'] == 'active')
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{$row['reference_number']}}">
+                                <i class="fas fa-ban me-2"></i> Cancel
+                            </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                                                            @if(!empty($row['attachment_url']))
-                                                                @php
-                                                                    $extension = strtolower(pathinfo($row['attachment'], PATHINFO_EXTENSION));
-                                                                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
-                                                                @endphp
-
-                                                                @if($isImage)
-                                                                    <!-- Display Image -->
-                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank">
-                                                                        <img src="{{ $row['attachment_url'] }}"
-                                                                            alt="Receipt"
-                                                                            style="max-width: 100px; max-height: 100px; border-radius: 5px;">
-                                                                    </a>
-                                                                @elseif($extension === 'pdf')
-                                                                    <!-- Display PDF -->
-                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
-                                                                        <i class="fas fa-file-pdf"></i> View PDF Receipt
-                                                                    </a>
-                                                                @else
-                                                                    <!-- Other file types -->
-                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-secondary">
-                                                                        <i class="fas fa-file"></i> View File
-                                                                    </a>
-                                                                @endif
-                                                            @else
-                                                                <span class="text-muted">No attachment</span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    @else
-                                                        <span class="text-muted">No attachment</span>
-                                                @endif
-                                            </div>
-                                    </div>
+            <!-- Cancel Modal -->
+            <div class="modal fade" id="cancelModal{{$row['reference_number']}}" tabindex="-1" aria-labelledby="cancelModalLabel{{$row['reference_number']}}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning text-white">
+                            <h5 class="modal-title" id="cancelModalLabel{{$row['reference_number']}}">
+                                Cancel Bill - {{strtoupper($row['reference_number'])}}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
+                        </div>
+                        <form action="{{route('expenditure.cancel.bill', ['bill' => Hashids::encode($row['id'])])}}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="cancelReason{{$row['reference_number']}}" class="form-label">Cancel Reason <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                        class="form-control-custom"
+                                        id="cancelReason{{$row['reference_number']}}"
+                                        name="cancel_reason"
+                                        placeholder="Enter cancel reason"
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <strong>Bill Details:</strong><br>
+                                        Reference: {{strtoupper($row['reference_number'])}}<br>
+                                        Amount: {{number_format($row['amount'])}}<br>
+                                        Account: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
+                                    </small>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-2"></i> Close
-                                </button>
-                                @if($row['status'] == 'active')
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{$row['reference_number']}}">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this bill?')">
                                     <i class="fas fa-ban me-2"></i> Cancel
                                 </button>
-                                @endif
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
-
-                <!-- Cancel Modal -->
-                <div class="modal fade" id="cancelModal{{$row['reference_number']}}" tabindex="-1" aria-labelledby="cancelModalLabel{{$row['reference_number']}}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header bg-warning text-white">
-                                <h5 class="modal-title" id="cancelModalLabel{{$row['reference_number']}}">
-                                    Cancel Bill - {{strtoupper($row['reference_number'])}}
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
-                            </div>
-                            <form action="{{route('expenditure.cancel.bill', ['bill' => Hashids::encode($row['id'])])}}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="cancelReason{{$row['reference_number']}}" class="form-label">Cancel Reason <span class="text-danger">*</span></label>
-                                        <input type="text"
-                                            class="form-control-custom"
-                                            id="cancelReason{{$row['reference_number']}}"
-                                            name="cancel_reason"
-                                            placeholder="Enter cancel reason"
-                                            required
-                                        >
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">
-                                            <strong>Bill Details:</strong><br>
-                                            Reference: {{strtoupper($row['reference_number'])}}<br>
-                                            Amount: {{number_format($row['amount'])}}<br>
-                                            Account: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this bill?')">
-                                        <i class="fas fa-ban me-2"></i> Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @endif
+            </div>
+        @endforeach
+    @endif
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Export Report Form Handling
+            // ========================
+            // EXPORT REPORT HANDLING (Improved)
+            // ========================
             const exportForm = document.getElementById('exportReportForm');
             const generateBtn = document.getElementById('generateReportBtn');
 
             if (exportForm && generateBtn) {
                 exportForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-
-                    // Prevent the global preloader from showing
-                    e.stopImmediatePropagation();
 
                     // Clear previous errors
                     clearErrors();
@@ -1194,19 +1162,19 @@
                     const exportFormat = document.getElementById('export_format').value;
 
                     if (!startDate || !endDate || !exportFormat) {
-                        showError('Please fill all required fields');
+                        showErrorInModal('Please fill all required fields (Start Date, End Date, and Format).');
                         return;
                     }
 
                     if (startDate > endDate) {
-                        showError('start_date', 'Start date cannot be after end date.');
+                        showErrorInModal('Start date cannot be after end date.');
                         return;
                     }
 
                     // Show loading state
                     const originalText = generateBtn.innerHTML;
                     generateBtn.disabled = true;
-                    generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Generating...';
+                    generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Generating...';
 
                     // Prepare form data
                     const formData = new FormData(this);
@@ -1221,182 +1189,139 @@
                         }
                     })
                     .then(response => {
-                        if (!response.ok) {
-                            // If response is not OK, check if it's a validation error
-                            if (response.status === 422) {
-                                return response.json().then(data => {
-                                    throw new Error(data.message || 'Validation failed');
-                                });
-                            }
-                            throw new Error('Network response was not ok');
-                        }
+                        // Check content-type to determine if it's a file or error
+                        const contentType = response.headers.get('content-type') || '';
 
-                        // Check content type to see if it's a file or JSON error
-                        const contentType = response.headers.get('content-type');
-                        if (contentType && contentType.includes('application/json')) {
+                        if (contentType.includes('application/json')) {
+                            // It's a JSON response (likely an error)
                             return response.json().then(data => {
-                                if (data.error) {
-                                    throw new Error(data.error);
-                                }
-                                return response.blob();
+                                throw new Error(data.error || data.message || 'An error occurred');
                             });
                         }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        // Check if blob is actually an error message
-                        if (blob instanceof Blob) {
-                            // Create blob URL
-                            const url = window.URL.createObjectURL(blob);
 
-                            // Open in new tab
-                            const newTab = window.open(url, '_blank');
-
-                            // Focus on new tab
-                            if (newTab) {
-                                newTab.focus();
-                            } else {
-                                // Fallback: download if popup blocked
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `transactions_report.${exportFormat}`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
+                        // It's a file (blob)
+                        // Get filename from Content-Disposition header
+                        const disposition = response.headers.get('content-disposition');
+                        let filename = 'report.' + exportFormat; // fallback
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                            const matches = filenameRegex.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '');
                             }
-
-                            // Clean up
-                            setTimeout(() => window.URL.revokeObjectURL(url), 100);
-
-                            // RESET FORM FIELDS ONLY (without closing modal)
-                            exportForm.reset();
-                            clearErrors();
                         }
 
-                        // Reset button state
+                        return response.blob().then(blob => {
+                            return { blob, filename };
+                        });
+                    })
+                    .then(({ blob, filename }) => {
+                        // Create a download link
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename; // 👈 USE SERVER-SENT FILENAME
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+
+                        // Clean up
+                        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                        // Reset form and button
+                        exportForm.reset();
+                        clearErrors();
                         resetButtonState(generateBtn, originalText);
+
+                        // Show success message
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'alert alert-success alert-dismissible fade show mt-3';
+                        successMsg.id = 'exportSuccessAlert';
+                        successMsg.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            Report generated successfully! Downloading...
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        const modalBody = document.querySelector('#exportReportModal .modal-body');
+                        modalBody.appendChild(successMsg);
+
+                        // Auto-hide success message after 5 seconds
+                        setTimeout(() => {
+                            const alert = document.getElementById('exportSuccessAlert');
+                            if (alert) alert.remove();
+                        }, 5000);
+
+                        // Close modal after a short delay
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('exportReportModal'));
+                            if (modal) modal.hide();
+                        }, 2000);
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-
-                        // Show error message in modal without opening new tab
-                        showErrorInModal(error.message || 'An error occurred while generating the report. Please try again.');
+                        console.error('Export error:', error);
+                        showErrorInModal(error.message || 'Failed to generate report. Please try again.');
                         resetButtonState(generateBtn, originalText);
                     });
                 });
 
-                // Reset form when modal is closed manually by user
+                // Reset form when modal is closed
                 const exportModal = document.getElementById('exportReportModal');
                 if (exportModal) {
                     exportModal.addEventListener('hidden.bs.modal', function () {
                         exportForm.reset();
                         clearErrors();
                         resetButtonState(generateBtn, '<i class="fas fa-download me-2"></i> Generate Report');
-
-                        // Clear any error alerts
-                        const existingAlert = document.getElementById('exportErrorAlert');
-                        if (existingAlert) {
-                            existingAlert.remove();
-                        }
+                        // Remove any alert messages
+                        document.querySelectorAll('#exportReportModal .alert').forEach(el => el.remove());
                     });
                 }
             }
 
             // Helper functions
             function clearErrors() {
-                document.querySelectorAll('.error-message').forEach(el => {
-                    el.textContent = '';
-                });
-            }
-
-            function showError(field, message) {
-                if (typeof field === 'object') {
-                    // Global error
-                    alert(message);
-                } else {
-                    // Field-specific error
-                    const errorElement = document.getElementById(`${field}_error`);
-                    if (errorElement) {
-                        errorElement.textContent = message;
-                    }
-                }
+                document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
             }
 
             function showErrorInModal(message) {
-                // Remove any existing error alerts
-                const existingAlert = document.getElementById('exportErrorAlert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
+                // Remove existing error alerts
+                document.querySelectorAll('#exportReportModal .alert-danger').forEach(el => el.remove());
 
-                // Create error alert
                 const errorAlert = document.createElement('div');
-                errorAlert.id = 'exportErrorAlert';
                 errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                errorAlert.id = 'exportErrorAlert';
                 errorAlert.innerHTML = `
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
-
-                // Insert after the form
                 const modalBody = document.querySelector('#exportReportModal .modal-body');
                 modalBody.appendChild(errorAlert);
             }
 
             function resetButtonState(button, originalText) {
-                button.disabled = false;
-                button.innerHTML = originalText;
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
             }
 
-            // Initialize Bootstrap tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton");
-
-            if (!form || !submitButton) return;
-
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
-
-                // Disable button and show loading state
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
-
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = "Save";
-                    return;
-                }
-
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
+            // ========================
+            // EDIT TRANSACTION HANDLING (unchanged)
+            // ========================
             const editButtons = document.querySelectorAll('.edit-transaction-btn');
             const editModal = document.getElementById('editTransactionModal');
             const editForm = document.getElementById('editTransactionForm');
             const modalTitle = document.getElementById('modalReferenceNumber');
 
-            // Handle edit button clicks
-            editButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const transactionId = this.getAttribute('data-transaction-id');
-                    loadTransactionData(transactionId);
+            if (editButtons.length) {
+                editButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const transactionId = this.getAttribute('data-transaction-id');
+                        loadTransactionData(transactionId);
+                    });
                 });
-            });
+            }
 
-            // Load transaction data via AJAX
             function loadTransactionData(transactionId) {
                 const updateBtn = document.getElementById('updateTransactionBtn');
                 updateBtn.disabled = true;
@@ -1442,7 +1367,6 @@
                     });
             }
 
-            // Populate form with transaction data
             function populateEditForm(transaction) {
                 modalTitle.textContent = transaction.reference_number;
                 document.getElementById('editTransactionId').value = transaction.id;
@@ -1510,36 +1434,35 @@
                 }
             }
 
-            // Handle update form submission
-            editForm.addEventListener('submit', function (event) {
-                event.preventDefault();
+            if (editForm) {
+                editForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
 
-                if (!editForm.checkValidity()) {
-                    editForm.reportValidity();
-                    return;
-                }
+                    if (!editForm.checkValidity()) {
+                        editForm.reportValidity();
+                        return;
+                    }
 
-                const updateBtn = document.getElementById('updateTransactionBtn');
-                updateBtn.disabled = true;
-                updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
+                    const updateBtn = document.getElementById('updateTransactionBtn');
+                    updateBtn.disabled = true;
+                    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
 
-                const formData = new FormData(editForm);
-                const transactionId = document.getElementById('editTransactionId').value;
+                    const formData = new FormData(editForm);
+                    const transactionId = document.getElementById('editTransactionId').value;
 
-                fetch(`/expenditure/update-transaction/${transactionId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: formData
-                })
+                    fetch(`/expenditure/update-transaction/${transactionId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: formData
+                    })
                     .then(response => {
                         if (!response.ok) throw new Error('Network error');
                         return response.json();
                     })
                     .then(data => {
                         if (data.status === true) {
-                            // Show success message with SweetAlert
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
@@ -1551,11 +1474,8 @@
                                 timerProgressBar: true,
                             }).then(() => {
                                 editForm.reset();
-
-                                // reload full window
                                 window.location.reload();
                             });
-
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -1586,13 +1506,15 @@
                         updateBtn.disabled = false;
                         updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                     });
-            });
+                });
+            }
 
-            // Reset form when modal is hidden
-            editModal.addEventListener('hidden.bs.modal', function () {
-                editForm.reset();
-                document.getElementById('currentAttachmentSection').style.display = 'none';
-            });
+            if (editModal) {
+                editModal.addEventListener('hidden.bs.modal', function () {
+                    if (editForm) editForm.reset();
+                    document.getElementById('currentAttachmentSection').style.display = 'none';
+                });
+            }
         });
     </script>
 @endsection
