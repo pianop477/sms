@@ -886,7 +886,6 @@
         </div>
     </div>
 
-    <script src="{{ asset('assets/js/scripts.js') }}"></script>
     <script>
         (function() {
             'use strict';
@@ -926,7 +925,6 @@
 
             // ========== OFFLINE STATUS ==========
 
-            // Update status dot and text
             function setStatus(mode, message) {
                 statusDot.className = 'status-dot';
                 if (mode === 'online') {
@@ -943,7 +941,6 @@
                 }
             }
 
-            // Check if there are tokens available for sync
             async function checkTokensAvailability() {
                 try {
                     const response = await fetch('/offline/tokens', {
@@ -961,7 +958,6 @@
                     syncBtn.classList.add('hidden');
                     return false;
                 } catch (e) {
-                    // If offline, try to check IndexedDB via SW
                     try {
                         const count = await getOfflineTokenCount();
                         if (count > 0) {
@@ -976,7 +972,6 @@
                 }
             }
 
-            // Get token count from IndexedDB (internal, not shown in UI)
             async function getOfflineTokenCount() {
                 if (!('serviceWorker' in navigator)) return 0;
                 try {
@@ -1040,7 +1035,6 @@
 
                     showProgress(30, 'Inasambaza ombi...');
 
-                    // Send sync message and wait for response
                     const result = await new Promise((resolve) => {
                         const channel = new MessageChannel();
                         channel.port1.onmessage = (event) => {
@@ -1058,7 +1052,6 @@
                         showProgress(100, 'Imekamilika!');
                         setTimeout(hideProgress, 800);
                         showAlert('Token zimepakuliwa kikamilifu!', 'success');
-                        // Re-check if tokens are available (hide button if none)
                         await checkTokensAvailability();
                         setStatus('online', 'Imeunganishwa');
                     } else {
@@ -1099,7 +1092,6 @@
                     }
                 });
 
-                // Register SW if not already
                 navigator.serviceWorker.getRegistration().then(registration => {
                     if (!registration) {
                         navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
@@ -1114,18 +1106,15 @@
             function updateConnectionStatus() {
                 if (navigator.onLine) {
                     setStatus('online', 'Imeunganishwa');
-                    // Check if tokens are available
                     checkTokensAvailability();
                 } else {
                     setStatus('offline', 'Hakuna mtandao');
-                    // Hide sync button when offline (can't download without internet)
                     syncBtn.classList.add('hidden');
                 }
             }
 
             window.addEventListener('online', () => {
                 updateConnectionStatus();
-                // Re-check tokens when coming back online
                 setTimeout(checkTokensAvailability, 1000);
             });
 
@@ -1134,24 +1123,19 @@
                 syncBtn.classList.add('hidden');
             });
 
-            // ========== BUTTON EVENTS ==========
-
             syncBtn.addEventListener('click', triggerOfflineSync);
 
-            // ========== INIT ==========
+            // ========== INIT OFFLINE STATUS ==========
 
             async function initOfflineStatus() {
                 updateConnectionStatus();
-                // If online, check tokens availability
                 if (navigator.onLine) {
                     await checkTokensAvailability();
                 } else {
-                    // If offline, check if there are cached tokens (via SW)
                     try {
                         const count = await getOfflineTokenCount();
                         if (count > 0) {
                             hasTokens = true;
-                            // Show button but disabled because no internet to download new ones
                             syncBtn.classList.remove('hidden');
                             syncBtn.disabled = true;
                             syncBtn.title = 'Unahitaji mtandao kupakia token mpya';
@@ -1161,7 +1145,7 @@
             }
 
             // ==========================================
-            // REST OF YOUR VERIFICATION LOGIC (unchanged)
+            // VERIFICATION LOGIC (FULLY OFFLINE CAPABLE)
             // ==========================================
 
             function init() {
@@ -1170,6 +1154,18 @@
                 setupPhotoZoom();
                 focusFirstInput();
                 initOfflineStatus();
+
+                // Notify user if page is offline and has no tokens
+                if (!navigator.onLine) {
+                    setTimeout(async () => {
+                        const count = await getOfflineTokenCount();
+                        if (count === 0) {
+                            showAlert('Huna token zilizohifadhiwa. Unganisha mtandao kupakua token.', 'warning', true, 5000);
+                        } else {
+                            showAlert('Una token ' + count + ' zilizohifadhiwa. Verification inawezekana offline.', 'info', true, 3000);
+                        }
+                    }, 1000);
+                }
             }
 
             function setupTokenEvents() {
@@ -1250,7 +1246,6 @@
                 if (verificationTimeout) clearTimeout(verificationTimeout);
                 currentStudentId = null;
                 removeError();
-                // Re-check tokens availability when resetting
                 if (navigator.onLine) checkTokensAvailability();
             }
 
@@ -1268,8 +1263,7 @@
                 alertBox.className = `alert alert-${type}`;
                 alertBox.style.display = 'block';
                 alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                if (autoHide) setTimeout(() => { if (alertBox.style.display === 'block') alertBox.style.display = 'none'; },
-                duration);
+                if (autoHide) setTimeout(() => { if (alertBox.style.display === 'block') alertBox.style.display = 'none'; }, duration);
             }
 
             function hideAlert() {
@@ -1293,7 +1287,7 @@
             }
 
             // ==========================================
-            // VERIFY TOKEN
+            // VERIFY TOKEN (OFFLINE CAPABLE)
             // ==========================================
             async function verifyToken() {
                 const token = getFullToken();
@@ -1310,6 +1304,9 @@
                 hideAlert();
 
                 try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
                     const response = await fetch('{{ route("tokens.verify.submit") }}', {
                         method: 'POST',
                         headers: {
@@ -1317,8 +1314,12 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ token: token })
+                        body: JSON.stringify({ token: token }),
+                        signal: controller.signal
                     });
+
+                    clearTimeout(timeoutId);
+
                     const data = await response.json();
                     if (response.ok && data.success) {
                         if (data.offline) {
@@ -1327,7 +1328,6 @@
                             showAlert(data.message, 'success', true, 1800);
                         }
                         showStudentInfo(data.data);
-                        // After successful online verification, refresh tokens availability
                         if (!data.offline) checkTokensAvailability();
                     } else {
                         showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
@@ -1335,9 +1335,38 @@
                         setTimeout(() => resetAll(), 3500);
                     }
                 } catch (error) {
-                    showAlert('Hitilafu ya mtandao. Jaribu kuangalia muunganisho wako.', 'error');
-                    addError();
-                    setTimeout(() => resetAll(), 4000);
+                    // Handle offline/network failure gracefully
+                    if (error.name === 'AbortError') {
+                        showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
+                    } else {
+                        // Try offline verification via Service Worker
+                        try {
+                            const registration = await navigator.serviceWorker.ready;
+                            if (registration.active) {
+                                const result = await new Promise((resolve) => {
+                                    const channel = new MessageChannel();
+                                    channel.port1.onmessage = (event) => {
+                                        resolve(event.data);
+                                    };
+                                    registration.active.postMessage({
+                                        type: 'VERIFY_TOKEN_OFFLINE',
+                                        token: token
+                                    }, [channel.port2]);
+                                    setTimeout(() => resolve({ success: false, error: 'Timeout' }), 5000);
+                                });
+                                if (result && result.success) {
+                                    showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
+                                    showStudentInfo(result.data);
+                                    return;
+                                }
+                            }
+                        } catch (swError) {
+                            console.warn('SW offline verification failed:', swError);
+                        }
+                        showAlert('Hakuna mtandao. Hakikisha token imehifadhiwa offline.', 'error', true, 4000);
+                        addError();
+                        setTimeout(() => resetAll(), 4000);
+                    }
                 } finally {
                     isLoading = false;
                     loadingSection.style.display = 'none';
@@ -1349,8 +1378,7 @@
                 const student = data.student;
                 const installment = data.installment;
                 const token = data.token;
-                const studentImage = student.image ? '/storage/students/' + student.image :
-                '/storage/students/student.jpg';
+                const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
                 const hasTransport = student.has_transport;
                 const transportIcon = hasTransport ? 'fa-bus' : 'fa-person-walking';
                 const transportColor = hasTransport ? '#22c55e' : '#dc2626';
@@ -1361,8 +1389,7 @@
                 const firstName = student.first_name ? student.first_name.toUpperCase() : '';
                 const lastName = student.last_name ? student.last_name.toUpperCase() : '';
                 const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-                const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() :
-                    'N/A';
+                const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A';
 
                 studentSection.innerHTML = `
                     <div class="success-card">
@@ -1433,12 +1460,12 @@
 
             function formatDate(dateStr) {
                 try {
-                    return new Date(dateStr).toLocaleString('sw-TZ', { day: '2-digit', month: 'short', hour: '2-digit',
-                        minute: '2-digit' });
+                    return new Date(dateStr).toLocaleString('sw-TZ', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
                 } catch (e) { return dateStr; }
             }
 
-            // Modal handlers
+            // ========== MODAL HANDLERS ==========
+
             function setupModalEvents() {
                 showResendModalBtn?.addEventListener('click', () => {
                     resendModal.classList.add('active');
@@ -1448,8 +1475,7 @@
                     modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
                 });
                 closeModalBtn?.addEventListener('click', () => resendModal.classList.remove('active'));
-                resendModal?.addEventListener('click', (e) => { if (e.target === resendModal) resendModal.classList.remove(
-                        'active'); });
+                resendModal?.addEventListener('click', (e) => { if (e.target === resendModal) resendModal.classList.remove('active'); });
                 resendForm?.addEventListener('submit', handleResendToken);
             }
 
@@ -1467,8 +1493,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                            .getAttribute('content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({ admission_number: admission })
                     });
@@ -1476,7 +1501,6 @@
                     if (data.success) {
                         showModalAlert(data.message, 'success');
                         setTimeout(() => resendModal.classList.remove('active'), 2000);
-                        // Refresh offline tokens after resend
                         triggerOfflineSync();
                     } else {
                         showModalAlert(data.message, 'error');
@@ -1496,7 +1520,8 @@
                 setTimeout(() => modalAlert.style.display = 'none', 3000);
             }
 
-            // Wait for DOM to be fully loaded before initializing
+            // ========== INIT ==========
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {

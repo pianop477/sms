@@ -1,5 +1,5 @@
 // public/service-worker.js
-const APP_VERSION = '2026.07.02.01';
+const APP_VERSION = '2026.07.02.02';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
@@ -43,7 +43,7 @@ async function saveTokensToIndexedDB(tokens) {
     }
     return new Promise((resolve, reject) => {
         tx.oncomplete = () => {
-            // ✅ Use Cache API instead of localStorage
+            // Store last sync time in cache
             const lastSyncData = JSON.stringify({ lastSync: new Date().toISOString() });
             caches.open(CACHE_NAME).then(cache => {
                 cache.put('/offline/last-sync', new Response(lastSyncData, {
@@ -138,6 +138,7 @@ async function fetchAndCacheTokens() {
 const STATIC_ASSETS = [
     '/',
     '/offline.html',
+    '/tokens/verify',
     '/manifest.json',
     '/assets/css/bootstrap.min.css',
     '/assets/css/styles.css',
@@ -208,21 +209,20 @@ self.addEventListener('message', event => {
 
     if (data.type === 'GET_OFFLINE_TOKEN_COUNT') {
         event.waitUntil(
-            getAllTokensFromIndexedDB().then(tokens => {
-                const lastSync = getLastSyncTime();
-                Promise.all([tokens, lastSync]).then(([tokensList, syncTime]) => {
+            Promise.all([getAllTokensFromIndexedDB(), getLastSyncTime()])
+                .then(([tokens, lastSync]) => {
                     if (event.ports && event.ports.length) {
                         event.ports[0].postMessage({
-                            count: tokensList.length,
-                            lastSync: syncTime
+                            count: tokens.length,
+                            lastSync: lastSync
                         });
                     }
-                });
-            }).catch(() => {
-                if (event.ports && event.ports.length) {
-                    event.ports[0].postMessage({ count: 0, lastSync: null });
-                }
-            })
+                })
+                .catch(() => {
+                    if (event.ports && event.ports.length) {
+                        event.ports[0].postMessage({ count: 0, lastSync: null });
+                    }
+                })
         );
         return;
     }
@@ -232,6 +232,7 @@ self.addEventListener('message', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
+    // Skip non-GET requests
     if (event.request.method !== 'GET') {
         return;
     }
@@ -252,7 +253,32 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 2. TOKEN SYNC ENDPOINT - network first, cache for offline
+    // 2. TOKEN VERIFICATION PAGE - cache first (IMPORTANT for offline access)
+    if (url.pathname === '/tokens/verify' && event.request.method === 'GET') {
+        event.respondWith(
+            caches.match(event.request).then(cached => {
+                if (cached) {
+                    console.log('[SW] Serving /tokens/verify from cache');
+                    return cached;
+                }
+                return fetch(event.request).then(response => {
+                    if (response && response.status === 200) {
+                        const responseForCache = response.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseForCache);
+                        });
+                    }
+                    return response;
+                }).catch(() => {
+                    // Fallback to offline.html if page not cached
+                    return caches.match('/offline.html');
+                });
+            })
+        );
+        return;
+    }
+
+    // 3. TOKEN SYNC ENDPOINT - network first, cache for offline
     if (url.pathname === '/offline/tokens') {
         event.respondWith(
             fetch(event.request).then(response => {
@@ -280,13 +306,13 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 3. TOKEN VERIFICATION - intercept for offline support
+    // 4. TOKEN VERIFICATION POST - intercept for offline support
     if (url.pathname === '/tokens/verify' && event.request.method === 'POST') {
         event.respondWith(handleTokenVerification(event.request));
         return;
     }
 
-    // 4. STATIC ASSETS - cache first
+    // 5. STATIC ASSETS - cache first
     if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/') ||
         url.pathname.match(/\.(css|js|png|jpg|jpeg|svg|ico|webp)$/i)) {
         event.respondWith(
@@ -306,7 +332,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 5. HTML PAGES - network first, fallback to offline.html
+    // 6. HTML PAGES - network first, fallback to offline.html
     event.respondWith(
         fetch(event.request).then(res => {
             if (res && res.status === 200) {
@@ -317,7 +343,11 @@ self.addEventListener('fetch', event => {
             }
             return res;
         }).catch(() => {
-            return caches.match('/offline.html');
+            // For any page, try to serve cached version first, then offline.html
+            return caches.match(event.request).then(cached => {
+                if (cached) return cached;
+                return caches.match('/offline.html');
+            });
         })
     );
 });
@@ -325,9 +355,13 @@ self.addEventListener('fetch', event => {
 // ========== TOKEN VERIFICATION HANDLER ==========
 async function handleTokenVerification(request) {
     try {
+        // Clone request before reading body
         const requestClone = request.clone();
+
+        // Try network first
         const response = await fetch(requestClone);
         if (response.ok) {
+            // Clone response before reading body
             const responseClone = response.clone();
             const data = await responseClone.json();
             if (data.success && data.data) {
@@ -340,20 +374,26 @@ async function handleTokenVerification(request) {
                     academic_year: new Date().getFullYear().toString(),
                     is_valid: true
                 };
+                // Save to IndexedDB in background
                 saveTokensToIndexedDB([tokenData]).catch(() => {});
             }
             return response;
         }
         throw new Error('Network request failed with status: ' + response.status);
     } catch (error) {
+        // Network failed - try offline verification
         try {
+            // Clone request before reading body
             const requestClone = request.clone();
             const requestData = await requestClone.json();
             const tokenCode = requestData.token;
+
             if (!tokenCode) {
                 throw new Error('No token provided');
             }
+
             const cachedToken = await getTokenFromIndexedDB(tokenCode);
+
             if (cachedToken && cachedToken.student) {
                 const responseData = {
                     success: true,
