@@ -792,7 +792,7 @@
                 </div>
                 <button id="syncOfflineBtn" class="btn-sync-offline hidden">
                     <i class="fas fa-cloud-download-alt"></i>
-                    <span>Pakua</span>
+                    <span>Sync Token</span>
                 </button>
             </div>
 
@@ -1063,7 +1063,7 @@
                         setStatus('online', 'Imeunganishwa');
                     } else {
                         hideProgress();
-                        showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
+                        showAlert('Imeshindwa kupakia token. Jaribu tena.', 'error');
                         setStatus('offline', 'Hitilafu');
                     }
                 } catch (e) {
@@ -1089,11 +1089,11 @@
                             checkTokensAvailability();
                             setStatus('online', 'Imeunganishwa');
                         } else {
-                            showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
+                            showAlert('Imeshindwa kupakia token. Jaribu tena.', 'error');
                             setStatus('offline', 'Hitilafu');
                         }
                         syncBtn.disabled = false;
-                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Pakua';
+                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync Token';
                         isSyncing = false;
                         hideProgress();
                     }
@@ -1154,7 +1154,7 @@
                             // Show button but disabled because no internet to download new ones
                             syncBtn.classList.remove('hidden');
                             syncBtn.disabled = true;
-                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
+                            syncBtn.title = 'Unahitaji mtandao kupakia token mpya';
                         }
                     } catch (e) {}
                 }
