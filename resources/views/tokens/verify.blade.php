@@ -3,18 +3,152 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Gate Pass Verification</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
-    <!-- Bootstrap 5 CSS (lightweight only for grid & utilities if needed) -->
+    <!-- Bootstrap 5 CSS -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
 
     <style>
+        /* ============================================
+                   OFFLINE STATUS BAR (IMPROVED - NO COUNT)
+                   ============================================ */
+        .offline-status-bar {
+            background: #f8fafc;
+            border-radius: 60px;
+            padding: 8px 16px;
+            margin: 10px 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
+            min-height: 48px;
+        }
+
+        .offline-status-bar .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .offline-status-bar .info i {
+            font-size: 1.1rem;
+        }
+
+        .offline-status-bar .info .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-dot.online {
+            background: #22c55e;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        .status-dot.syncing {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .btn-sync-offline {
+            background: transparent;
+            border: 2px solid #5B66E8;
+            color: #5B66E8;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-sync-offline:hover {
+            background: #5B66E8;
+            color: white;
+        }
+
+        .btn-sync-offline:active {
+            transform: scale(0.95);
+        }
+
+        .btn-sync-offline:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn-sync-offline.hidden {
+            display: none !important;
+        }
+
+        .btn-sync-offline .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* ============================================
+                   PROGRESS BAR FOR SYNC
+                   ============================================ */
+        .sync-progress-container {
+            display: none;
+            margin: 8px 0 12px;
+            background: #f1f5f9;
+            border-radius: 60px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sync-progress-container.active {
+            display: block;
+        }
+
+        .sync-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5B66E8, #8B5CF6);
+            border-radius: 60px;
+            transition: width 0.4s ease;
+        }
+
+        .sync-progress-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .sync-progress-text.active {
+            display: block;
+        }
+
+        /* ============================================
+                   REST OF YOUR CSS (unchanged)
+                   ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -31,14 +165,12 @@
             padding: 12px;
         }
 
-        /* Main container - full width mobile friendly */
         .gateway-container {
             width: 100%;
             max-width: 560px;
             margin: 0 auto;
         }
 
-        /* Card design */
         .gateway-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(0px);
@@ -49,7 +181,6 @@
             transition: all 0.2s ease;
         }
 
-        /* Header area */
         .gateway-header {
             text-align: center;
             margin-bottom: 28px;
@@ -89,7 +220,6 @@
             font-weight: 500;
         }
 
-        /* Token input area - BEST mobile optimization */
         .token-input-container {
             margin: 10px 0 16px;
         }
@@ -106,7 +236,6 @@
             justify-content: center;
         }
 
-        /* LARGE, TAPPABLE TOKEN INPUTS */
         .token-input {
             width: 85px;
             height: 85px;
@@ -123,7 +252,6 @@
             letter-spacing: 4px;
         }
 
-        /* Remove spinners */
         .token-input::-webkit-outer-spin-button,
         .token-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -164,7 +292,6 @@
             }
         }
 
-        /* Buttons - high tappable area */
         .btn-container {
             display: flex;
             justify-content: center;
@@ -220,7 +347,6 @@
             background: #f1f5f9;
         }
 
-        /* Alert messages */
         .alert {
             padding: 14px 18px;
             border-radius: 24px;
@@ -268,7 +394,6 @@
             border-left: 5px solid #f97316;
         }
 
-        /* Loading state */
         .loading-state {
             text-align: center;
             padding: 36px 20px;
@@ -290,7 +415,6 @@
             }
         }
 
-        /* Student success card - Mobile first readability */
         .success-card {
             background: white;
             border-radius: 28px;
@@ -326,7 +450,6 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Identity & photo */
         .identity-verification-section {
             padding: 20px 16px 12px;
         }
@@ -370,7 +493,6 @@
             max-width: 95%;
         }
 
-        /* Student details grid */
         .student-details-panel {
             background: #f8fafc;
             border-radius: 24px;
@@ -415,7 +537,6 @@
             word-break: break-word;
         }
 
-        /* Transport status */
         .transport-status-card {
             background: #f1f5f9;
             margin: 4px 16px 16px;
@@ -426,7 +547,6 @@
             justify-content: space-between;
         }
 
-        /* Double action buttons */
         .confirm-access-section {
             padding: 8px 16px 22px;
             display: flex;
@@ -450,7 +570,6 @@
             box-shadow: none;
         }
 
-        /* Resend button area */
         .resend-section {
             margin-top: 22px;
             padding-top: 16px;
@@ -478,7 +597,6 @@
             border-color: #5B66E8;
         }
 
-        /* Modal for resend token */
         .resend-modal {
             position: fixed;
             top: 0;
@@ -537,7 +655,6 @@
             box-shadow: 0 0 0 3px rgba(91, 102, 232, 0.2);
         }
 
-        /* Photo zoom modal */
         .photo-modal {
             position: fixed;
             top: 0;
@@ -580,7 +697,6 @@
             text-decoration: none;
         }
 
-        /* === RESPONSIVE: super mobile tweaks === */
         @media (max-width: 520px) {
             .gateway-card {
                 padding: 20px 16px;
@@ -666,18 +782,34 @@
 
             <div id="alertBox" class="alert"></div>
 
+            <!-- ========================================= -->
+            <!-- OFFLINE STATUS BAR (IMPROVED - NO COUNT)  -->
+            <!-- ========================================= -->
+            <div id="offlineStatusBar" class="offline-status-bar">
+                <div class="info">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Inaangalia...</span>
+                </div>
+                <button id="syncOfflineBtn" class="btn-sync-offline hidden">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    <span>Pakua</span>
+                </button>
+            </div>
+
+            <!-- Progress Bar for Sync -->
+            <div id="syncProgressContainer" class="sync-progress-container">
+                <div id="syncProgressBar" class="sync-progress-bar" style="width: 0%;"></div>
+                <div id="syncProgressText" class="sync-progress-text">Inapakia...</div>
+            </div>
+
             <div id="tokenSection">
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="numeric" pattern="[0-9]">
                         </div>
                     </div>
                 </div>
@@ -757,387 +889,620 @@
     <script src="{{ asset('assets/js/scripts.js') }}"></script>
     <script>
         (function() {
-        // ========== OFFLINE TOKEN SYNC ==========
-        // Register background sync
-        if ('serviceWorker' in navigator && 'SyncManager' in window) {
-            navigator.serviceWorker.ready.then(reg => {
-                reg.sync.register('sync-tokens').catch(err => console.log('Sync reg failed:', err));
-            });
-        }
+            'use strict';
 
-        // Function to refresh tokens when online
-        async function refreshOfflineTokens() {
-            if (!navigator.onLine) return;
-            try {
-                const response = await fetch('/offline/tokens');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.tokens && navigator.serviceWorker.controller) {
-                        navigator.serviceWorker.controller.postMessage({
-                            type: 'SYNC_TOKENS',
-                            tokens: data.tokens
-                        });
-                        console.log('Offline tokens refreshed:', data.tokens.length);
-                    }
+            // ========== DOM REFS ==========
+            const syncBtn = document.getElementById('syncOfflineBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const progressContainer = document.getElementById('syncProgressContainer');
+            const progressBar = document.getElementById('syncProgressBar');
+            const progressText = document.getElementById('syncProgressText');
+            const alertBox = document.getElementById('alertBox');
+            const tokenInputs = document.querySelectorAll('.token-input');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const tokenSection = document.getElementById('tokenSection');
+            const studentSection = document.getElementById('studentSection');
+            const loadingSection = document.getElementById('loadingSection');
+            const resendModal = document.getElementById('resendModal');
+            const showResendModalBtn = document.getElementById('showResendModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalAlert = document.getElementById('modalAlert');
+            const resendForm = document.getElementById('resendForm');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalAdmissionInput = document.getElementById('modalAdmissionInput');
+            const photoZoomModal = document.getElementById('photoZoomModal');
+            const zoomedPhoto = document.getElementById('zoomedPhoto');
+
+            let isLoading = false;
+            let verificationTimeout = null;
+            let currentStudentId = null;
+            let hasTokens = false;
+            let isSyncing = false;
+
+            const ALERT_DURATION = 3500;
+            const VERIFY_SESSION_DURATION = 60000;
+
+            // ========== OFFLINE STATUS ==========
+
+            // Update status dot and text
+            function setStatus(mode, message) {
+                statusDot.className = 'status-dot';
+                if (mode === 'online') {
+                    statusDot.classList.add('online');
+                    statusText.textContent = message || 'Online';
+                } else if (mode === 'offline') {
+                    statusDot.classList.add('offline');
+                    statusText.textContent = message || 'Offline';
+                } else if (mode === 'syncing') {
+                    statusDot.classList.add('syncing');
+                    statusText.textContent = message || 'Inapakia...';
+                } else {
+                    statusText.textContent = message || 'Inaangalia...';
                 }
-            } catch (e) {
-                console.error('Failed to refresh tokens:', e);
             }
-        }
 
-        // Refresh tokens on page load and every hour
-        if ('serviceWorker' in navigator) {
-            refreshOfflineTokens();
-            setInterval(refreshOfflineTokens, 60 * 60 * 1000);
-        }
+            // Check if there are tokens available for sync
+            async function checkTokensAvailability() {
+                try {
+                    const response = await fetch('/offline/tokens', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.tokens && data.tokens.length > 0) {
+                            hasTokens = true;
+                            syncBtn.classList.remove('hidden');
+                            return true;
+                        }
+                    }
+                    hasTokens = false;
+                    syncBtn.classList.add('hidden');
+                    return false;
+                } catch (e) {
+                    // If offline, try to check IndexedDB via SW
+                    try {
+                        const count = await getOfflineTokenCount();
+                        if (count > 0) {
+                            hasTokens = true;
+                            syncBtn.classList.remove('hidden');
+                            return true;
+                        }
+                    } catch (err) {}
+                    hasTokens = false;
+                    syncBtn.classList.add('hidden');
+                    return false;
+                }
+            }
 
-        // ========== DOM ELEMENTS ==========
-        const tokenInputs = document.querySelectorAll('.token-input');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const alertBox = document.getElementById('alertBox');
-        const tokenSection = document.getElementById('tokenSection');
-        const studentSection = document.getElementById('studentSection');
-        const loadingSection = document.getElementById('loadingSection');
+            // Get token count from IndexedDB (internal, not shown in UI)
+            async function getOfflineTokenCount() {
+                if (!('serviceWorker' in navigator)) return 0;
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    if (!registration.active) return 0;
+                    return new Promise((resolve) => {
+                        const channel = new MessageChannel();
+                        channel.port1.onmessage = (event) => {
+                            resolve(event.data?.count || 0);
+                        };
+                        registration.active.postMessage({
+                            type: 'GET_OFFLINE_TOKEN_COUNT'
+                        }, [channel.port2]);
+                        setTimeout(() => resolve(0), 2000);
+                    });
+                } catch (e) {
+                    return 0;
+                }
+            }
 
-        const resendModal = document.getElementById('resendModal');
-        const showResendModalBtn = document.getElementById('showResendModalBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const modalAlert = document.getElementById('modalAlert');
-        const resendForm = document.getElementById('resendForm');
-        const modalSubmitBtn = document.getElementById('modalSubmitBtn');
-        const modalAdmissionInput = document.getElementById('modalAdmissionInput');
-        const photoZoomModal = document.getElementById('photoZoomModal');
-        const zoomedPhoto = document.getElementById('zoomedPhoto');
+            // ========== PROGRESS BAR ==========
 
-        let isLoading = false;
-        let verificationTimeout = null;
-        let currentStudentId = null;
+            function showProgress(percent, text) {
+                progressContainer.classList.add('active');
+                progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+                if (text) {
+                    progressText.textContent = text;
+                    progressText.classList.add('active');
+                } else {
+                    progressText.classList.remove('active');
+                }
+            }
 
-        const ALERT_DURATION = 3500;
-        const VERIFY_SESSION_DURATION = 60000;
+            function hideProgress() {
+                progressContainer.classList.remove('active');
+                progressBar.style.width = '0%';
+                progressText.classList.remove('active');
+            }
 
-        function init() {
-            setupTokenEvents();
-            setupModalEvents();
-            setupPhotoZoom();
-            focusFirstInput();
-        }
+            // ========== SYNC TRIGGER ==========
 
-        function setupTokenEvents() {
-            tokenInputs.forEach((input, idx) => {
-                input.addEventListener('input', (e) => handleInput(e, idx));
-                input.addEventListener('keydown', handleKeydown);
-                input.addEventListener('paste', handlePaste);
-                input.addEventListener('keypress', onlyNumbers);
+            async function triggerOfflineSync() {
+                if (isSyncing) return;
+                if (!('serviceWorker' in navigator)) {
+                    showAlert('Huduma ya offline haipatikani.', 'error');
+                    return;
+                }
+
+                isSyncing = true;
+                syncBtn.disabled = true;
+                const originalHtml = syncBtn.innerHTML;
+                syncBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Inapakia...';
+                setStatus('syncing', 'Inapakia...');
+                showProgress(10, 'Kuanza upakiaji...');
+
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    if (!registration.active) {
+                        throw new Error('Service Worker haijaanza');
+                    }
+
+                    showProgress(30, 'Inasambaza ombi...');
+
+                    // Send sync message and wait for response
+                    const result = await new Promise((resolve) => {
+                        const channel = new MessageChannel();
+                        channel.port1.onmessage = (event) => {
+                            resolve(event.data || { success: false });
+                        };
+                        registration.active.postMessage({
+                            type: 'SYNC_TOKENS'
+                        }, [channel.port2]);
+                        setTimeout(() => resolve({ success: false, error: 'Timeout' }), 20000);
+                    });
+
+                    showProgress(80, 'Inahifadhi token...');
+
+                    if (result && result.success) {
+                        showProgress(100, 'Imekamilika!');
+                        setTimeout(hideProgress, 800);
+                        showAlert('Token zimepakuliwa kikamilifu!', 'success');
+                        // Re-check if tokens are available (hide button if none)
+                        await checkTokensAvailability();
+                        setStatus('online', 'Imeunganishwa');
+                    } else {
+                        hideProgress();
+                        showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
+                        setStatus('offline', 'Hitilafu');
+                    }
+                } catch (e) {
+                    console.error('Sync error:', e);
+                    hideProgress();
+                    showAlert('Hitilafu wakati wa upakiaji. Hakikisha umeunganishwa mtandao.', 'error');
+                    setStatus('offline', 'Hitilafu');
+                } finally {
+                    isSyncing = false;
+                    syncBtn.disabled = false;
+                    syncBtn.innerHTML = originalHtml;
+                }
+            }
+
+            // ========== SERVICE WORKER MESSAGES ==========
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('message', function(event) {
+                    const data = event.data;
+                    if (data && data.type === 'SYNC_STATUS') {
+                        if (data.success) {
+                            showAlert('Token zimepakuliwa kikamilifu!', 'success');
+                            checkTokensAvailability();
+                            setStatus('online', 'Imeunganishwa');
+                        } else {
+                            showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
+                            setStatus('offline', 'Hitilafu');
+                        }
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Pakua';
+                        isSyncing = false;
+                        hideProgress();
+                    }
+                });
+
+                // Register SW if not already
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (!registration) {
+                        navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+                            .then(() => console.log('SW registered from page'))
+                            .catch(err => console.warn('SW registration failed:', err));
+                    }
+                });
+            }
+
+            // ========== CHECK ONLINE/OFFLINE STATUS ==========
+
+            function updateConnectionStatus() {
+                if (navigator.onLine) {
+                    setStatus('online', 'Imeunganishwa');
+                    // Check if tokens are available
+                    checkTokensAvailability();
+                } else {
+                    setStatus('offline', 'Hakuna mtandao');
+                    // Hide sync button when offline (can't download without internet)
+                    syncBtn.classList.add('hidden');
+                }
+            }
+
+            window.addEventListener('online', () => {
+                updateConnectionStatus();
+                // Re-check tokens when coming back online
+                setTimeout(checkTokensAvailability, 1000);
             });
-            verifyBtn.addEventListener('click', verifyToken);
-            resetBtn.addEventListener('click', resetAll);
-        }
 
-        function onlyNumbers(e) {
-            if (!/[0-9]/.test(String.fromCharCode(e.which))) e.preventDefault();
-        }
+            window.addEventListener('offline', () => {
+                setStatus('offline', 'Hakuna mtandao');
+                syncBtn.classList.add('hidden');
+            });
 
-        function handleInput(e, idx) {
-            let val = e.target.value.replace(/[^0-9]/g, '').slice(-1);
-            e.target.value = val;
-            if (val && idx < tokenInputs.length - 1) {
-                tokenInputs[idx + 1].focus();
+            // ========== BUTTON EVENTS ==========
+
+            syncBtn.addEventListener('click', triggerOfflineSync);
+
+            // ========== INIT ==========
+
+            async function initOfflineStatus() {
+                updateConnectionStatus();
+                // If online, check tokens availability
+                if (navigator.onLine) {
+                    await checkTokensAvailability();
+                } else {
+                    // If offline, check if there are cached tokens (via SW)
+                    try {
+                        const count = await getOfflineTokenCount();
+                        if (count > 0) {
+                            hasTokens = true;
+                            // Show button but disabled because no internet to download new ones
+                            syncBtn.classList.remove('hidden');
+                            syncBtn.disabled = true;
+                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
+                        }
+                    } catch (e) {}
+                }
             }
-            updateVerifyButton();
-            hideAlert();
-            removeError();
-            if (idx === tokenInputs.length - 1 || Array.from(tokenInputs).every(inp => inp.value.length === 1)) {
+
+            // ==========================================
+            // REST OF YOUR VERIFICATION LOGIC (unchanged)
+            // ==========================================
+
+            function init() {
+                setupTokenEvents();
+                setupModalEvents();
+                setupPhotoZoom();
+                focusFirstInput();
+                initOfflineStatus();
+            }
+
+            function setupTokenEvents() {
+                tokenInputs.forEach((input, idx) => {
+                    input.addEventListener('input', (e) => handleInput(e, idx));
+                    input.addEventListener('keydown', handleKeydown);
+                    input.addEventListener('paste', handlePaste);
+                    input.addEventListener('keypress', onlyNumbers);
+                });
+                verifyBtn.addEventListener('click', verifyToken);
+                resetBtn.addEventListener('click', resetAll);
+            }
+
+            function onlyNumbers(e) {
+                if (!/[0-9]/.test(String.fromCharCode(e.which))) e.preventDefault();
+            }
+
+            function handleInput(e, idx) {
+                let val = e.target.value.replace(/[^0-9]/g, '').slice(-1);
+                e.target.value = val;
+                if (val && idx < tokenInputs.length - 1) {
+                    tokenInputs[idx + 1].focus();
+                }
+                updateVerifyButton();
+                hideAlert();
+                removeError();
+                if (idx === tokenInputs.length - 1 || Array.from(tokenInputs).every(inp => inp.value.length === 1)) {
+                    autoSubmitIfComplete();
+                }
+            }
+
+            function handleKeydown(e) {
+                const idx = parseInt(e.target.dataset.idx);
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                    tokenInputs[idx - 1].focus();
+                    tokenInputs[idx - 1].value = '';
+                    updateVerifyButton();
+                }
+            }
+
+            function handlePaste(e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').substring(0, 4);
+                for (let i = 0; i < text.length && i < tokenInputs.length; i++) {
+                    tokenInputs[i].value = text[i];
+                }
+                if (text.length < tokenInputs.length) tokenInputs[text.length].focus();
+                else tokenInputs[3].focus();
+                updateVerifyButton();
+                hideAlert();
+                removeError();
                 autoSubmitIfComplete();
             }
-        }
 
-        function handleKeydown(e) {
-            const idx = parseInt(e.target.dataset.idx);
-            if (e.key === 'Backspace' && !e.target.value && idx > 0) {
-                tokenInputs[idx - 1].focus();
-                tokenInputs[idx - 1].value = '';
+            function focusFirstInput() {
+                setTimeout(() => tokenInputs[0]?.focus(), 100);
+            }
+
+            function removeError() {
+                tokenInputs.forEach(inp => inp.classList.remove('error'));
+            }
+
+            function addError() {
+                tokenInputs.forEach(inp => {
+                    if (inp.value) inp.classList.add('error');
+                });
+                setTimeout(() => tokenInputs.forEach(inp => inp.classList.remove('error')), 500);
+            }
+
+            function resetAll() {
+                tokenInputs.forEach(inp => inp.value = '');
+                focusFirstInput();
                 updateVerifyButton();
+                hideAlert();
+                studentSection.style.display = 'none';
+                tokenSection.style.display = 'block';
+                verifyBtn.disabled = true;
+                if (verificationTimeout) clearTimeout(verificationTimeout);
+                currentStudentId = null;
+                removeError();
+                // Re-check tokens availability when resetting
+                if (navigator.onLine) checkTokensAvailability();
             }
-        }
 
-        function handlePaste(e) {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').substring(0, 4);
-            for (let i = 0; i < text.length && i < tokenInputs.length; i++) {
-                tokenInputs[i].value = text[i];
+            function updateVerifyButton() {
+                const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
+                verifyBtn.disabled = !allFilled || isLoading;
             }
-            if (text.length < tokenInputs.length) tokenInputs[text.length].focus();
-            else tokenInputs[3].focus();
-            updateVerifyButton();
-            hideAlert();
-            removeError();
-            autoSubmitIfComplete();
-        }
 
-        function focusFirstInput() {
-            setTimeout(() => tokenInputs[0]?.focus(), 100);
-        }
-
-        function removeError() {
-            tokenInputs.forEach(inp => inp.classList.remove('error'));
-        }
-
-        function addError() {
-            tokenInputs.forEach(inp => {
-                if (inp.value) inp.classList.add('error');
-            });
-            setTimeout(() => tokenInputs.forEach(inp => inp.classList.remove('error')), 500);
-        }
-
-        function resetAll() {
-            tokenInputs.forEach(inp => inp.value = '');
-            focusFirstInput();
-            updateVerifyButton();
-            hideAlert();
-            studentSection.style.display = 'none';
-            tokenSection.style.display = 'block';
-            verifyBtn.disabled = true;
-            if (verificationTimeout) clearTimeout(verificationTimeout);
-            currentStudentId = null;
-            removeError();
-        }
-
-        function updateVerifyButton() {
-            const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
-            verifyBtn.disabled = !allFilled || isLoading;
-        }
-
-        function getFullToken() {
-            return Array.from(tokenInputs).map(inp => inp.value).join('');
-        }
-
-        function showAlert(message, type, autoHide = true, duration = ALERT_DURATION) {
-            alertBox.textContent = message;
-            alertBox.className = `alert alert-${type}`;
-            alertBox.style.display = 'block';
-            alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if (autoHide) setTimeout(() => { if (alertBox.style.display === 'block') alertBox.style.display = 'none'; }, duration);
-        }
-
-        function hideAlert() {
-            alertBox.style.display = 'none';
-        }
-
-        function setupPhotoZoom() {
-            photoZoomModal.addEventListener('click', () => photoZoomModal.classList.remove('active'));
-        }
-
-        window.showPhotoZoom = (src) => {
-            zoomedPhoto.src = src;
-            photoZoomModal.classList.add('active');
-        };
-
-        function autoSubmitIfComplete() {
-            const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
-            if (allFilled && !isLoading) {
-                setTimeout(() => verifyToken(), 50);
+            function getFullToken() {
+                return Array.from(tokenInputs).map(inp => inp.value).join('');
             }
-        }
 
-        function showStudentInfo(data) {
-            const student = data.student;
-            const installment = data.installment;
-            const token = data.token;
-            const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
-            const hasTransport = student.has_transport;
-            const transportIcon = hasTransport ? 'fa-bus' : 'fa-person-walking';
-            const transportColor = hasTransport ? '#22c55e' : '#dc2626';
-            const transportText = hasTransport ? 'ANATUMIA' : 'HATUMII';
+            function showAlert(message, type, autoHide = true, duration = ALERT_DURATION) {
+                alertBox.textContent = message;
+                alertBox.className = `alert alert-${type}`;
+                alertBox.style.display = 'block';
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (autoHide) setTimeout(() => { if (alertBox.style.display === 'block') alertBox.style.display = 'none'; },
+                duration);
+            }
 
-            currentStudentId = student.id;
+            function hideAlert() {
+                alertBox.style.display = 'none';
+            }
 
-            const firstName = student.first_name ? student.first_name.toUpperCase() : '';
-            const lastName = student.last_name ? student.last_name.toUpperCase() : '';
-            const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-            const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A';
+            function setupPhotoZoom() {
+                photoZoomModal.addEventListener('click', () => photoZoomModal.classList.remove('active'));
+            }
 
-            studentSection.innerHTML = `
-                <div class="success-card">
-                    <div class="success-header">
-                        <i class="fas fa-check-circle"></i>
-                        <h2>HALALI</h2>
-                        <p>GATE PASS INATAMBULIKA</p>
-                    </div>
-                    <div class="identity-verification-section">
-                        <div class="student-photo-container">
-                            <div class="photo-frame" onclick="showPhotoZoom('${studentImage}')">
-                                <img src="${studentImage}" class="student-large-photo" onerror="this.src='/storage/students/student.jpg'" alt="Student">
-                            </div>
-                            <div class="face-match-instruction">
-                                <i class="fas fa-id-card"></i> Linganisha uso na picha hii
-                            </div>
-                        </div>
-                        <div class="student-details-panel">
-                            <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-user"></i> JINA:</div>
-                                <div class="detail-value">${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-hashtag"></i> NA. USAJILI:</div>
-                                <div class="detail-value">${escapeHtml(admissionNum)}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-school"></i> DARASA:</div>
-                                <div class="detail-value">${escapeHtml(className)}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-coins"></i> AWAMU: </div>
-                                <div class="detail-value">${escapeHtml(installment.name)}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label"><i class="fas fa-hourglass-end"></i> MWISHO:</div>
-                                <div class="detail-value">${formatDate(token.expires_at)}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="transport-status-card">
-                        <span class="detail-label"><i class="fas fa-truck-moving"></i> USAFIRI:</span>
-                        <span style="color: ${transportColor}; font-weight:800;"><i class="fas ${transportIcon}"></i> ${transportText}</span>
-                    </div>
-                    <div class="confirm-access-section">
-                        <button id="newVerifyBtn" class="btn-submit btn-new-verify"><i class="fas fa-qrcode"></i> VERIFY MWINGINE</button>
-                    </div>
-                </div>
-            `;
-            studentSection.style.display = 'block';
-            tokenSection.style.display = 'none';
+            window.showPhotoZoom = (src) => {
+                zoomedPhoto.src = src;
+                photoZoomModal.classList.add('active');
+            };
 
-            if (verificationTimeout) clearTimeout(verificationTimeout);
-            verificationTimeout = setTimeout(() => {
-                if (studentSection.style.display === 'block') {
-                    showAlert('Muda wa verification umekwisha, tafadhali ingiza token upya.', 'warning');
-                    resetAll();
+            function autoSubmitIfComplete() {
+                const allFilled = Array.from(tokenInputs).every(inp => inp.value.length === 1);
+                if (allFilled && !isLoading) {
+                    setTimeout(() => verifyToken(), 50);
                 }
-            }, VERIFY_SESSION_DURATION);
-
-            document.getElementById('confirmAccessBtn')?.addEventListener('click', () => confirmAccess());
-            document.getElementById('newVerifyBtn')?.addEventListener('click', () => resetAll());
-        }
-
-        function confirmAccess() {
-            showAlert('✅ IMERUHUSIWA! Mwanafunzi anaweza kupita.', 'success', true, 2800);
-            setTimeout(() => {
-                resetAll();
-                showAlert('Tayari kwa verification nyingine', 'info', true, 2000);
-            }, 2800);
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-
-        function formatDate(dateStr) {
-            try {
-                return new Date(dateStr).toLocaleString('sw-TZ', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-            } catch (e) { return dateStr; }
-        }
-
-        // Modal handlers
-        function setupModalEvents() {
-            showResendModalBtn?.addEventListener('click', () => {
-                resendModal.classList.add('active');
-                modalAdmissionInput.value = '';
-                modalAlert.style.display = 'none';
-                modalSubmitBtn.disabled = false;
-                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
-            });
-            closeModalBtn?.addEventListener('click', () => resendModal.classList.remove('active'));
-            resendModal?.addEventListener('click', (e) => { if (e.target === resendModal) resendModal.classList.remove('active'); });
-            resendForm?.addEventListener('submit', handleResendToken);
-        }
-
-        async function handleResendToken(e) {
-            e.preventDefault();
-            const admission = modalAdmissionInput.value.trim();
-            if (!admission) {
-                showModalAlert('Ingiza namba ya usajili', 'error');
-                return;
             }
-            modalSubmitBtn.disabled = true;
-            modalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inachakata...';
-            try {
-                const resp = await fetch('{{ route("tokens.resend") }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-                    body: JSON.stringify({ admission_number: admission })
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    showModalAlert(data.message, 'success');
-                    setTimeout(() => resendModal.classList.remove('active'), 2000);
-                    // Refresh offline tokens after resend
-                    refreshOfflineTokens();
-                } else {
-                    showModalAlert(data.message, 'error');
-                }
-            } catch (err) {
-                showModalAlert('Hitilafu ya mtandao, jaribu tena', 'error');
-            } finally {
-                modalSubmitBtn.disabled = false;
-                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
-            }
-        }
 
-        function showModalAlert(msg, type) {
-            modalAlert.textContent = msg;
-            modalAlert.className = `alert alert-${type}`;
-            modalAlert.style.display = 'block';
-            setTimeout(() => modalAlert.style.display = 'none', 3000);
-        }
-
-        async function verifyToken() {
-            const token = getFullToken();
-            if (token.length !== 4) {
-                showAlert('Tafadhali weka token kamili (namba 4)', 'error');
-                addError();
-                return;
-            }
-            if (isLoading) return;
-            isLoading = true;
-            verifyBtn.disabled = true;
-            tokenSection.style.display = 'none';
-            loadingSection.style.display = 'block';
-            hideAlert();
-            try {
-                const response = await fetch('{{ route("tokens.verify.submit") }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Accept': 'application/json' },
-                    body: JSON.stringify({ token: token })
-                });
-                const data = await response.json();
-                if (response.ok && data.success) {
-                    if (data.offline) {
-                        showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
-                    } else {
-                        showAlert(data.message, 'success', true, 1800);
-                    }
-                    showStudentInfo(data.data);
-                } else {
-                    showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
+            // ==========================================
+            // VERIFY TOKEN
+            // ==========================================
+            async function verifyToken() {
+                const token = getFullToken();
+                if (token.length !== 4) {
+                    showAlert('Tafadhali weka token kamili (namba 4)', 'error');
                     addError();
-                    setTimeout(() => resetAll(), 3500);
+                    return;
                 }
-            } catch (error) {
-                showAlert('Hitilafu ya mtandao, hakikisha umeunganishwa', 'error');
-                addError();
-                setTimeout(() => resetAll(), 4000);
-            } finally {
-                isLoading = false;
-                loadingSection.style.display = 'none';
-                verifyBtn.disabled = false;
-            }
-        }
+                if (isLoading) return;
+                isLoading = true;
+                verifyBtn.disabled = true;
+                tokenSection.style.display = 'none';
+                loadingSection.style.display = 'block';
+                hideAlert();
 
-        init();
-    })();
+                try {
+                    const response = await fetch('{{ route("tokens.verify.submit") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ token: token })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        if (data.offline) {
+                            showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
+                        } else {
+                            showAlert(data.message, 'success', true, 1800);
+                        }
+                        showStudentInfo(data.data);
+                        // After successful online verification, refresh tokens availability
+                        if (!data.offline) checkTokensAvailability();
+                    } else {
+                        showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
+                        addError();
+                        setTimeout(() => resetAll(), 3500);
+                    }
+                } catch (error) {
+                    showAlert('Hitilafu ya mtandao. Jaribu kuangalia muunganisho wako.', 'error');
+                    addError();
+                    setTimeout(() => resetAll(), 4000);
+                } finally {
+                    isLoading = false;
+                    loadingSection.style.display = 'none';
+                    verifyBtn.disabled = false;
+                }
+            }
+
+            function showStudentInfo(data) {
+                const student = data.student;
+                const installment = data.installment;
+                const token = data.token;
+                const studentImage = student.image ? '/storage/students/' + student.image :
+                '/storage/students/student.jpg';
+                const hasTransport = student.has_transport;
+                const transportIcon = hasTransport ? 'fa-bus' : 'fa-person-walking';
+                const transportColor = hasTransport ? '#22c55e' : '#dc2626';
+                const transportText = hasTransport ? 'ANATUMIA' : 'HATUMII';
+
+                currentStudentId = student.id;
+
+                const firstName = student.first_name ? student.first_name.toUpperCase() : '';
+                const lastName = student.last_name ? student.last_name.toUpperCase() : '';
+                const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
+                const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() :
+                    'N/A';
+
+                studentSection.innerHTML = `
+                    <div class="success-card">
+                        <div class="success-header">
+                            <i class="fas fa-check-circle"></i>
+                            <h2>HALALI</h2>
+                            <p>GATE PASS INATAMBULIKA</p>
+                        </div>
+                        <div class="identity-verification-section">
+                            <div class="student-photo-container">
+                                <div class="photo-frame" onclick="showPhotoZoom('${studentImage}')">
+                                    <img src="${studentImage}" class="student-large-photo" onerror="this.src='/storage/students/student.jpg'" alt="Student">
+                                </div>
+                                <div class="face-match-instruction">
+                                    <i class="fas fa-id-card"></i> Linganisha uso na picha hii
+                                </div>
+                            </div>
+                            <div class="student-details-panel">
+                                <div class="detail-row">
+                                    <div class="detail-label"><i class="fas fa-user"></i> JINA:</div>
+                                    <div class="detail-value">${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label"><i class="fas fa-hashtag"></i> NA. USAJILI:</div>
+                                    <div class="detail-value">${escapeHtml(admissionNum)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label"><i class="fas fa-school"></i> DARASA:</div>
+                                    <div class="detail-value">${escapeHtml(className)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label"><i class="fas fa-coins"></i> AWAMU: </div>
+                                    <div class="detail-value">${escapeHtml(installment.name)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label"><i class="fas fa-hourglass-end"></i> MWISHO:</div>
+                                    <div class="detail-value">${formatDate(token.expires_at)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="transport-status-card">
+                            <span class="detail-label"><i class="fas fa-truck-moving"></i> USAFIRI:</span>
+                            <span style="color: ${transportColor}; font-weight:800;"><i class="fas ${transportIcon}"></i> ${transportText}</span>
+                        </div>
+                        <div class="confirm-access-section">
+                            <button id="newVerifyBtn" class="btn-submit btn-new-verify"><i class="fas fa-qrcode"></i> VERIFY MWINGINE</button>
+                        </div>
+                    </div>
+                `;
+                studentSection.style.display = 'block';
+                tokenSection.style.display = 'none';
+
+                if (verificationTimeout) clearTimeout(verificationTimeout);
+                verificationTimeout = setTimeout(() => {
+                    if (studentSection.style.display === 'block') {
+                        showAlert('Muda wa verification umekwisha, tafadhali ingiza token upya.', 'warning');
+                        resetAll();
+                    }
+                }, VERIFY_SESSION_DURATION);
+
+                document.getElementById('newVerifyBtn')?.addEventListener('click', () => resetAll());
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+            }
+
+            function formatDate(dateStr) {
+                try {
+                    return new Date(dateStr).toLocaleString('sw-TZ', { day: '2-digit', month: 'short', hour: '2-digit',
+                        minute: '2-digit' });
+                } catch (e) { return dateStr; }
+            }
+
+            // Modal handlers
+            function setupModalEvents() {
+                showResendModalBtn?.addEventListener('click', () => {
+                    resendModal.classList.add('active');
+                    modalAdmissionInput.value = '';
+                    modalAlert.style.display = 'none';
+                    modalSubmitBtn.disabled = false;
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
+                });
+                closeModalBtn?.addEventListener('click', () => resendModal.classList.remove('active'));
+                resendModal?.addEventListener('click', (e) => { if (e.target === resendModal) resendModal.classList.remove(
+                        'active'); });
+                resendForm?.addEventListener('submit', handleResendToken);
+            }
+
+            async function handleResendToken(e) {
+                e.preventDefault();
+                const admission = modalAdmissionInput.value.trim();
+                if (!admission) {
+                    showModalAlert('Ingiza namba ya usajili', 'error');
+                    return;
+                }
+                modalSubmitBtn.disabled = true;
+                modalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inachakata...';
+                try {
+                    const resp = await fetch('{{ route("tokens.resend") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
+                        },
+                        body: JSON.stringify({ admission_number: admission })
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        showModalAlert(data.message, 'success');
+                        setTimeout(() => resendModal.classList.remove('active'), 2000);
+                        // Refresh offline tokens after resend
+                        triggerOfflineSync();
+                    } else {
+                        showModalAlert(data.message, 'error');
+                    }
+                } catch (err) {
+                    showModalAlert('Hitilafu ya mtandao, jaribu tena', 'error');
+                } finally {
+                    modalSubmitBtn.disabled = false;
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
+                }
+            }
+
+            function showModalAlert(msg, type) {
+                modalAlert.textContent = msg;
+                modalAlert.className = `alert alert-${type}`;
+                modalAlert.style.display = 'block';
+                setTimeout(() => modalAlert.style.display = 'none', 3000);
+            }
+
+            // Wait for DOM to be fully loaded before initializing
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
     </script>
 </body>
 

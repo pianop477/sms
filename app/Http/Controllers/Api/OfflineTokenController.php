@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api; // 👈 NAMESPACE SAHIHI
 
 use App\Http\Controllers\Controller;
 use App\Models\FeeClearanceToken;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan; // Ongeza hii
 
 class OfflineTokenController extends Controller
 {
@@ -15,16 +16,14 @@ class OfflineTokenController extends Controller
         $academicYear = $request->input('academic_year', date('Y'));
         $schoolId = $request->input('school_id');
 
-        // Create a cache key based on parameters
         $cacheKey = 'offline_tokens_' . $academicYear;
         if ($schoolId) {
             $cacheKey .= '_school_' . $schoolId;
         }
 
-        // Try to get from cache first (for performance)
         $cached = Cache::get($cacheKey);
 
-        if ($cached) {
+        if ($cached && isset($cached['tokens']) && count($cached['tokens']) > 0) {
             return response()->json([
                 'success' => true,
                 'total' => $cached['total'] ?? 0,
@@ -35,7 +34,6 @@ class OfflineTokenController extends Controller
             ]);
         }
 
-        // If not cached, fetch from database
         $query = FeeClearanceToken::with(['student', 'student.class', 'installment'])
             ->where('status', 'active')
             ->where('expires_at', '>', now())
@@ -66,18 +64,19 @@ class OfflineTokenController extends Controller
                     'class_name' => $student->class->class_name ?? 'N/A',
                     'has_transport' => !is_null($student->transport_id),
                     'image' => $student->image,
+                    'school_id' => $student->school_id
                 ],
                 'installment' => [
                     'name' => $token->installment->name ?? 'School Fees',
                     'order' => $token->installment->order ?? 1
                 ],
                 'expires_at' => Carbon::parse($token->expires_at)->toIso8601String(),
+                'expires_date' => Carbon::parse($token->expires_at)->format('d/m/Y'),
                 'academic_year' => $token->academic_year,
                 'is_valid' => Carbon::parse($token->expires_at)->isFuture()
             ];
         }
 
-        // Store in cache for 1 hour
         $cachedData = [
             'tokens' => $data,
             'total' => count($data),
@@ -93,5 +92,29 @@ class OfflineTokenController extends Controller
             'cached' => false,
             'academic_year' => $academicYear
         ]);
+    }
+
+    /**
+     * Trigger offline sync manually (optional)
+     */
+    public function triggerSync(Request $request)
+    {
+        try {
+            Artisan::call('tokens:sync-offline', [
+                '--academic-year' => $request->input('academic_year', date('Y')),
+                '--school-id' => $request->input('school_id'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Offline sync triggered successfully',
+                'output' => Artisan::output()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to trigger sync: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Concerns\FormatsMessages;
+use Illuminate\Support\Facades\Artisan;
 
 class TokenController extends Controller
 {
@@ -330,5 +331,23 @@ class TokenController extends Controller
                                     ->orderBy('updated_at', 'desc')
                                     ->get();
         return view('tokens.student_tokens', compact('tokens'));
+    }
+
+    public function syncOffline(Request $request)
+    {
+        try {
+            Artisan::call('tokens:sync-offline', ['--academic-year' => date('Y')]);
+            $output = Artisan::output();
+            return response()->json([
+                'success' => true,
+                'message' => 'Token sync started successfully.',
+                'output' => $output
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to sync tokens: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
