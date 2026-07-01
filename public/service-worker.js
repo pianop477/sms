@@ -1,9 +1,8 @@
 // public/service-worker.js
-const APP_VERSION = '2026.07.01.02';
+const APP_VERSION = '2026.07.02.01';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
-const OFFLINE_PAGE = '/offline.html';
 
 // ========== INDEXEDDB HELPERS ==========
 function openTokenDB() {
@@ -44,11 +43,31 @@ async function saveTokensToIndexedDB(tokens) {
     }
     return new Promise((resolve, reject) => {
         tx.oncomplete = () => {
-            localStorage.setItem('offline_last_sync', new Date().toISOString());
+            // ✅ Use Cache API instead of localStorage
+            const lastSyncData = JSON.stringify({ lastSync: new Date().toISOString() });
+            caches.open(CACHE_NAME).then(cache => {
+                cache.put('/offline/last-sync', new Response(lastSyncData, {
+                    headers: { 'Content-Type': 'application/json' }
+                }));
+            }).catch(() => {});
             resolve();
         };
         tx.onerror = () => reject(tx.error);
     });
+}
+
+async function getLastSyncTime() {
+    try {
+        const cache = await caches.open(CACHE_NAME);
+        const response = await cache.match('/offline/last-sync');
+        if (response) {
+            const data = await response.json();
+            return data.lastSync || null;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
 }
 
 async function getTokenFromIndexedDB(tokenCode) {
@@ -88,10 +107,8 @@ async function fetchAndCacheTokens() {
     try {
         const response = await fetch('/offline/tokens');
         if (response.ok) {
-            // ✅ Clone BEFORE reading body
             const responseForCache = response.clone();
             const data = await responseForCache.json();
-
             if (data.success && data.tokens && data.tokens.length) {
                 await saveTokensToIndexedDB(data.tokens);
                 console.log('[SW] Tokens cached offline:', data.tokens.length);
@@ -192,13 +209,15 @@ self.addEventListener('message', event => {
     if (data.type === 'GET_OFFLINE_TOKEN_COUNT') {
         event.waitUntil(
             getAllTokensFromIndexedDB().then(tokens => {
-                const lastSync = localStorage.getItem('offline_last_sync') || null;
-                if (event.ports && event.ports.length) {
-                    event.ports[0].postMessage({
-                        count: tokens.length,
-                        lastSync: lastSync
-                    });
-                }
+                const lastSync = getLastSyncTime();
+                Promise.all([tokens, lastSync]).then(([tokensList, syncTime]) => {
+                    if (event.ports && event.ports.length) {
+                        event.ports[0].postMessage({
+                            count: tokensList.length,
+                            lastSync: syncTime
+                        });
+                    }
+                });
             }).catch(() => {
                 if (event.ports && event.ports.length) {
                     event.ports[0].postMessage({ count: 0, lastSync: null });
@@ -238,7 +257,6 @@ self.addEventListener('fetch', event => {
         event.respondWith(
             fetch(event.request).then(response => {
                 if (response.ok) {
-                    // ✅ Clone BEFORE caching
                     const responseForCache = response.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, responseForCache);
@@ -276,7 +294,6 @@ self.addEventListener('fetch', event => {
                 if (cached) return cached;
                 return fetch(event.request).then(res => {
                     if (res && res.status === 200) {
-                        // ✅ Clone BEFORE caching
                         const resForCache = res.clone();
                         caches.open(CACHE_NAME).then(cache => {
                             cache.put(event.request, resForCache);
@@ -293,7 +310,6 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(event.request).then(res => {
             if (res && res.status === 200) {
-                // ✅ Clone BEFORE caching
                 const resForCache = res.clone();
                 caches.open(CACHE_NAME).then(cache => {
                     cache.put(event.request, resForCache);
@@ -306,20 +322,14 @@ self.addEventListener('fetch', event => {
     );
 });
 
-// ========== TOKEN VERIFICATION HANDLER (FULLY FIXED) ==========
+// ========== TOKEN VERIFICATION HANDLER ==========
 async function handleTokenVerification(request) {
     try {
-        // ✅ Clone request BEFORE reading body
         const requestClone = request.clone();
-
-        // Try network first
         const response = await fetch(requestClone);
-
         if (response.ok) {
-            // ✅ Clone response BEFORE reading body
             const responseClone = response.clone();
             const data = await responseClone.json();
-
             if (data.success && data.data) {
                 const tokenData = {
                     token: data.data.token.token,
@@ -330,26 +340,20 @@ async function handleTokenVerification(request) {
                     academic_year: new Date().getFullYear().toString(),
                     is_valid: true
                 };
-                // Save in background - don't await to avoid blocking
                 saveTokensToIndexedDB([tokenData]).catch(() => {});
             }
             return response;
         }
         throw new Error('Network request failed with status: ' + response.status);
     } catch (error) {
-        // Network failed - try offline verification
         try {
-            // ✅ Clone request BEFORE reading body
             const requestClone = request.clone();
             const requestData = await requestClone.json();
             const tokenCode = requestData.token;
-
             if (!tokenCode) {
                 throw new Error('No token provided');
             }
-
             const cachedToken = await getTokenFromIndexedDB(tokenCode);
-
             if (cachedToken && cachedToken.student) {
                 const responseData = {
                     success: true,
