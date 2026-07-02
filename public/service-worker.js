@@ -1,5 +1,5 @@
 // public/service-worker.js
-const APP_VERSION = '2026.07.02.03';
+const APP_VERSION = '2026.07.02.04';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
@@ -111,7 +111,6 @@ async function fetchAndCacheTokens() {
             if (data.success && data.tokens && data.tokens.length) {
                 await saveTokensToIndexedDB(data.tokens);
                 console.log('[SW] Tokens cached offline:', data.tokens.length);
-
                 const clients = await self.clients.matchAll();
                 clients.forEach(client => {
                     client.postMessage({
@@ -226,7 +225,6 @@ self.addEventListener('message', event => {
         return;
     }
 
-    // ✅ New: Handle offline token verification via message
     if (data.type === 'VERIFY_TOKEN_OFFLINE') {
         event.waitUntil(
             (async () => {
@@ -269,7 +267,9 @@ self.addEventListener('message', event => {
     }
 });
 
-// ========== FETCH HANDLER ==========
+// ============================================================
+// ========== FETCH HANDLER ====================================
+// ============================================================
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
@@ -278,12 +278,14 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // ✅ Skip chrome-extension requests
+    // Skip chrome-extension requests
     if (url.protocol === 'chrome-extension:') {
         return;
     }
 
+    // =========================================================
     // 1. OFFLINE PAGE - cache first
+    // =========================================================
     if (url.pathname === '/offline.html' || url.pathname === '/offline') {
         event.respondWith(
             caches.match(event.request).then(cached => {
@@ -299,7 +301,9 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 2. TOKEN VERIFICATION PAGE - cache first (IMPORTANT for offline access)
+    // =========================================================
+    // 2. TOKEN VERIFICATION PAGE - cache first
+    // =========================================================
     if (url.pathname === '/tokens/verify' && event.request.method === 'GET') {
         event.respondWith(
             caches.match(event.request).then(cached => {
@@ -323,7 +327,9 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // =========================================================
     // 3. TOKEN SYNC ENDPOINT - network first, cache for offline
+    // =========================================================
     if (url.pathname === '/offline/tokens') {
         event.respondWith(
             fetch(event.request).then(response => {
@@ -351,13 +357,45 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 4. ✅ TOKEN VERIFICATION POST - intercept for offline support
+    // =========================================================
+    // 4. TOKEN VERIFICATION POST - intercept for offline support
+    // =========================================================
     if (url.pathname === '/tokens/verify' && event.request.method === 'POST') {
         event.respondWith(handleTokenVerification(event.request));
         return;
     }
 
-    // 5. STATIC ASSETS - cache first
+    // =========================================================
+    // ✅ 5. FONT AWESOME ASSETS - CACHE FIRST (WILDCARD PATTERN)
+    //    HAPA NDIPO UNAWEKA NJIA B
+    // =========================================================
+    if (url.pathname.match(/\/assets\/fontawesome-free-6\.5\.2-web\/(css|webfonts)\/.+\.(css|woff2|woff|ttf|eot|svg)$/)) {
+        event.respondWith(
+            caches.match(event.request).then(cached => {
+                if (cached) {
+                    console.log('[SW] Serving Font Awesome from cache:', url.pathname);
+                    return cached;
+                }
+                return fetch(event.request).then(res => {
+                    if (res && res.status === 200) {
+                        const resForCache = res.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, resForCache);
+                        });
+                    }
+                    return res;
+                });
+            }).catch(() => {
+                // Fallback: return empty response if both cache and network fail
+                return new Response('', { status: 404 });
+            })
+        );
+        return;
+    }
+
+    // =========================================================
+    // 6. STATIC ASSETS - cache first
+    // =========================================================
     if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/') ||
         url.pathname.match(/\.(css|js|png|jpg|jpeg|svg|ico|webp)$/i)) {
         event.respondWith(
@@ -377,7 +415,9 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 6. HTML PAGES - network first, fallback to offline.html
+    // =========================================================
+    // 7. HTML PAGES - network first, fallback to offline.html
+    // =========================================================
     event.respondWith(
         fetch(event.request).then(res => {
             if (res && res.status === 200) {
