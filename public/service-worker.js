@@ -1,9 +1,5 @@
 // public/service-worker.js
-<<<<<<< HEAD
-const APP_VERSION = '2026.07.02.14';
-=======
 const APP_VERSION = '2026.07.02.04';
->>>>>>> 8ce02afb880f93cb08fb1da35a84eb5919157a1e
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_DB_NAME = 'gatepass-tokens-db';
 const TOKEN_STORE_NAME = 'tokens';
