@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api; // 👈 NAMESPACE SAHIHI
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\FeeClearanceToken;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Artisan; // Ongeza hii
+use Illuminate\Support\Facades\Artisan;
 
 class OfflineTokenController extends Controller
 {
@@ -62,6 +62,10 @@ class OfflineTokenController extends Controller
                     'last_name' => $student->last_name,
                     'full_name' => $student->first_name . ' ' . $student->last_name,
                     'class_name' => $student->class->class_name ?? 'N/A',
+                    'class' => $student->class ? [
+                        'id' => $student->class->id,
+                        'class_name' => $student->class->class_name
+                    ] : null,
                     'has_transport' => !is_null($student->transport_id),
                     'image' => $student->image,
                     'school_id' => $student->school_id
@@ -94,9 +98,6 @@ class OfflineTokenController extends Controller
         ]);
     }
 
-    /**
-     * Trigger offline sync manually (optional)
-     */
     public function triggerSync(Request $request)
     {
         try {

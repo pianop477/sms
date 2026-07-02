@@ -3,21 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Gate Pass Verification</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
-    <!-- Bootstrap 5 CSS -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
 
     <style>
-        /* ============================================
-                   OFFLINE STATUS BAR (IMPROVED - NO COUNT)
-                   ============================================ */
+        /* ========== ALL YOUR EXISTING CSS REMAINS UNCHANGED ========== */
+        /* [Mistari yako ya CSS hapa - nimeihifadhi kama ilivyo] */
         .offline-status-bar {
             background: #f8fafc;
             border-radius: 60px;
@@ -31,7 +27,6 @@
             border: 1px solid #e2e8f0;
             min-height: 48px;
         }
-
         .offline-status-bar .info {
             display: flex;
             align-items: center;
@@ -40,11 +35,9 @@
             font-weight: 500;
             color: #334155;
         }
-
         .offline-status-bar .info i {
             font-size: 1.1rem;
         }
-
         .offline-status-bar .info .status-dot {
             display: inline-block;
             width: 10px;
@@ -52,34 +45,20 @@
             border-radius: 50%;
             margin-right: 4px;
         }
-
         .status-dot.online {
             background: #22c55e;
         }
-
         .status-dot.offline {
             background: #ef4444;
         }
-
         .status-dot.syncing {
             background: #f59e0b;
             animation: pulse 1s infinite;
         }
-
         @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
-
         .btn-sync-offline {
             background: transparent;
             border: 2px solid #5B66E8;
@@ -94,34 +73,25 @@
             gap: 6px;
             cursor: pointer;
         }
-
         .btn-sync-offline:hover {
             background: #5B66E8;
             color: white;
         }
-
         .btn-sync-offline:active {
             transform: scale(0.95);
         }
-
         .btn-sync-offline:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             pointer-events: none;
         }
-
         .btn-sync-offline.hidden {
             display: none !important;
         }
-
         .btn-sync-offline .spinner-border-sm {
             width: 1rem;
             height: 1rem;
         }
-
-        /* ============================================
-                   PROGRESS BAR FOR SYNC
-                   ============================================ */
         .sync-progress-container {
             display: none;
             margin: 8px 0 12px;
@@ -131,11 +101,9 @@
             overflow: hidden;
             position: relative;
         }
-
         .sync-progress-container.active {
             display: block;
         }
-
         .sync-progress-bar {
             height: 100%;
             width: 0%;
@@ -143,7 +111,6 @@
             border-radius: 60px;
             transition: width 0.4s ease;
         }
-
         .sync-progress-text {
             font-size: 0.7rem;
             color: #64748b;
@@ -151,20 +118,15 @@
             margin-top: 4px;
             display: none;
         }
-
         .sync-progress-text.active {
             display: block;
         }
-
-        /* ============================================
-                   REST OF YOUR CSS (unchanged)
-                   ============================================ */
+        /* Rest of your CSS... (keep all existing styles) */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: linear-gradient(145deg, #5B66E8 0%, #8B5CF6 100%);
@@ -174,13 +136,11 @@
             justify-content: center;
             padding: 12px;
         }
-
         .gateway-container {
             width: 100%;
             max-width: 560px;
             margin: 0 auto;
         }
-
         .gateway-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(0px);
@@ -190,12 +150,10 @@
             padding: 24px 20px 28px;
             transition: all 0.2s ease;
         }
-
         .gateway-header {
             text-align: center;
             margin-bottom: 28px;
         }
-
         .gateway-icon {
             width: 70px;
             height: 70px;
@@ -207,12 +165,10 @@
             margin-bottom: 12px;
             box-shadow: 0 8px 14px rgba(91, 102, 232, 0.25);
         }
-
         .gateway-icon i {
             font-size: 32px;
             color: white;
         }
-
         .gateway-header h2 {
             font-size: 1.55rem;
             font-weight: 800;
@@ -223,29 +179,24 @@
             letter-spacing: -0.3px;
             margin-bottom: 6px;
         }
-
         .gateway-header p {
             color: #475569;
             font-size: 0.9rem;
             font-weight: 500;
         }
-
         .token-input-container {
             margin: 10px 0 16px;
         }
-
         .token-input-group {
             display: flex;
             justify-content: center;
         }
-
         .token-box {
             display: flex;
             gap: 14px;
             flex-wrap: nowrap;
             justify-content: center;
         }
-
         .token-input {
             width: 85px;
             height: 85px;
@@ -261,53 +212,36 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
             letter-spacing: 4px;
         }
-
         .token-input::-webkit-outer-spin-button,
         .token-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-
         .token-input[type=number] {
             -moz-appearance: textfield;
             appearance: textfield;
         }
-
         .token-input:focus {
             border-color: #5B66E8;
             outline: none;
             box-shadow: 0 0 0 4px rgba(91, 102, 232, 0.2);
             transform: scale(1.02);
         }
-
         .token-input.error {
             border-color: #dc2626;
             background: #fef2f2;
             animation: shake 0.3s ease;
         }
-
         @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-5px);
-            }
-
-            75% {
-                transform: translateX(5px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
-
         .btn-container {
             display: flex;
             justify-content: center;
             margin: 12px 0 8px;
         }
-
         .btn-submit {
             width: 100%;
             max-width: 320px;
@@ -326,17 +260,14 @@
             gap: 12px;
             box-shadow: 0 6px 14px rgba(91, 102, 232, 0.3);
         }
-
         .btn-submit:active {
             transform: scale(0.97);
         }
-
         .btn-submit:disabled {
             opacity: 0.6;
             transform: none;
             cursor: not-allowed;
         }
-
         .btn-reset {
             background: transparent;
             border: 1px solid #cbd5e1;
@@ -352,11 +283,9 @@
             margin-top: 4px;
             transition: 0.2s;
         }
-
         .btn-reset:active {
             background: #f1f5f9;
         }
-
         .alert {
             padding: 14px 18px;
             border-radius: 24px;
@@ -367,48 +296,34 @@
             backdrop-filter: blur(4px);
             animation: fadeSlide 0.2s ease;
         }
-
         @keyframes fadeSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
         .alert-success {
             background: #dff9e6;
             color: #0a3b2a;
             border-left: 5px solid #22c55e;
         }
-
         .alert-error {
             background: #ffe5e5;
             color: #7f1a1a;
             border-left: 5px solid #ef4444;
         }
-
         .alert-info {
             background: #e0f2fe;
             color: #075985;
             border-left: 5px solid #0ea5e9;
         }
-
         .alert-warning {
             background: #fff1e6;
             color: #9a3412;
             border-left: 5px solid #f97316;
         }
-
         .loading-state {
             text-align: center;
             padding: 36px 20px;
         }
-
         .spinner {
             width: 40px;
             height: 40px;
@@ -418,13 +333,9 @@
             animation: spin 0.8s linear infinite;
             margin: 0 auto 12px;
         }
-
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
-
         .success-card {
             background: white;
             border-radius: 28px;
@@ -432,19 +343,16 @@
             margin-top: 6px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
-
         .success-header {
             background: linear-gradient(115deg, #22c55e, #15803d);
             padding: 18px 12px;
             text-align: center;
         }
-
         .success-header i {
             font-size: 28px;
             color: white;
             margin-right: 8px;
         }
-
         .success-header h2 {
             font-size: 1.6rem;
             font-weight: 800;
@@ -452,22 +360,18 @@
             color: white;
             letter-spacing: 1px;
         }
-
         .success-header p {
             font-size: 0.75rem;
             font-weight: 500;
             margin: 6px 0 0;
             color: rgba(255, 255, 255, 0.9);
         }
-
         .identity-verification-section {
             padding: 20px 16px 12px;
         }
-
         .student-photo-container {
             text-align: center;
         }
-
         .photo-frame {
             display: inline-block;
             cursor: pointer;
@@ -477,18 +381,15 @@
             transition: 0.2s;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
-
         .photo-frame:active {
             transform: scale(0.98);
         }
-
         .student-large-photo {
             width: 160px;
             height: 160px;
             object-fit: cover;
             display: block;
         }
-
         .face-match-instruction {
             background: #fef9e3;
             border-radius: 40px;
@@ -502,14 +403,12 @@
             color: #b45309;
             max-width: 95%;
         }
-
         .student-details-panel {
             background: #f8fafc;
             border-radius: 24px;
             padding: 14px 16px;
             margin: 12px 0 8px;
         }
-
         .detail-row {
             display: flex;
             justify-content: space-between;
@@ -517,11 +416,9 @@
             padding: 12px 0;
             border-bottom: 1px solid #e2edf2;
         }
-
         .detail-row:last-child {
             border-bottom: none;
         }
-
         .detail-label {
             font-weight: 700;
             color: #1e293b;
@@ -531,13 +428,11 @@
             gap: 8px;
             letter-spacing: -0.2px;
         }
-
         .detail-label i {
             width: 20px;
             color: #5B66E8;
             font-size: 0.9rem;
         }
-
         .detail-value {
             font-weight: 700;
             color: #0f172a;
@@ -546,7 +441,6 @@
             max-width: 60%;
             word-break: break-word;
         }
-
         .transport-status-card {
             background: #f1f5f9;
             margin: 4px 16px 16px;
@@ -556,14 +450,12 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .confirm-access-section {
             padding: 8px 16px 22px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-
         .btn-confirm {
             background: #16a34a;
             box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
@@ -571,7 +463,6 @@
             padding: 14px;
             font-size: 1rem;
         }
-
         .btn-new-verify {
             background: #475569;
             max-width: 100%;
@@ -579,13 +470,11 @@
             font-size: 0.95rem;
             box-shadow: none;
         }
-
         .resend-section {
             margin-top: 22px;
             padding-top: 16px;
             border-top: 1px solid #eef2f6;
         }
-
         .resend-btn {
             background: white;
             border: 2px solid #cbd5e1;
@@ -601,12 +490,10 @@
             justify-content: center;
             gap: 8px;
         }
-
         .resend-btn:active {
             background: #f8fafc;
             border-color: #5B66E8;
         }
-
         .resend-modal {
             position: fixed;
             top: 0;
@@ -623,12 +510,10 @@
             visibility: hidden;
             transition: 0.25s;
         }
-
         .resend-modal.active {
             opacity: 1;
             visibility: visible;
         }
-
         .resend-modal-content {
             background: white;
             border-radius: 40px;
@@ -637,12 +522,10 @@
             padding: 28px 24px;
             box-shadow: 0 30px 40px rgba(0, 0, 0, 0.3);
         }
-
         .resend-modal-header {
             text-align: center;
             margin-bottom: 24px;
         }
-
         .resend-modal-header i {
             font-size: 52px;
             background: linear-gradient(135deg, #5B66E8, #8B5CF6);
@@ -650,7 +533,6 @@
             background-clip: text;
             color: transparent;
         }
-
         .form-control {
             border-radius: 60px;
             border: 2px solid #e2e8f0;
@@ -658,13 +540,11 @@
             font-size: 1rem;
             width: 100%;
         }
-
         .form-control:focus {
             border-color: #5B66E8;
             outline: none;
             box-shadow: 0 0 0 3px rgba(91, 102, 232, 0.2);
         }
-
         .photo-modal {
             position: fixed;
             top: 0;
@@ -681,100 +561,45 @@
             visibility: hidden;
             transition: 0.2s;
         }
-
         .photo-modal.active {
             opacity: 1;
             visibility: visible;
         }
-
         .photo-modal img {
             max-width: 90%;
             max-height: 85%;
             border-radius: 24px;
             object-fit: contain;
         }
-
         .footer {
             text-align: center;
             margin-top: 20px;
             color: rgba(255, 255, 255, 0.85);
             font-size: 0.7rem;
         }
-
         .footer a {
             color: white;
             font-weight: 500;
             text-decoration: none;
         }
-
         @media (max-width: 520px) {
-            .gateway-card {
-                padding: 20px 16px;
-            }
-
-            .token-input {
-                width: 70px;
-                height: 70px;
-                font-size: 42px;
-                border-radius: 20px;
-            }
-
-            .token-box {
-                gap: 10px;
-            }
-
-            .student-large-photo {
-                width: 130px;
-                height: 130px;
-            }
-
-            .detail-value {
-                font-size: 0.8rem;
-            }
+            .gateway-card { padding: 20px 16px; }
+            .token-input { width: 70px; height: 70px; font-size: 42px; border-radius: 20px; }
+            .token-box { gap: 10px; }
+            .student-large-photo { width: 130px; height: 130px; }
+            .detail-value { font-size: 0.8rem; }
         }
-
         @media (max-width: 440px) {
-            .token-input {
-                width: 62px;
-                height: 62px;
-                font-size: 36px;
-                border-radius: 18px;
-            }
-
-            .token-box {
-                gap: 8px;
-            }
-
-            .gateway-header h2 {
-                font-size: 1.3rem;
-            }
-
-            .btn-submit {
-                padding: 12px 18px;
-                font-size: 0.95rem;
-            }
+            .token-input { width: 62px; height: 62px; font-size: 36px; border-radius: 18px; }
+            .token-box { gap: 8px; }
+            .gateway-header h2 { font-size: 1.3rem; }
+            .btn-submit { padding: 12px 18px; font-size: 0.95rem; }
         }
-
         @media (max-width: 380px) {
-            .token-input {
-                width: 55px;
-                height: 55px;
-                font-size: 32px;
-            }
-
-            .token-box {
-                gap: 6px;
-            }
-
-            .student-large-photo {
-                width: 110px;
-                height: 110px;
-            }
-
-            .face-match-instruction {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
+            .token-input { width: 55px; height: 55px; font-size: 32px; }
+            .token-box { gap: 6px; }
+            .student-large-photo { width: 110px; height: 110px; }
+            .face-match-instruction { font-size: 0.7rem; padding: 6px 10px; }
         }
     </style>
 </head>
@@ -793,7 +618,7 @@
             <div id="alertBox" class="alert"></div>
 
             <!-- ========================================= -->
-            <!-- OFFLINE STATUS BAR (IMPROVED - NO COUNT)  -->
+            <!-- OFFLINE STATUS BAR                        -->
             <!-- ========================================= -->
             <div id="offlineStatusBar" class="offline-status-bar">
                 <div class="info">
@@ -802,7 +627,7 @@
                 </div>
                 <button id="syncOfflineBtn" class="btn-sync-offline hidden">
                     <i class="fas fa-cloud-download-alt"></i>
-                    <span>Sync Token</span>
+                    <span>Pakua Token</span>
                 </button>
             </div>
 
@@ -816,14 +641,10 @@
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
-                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off"
-                                inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                            <input type="number" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="numeric" pattern="[0-9]">
                         </div>
                     </div>
                 </div>
@@ -933,6 +754,8 @@
             let currentStudentId = null;
             let hasTokens = false;
             let isSyncing = false;
+            let offlineTokenCount = 0;
+            let onlineTokenTotal = 0;
 
             const ALERT_DURATION = 3500;
             const VERIFY_SESSION_DURATION = 60000;
@@ -955,37 +778,7 @@
                 }
             }
 
-            async function checkTokensAvailability() {
-                try {
-                    const response = await fetch('/offline/tokens', {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.success && data.tokens && data.tokens.length > 0) {
-                            hasTokens = true;
-                            syncBtn.classList.remove('hidden');
-                            return true;
-                        }
-                    }
-                    hasTokens = false;
-                    syncBtn.classList.add('hidden');
-                    return false;
-                } catch (e) {
-                    try {
-                        const count = await getOfflineTokenCount();
-                        if (count > 0) {
-                            hasTokens = true;
-                            syncBtn.classList.remove('hidden');
-                            return true;
-                        }
-                    } catch (err) {}
-                    hasTokens = false;
-                    syncBtn.classList.add('hidden');
-                    return false;
-                }
-            }
-
+            // Get offline token count from IndexedDB
             async function getOfflineTokenCount() {
                 if (!('serviceWorker' in navigator)) return 0;
                 try {
@@ -999,10 +792,62 @@
                         registration.active.postMessage({
                             type: 'GET_OFFLINE_TOKEN_COUNT'
                         }, [channel.port2]);
-                        setTimeout(() => resolve(0), 2000);
+                        setTimeout(() => resolve(0), 3000);
                     });
                 } catch (e) {
                     return 0;
+                }
+            }
+
+            // Check if there are tokens available for sync (with comparison)
+            async function checkTokensAvailability() {
+                try {
+                    // Get online token count from server
+                    const response = await fetch('/offline/tokens', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    let onlineTotal = 0;
+                    if (response.ok) {
+                        const data = await response.json();
+                        onlineTotal = data.total || 0;
+                        onlineTokenTotal = onlineTotal;
+                    }
+
+                    // Get offline token count from IndexedDB
+                    const offlineCount = await getOfflineTokenCount();
+                    offlineTokenCount = offlineCount;
+
+                    // Show sync button only if there are tokens online AND offline count is less than online total
+                    // OR if offline count is 0 but online has tokens (first sync)
+                    if (onlineTotal > 0 && offlineCount < onlineTotal) {
+                        hasTokens = true;
+                        syncBtn.classList.remove('hidden');
+                        syncBtn.disabled = false;
+                        syncBtn.title = 'Pakua token mpya';
+                        return true;
+                    } else {
+                        hasTokens = false;
+                        syncBtn.classList.add('hidden');
+                        return false;
+                    }
+                } catch (e) {
+                    // If offline, try to check IndexedDB only
+                    try {
+                        const offlineCount = await getOfflineTokenCount();
+                        offlineTokenCount = offlineCount;
+                        if (offlineCount > 0) {
+                            // Show button but disabled (can't download without internet)
+                            hasTokens = true;
+                            syncBtn.classList.remove('hidden');
+                            syncBtn.disabled = true;
+                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
+                            return true;
+                        }
+                    } catch (err) {}
+                    hasTokens = false;
+                    syncBtn.classList.add('hidden');
+                    return false;
                 }
             }
 
@@ -1065,12 +910,13 @@
                     if (result && result.success) {
                         showProgress(100, 'Imekamilika!');
                         setTimeout(hideProgress, 800);
-                        showAlert('Token zimepakuliwa kikamilifu!', 'success');
-                        await checkTokensAvailability();
+                        // ✅ DON'T show "Token zimepakuliwa kikamilifu!" - just update status
                         setStatus('online', 'Imeunganishwa');
+                        // Re-check if tokens are available (hide button if all synced)
+                        await checkTokensAvailability();
                     } else {
                         hideProgress();
-                        showAlert('Imeshindwa kupakia token. Jaribu tena.', 'error');
+                        showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
                         setStatus('offline', 'Hitilafu');
                     }
                 } catch (e) {
@@ -1092,15 +938,15 @@
                     const data = event.data;
                     if (data && data.type === 'SYNC_STATUS') {
                         if (data.success) {
-                            showAlert('Token zimepakuliwa kikamilifu!', 'success');
-                            checkTokensAvailability();
+                            // ✅ Don't show "Token zimepakuliwa kikamilifu!" - just update
                             setStatus('online', 'Imeunganishwa');
+                            checkTokensAvailability();
                         } else {
-                            showAlert('Imeshindwa kupakia token. Jaribu tena.', 'error');
+                            showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
                             setStatus('offline', 'Hitilafu');
                         }
                         syncBtn.disabled = false;
-                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync Token';
+                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Pakua Token';
                         isSyncing = false;
                         hideProgress();
                     }
@@ -1148,11 +994,12 @@
                 } else {
                     try {
                         const count = await getOfflineTokenCount();
+                        offlineTokenCount = count;
                         if (count > 0) {
                             hasTokens = true;
                             syncBtn.classList.remove('hidden');
                             syncBtn.disabled = true;
-                            syncBtn.title = 'Unahitaji mtandao kupakia token mpya';
+                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
                         }
                     } catch (e) {}
                 }
@@ -1176,7 +1023,8 @@
                         if (count === 0) {
                             showAlert('Huna token zilizohifadhiwa offline. Unganisha mtandao kupakua token.', 'warning', true, 5000);
                         } else {
-                            showAlert(`Una token ${count} zilizohifadhiwa. Verification inawezekana offline.`, 'info', true, 3000);
+                            // ✅ Show simple info - no count displayed
+                            showAlert('Hali ya offline. Token zilizohifadhiwa zinaweza kuthibitishwa.', 'info', true, 3000);
                         }
                     }, 1000);
                 }
@@ -1318,7 +1166,6 @@
                 hideAlert();
 
                 try {
-                    // ✅ Use AbortController for timeout
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -1350,13 +1197,12 @@
                         setTimeout(() => resetAll(), 3500);
                     }
                 } catch (error) {
-                    // ✅ Network failed - try offline verification via SW message
+                    // Network failed - try offline verification via SW message
                     if (error.name === 'AbortError') {
                         showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
                     } else {
                         showAlert('Hakuna mtandao. Inajaribu kuthibitisha token offline...', 'info', true, 2000);
 
-                        // Try offline verification via Service Worker message
                         try {
                             if ('serviceWorker' in navigator) {
                                 const registration = await navigator.serviceWorker.ready;
@@ -1409,6 +1255,9 @@
                 }
             }
 
+            // ==========================================
+            // SHOW STUDENT INFO (FIXED FOR OFFLINE)
+            // ==========================================
             function showStudentInfo(data) {
                 const student = data.student;
                 const installment = data.installment;
@@ -1424,7 +1273,9 @@
                 const firstName = student.first_name ? student.first_name.toUpperCase() : '';
                 const lastName = student.last_name ? student.last_name.toUpperCase() : '';
                 const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-                const className = student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A';
+                // ✅ FIX: Use class_name directly from student data (works for both online and offline)
+                const className = student.class_name ? student.class_name.toUpperCase() :
+                                 (student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A');
 
                 studentSection.innerHTML = `
                     <div class="success-card">
