@@ -64,13 +64,13 @@
             border: 2px solid #5B66E8;
             color: #5B66E8;
             border-radius: 40px;
-            padding: 6px 18px;
+            padding: 4px 10px;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.5rem;
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 3px;
             cursor: pointer;
         }
         .btn-sync-offline:hover {
@@ -627,7 +627,7 @@
                 </div>
                 <button id="syncOfflineBtn" class="btn-sync-offline hidden">
                     <i class="fas fa-cloud-download-alt"></i>
-                    <span>Pakua Token</span>
+                    <span>Sync Token</span>
                 </button>
             </div>
 
@@ -824,7 +824,7 @@
                         hasTokens = true;
                         syncBtn.classList.remove('hidden');
                         syncBtn.disabled = false;
-                        syncBtn.title = 'Pakua token mpya';
+                        syncBtn.title = 'Sync Token';
                         return true;
                     } else {
                         hasTokens = false;
@@ -911,7 +911,7 @@
                         showProgress(100, 'Imekamilika!');
                         setTimeout(hideProgress, 800);
                         // ✅ DON'T show "Token zimepakuliwa kikamilifu!" - just update status
-                        setStatus('online', 'Imeunganishwa');
+                        setStatus('online', 'Online Mode');
                         // Re-check if tokens are available (hide button if all synced)
                         await checkTokensAvailability();
                     } else {
@@ -939,14 +939,14 @@
                     if (data && data.type === 'SYNC_STATUS') {
                         if (data.success) {
                             // ✅ Don't show "Token zimepakuliwa kikamilifu!" - just update
-                            setStatus('online', 'Imeunganishwa');
+                            setStatus('online', 'Online Mode');
                             checkTokensAvailability();
                         } else {
                             showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
                             setStatus('offline', 'Hitilafu');
                         }
                         syncBtn.disabled = false;
-                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Pakua Token';
+                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync Token';
                         isSyncing = false;
                         hideProgress();
                     }
@@ -965,10 +965,10 @@
 
             function updateConnectionStatus() {
                 if (navigator.onLine) {
-                    setStatus('online', 'Imeunganishwa');
+                    setStatus('online', 'Online Mode');
                     checkTokensAvailability();
                 } else {
-                    setStatus('offline', 'Hakuna mtandao');
+                    setStatus('offline', 'Offline Mode');
                     syncBtn.classList.add('hidden');
                 }
             }
@@ -979,7 +979,7 @@
             });
 
             window.addEventListener('offline', () => {
-                setStatus('offline', 'Hakuna mtandao');
+                setStatus('offline', 'Offline Mode');
                 syncBtn.classList.add('hidden');
             });
 
