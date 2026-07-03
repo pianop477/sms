@@ -12,8 +12,9 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
 
     <style>
-        /* ========== ALL YOUR EXISTING CSS REMAINS UNCHANGED ========== */
-        /* [Mistari yako ya CSS hapa - nimeihifadhi kama ilivyo] */
+        /* ============================================
+                   OFFLINE STATUS BAR
+                   ============================================ */
         .offline-status-bar {
             background: #f8fafc;
             border-radius: 60px;
@@ -27,6 +28,7 @@
             border: 1px solid #e2e8f0;
             min-height: 48px;
         }
+
         .offline-status-bar .info {
             display: flex;
             align-items: center;
@@ -35,9 +37,7 @@
             font-weight: 500;
             color: #334155;
         }
-        .offline-status-bar .info i {
-            font-size: 1.1rem;
-        }
+
         .offline-status-bar .info .status-dot {
             display: inline-block;
             width: 10px;
@@ -45,6 +45,7 @@
             border-radius: 50%;
             margin-right: 4px;
         }
+
         .status-dot.online {
             background: #22c55e;
         }
@@ -55,10 +56,12 @@
             background: #f59e0b;
             animation: pulse 1s infinite;
         }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(0.8); }
         }
+
         .btn-sync-offline {
             background: transparent;
             border: 2px solid #5B66E8;
@@ -73,6 +76,7 @@
             gap: 6px;
             cursor: pointer;
         }
+
         .btn-sync-offline:hover {
             background: #5B66E8;
             color: white;
@@ -88,10 +92,16 @@
         .btn-sync-offline.hidden {
             display: none !important;
         }
-        .btn-sync-offline .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
+
+        .sync-status-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.05);
+            white-space: nowrap;
         }
+
         .sync-progress-container {
             display: none;
             margin: 8px 0 12px;
@@ -101,9 +111,11 @@
             overflow: hidden;
             position: relative;
         }
+
         .sync-progress-container.active {
             display: block;
         }
+
         .sync-progress-bar {
             height: 100%;
             width: 0%;
@@ -111,6 +123,7 @@
             border-radius: 60px;
             transition: width 0.4s ease;
         }
+
         .sync-progress-text {
             font-size: 0.7rem;
             color: #64748b;
@@ -121,12 +134,16 @@
         .sync-progress-text.active {
             display: block;
         }
-        /* Rest of your CSS... (keep all existing styles) */
+
+        /* ============================================
+                   REST OF YOUR CSS (unchanged)
+                   ============================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: linear-gradient(145deg, #5B66E8 0%, #8B5CF6 100%);
@@ -136,11 +153,13 @@
             justify-content: center;
             padding: 12px;
         }
+
         .gateway-container {
             width: 100%;
             max-width: 560px;
             margin: 0 auto;
         }
+
         .gateway-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(0px);
@@ -150,10 +169,12 @@
             padding: 24px 20px 28px;
             transition: all 0.2s ease;
         }
+
         .gateway-header {
             text-align: center;
             margin-bottom: 28px;
         }
+
         .gateway-icon {
             width: 70px;
             height: 70px;
@@ -165,10 +186,12 @@
             margin-bottom: 12px;
             box-shadow: 0 8px 14px rgba(91, 102, 232, 0.25);
         }
+
         .gateway-icon i {
             font-size: 32px;
             color: white;
         }
+
         .gateway-header h2 {
             font-size: 1.55rem;
             font-weight: 800;
@@ -179,24 +202,29 @@
             letter-spacing: -0.3px;
             margin-bottom: 6px;
         }
+
         .gateway-header p {
             color: #475569;
             font-size: 0.9rem;
             font-weight: 500;
         }
+
         .token-input-container {
             margin: 10px 0 16px;
         }
+
         .token-input-group {
             display: flex;
             justify-content: center;
         }
+
         .token-box {
             display: flex;
             gap: 14px;
             flex-wrap: nowrap;
             justify-content: center;
         }
+
         .token-input {
             width: 85px;
             height: 85px;
@@ -212,6 +240,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
             letter-spacing: 4px;
         }
+
         .token-input::-webkit-outer-spin-button,
         .token-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -221,27 +250,32 @@
             -moz-appearance: textfield;
             appearance: textfield;
         }
+
         .token-input:focus {
             border-color: #5B66E8;
             outline: none;
             box-shadow: 0 0 0 4px rgba(91, 102, 232, 0.2);
             transform: scale(1.02);
         }
+
         .token-input.error {
             border-color: #dc2626;
             background: #fef2f2;
             animation: shake 0.3s ease;
         }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+
         .btn-container {
             display: flex;
             justify-content: center;
             margin: 12px 0 8px;
         }
+
         .btn-submit {
             width: 100%;
             max-width: 320px;
@@ -260,6 +294,7 @@
             gap: 12px;
             box-shadow: 0 6px 14px rgba(91, 102, 232, 0.3);
         }
+
         .btn-submit:active {
             transform: scale(0.97);
         }
@@ -268,6 +303,7 @@
             transform: none;
             cursor: not-allowed;
         }
+
         .btn-reset {
             background: transparent;
             border: 1px solid #cbd5e1;
@@ -286,6 +322,7 @@
         .btn-reset:active {
             background: #f1f5f9;
         }
+
         .alert {
             padding: 14px 18px;
             border-radius: 24px;
@@ -296,10 +333,12 @@
             backdrop-filter: blur(4px);
             animation: fadeSlide 0.2s ease;
         }
+
         @keyframes fadeSlide {
             from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .alert-success {
             background: #dff9e6;
             color: #0a3b2a;
@@ -320,10 +359,12 @@
             color: #9a3412;
             border-left: 5px solid #f97316;
         }
+
         .loading-state {
             text-align: center;
             padding: 36px 20px;
         }
+
         .spinner {
             width: 40px;
             height: 40px;
@@ -333,9 +374,11 @@
             animation: spin 0.8s linear infinite;
             margin: 0 auto 12px;
         }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
         .success-card {
             background: white;
             border-radius: 28px;
@@ -343,11 +386,13 @@
             margin-top: 6px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
+
         .success-header {
             background: linear-gradient(115deg, #22c55e, #15803d);
             padding: 18px 12px;
             text-align: center;
         }
+
         .success-header i {
             font-size: 28px;
             color: white;
@@ -366,6 +411,7 @@
             margin: 6px 0 0;
             color: rgba(255, 255, 255, 0.9);
         }
+
         .identity-verification-section {
             padding: 20px 16px 12px;
         }
@@ -403,6 +449,7 @@
             color: #b45309;
             max-width: 95%;
         }
+
         .student-details-panel {
             background: #f8fafc;
             border-radius: 24px;
@@ -441,6 +488,7 @@
             max-width: 60%;
             word-break: break-word;
         }
+
         .transport-status-card {
             background: #f1f5f9;
             margin: 4px 16px 16px;
@@ -450,12 +498,14 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .confirm-access-section {
             padding: 8px 16px 22px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
+
         .btn-confirm {
             background: #16a34a;
             box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
@@ -470,6 +520,7 @@
             font-size: 0.95rem;
             box-shadow: none;
         }
+
         .resend-section {
             margin-top: 22px;
             padding-top: 16px;
@@ -494,6 +545,7 @@
             background: #f8fafc;
             border-color: #5B66E8;
         }
+
         .resend-modal {
             position: fixed;
             top: 0;
@@ -533,6 +585,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .form-control {
             border-radius: 60px;
             border: 2px solid #e2e8f0;
@@ -545,6 +598,7 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(91, 102, 232, 0.2);
         }
+
         .photo-modal {
             position: fixed;
             top: 0;
@@ -571,6 +625,7 @@
             border-radius: 24px;
             object-fit: contain;
         }
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -582,6 +637,7 @@
             font-weight: 500;
             text-decoration: none;
         }
+
         @media (max-width: 520px) {
             .gateway-card { padding: 20px 16px; }
             .token-input { width: 70px; height: 70px; font-size: 42px; border-radius: 20px; }
@@ -589,12 +645,14 @@
             .student-large-photo { width: 130px; height: 130px; }
             .detail-value { font-size: 0.8rem; }
         }
+
         @media (max-width: 440px) {
             .token-input { width: 62px; height: 62px; font-size: 36px; border-radius: 18px; }
             .token-box { gap: 8px; }
             .gateway-header h2 { font-size: 1.3rem; }
             .btn-submit { padding: 12px 18px; font-size: 0.95rem; }
         }
+
         @media (max-width: 380px) {
             .token-input { width: 55px; height: 55px; font-size: 32px; }
             .token-box { gap: 6px; }
@@ -618,16 +676,17 @@
             <div id="alertBox" class="alert"></div>
 
             <!-- ========================================= -->
-            <!-- OFFLINE STATUS BAR                        -->
+            <!-- OFFLINE STATUS BAR (IMPROVED)             -->
             <!-- ========================================= -->
             <div id="offlineStatusBar" class="offline-status-bar">
                 <div class="info">
                     <span class="status-dot" id="statusDot"></span>
                     <span id="statusText">Inaangalia...</span>
+                    <span id="syncStatusText" class="sync-status-text"></span>
                 </div>
                 <button id="syncOfflineBtn" class="btn-sync-offline hidden">
                     <i class="fas fa-cloud-download-alt"></i>
-                    <span>Pakua Token</span>
+                    <span>Sync Token</span>
                 </button>
             </div>
 
@@ -729,6 +788,7 @@
             const syncBtn = document.getElementById('syncOfflineBtn');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
+            const syncStatusText = document.getElementById('syncStatusText');
             const progressContainer = document.getElementById('syncProgressContainer');
             const progressBar = document.getElementById('syncProgressBar');
             const progressText = document.getElementById('syncProgressText');
@@ -760,8 +820,39 @@
             const ALERT_DURATION = 3500;
             const VERIFY_SESSION_DURATION = 60000;
 
-            // ========== OFFLINE STATUS ==========
+            // ========== HELPER: SET SYNC STATUS ==========
+            function setSyncStatus(status, message) {
+                if (!syncStatusText) return;
+                let icon = '';
+                let text = '';
+                let color = '';
+                switch (status) {
+                    case 'synced':
+                        icon = '✅';
+                        text = message || 'Tayari kwa offline';
+                        color = '#22c55e';
+                        break;
+                    case 'not_synced':
+                        icon = '⚠️';
+                        text = message || 'Token mpya zinapatikana';
+                        color = '#f59e0b';
+                        break;
+                    case 'offline':
+                        icon = '📡';
+                        text = message || 'Hali ya offline';
+                        color = '#ef4444';
+                        break;
+                    case 'checking':
+                    default:
+                        icon = '⏳';
+                        text = message || 'Inaangalia...';
+                        color = '#64748b';
+                        break;
+                }
+                syncStatusText.innerHTML = `<span style="color: ${color};">${icon} ${text}</span>`;
+            }
 
+            // ========== OFFLINE STATUS ==========
             function setStatus(mode, message) {
                 statusDot.className = 'status-dot';
                 if (mode === 'online') {
@@ -799,7 +890,7 @@
                 }
             }
 
-            // Check if there are tokens available for sync (with comparison)
+            // Check tokens availability and update sync status
             async function checkTokensAvailability() {
                 try {
                     // Get online token count from server
@@ -818,41 +909,50 @@
                     const offlineCount = await getOfflineTokenCount();
                     offlineTokenCount = offlineCount;
 
-                    // Show sync button only if there are tokens online AND offline count is less than online total
-                    // OR if offline count is 0 but online has tokens (first sync)
-                    if (onlineTotal > 0 && offlineCount < onlineTotal) {
+                    if (onlineTotal === 0) {
+                        setSyncStatus('not_synced', 'Hakuna token');
+                        syncBtn.classList.add('hidden');
+                        hasTokens = false;
+                        return false;
+                    } else if (offlineCount >= onlineTotal) {
+                        setSyncStatus('synced', 'Tayari kwa offline');
+                        syncBtn.classList.add('hidden');
                         hasTokens = true;
-                        syncBtn.classList.remove('hidden');
-                        syncBtn.disabled = false;
-                        syncBtn.title = 'Pakua token mpya';
                         return true;
                     } else {
-                        hasTokens = false;
-                        syncBtn.classList.add('hidden');
-                        return false;
+                        setSyncStatus('not_synced', 'Token mpya zinapatikana');
+                        syncBtn.classList.remove('hidden');
+                        syncBtn.disabled = false;
+                        syncBtn.title = 'Sync Token';
+                        hasTokens = true;
+                        return true;
                     }
                 } catch (e) {
-                    // If offline, try to check IndexedDB only
+                    // Offline or network error
                     try {
                         const offlineCount = await getOfflineTokenCount();
                         offlineTokenCount = offlineCount;
                         if (offlineCount > 0) {
-                            // Show button but disabled (can't download without internet)
+                            setSyncStatus('offline', 'Hali ya offline');
+                            syncBtn.classList.add('hidden');
                             hasTokens = true;
-                            syncBtn.classList.remove('hidden');
-                            syncBtn.disabled = true;
-                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
                             return true;
+                        } else {
+                            setSyncStatus('offline', 'Hakuna token offline');
+                            syncBtn.classList.add('hidden');
+                            hasTokens = false;
+                            return false;
                         }
-                    } catch (err) {}
-                    hasTokens = false;
-                    syncBtn.classList.add('hidden');
-                    return false;
+                    } catch (err) {
+                        setSyncStatus('offline', 'Hakuna token offline');
+                        syncBtn.classList.add('hidden');
+                        hasTokens = false;
+                        return false;
+                    }
                 }
             }
 
             // ========== PROGRESS BAR ==========
-
             function showProgress(percent, text) {
                 progressContainer.classList.add('active');
                 progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
@@ -871,7 +971,6 @@
             }
 
             // ========== SYNC TRIGGER ==========
-
             async function triggerOfflineSync() {
                 if (isSyncing) return;
                 if (!('serviceWorker' in navigator)) {
@@ -884,6 +983,7 @@
                 const originalHtml = syncBtn.innerHTML;
                 syncBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Inapakia...';
                 setStatus('syncing', 'Inapakia...');
+                setSyncStatus('not_synced', 'Inasawazisha...');
                 showProgress(10, 'Kuanza upakiaji...');
 
                 try {
@@ -910,20 +1010,21 @@
                     if (result && result.success) {
                         showProgress(100, 'Imekamilika!');
                         setTimeout(hideProgress, 800);
-                        // ✅ DON'T show "Token zimepakuliwa kikamilifu!" - just update status
                         setStatus('online', 'Imeunganishwa');
-                        // Re-check if tokens are available (hide button if all synced)
+                        // Re-check status (will set "synced" if all tokens are synced)
                         await checkTokensAvailability();
                     } else {
                         hideProgress();
                         showAlert('Imeshindwa kupakua token. Jaribu tena.', 'error');
                         setStatus('offline', 'Hitilafu');
+                        setSyncStatus('not_synced', 'Hitilafu ya upakiaji');
                     }
                 } catch (e) {
                     console.error('Sync error:', e);
                     hideProgress();
                     showAlert('Hitilafu wakati wa upakiaji. Hakikisha umeunganishwa mtandao.', 'error');
                     setStatus('offline', 'Hitilafu');
+                    setSyncStatus('not_synced', 'Hitilafu');
                 } finally {
                     isSyncing = false;
                     syncBtn.disabled = false;
@@ -932,13 +1033,11 @@
             }
 
             // ========== SERVICE WORKER MESSAGES ==========
-
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.addEventListener('message', function(event) {
                     const data = event.data;
                     if (data && data.type === 'SYNC_STATUS') {
                         if (data.success) {
-                            // ✅ Don't show "Token zimepakuliwa kikamilifu!" - just update
                             setStatus('online', 'Imeunganishwa');
                             checkTokensAvailability();
                         } else {
@@ -946,7 +1045,7 @@
                             setStatus('offline', 'Hitilafu');
                         }
                         syncBtn.disabled = false;
-                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Pakua Token';
+                        syncBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync Token';
                         isSyncing = false;
                         hideProgress();
                     }
@@ -961,8 +1060,7 @@
                 });
             }
 
-            // ========== CHECK ONLINE/OFFLINE STATUS ==========
-
+            // ========== ONLINE/OFFLINE STATUS ==========
             function updateConnectionStatus() {
                 if (navigator.onLine) {
                     setStatus('online', 'Imeunganishwa');
@@ -970,6 +1068,7 @@
                 } else {
                     setStatus('offline', 'Hakuna mtandao');
                     syncBtn.classList.add('hidden');
+                    setSyncStatus('offline', 'Hali ya offline');
                 }
             }
 
@@ -981,12 +1080,12 @@
             window.addEventListener('offline', () => {
                 setStatus('offline', 'Hakuna mtandao');
                 syncBtn.classList.add('hidden');
+                setSyncStatus('offline', 'Hali ya offline');
             });
 
             syncBtn.addEventListener('click', triggerOfflineSync);
 
             // ========== INIT OFFLINE STATUS ==========
-
             async function initOfflineStatus() {
                 updateConnectionStatus();
                 if (navigator.onLine) {
@@ -996,19 +1095,20 @@
                         const count = await getOfflineTokenCount();
                         offlineTokenCount = count;
                         if (count > 0) {
+                            setSyncStatus('offline', 'Hali ya offline');
                             hasTokens = true;
-                            syncBtn.classList.remove('hidden');
-                            syncBtn.disabled = true;
-                            syncBtn.title = 'Unahitaji mtandao kupakua token mpya';
+                        } else {
+                            setSyncStatus('offline', 'Hakuna token offline');
+                            hasTokens = false;
                         }
+                        syncBtn.classList.add('hidden');
                     } catch (e) {}
                 }
             }
 
             // ==========================================
-            // VERIFICATION LOGIC (FULLY OFFLINE CAPABLE)
+            // VERIFICATION LOGIC (unchanged from previous)
             // ==========================================
-
             function init() {
                 setupTokenEvents();
                 setupModalEvents();
@@ -1016,14 +1116,12 @@
                 focusFirstInput();
                 initOfflineStatus();
 
-                // ✅ Check if page is being served from cache (offline)
                 if (!navigator.onLine) {
                     setTimeout(async () => {
                         const count = await getOfflineTokenCount();
                         if (count === 0) {
                             showAlert('Huna token zilizohifadhiwa offline. Unganisha mtandao kupakua token.', 'warning', true, 5000);
                         } else {
-                            // ✅ Show simple info - no count displayed
                             showAlert('Hali ya offline. Token zilizohifadhiwa zinaweza kuthibitishwa.', 'info', true, 3000);
                         }
                     }, 1000);
@@ -1197,7 +1295,6 @@
                         setTimeout(() => resetAll(), 3500);
                     }
                 } catch (error) {
-                    // Network failed - try offline verification via SW message
                     if (error.name === 'AbortError') {
                         showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
                     } else {
@@ -1273,7 +1370,6 @@
                 const firstName = student.first_name ? student.first_name.toUpperCase() : '';
                 const lastName = student.last_name ? student.last_name.toUpperCase() : '';
                 const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-                // ✅ FIX: Use class_name directly from student data (works for both online and offline)
                 const className = student.class_name ? student.class_name.toUpperCase() :
                                  (student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A');
 
@@ -1351,7 +1447,6 @@
             }
 
             // ========== MODAL HANDLERS ==========
-
             function setupModalEvents() {
                 showResendModalBtn?.addEventListener('click', () => {
                     resendModal.classList.add('active');
@@ -1407,7 +1502,6 @@
             }
 
             // ========== INIT ==========
-
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
