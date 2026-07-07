@@ -885,6 +885,39 @@
                 }
             }
 
+            function refreshCsrfToken() {
+                return fetch('{{ route('refresh-csrf') }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to refresh CSRF token');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.token) {
+                        // Update all forms
+                        document.querySelectorAll('input[name="_token"]').forEach(input => {
+                            input.value = data.token;
+                        });
+                        // Update meta tag for AJAX requests
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) metaTag.content = data.token;
+                        return data.token;
+                    } else {
+                        throw new Error('No token in response');
+                    }
+                })
+                .catch(error => {
+                    console.warn('CSRF refresh failed:', error);
+                    // Return null so we can fall back to existing token
+                    return null;
+                });
+            }
+
             // Start the app
             document.addEventListener('DOMContentLoaded', init);
         })();

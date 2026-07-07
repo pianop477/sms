@@ -147,6 +147,7 @@ class TokenController extends Controller
      */
     public function resendToken(Request $request)
     {
+        // ✅ Validate input
         $request->validate([
             'admission_number' => 'required|string|min:9'
         ]);
@@ -154,7 +155,7 @@ class TokenController extends Controller
         try {
             $currentAcademicYear = date('Y');
 
-            // ✅ Find student by admission number
+            // ✅ 1. Find student by admission number
             $student = Student::where('admission_number', $request->admission_number)
                 ->first();
 
@@ -169,8 +170,13 @@ class TokenController extends Controller
                 ], 404);
             }
 
-            // ✅ Get parent phone - Correct relationship path
-            // Student -> parent_id -> Parents -> user_id -> Users -> phone
+            Log::info('🔵 RESEND TOKEN - Student found', [
+                'student_id' => $student->id,
+                'admission_number' => $student->admission_number,
+                'student_name' => $student->first_name . ' ' . $student->last_name
+            ]);
+
+            // ✅ 2. Get parent phone number
             $parentPhone = null;
             $parentName = null;
 
@@ -178,20 +184,15 @@ class TokenController extends Controller
                 $parent = Parents::with('user')->where('id', $student->parent_id)->first();
 
                 if ($parent) {
-                    // Log::info('🔵 RESEND TOKEN - Parent found', [
-                    //     'parent_id' => $parent->id,
-                    //     'has_user' => $parent->user ? 'YES' : 'NO'
-                    // ]);
-
                     if ($parent->user) {
                         $parentPhone = $parent->user->phone;
                         $parentName = $parent->user->first_name . ' ' . $parent->user->last_name;
 
-                        // Log::info('🔵 RESEND TOKEN - Parent phone found', [
-                        //     'parent_id' => $parent->id,
-                        //     'parent_name' => $parentName,
-                        //     'phone' => $parentPhone
-                        // ]);
+                        Log::info('🔵 RESEND TOKEN - Parent found', [
+                            'parent_id' => $parent->id,
+                            'parent_name' => $parentName,
+                            'phone' => $parentPhone
+                        ]);
                     } else {
                         Log::warning('🔴 RESEND TOKEN - Parent has no user record', [
                             'parent_id' => $parent->id
@@ -204,10 +205,12 @@ class TokenController extends Controller
                 }
             } else {
                 Log::warning('🔴 RESEND TOKEN - Student has no parent_id', [
-                    'student_id' => $student->id
+                    'student_id' => $student->id,
+                    'admission_number' => $student->admission_number
                 ]);
             }
 
+            // ✅ 3. Check if parent phone exists
             if (!$parentPhone) {
                 return response()->json([
                     'success' => false,
@@ -215,7 +218,7 @@ class TokenController extends Controller
                 ], 404);
             }
 
-            // ✅ Check for active token
+            // ✅ 4. Check for existing active token
             $activeToken = FeeClearanceToken::where('student_id', $student->id)
                 ->where('academic_year', $currentAcademicYear)
                 ->where('status', 'active')
@@ -223,62 +226,138 @@ class TokenController extends Controller
                 ->with('installment')
                 ->first();
 
-            // Log::info('🔵 RESEND TOKEN - Token search result', [
-            //     'student_id' => $student->id,
-            //     'token_found' => $activeToken ? 'YES' : 'NO'
-            // ]);
+            Log::info('🔵 RESEND TOKEN - Active token check', [
+                'student_id' => $student->id,
+                'academic_year' => $currentAcademicYear,
+                'token_exists' => $activeToken ? 'YES' : 'NO'
+            ]);
 
-            // ✅ If no active token, try to create one
+            // ✅ 5. If no active token, create one
             if (!$activeToken) {
+                Log::info('🔵 RESEND TOKEN - No active token found, creating new one');
+
                 $service = new FeeClearanceService();
+
+                // Check eligibility
                 $evaluation = $service->evaluate($student, $currentAcademicYear);
 
                 if (!$evaluation['eligible']) {
+                    Log::warning('🔴 RESEND TOKEN - Student not eligible', [
+                        'student_id' => $student->id,
+                        'reason' => $evaluation['reason'] ?? 'Unknown reason'
+                    ]);
+
                     return response()->json([
                         'success' => false,
                         'message' => 'Hakuna token inayotumika kwa mwanafunzi huyu. Anaweza kuwa hajakidhi masharti ya malipo.'
                     ], 400);
                 }
 
-                $activeToken = $service->process($student, $currentAcademicYear);
+                // ✅ FIX: Process returns array with 'token' key
+                $result = $service->process($student, $currentAcademicYear);
+
+                // ✅ Get token from array result
+                $activeToken = $result['token'] ?? null;
+                $action = $result['action'] ?? 'none';
 
                 if (!$activeToken) {
+                    Log::error('🔴 RESEND TOKEN - Failed to create token', [
+                        'student_id' => $student->id,
+                        'result' => $result
+                    ]);
+
                     return response()->json([
                         'success' => false,
                         'message' => 'Imeshindwa kutengeneza token. Tafadhali jaribu tena.'
                     ], 500);
                 }
+
+                Log::info('🟢 RESEND TOKEN - Token created successfully', [
+                    'student_id' => $student->id,
+                    'token_id' => $activeToken->id,
+                    'token' => $activeToken->token,
+                    'action' => $action
+                ]);
+
+                // ✅ Reload token with relationships if newly created
+                if ($action === 'created' || $action === 'updated') {
+                    $activeToken = FeeClearanceToken::where('id', $activeToken->id)
+                        ->with('installment')
+                        ->first();
+                }
             }
 
-            // ✅ Send SMS
-            $school = school::find($student->school_id);
-            $formattedToken = $activeToken->token;
-            $expiryDate = Carbon::parse($activeToken->expires_at)->format('d/m/Y');
-            $link = $this->appBaseUrl . '/tokens/verify';
-            $installmentName = $activeToken->installment->name;
+            // ✅ Ensure we have a valid token with relationships
+            if (!$activeToken || !$activeToken->id) {
+                Log::error('🔴 RESEND TOKEN - Invalid token object', [
+                    'student_id' => $student->id,
+                    'token' => $activeToken
+                ]);
 
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Token haipatikani. Tafadhali jaribu tena.'
+                ], 500);
+            }
+
+            // ✅ 6. Get school details
+            $school = School::find($student->school_id);
+
+            if (!$school) {
+                Log::warning('🔴 RESEND TOKEN - School not found', [
+                    'school_id' => $student->school_id
+                ]);
+            }
+
+            // ✅ 7. Prepare SMS data
+            $formattedToken = $activeToken->token ?? 'N/A';
+            $expiryDate = isset($activeToken->expires_at)
+                ? Carbon::parse($activeToken->expires_at)->format('d/m/Y')
+                : 'N/A';
+
+            // Safely get installment name
+            $installmentName = 'Muhula';
+            if (isset($activeToken->installment) && $activeToken->installment) {
+                $installmentName = $activeToken->installment->name ?? 'Muhula';
+            }
+
+            // ✅ 8. Prepare SMS message
             $message = "GATEPASS NA. ni: {$formattedToken}\n" .
                 "Jina la Mtoto: {$student->first_name} {$student->last_name}\n" .
                 "Awamu: {$installmentName}\n" .
                 "Mwisho wa Awamu: {$expiryDate}\n" .
-                "Hakiki uwapo shuleni/kwenye Basi" ;
+                "Hakiki uwapo shuleni/kwenye Basi";
 
+            Log::info('🔵 RESEND TOKEN - Sending SMS', [
+                'to' => $parentPhone,
+                'message' => $message
+            ]);
+
+            // ✅ 9. Send SMS
             try {
                 $smsService = new NextSmsService();
+
                 $payload = [
                     'from' => $school->sender_id ?? 'SHULE APP',
                     'to' => $this->formatPhoneNumberForSms($parentPhone),
                     'text' => $message,
-                    'reference' => 'resend_token_' . time()
+                    'reference' => 'resend_token_' . time() . '_' . $student->id
                 ];
 
-                $smsService->sendSmsByNext(
+                $smsResponse = $smsService->sendSmsByNext(
                     $payload['from'],
                     $payload['to'],
                     $payload['text'],
                     $payload['reference']
                 );
 
+                Log::info('🟢 RESEND TOKEN - SMS sent successfully', [
+                    'student_id' => $student->id,
+                    'phone' => $parentPhone,
+                    'reference' => $payload['reference']
+                ]);
+
+                // ✅ Return success response
                 return response()->json([
                     'success' => true,
                     'message' => 'Token imetumwa tena kwa simu ya mzazi.',
@@ -287,37 +366,61 @@ class TokenController extends Controller
                         'admission_number' => $student->admission_number,
                         'token' => $formattedToken,
                         'phone' => $parentPhone,
-                        'expires_at' => $expiryDate
+                        'expires_at' => $expiryDate,
+                        'installment' => $installmentName
                     ]
                 ]);
+
             } catch (\Exception $e) {
+                // ✅ SMS failed but token exists - still return token
                 Log::error('🔴 RESEND TOKEN - SMS sending failed', [
                     'student_id' => $student->id,
                     'phone' => $parentPhone,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
                 ]);
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Token imetengenezwa. Token: ' . $formattedToken,
+                    'message' => 'Token imetengenezwa lakini SMS haikutumwa. Token: ' . $formattedToken,
                     'data' => [
                         'student_name' => $student->first_name . ' ' . $student->last_name,
                         'admission_number' => $student->admission_number,
                         'token' => $formattedToken,
-                        'expires_at' => $expiryDate
+                        'expires_at' => $expiryDate,
+                        'installment' => $installmentName,
+                        'sms_sent' => false
                     ]
                 ]);
             }
-        } catch (\Exception $e) {
-            Log::error('🔴 RESEND TOKEN - General exception', [
-                'admission_number' => $request->admission_number,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // ✅ Handle validation errors
+            Log::warning('🔴 RESEND TOKEN - Validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->all()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Hitilafu katika kutuma token. Tafadhali jaribu tena.'
+                'message' => 'Taarifa zilizotumwa si sahihi. Tafadhali hakiki na jaribu tena.',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            // ✅ Handle general exceptions
+            Log::error('🔴 RESEND TOKEN - General exception', [
+                'admission_number' => $request->admission_number,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Hitilafu katika kutuma token. Tafadhali jaribu tena.',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
