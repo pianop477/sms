@@ -663,7 +663,7 @@
 
                 <div class="resend-section">
                     <button id="showResendModalBtn" class="resend-btn">
-                        <i class="fas fa-envelope-open-text"></i> Sijapata token? Tuma tena
+                        <i class="fas fa-envelope-open-text"></i> Umepoteza token? Omba tena
                     </button>
                 </div>
             </div>
