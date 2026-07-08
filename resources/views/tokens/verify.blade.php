@@ -12,116 +12,6 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
 
     <style>
-        /* ========== ALL YOUR EXISTING CSS REMAINS UNCHANGED ========== */
-        /* [Mistari yako ya CSS hapa - nimeihifadhi kama ilivyo] */
-        .offline-status-bar {
-            background: #f8fafc;
-            border-radius: 60px;
-            padding: 8px 16px;
-            margin: 10px 0 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            border: 1px solid #e2e8f0;
-            min-height: 48px;
-        }
-        .offline-status-bar .info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #334155;
-        }
-        .offline-status-bar .info i {
-            font-size: 1.1rem;
-        }
-        .offline-status-bar .info .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 4px;
-        }
-        .status-dot.online {
-            background: #22c55e;
-        }
-        .status-dot.offline {
-            background: #ef4444;
-        }
-        .status-dot.syncing {
-            background: #f59e0b;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-        .btn-sync-offline {
-            background: transparent;
-            border: 2px solid #5B66E8;
-            color: #5B66E8;
-            border-radius: 40px;
-            padding: 4px 10px;
-            font-weight: 600;
-            font-size: 0.5rem;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-        }
-        .btn-sync-offline:hover {
-            background: #5B66E8;
-            color: white;
-        }
-        .btn-sync-offline:active {
-            transform: scale(0.95);
-        }
-        .btn-sync-offline:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .btn-sync-offline.hidden {
-            display: none !important;
-        }
-        .btn-sync-offline .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-        .sync-progress-container {
-            display: none;
-            margin: 8px 0 12px;
-            background: #f1f5f9;
-            border-radius: 60px;
-            height: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-        .sync-progress-container.active {
-            display: block;
-        }
-        .sync-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #5B66E8, #8B5CF6);
-            border-radius: 60px;
-            transition: width 0.4s ease;
-        }
-        .sync-progress-text {
-            font-size: 0.7rem;
-            color: #64748b;
-            text-align: center;
-            margin-top: 4px;
-            display: none;
-        }
-        .sync-progress-text.active {
-            display: block;
-        }
-        /* Rest of your CSS... (keep all existing styles) */
         * {
             margin: 0;
             padding: 0;
@@ -582,6 +472,114 @@
             font-weight: 500;
             text-decoration: none;
         }
+        .offline-status-bar {
+            background: #f8fafc;
+            border-radius: 60px;
+            padding: 8px 16px;
+            margin: 10px 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
+            min-height: 48px;
+        }
+        .offline-status-bar .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .offline-status-bar .info i {
+            font-size: 1.1rem;
+        }
+        .offline-status-bar .info .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .status-dot.online {
+            background: #22c55e;
+        }
+        .status-dot.offline {
+            background: #ef4444;
+        }
+        .status-dot.syncing {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .btn-sync-offline {
+            background: transparent;
+            border: 2px solid #5B66E8;
+            color: #5B66E8;
+            border-radius: 40px;
+            padding: 4px 10px;
+            font-weight: 600;
+            font-size: 0.5rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+        .btn-sync-offline:hover {
+            background: #5B66E8;
+            color: white;
+        }
+        .btn-sync-offline:active {
+            transform: scale(0.95);
+        }
+        .btn-sync-offline:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .btn-sync-offline.hidden {
+            display: none !important;
+        }
+        .btn-sync-offline .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+        .sync-progress-container {
+            display: none;
+            margin: 8px 0 12px;
+            background: #f1f5f9;
+            border-radius: 60px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .sync-progress-container.active {
+            display: block;
+        }
+        .sync-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5B66E8, #8B5CF6);
+            border-radius: 60px;
+            transition: width 0.4s ease;
+        }
+        .sync-progress-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+            margin-top: 4px;
+            display: none;
+        }
+        .sync-progress-text.active {
+            display: block;
+        }
+
         @media (max-width: 520px) {
             .gateway-card { padding: 20px 16px; }
             .token-input { width: 70px; height: 70px; font-size: 42px; border-radius: 20px; }
@@ -617,9 +615,7 @@
 
             <div id="alertBox" class="alert"></div>
 
-            <!-- ========================================= -->
-            <!-- OFFLINE STATUS BAR                        -->
-            <!-- ========================================= -->
+            <!-- Offline Status Bar -->
             <div id="offlineStatusBar" class="offline-status-bar">
                 <div class="info">
                     <span class="status-dot" id="statusDot"></span>
@@ -725,6 +721,163 @@
         (function() {
             'use strict';
 
+            // ============================================================
+            // CSRF TOKEN AUTO-REFRESH SYSTEM - COMPLETE SOLUTION
+            // ============================================================
+
+            let csrfRefreshInterval = null;
+            const CSRF_REFRESH_INTERVAL = 45000; // Refresh every 45 seconds
+            let isRefreshingCsrf = false;
+            let lastCsrfRefresh = Date.now();
+
+            // Function to refresh CSRF token
+            async function refreshCsrfToken() {
+                if (isRefreshingCsrf) {
+                    return document.querySelector('meta[name="csrf-token"]')?.content || null;
+                }
+
+                isRefreshingCsrf = true;
+
+                try {
+                    const response = await fetch('{{ route("refresh-csrf") }}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        },
+                        credentials: 'same-origin'
+                    });
+
+                    if (!response.ok) {
+                        // Try POST as fallback
+                        const fallbackResponse = await fetch('{{ route("refresh-csrf.post") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'Cache-Control': 'no-cache'
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ refresh: true })
+                        });
+
+                        if (!fallbackResponse.ok) {
+                            throw new Error('Failed to refresh CSRF token');
+                        }
+
+                        const data = await fallbackResponse.json();
+                        if (data.token) {
+                            updateCsrfTokens(data.token);
+                            lastCsrfRefresh = Date.now();
+                            return data.token;
+                        }
+                        throw new Error('No token in response');
+                    }
+
+                    const data = await response.json();
+                    if (data.token) {
+                        updateCsrfTokens(data.token);
+                        lastCsrfRefresh = Date.now();
+                        return data.token;
+                    }
+                    throw new Error('No token in response');
+                } catch (error) {
+                    console.warn('CSRF refresh failed:', error);
+                    // Return existing token as fallback
+                    return document.querySelector('meta[name="csrf-token"]')?.content || null;
+                } finally {
+                    isRefreshingCsrf = false;
+                }
+            }
+
+            // Function to update all CSRF tokens on the page
+            function updateCsrfTokens(token) {
+                if (!token) return;
+
+                // Update meta tag
+                const metaTag = document.querySelector('meta[name="csrf-token"]');
+                if (metaTag) {
+                    metaTag.content = token;
+                }
+
+                // Update all input fields with name="_token"
+                document.querySelectorAll('input[name="_token"]').forEach(input => {
+                    input.value = token;
+                });
+
+                // Update all forms
+                document.querySelectorAll('form').forEach(form => {
+                    let tokenInput = form.querySelector('input[name="_token"]');
+                    if (tokenInput) {
+                        tokenInput.value = token;
+                    } else {
+                        // Create hidden input if missing
+                        tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = token;
+                        form.prepend(tokenInput);
+                    }
+                });
+
+                // Update for AJAX
+                if (window.axios) {
+                    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+                }
+
+                window.csrfToken = token;
+            }
+
+            // Get current CSRF token with refresh if needed
+            async function getCsrfToken(forceRefresh = false) {
+                const currentToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+                if (!currentToken) {
+                    return await refreshCsrfToken();
+                }
+
+                // Check if token is older than 2 minutes (120 seconds)
+                const tokenAge = Date.now() - lastCsrfRefresh;
+                if (forceRefresh || tokenAge > 120000) {
+                    return await refreshCsrfToken();
+                }
+
+                return currentToken;
+            }
+
+            // Start CSRF auto-refresh
+            function startCsrfAutoRefresh() {
+                // Clear existing interval
+                if (csrfRefreshInterval) {
+                    clearInterval(csrfRefreshInterval);
+                }
+
+                // Initial refresh
+                refreshCsrfToken().catch(console.warn);
+
+                // Set up periodic refresh
+                csrfRefreshInterval = setInterval(() => {
+                    if (!document.hidden) {
+                        refreshCsrfToken().catch(console.warn);
+                    }
+                }, CSRF_REFRESH_INTERVAL);
+
+                // Refresh on visibility change
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        refreshCsrfToken().catch(console.warn);
+                    }
+                });
+
+                console.log('CSRF auto-refresh system initialized');
+            }
+
+            // ============================================================
+            // END CSRF TOKEN AUTO-REFRESH SYSTEM
+            // ============================================================
+
             // ========== DOM REFS ==========
             const syncBtn = document.getElementById('syncOfflineBtn');
             const statusDot = document.getElementById('statusDot');
@@ -799,10 +952,9 @@
                 }
             }
 
-            // Check if there are tokens available for sync (with comparison)
+            // Check if there are tokens available for sync
             async function checkTokensAvailability() {
                 try {
-                    // Get online token count from server
                     const response = await fetch('/offline/tokens', {
                         headers: { 'Accept': 'application/json' }
                     });
@@ -814,12 +966,9 @@
                         onlineTokenTotal = onlineTotal;
                     }
 
-                    // Get offline token count from IndexedDB
                     const offlineCount = await getOfflineTokenCount();
                     offlineTokenCount = offlineCount;
 
-                    // Show sync button only if there are tokens online AND offline count is less than online total
-                    // OR if offline count is 0 but online has tokens (first sync)
                     if (onlineTotal > 0 && offlineCount < onlineTotal) {
                         hasTokens = true;
                         syncBtn.classList.remove('hidden');
@@ -832,12 +981,10 @@
                         return false;
                     }
                 } catch (e) {
-                    // If offline, try to check IndexedDB only
                     try {
                         const offlineCount = await getOfflineTokenCount();
                         offlineTokenCount = offlineCount;
                         if (offlineCount > 0) {
-                            // Show button but disabled (can't download without internet)
                             hasTokens = true;
                             syncBtn.classList.remove('hidden');
                             syncBtn.disabled = true;
@@ -910,9 +1057,7 @@
                     if (result && result.success) {
                         showProgress(100, 'Imekamilika!');
                         setTimeout(hideProgress, 800);
-                        // ✅ DON'T show "Token zimepakuliwa kikamilifu!" - just update status
                         setStatus('online', 'Online Mode');
-                        // Re-check if tokens are available (hide button if all synced)
                         await checkTokensAvailability();
                     } else {
                         hideProgress();
@@ -938,7 +1083,6 @@
                     const data = event.data;
                     if (data && data.type === 'SYNC_STATUS') {
                         if (data.success) {
-                            // ✅ Don't show "Token zimepakuliwa kikamilifu!" - just update
                             setStatus('online', 'Online Mode');
                             checkTokensAvailability();
                         } else {
@@ -1006,7 +1150,7 @@
             }
 
             // ==========================================
-            // VERIFICATION LOGIC (FULLY OFFLINE CAPABLE)
+            // VERIFICATION LOGIC (WITH CSRF PROTECTION)
             // ==========================================
 
             function init() {
@@ -1016,14 +1160,15 @@
                 focusFirstInput();
                 initOfflineStatus();
 
-                // ✅ Check if page is being served from cache (offline)
+                // Start CSRF auto-refresh
+                startCsrfAutoRefresh();
+
                 if (!navigator.onLine) {
                     setTimeout(async () => {
                         const count = await getOfflineTokenCount();
                         if (count === 0) {
                             showAlert('Huna token zilizohifadhiwa offline. Unganisha mtandao kupakua token.', 'warning', true, 5000);
                         } else {
-                            // ✅ Show simple info - no count displayed
                             showAlert('Hali ya offline. Token zilizohifadhiwa zinaweza kuthibitishwa.', 'info', true, 3000);
                         }
                     }, 1000);
@@ -1149,7 +1294,7 @@
             }
 
             // ==========================================
-            // VERIFY TOKEN (OFFLINE CAPABLE)
+            // VERIFY TOKEN (WITH CSRF PROTECTION)
             // ==========================================
             async function verifyToken() {
                 const token = getFullToken();
@@ -1166,6 +1311,9 @@
                 hideAlert();
 
                 try {
+                    // Get fresh CSRF token
+                    const csrfToken = await getCsrfToken(true);
+
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -1173,7 +1321,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': csrfToken,
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({ token: token }),
@@ -1182,72 +1330,36 @@
 
                     clearTimeout(timeoutId);
 
+                    // Handle CSRF mismatch
+                    if (response.status === 419) {
+                        console.warn('CSRF token mismatch, refreshing and retrying...');
+                        await refreshCsrfToken();
+                        showAlert('Token imerefresh, inajaribu tena...', 'info', true, 1500);
+
+                        // Retry with new token
+                        const retryResponse = await fetch('{{ route("tokens.verify.submit") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ token: token })
+                        });
+
+                        const retryData = await retryResponse.json();
+                        handleVerificationResponse(retryData, retryResponse);
+                        isLoading = false;
+                        loadingSection.style.display = 'none';
+                        verifyBtn.disabled = false;
+                        return;
+                    }
+
                     const data = await response.json();
-                    if (response.ok && data.success) {
-                        if (data.offline) {
-                            showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
-                        } else {
-                            showAlert(data.message, 'success', true, 1800);
-                        }
-                        showStudentInfo(data.data);
-                        if (!data.offline) checkTokensAvailability();
-                    } else {
-                        showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
-                        addError();
-                        setTimeout(() => resetAll(), 3500);
-                    }
+                    handleVerificationResponse(data, response);
+
                 } catch (error) {
-                    // Network failed - try offline verification via SW message
-                    if (error.name === 'AbortError') {
-                        showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
-                    } else {
-                        showAlert('Hakuna mtandao. Inajaribu kuthibitisha token offline...', 'info', true, 2000);
-
-                        try {
-                            if ('serviceWorker' in navigator) {
-                                const registration = await navigator.serviceWorker.ready;
-                                if (registration.active) {
-                                    const result = await new Promise((resolve) => {
-                                        const channel = new MessageChannel();
-                                        channel.port1.onmessage = (event) => {
-                                            resolve(event.data);
-                                        };
-                                        registration.active.postMessage({
-                                            type: 'VERIFY_TOKEN_OFFLINE',
-                                            token: token
-                                        }, [channel.port2]);
-                                        setTimeout(() => resolve({ success: false, error: 'Timeout' }), 5000);
-                                    });
-
-                                    if (result && result.success) {
-                                        showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
-                                        showStudentInfo(result.data);
-                                        isLoading = false;
-                                        loadingSection.style.display = 'none';
-                                        verifyBtn.disabled = false;
-                                        return;
-                                    } else {
-                                        showAlert('Token haipatikani offline. Unganisha mtandao.', 'error');
-                                        addError();
-                                        setTimeout(() => resetAll(), 4000);
-                                    }
-                                } else {
-                                    showAlert('Service Worker haijaanza. Unganisha mtandao.', 'error');
-                                    addError();
-                                    setTimeout(() => resetAll(), 4000);
-                                }
-                            } else {
-                                showAlert('Huduma ya offline haipatikani. Unganisha mtandao.', 'error');
-                                addError();
-                                setTimeout(() => resetAll(), 4000);
-                            }
-                        } catch (swError) {
-                            console.error('SW offline verification error:', swError);
-                            showAlert('Hitilafu ya verification offline. Unganisha mtandao.', 'error');
-                            addError();
-                            setTimeout(() => resetAll(), 4000);
-                        }
-                    }
+                    handleVerificationError(error);
                 } finally {
                     isLoading = false;
                     loadingSection.style.display = 'none';
@@ -1255,8 +1367,80 @@
                 }
             }
 
+            // Helper function to handle verification response
+            function handleVerificationResponse(data, response) {
+                if (response.ok && data.success) {
+                    if (data.offline) {
+                        showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
+                    } else {
+                        showAlert(data.message, 'success', true, 1800);
+                    }
+                    showStudentInfo(data.data);
+                    if (!data.offline) checkTokensAvailability();
+                } else {
+                    showAlert(data.message || 'Token si sahihi au imeisha muda.', 'error');
+                    addError();
+                    setTimeout(() => resetAll(), 3500);
+                }
+            }
+
+            // Helper function to handle verification errors
+            function handleVerificationError(error) {
+                if (error.name === 'AbortError') {
+                    showAlert('Muda wa ombi umeisha. Jaribu tena.', 'error');
+                } else {
+                    showAlert('Hakuna mtandao. Inajaribu kuthibitisha token offline...', 'info', true, 2000);
+                    performOfflineVerification(getFullToken());
+                }
+            }
+
+            // Offline verification
+            async function performOfflineVerification(token) {
+                try {
+                    if ('serviceWorker' in navigator) {
+                        const registration = await navigator.serviceWorker.ready;
+                        if (registration.active) {
+                            const result = await new Promise((resolve) => {
+                                const channel = new MessageChannel();
+                                channel.port1.onmessage = (event) => {
+                                    resolve(event.data);
+                                };
+                                registration.active.postMessage({
+                                    type: 'VERIFY_TOKEN_OFFLINE',
+                                    token: token
+                                }, [channel.port2]);
+                                setTimeout(() => resolve({ success: false, error: 'Timeout' }), 5000);
+                            });
+
+                            if (result && result.success) {
+                                showAlert('Token halali (Hali ya offline)', 'info', true, 2000);
+                                showStudentInfo(result.data);
+                                return;
+                            } else {
+                                showAlert('Token haipatikani offline. Unganisha mtandao.', 'error');
+                                addError();
+                                setTimeout(() => resetAll(), 4000);
+                            }
+                        } else {
+                            showAlert('Service Worker haijaanza. Unganisha mtandao.', 'error');
+                            addError();
+                            setTimeout(() => resetAll(), 4000);
+                        }
+                    } else {
+                        showAlert('Huduma ya offline haipatikani. Unganisha mtandao.', 'error');
+                        addError();
+                        setTimeout(() => resetAll(), 4000);
+                    }
+                } catch (swError) {
+                    console.error('SW offline verification error:', swError);
+                    showAlert('Hitilafu ya verification offline. Unganisha mtandao.', 'error');
+                    addError();
+                    setTimeout(() => resetAll(), 4000);
+                }
+            }
+
             // ==========================================
-            // SHOW STUDENT INFO (FIXED FOR OFFLINE)
+            // SHOW STUDENT INFO
             // ==========================================
             function showStudentInfo(data) {
                 const student = data.student;
@@ -1273,7 +1457,6 @@
                 const firstName = student.first_name ? student.first_name.toUpperCase() : '';
                 const lastName = student.last_name ? student.last_name.toUpperCase() : '';
                 const admissionNum = student.admission_number ? student.admission_number.toUpperCase() : 'N/A';
-                // ✅ FIX: Use class_name directly from student data (works for both online and offline)
                 const className = student.class_name ? student.class_name.toUpperCase() :
                                  (student.class && student.class.class_name ? student.class.class_name.toUpperCase() : 'N/A');
 
@@ -1375,27 +1558,51 @@
                 modalSubmitBtn.disabled = true;
                 modalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inachakata...';
                 try {
+                    // Get fresh CSRF token
+                    const csrfToken = await getCsrfToken(true);
+
                     const resp = await fetch('{{ route("tokens.resend") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            'X-CSRF-TOKEN': csrfToken
                         },
                         body: JSON.stringify({ admission_number: admission })
                     });
-                    const data = await resp.json();
-                    if (data.success) {
-                        showModalAlert(data.message, 'success');
-                        setTimeout(() => resendModal.classList.remove('active'), 2000);
-                        triggerOfflineSync();
-                    } else {
-                        showModalAlert(data.message, 'error');
+
+                    // Handle CSRF mismatch
+                    if (resp.status === 419) {
+                        await refreshCsrfToken();
+                        const retryResp = await fetch('{{ route("tokens.resend") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({ admission_number: admission })
+                        });
+                        const retryData = await retryResp.json();
+                        handleResendResponse(retryData);
+                        return;
                     }
+
+                    const data = await resp.json();
+                    handleResendResponse(data);
                 } catch (err) {
                     showModalAlert('Hitilafu ya mtandao, jaribu tena', 'error');
                 } finally {
                     modalSubmitBtn.disabled = false;
                     modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Tuma ombi';
+                }
+            }
+
+            function handleResendResponse(data) {
+                if (data.success) {
+                    showModalAlert(data.message, 'success');
+                    setTimeout(() => resendModal.classList.remove('active'), 2000);
+                    triggerOfflineSync();
+                } else {
+                    showModalAlert(data.message, 'error');
                 }
             }
 
@@ -1406,39 +1613,6 @@
                 setTimeout(() => modalAlert.style.display = 'none', 3000);
             }
 
-            function refreshCsrfToken() {
-                return fetch('{{ route('refresh-csrf') }}', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Failed to refresh CSRF token');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.token) {
-                        // Update all forms
-                        document.querySelectorAll('input[name="_token"]').forEach(input => {
-                            input.value = data.token;
-                        });
-                        // Update meta tag for AJAX requests
-                        const metaTag = document.querySelector('meta[name="csrf-token"]');
-                        if (metaTag) metaTag.content = data.token;
-                        return data.token;
-                    } else {
-                        throw new Error('No token in response');
-                    }
-                })
-                .catch(error => {
-                    console.warn('CSRF refresh failed:', error);
-                    // Return null so we can fall back to existing token
-                    return null;
-                });
-            }
-
             // ========== INIT ==========
 
             if (document.readyState === 'loading') {
@@ -1446,6 +1620,7 @@
             } else {
                 init();
             }
+
         })();
     </script>
 </body>

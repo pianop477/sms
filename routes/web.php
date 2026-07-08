@@ -80,8 +80,18 @@ Route::get('/home', function () {
 })->name('welcome');
 
 Route::get('/refresh-csrf', function () {
-    return response()->json(['token' => csrf_token()]);
+    return response()->json([
+        'token' => csrf_token(),
+        'expires_in' => 120
+    ]);
 })->name('refresh-csrf')->middleware('web');
+
+Route::post('/refresh-csrf', function () {
+    return response()->json([
+        'token' => csrf_token(),
+        'expires_in' => 120
+    ]);
+})->name('refresh-csrf.post')->middleware('web');
 
 Route::get('/check-session', function () {
     return response()->json(['active' => auth()->check()]);
