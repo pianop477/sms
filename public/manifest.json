@@ -2,7 +2,7 @@
     "name": "ShuleApp - School Management System",
     "short_name": "ShuleApp",
     "description": "Digital platform for School Management System",
-    "start_url": "/?v=2026.07.02.14",
+    "start_url": "/?v=2026.07.10.12",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2C3E50",
@@ -49,5 +49,5 @@
             ]
         }
     ],
-    "id": "shuleapp-2026.07.02.14"
+    "id": "shuleapp-2026.07.10.12"
 }
