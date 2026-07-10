@@ -60,6 +60,16 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('tokens:sync-offline')->hourly();
         $schedule->command('tokens:sync-offline --clean-expired')->dailyAt('00:00');
+         $schedule->command('fee:sync-all')
+            ->everyFifteenMinutes()  // or ->hourly() or ->everyFiveMinutes()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/fee_sync.log'))
+            ->onSuccess(function () {
+                Log::info('✅ fee:sync-all completed successfully');
+            })
+            ->onFailure(function () {
+                Log::error('❌ fee:sync-all failed');
+            });
 
         // ========== PWA VERSION UPDATE ==========
         // Update PWA version weekly on Sunday at 2 AM
