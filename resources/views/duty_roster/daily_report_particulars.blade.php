@@ -410,7 +410,7 @@
                             </button>
                         </div>
 
-                        <div class="table-responsive">
+                        <div class="">
                             <table class="table table-bordered table-responsive-md">
                                 <thead>
                                     <tr>
