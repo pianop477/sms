@@ -179,6 +179,7 @@
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Student Name</th>
+                                            <th scope="col">Admission #</th>
                                             <th scope="col">Class</th>
                                             <th scope="col" class="text-center">Academic Year</th>
                                             <th scope="col">Token</th>
@@ -197,6 +198,7 @@
                                                 <tr>
                                                     <td>{{$loop->iteration}}</td>
                                                     <td>{{ucwords(strtolower($row->student->first_name. ' '.$row->student->middle_name. ' '. $row->student->last_name))}}</td>
+                                                    <td>{{strtoupper($row->admission_number)}}</td>
                                                     <td class="">{{strtoupper($row->student->class->class_code ?? 'N/A')}}</td>
                                                     <td class="text-center">{{$row->academic_year}}</td>
                                                     <td>{{ $row->token }}</td>
