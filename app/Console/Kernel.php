@@ -15,17 +15,14 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('contracts:manage')
             ->dailyAt('00:00')
-            ->withoutOverlapping()
             ->sendOutputTo(storage_path('logs/contract-scheduler.log'));
 
         // Also run every hour for more frequent updates (optional)
         $schedule->command('contracts:manage')
             ->hourly()
-            ->withoutOverlapping()
             ->runInBackground();
         $schedule->command('otp:cleanup-expired')
             ->hourly()
-            ->withoutOverlapping()
             ->runInBackground();
         $schedule->command('school:check-active-school')->daily();
         $schedule->command('results:delete-expired')->everyMinute();
@@ -51,17 +48,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('parents:truncate-inactive-parents')->daily();
         $schedule->command('bills:update-statuses')->everySecond();
         $schedule->command('reminders:service-expiry')
-            ->dailyAt('08:00')
-            ->withoutOverlapping();
+            ->dailyAt('08:00');
 
         $schedule->command('students:assign-fee-structure --chunk=100')
-            ->everyFiveMinutes()
-            ->withoutOverlapping()
+            ->everyMinute()
             ->appendOutputTo(storage_path('logs/fee-structure-assignment.log'));
 
         $schedule->command('tokens:send-existing --chunk=100')
             ->everyFiveMinutes()
-            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/existing-tokens.log'));
 
         $schedule->command('tokens:sync-offline')->hourly();
@@ -70,32 +64,27 @@ class Kernel extends ConsoleKernel
         // ========== PWA VERSION UPDATE ==========
         // Update PWA version weekly on Sunday at 2 AM
         $schedule->command('pwa:version --force')
-            ->hourly()
-            ->withoutOverlapping();
+            ->hourly();
 
         // Add to schedule() method
         $schedule->command('tokens:auto-expire')
-            ->dailyAt('00:30')  // Run daily at 12:30 AM
-            ->withoutOverlapping();
+            ->dailyAt('00:30');
 
         // Cleanup old tokens (older than 365 days / 1 year)
         $schedule->command('tokens:clean-expired --days=365')
             ->weekly()
             ->mondays()
-            ->at('00:01')
-            ->withoutOverlapping();
+            ->at('00:01');
 
         // Sync tokens after payment corrections - run every hour
         $schedule->command('tokens:sync-after-correction')
-            ->everyMinute()
-            ->withoutOverlapping();
+            ->everyMinute();
 
         $schedule->command('e-permit:auto-approve')->everySecond();
 
         $schedule->command('reports:clean')->weekly();
         $schedule->command('payments:backfill-academic-year --chunk=100')
                     ->everyThirtyMinutes()
-                    ->withoutOverlapping()
                     ->appendOutputTo(storage_path('logs/backfill-academic-year.log'));
     }
 

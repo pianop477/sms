@@ -123,6 +123,7 @@ class AssignFeeStructureToStudents extends Command
                     // ✅ Check if student has existing bills for this academic year
                     $hasBills = school_fees::where('student_id', $student->id)
                         ->where('academic_year', $academicYear)
+                        ->whereNotIn('status', ['expired', 'cancelled'])
                         ->exists();
 
                     if ($hasBills) {
