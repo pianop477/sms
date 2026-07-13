@@ -54,7 +54,7 @@ class RolesController extends Controller
             ->join('users', 'users.id', '=', 'teachers.user_id')
             ->select(
                 'class_teachers.*',
-                'teachers.*',
+                'teachers.id as teacherId', 'teachers.address', 'teachers.status',
                 'grades.class_name',
                 'grades.class_code',
                 'users.first_name as teacher_first_name',
@@ -335,33 +335,39 @@ class RolesController extends Controller
         return redirect()->route('Class.Teachers', ['class' => Hashids::encode($class_teacher->class_id)]);
     }
 
+
     /**
      * Remove the resource from storage.
      */
-    public function destroy($teacher)
+    public function destroy($id)
     {
-        $id = Hashids::decode($teacher);
+        $decoded = Hashids::decode($id);
+        // return $decoded;
         $user = Auth::user();
-        $teachers = Teacher::findOrFail($id[0]);
+        $classTeacher = Class_teacher::findOrFail($decoded[0]);
+        // return $classTeacher;/
+        $teacher = Teacher::findOrFail($classTeacher->teacher_id);
+        // return $teacher;
 
-        if ($teachers->school_id != $user->school_id) {
+        if ($user->school_id != $classTeacher->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
+        // dd($classTeacher);
 
-        $class_teacher = Class_teacher::where('teacher_id', '=', $teachers->id)->firstOrFail();
-        $class_teacher->delete();
+        $classTeacher->delete();
 
-        $currentTeacherId = $teachers->id;
-        $isCurrentTeacherAssigned = Class_teacher::where('teacher_id', $currentTeacherId)->exists();
+
+        // $currentTeacherId = $classTeacher->teacher_id;
+        $isCurrentTeacherAssigned = Class_teacher::where('teacher_id', $teacher->id)->exists();
 
         // Update role_id to 1 only if the teacher is not assigned to any other class
         if (!$isCurrentTeacherAssigned) {
-            $teachers->role_id = 1;
-            $teachers->save();
+            $teacher->role_id = 1;
+            $teacher->save();
         }
 
-        Alert()->toast('Class teacher removed successfully', 'success');
+        Alert()->toast('Class teacher deleted successfully', 'success');
         return back();
     }
 

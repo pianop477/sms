@@ -418,7 +418,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // roles assignment management
         Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
         Route::put('{classTeacher}/Update-class-teacher', [RolesController::class, 'update'])->name('roles.update.class.teacher');
-        Route::get('{teacher}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
+        Route::get('{id}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
         Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
 
         //timetable settings ********************************

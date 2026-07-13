@@ -797,10 +797,10 @@
                                                title="Edit Assignment">
                                                 <i class="fas fa-pen"></i>
                                             </a>
-                                            <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}"
+                                            <a href="{{route('roles.destroy', ['id' => Hashids::encode($teacher->id)])}}"
                                                class="action-icon delete"
                                                title="Remove Teacher"
-                                               onclick="return confirm('⚠️ Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class? This action cannot be undone.')">
+                                               onclick="return confirm('⚠️ Are you sure you want to delete {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class? This action cannot be undone.')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
