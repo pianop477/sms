@@ -740,7 +740,7 @@
                             } elseif ($teacher->role_id == 2) {
                                 // Head Teacher - get all pending_head permits regardless of head_teacher_id
                                 // Since there's usually only one head teacher in a school
-        $pendingCount = App\Models\EPermit::where('status', 'pending_head')->count();
+                        $pendingCount = App\Models\EPermit::where('status', 'pending_head')->count();
                             }
                         }
                     @endphp
@@ -793,8 +793,6 @@
 
         <!-- Head Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
-
-
             <!-- Service Status Card - Premium Compact -->
             <div class="modern-card service-card-premium mb-4">
                 <div class="p-4">
@@ -844,7 +842,6 @@
                             <small class="text-muted">{{ $serviceEndDate->format('d M Y') }}</small>
                         </div>
                     </div>
-
                     <!-- Countdown Section -->
                     <div class="countdown-premium">
                         <div class="countdown-item">
@@ -1017,9 +1014,9 @@
                 </div>
 
                 <!-- Charts Section with Fixed Heights -->
-                <div class="col-lg-12 mb-4">
+                <div class="col-12 mb-4">
                     <div class="row">
-                        <div class="col-xl-8 mb-4">
+                        <div class="col-md-8 mb-4">
                             <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
@@ -1033,7 +1030,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xl-4 mb-4">
+                        <div class="col-md-4 mb-4">
                             <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
@@ -1048,7 +1045,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Additional Analytics with Fixed Heights -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
@@ -1065,7 +1061,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-xl-5 mb-4">
                             <div class="card border-0 shadow-sm attendance-card-fixed">
                                 <div class="card-header bg-white border-0 pb-0">
@@ -1306,16 +1301,15 @@
                                                             <th class="text-center py-2 border-top">
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-center">
+                                                                    @php
+                                                                        $generalRate = round(
+                                                                            ($totalPresent / $totalRegisteredInSchool) *
+                                                                                100,
+                                                                            2,
+                                                                        );
+                                                                    @endphp
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
-                                                                        @php
-                                                                            $generalRate = round(
-                                                                                ($totalPresent /
-                                                                                    $totalRegisteredInSchool) *
-                                                                                    100,
-                                                                                2,
-                                                                            );
-                                                                        @endphp
                                                                         <div class="progress-bar
                                                                         @if ($generalRate >= 90) bg-success
                                                                         @elseif($generalRate >= 70) bg-info
@@ -1325,6 +1319,7 @@
                                                                             style="width: {{ min($generalRate, 100) }}%">
                                                                         </div>
                                                                     </div>
+
                                                                     <strong
                                                                         class="ms-2
                                                                         @if ($generalRate >= 90) text-success
@@ -1338,7 +1333,7 @@
                                                         </tr>
                                                     </tfoot>
                                                 @endif
-                                            </tr>
+                                            </table>
 
                                             {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
                                             <div class="row g-2 mt-1 mx-2">
@@ -1470,12 +1465,13 @@
                                                                                 <td class="fw-semibold text-capitalize">
                                                                                     {{ ucwords(strtolower($teacher->gender)) }}
                                                                                 </td>
-                                                                                <td class="text-end">{{ $teacher->teacher_count }}
+                                                                                <td class="text-end">
+                                                                                    {{ $teacher->teacher_count }}
                                                                                 </td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
-                                                                </table>
+                                                                </td>
                                                             </div>
                                                         @endif
                                                     </div>
