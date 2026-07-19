@@ -457,7 +457,7 @@ class updateRostersStatus extends Command
             $startDate = Carbon::parse($roster->start_date)->format('d/m/Y');
             $fullname = ucwords(strtolower($teacher->first_name));
 
-            $message = "Hello {$fullname}, kindly be reminded that your duty shift starts tomorrow ({$startDate}). Please ensure all requirements are fulfilled on time. Your cooperation is highly appreciated.";
+            $message = "Hello {$fullname}, be reminded that your duty starts tomorrow. Please ensure all requirements are fulfilled on time. Your cooperation is highly appreciated.";
 
             // TUMA SMS
             $sms = new NextSmsService();
