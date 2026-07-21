@@ -19,19 +19,13 @@
             color: #333;
         }
 
-        /* ============================================ */
-        /* FIXED OVERLAPPING ISSUES - CRITICAL FIXES */
-        /* ============================================ */
-
         .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 0.5rem 1.5rem 0 rgba(58, 59, 69, 0.1);
             margin-bottom: 20px;
             transition: all 0.3s ease;
-            overflow: visible !important; /* Changed from hidden to visible */
-            position: relative;
-            z-index: 1;
+            overflow: hidden;
         }
 
         .card:hover {
@@ -39,104 +33,16 @@
             box-shadow: 0 0.75rem 2rem 0 rgba(58, 59, 69, 0.15);
         }
 
-        /* FIX: Service Card - Prevent overlap */
-        .service-card-premium {
-            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
-            border: 1px solid rgba(78, 115, 223, 0.1);
-            position: relative;
-            isolation: isolate;
-            overflow: visible !important;
-            z-index: 5;
-        }
-
-        .service-card-premium::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(78, 115, 223, 0.08), transparent 70%);
-            z-index: -1;
-        }
-
-        .service-icon-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
-            flex-shrink: 0;
-        }
-
-        /* FIX: Countdown Timer - No overlap */
-        .countdown-premium {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-
-        .countdown-item {
-            flex: 1;
-            min-width: 85px;
-            background: white;
-            border-radius: 16px;
-            padding: 16px 8px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            transition: all 0.3s ease;
-            z-index: 1;
-        }
-
-        .countdown-item:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary-color);
-            box-shadow: 0 15px 30px rgba(78, 115, 223, 0.1);
-        }
-
-        .countdown-item .number {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #2c3e50, #1e293b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            font-family: 'Poppins', monospace;
-        }
-
-        .countdown-item .label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .header-title {
             color: var(--primary-color);
-            opacity: 0.8;
+            font-weight: 800;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.75rem;
         }
 
-        .countdown-item::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-            border-radius: 3px;
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .countdown-item:hover::after {
-            transform: scaleX(1);
-        }
-
-        /* FIX: Stats Cards - Proper spacing */
+        /* Statistics Cards Styling */
         .stat-card {
             border-radius: 15px;
             border: none;
@@ -144,7 +50,6 @@
             overflow: hidden;
             transition: all 0.4s ease;
             min-height: 140px;
-            z-index: 1;
         }
 
         .stat-card::before {
@@ -181,6 +86,205 @@
             opacity: 0.3;
             transform: scale(1.1);
         }
+
+        .modern-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(78, 115, 223, 0.15);
+        }
+
+        /* Service Card Premium */
+        .service-card-premium {
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+            border: 1px solid rgba(78, 115, 223, 0.1);
+            position: relative;
+            isolation: isolate;
+        }
+
+        .service-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(78, 115, 223, 0.08), transparent 70%);
+            z-index: -1;
+        }
+
+        .service-icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
+        }
+
+        /* Countdown Timer Premium */
+        .countdown-premium {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            flex: 1;
+            min-width: 85px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(78, 115, 223, 0.1);
+        }
+
+        .countdown-item .number {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2c3e50, #1e293b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            font-family: 'Poppins', monospace;
+        }
+
+        .countdown-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .countdown-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .countdown-item:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Stats Cards Premium */
+        .stat-card-premium {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            min-height: 140px;
+        }
+
+        .stat-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card-premium:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-premium .card-body {
+            position: relative;
+            z-index: 2;
+            padding: 1.8rem 1.5rem;
+        }
+
+        .stat-card-premium .card-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 4.5rem;
+            opacity: 0.15;
+            transition: all 0.5s ease;
+            color: white;
+        }
+
+        .stat-card-premium:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+            opacity: 0.25;
+        }
+
+        .stat-card-premium .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card-premium .card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 115, 223, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 5px rgba(78, 115, 223, 0.2);
+            }
+        }
+
+        .countdown-item {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
 
         .stat-card .card-title {
             font-size: 0.9rem;
@@ -230,10 +334,7 @@
             background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);
         }
 
-        /* ============================================ */
-        /* FIXED: Chart Containers - No overlap */
-        /* ============================================ */
-
+        /* Chart Container Styles */
         .chart-container {
             background: white;
             border-radius: 15px;
@@ -244,12 +345,10 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            position: relative;
-            z-index: 1;
-            overflow: visible !important;
         }
 
         .chart-container:hover {
+            /* transform: translateY(-5px); */
             box-shadow: 0 0.75rem 2rem rgba(58, 59, 69, 0.15);
         }
 
@@ -258,7 +357,6 @@
             min-height: 300px;
             position: relative;
             width: 100%;
-            overflow: visible !important;
         }
 
         .chart-wrapper canvas,
@@ -285,10 +383,7 @@
             font-size: 0.875rem;
         }
 
-        /* ============================================ */
-        /* FIXED: Tables and Scrollable Areas */
-        /* ============================================ */
-
+        /* Table Styles */
         .table-responsive {
             border-radius: 15px;
             overflow-x: auto !important;
@@ -332,104 +427,13 @@
             background-color: #f8f9fc;
         }
 
-        .scrollable-table-container {
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .fixed-height-card {
-            height: 480px;
-            display: flex;
-            flex-direction: column;
-            overflow: visible !important;
-        }
-
-        .fixed-height-card .card-header {
-            flex-shrink: 0;
-        }
-
-        .fixed-height-card .scrollable-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 1rem 1rem 1rem;
-        }
-
-        .attendance-card-fixed {
-            height: 480px;
-            display: flex;
-            flex-direction: column;
-            overflow: visible !important;
-        }
-
-        .attendance-card-fixed .card-body {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .chart-card-fixed {
-            height: 450px;
-            display: flex;
-            flex-direction: column;
-            overflow: visible !important;
-        }
-
-        .chart-card-fixed .chart-wrapper {
-            flex: 1;
-            min-height: auto;
-        }
-
-        .quick-stats-container {
-            height: 480px;
-            display: flex;
-            flex-direction: column;
-            overflow: visible !important;
-        }
-
-        .quick-stats-container .scrollable-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 1rem;
-        }
-
-        .small-table-scroll {
-            max-height: 180px;
-            overflow-y: auto;
-        }
-
-        .sticky-header thead th {
-            position: sticky;
-            top: 0;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
-            z-index: 10;
-        }
-
-        /* ============================================ */
-        /* FIXED: Alert and Notification Styles */
-        /* ============================================ */
-
-        .alert-custom {
-            border-radius: 10px;
-            border: none;
-            border-left: 5px solid;
-            position: relative;
-            z-index: 1;
-        }
-
-        .badge-premium {
+        .status-badge {
             padding: 6px 12px;
-            border-radius: 30px;
+            border-radius: 20px;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
-
-        /* ============================================ */
-        /* FIXED: Button and Action Styles */
-        /* ============================================ */
 
         .action-buttons {
             display: flex;
@@ -449,72 +453,116 @@
             text-decoration: none;
         }
 
+        .badge-premium {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
         .action-buttons a:hover,
         .action-buttons button:hover {
             transform: translateY(-2px);
         }
 
-        .btn-score {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .btn-result {
-            background: var(--secondary-color);
-            color: white;
+        /* Alert Styles */
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            border-left: 5px solid;
         }
 
         /* ============================================ */
-        /* FIXED: Dropdown and Modal Z-Index */
+        /* FIXED HEIGHT & SCROLLABLE CONTENT STYLES */
         /* ============================================ */
 
-        .dropdown-menu {
-            z-index: 9999 !important;
-            position: absolute !important;
+        /* Fixed height containers for scrollable content */
+        .scrollable-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
         }
 
-        .chart-container .dropdown-menu {
-            position: fixed !important;
-            z-index: 1060 !important;
+        .scrollable-card-body {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1rem;
         }
 
-        /* ============================================ */
-        /* FIXED: Animation and Transitions */
-        /* ============================================ */
-
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
+        .fixed-height-card {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
+        .fixed-height-card .card-header {
+            flex-shrink: 0;
         }
 
-        @keyframes pulse-glow {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(78, 115, 223, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 20px 5px rgba(78, 115, 223, 0.2);
-            }
+        .fixed-height-card .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
         }
 
-        .countdown-item {
-            animation: pulse-glow 3s ease-in-out infinite;
+        .attendance-card-fixed {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ============================================ */
-        /* FIXED: Mobile Responsiveness */
-        /* ============================================ */
+        .attendance-card-fixed .card-body {
+            flex: 1;
+            overflow-y: auto;
+        }
 
+        .chart-card-fixed {
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card-fixed .chart-wrapper {
+            flex: 1;
+            min-height: auto;
+        }
+
+        /* Quick stats card fix */
+        .quick-stats-container {
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-stats-container .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem;
+        }
+
+        .small-table-scroll {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        /* Sticky headers inside scrollable areas */
+        .sticky-header thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
             .fixed-height-card {
                 height: auto;
                 min-height: 400px;
@@ -532,204 +580,16 @@
                 height: auto;
                 min-height: 400px;
             }
-
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .table-responsive {
-                border: 0;
-            }
-
-            .table-responsive thead {
-                display: none;
-            }
-
-            .table-responsive tr {
-                display: block;
-                margin-bottom: 15px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-
-            .table-responsive td {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                padding: 10px 15px;
-                position: relative;
-                border-bottom: 1px solid #f1f1f1;
-                width: 100%;
-            }
-
-            .table-responsive td::before {
-                display: none;
-            }
-
-            .btn-group {
-                display: flex;
-                gap: 5px;
-                justify-content: center;
-                width: 100%;
-            }
-
-            .table-responsive td.text-center {
-                justify-content: center;
-            }
-
-            .countdown-premium {
-                gap: 8px;
-            }
-
-            .countdown-item {
-                min-width: 70px;
-                padding: 12px 6px;
-            }
-
-            .countdown-item .number {
-                font-size: 24px;
-            }
-
-            .countdown-item .label {
-                font-size: 10px;
-            }
-
-            .service-card-premium .p-4 {
-                padding: 1rem !important;
-            }
-
-            .service-icon-circle {
-                width: 45px;
-                height: 45px;
-                font-size: 18px;
-            }
-
-            .stat-card .card-value {
-                font-size: 1.5rem;
-            }
-
-            .stat-card .card-icon {
-                font-size: 3rem;
-            }
-
-            .progress-table td {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
-
-            .progress-table th {
-                padding: 12px 8px;
-                font-size: 0.75rem;
-            }
         }
 
-        /* ============================================ */
-        /* FIXED: Extra Large Screen Optimizations */
-        /* ============================================ */
-
-        @media (min-width: 992px) {
-            .container-fluid {
-                padding-left: 30px;
-                padding-right: 30px;
-            }
+        .dropdown-menu {
+            z-index: 9999 !important;
+            position: absolute !important;
         }
 
-        /* ============================================ */
-        /* FIXED: Print Styles */
-        /* ============================================ */
-
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            .card {
-                box-shadow: none !important;
-                border: 1px solid #ddd !important;
-            }
-            .stat-card {
-                break-inside: avoid;
-            }
-        }
-
-        /* ============================================ */
-        /* ADDED: Missing Styles for Better UX */
-        /* ============================================ */
-
-        .header-title {
-            color: var(--primary-color);
-            font-weight: 800;
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            font-size: 1.75rem;
-        }
-
-        .modern-card {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: visible !important;
-        }
-
-        .modern-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(78, 115, 223, 0.15);
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
-
-        .text-truncate-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* FIX: Ensure buttons are clickable */
-        .stat-card a,
-        .stat-card .text-decoration-none {
-            display: block;
-            height: 100%;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .stat-card a:hover,
-        .stat-card .text-decoration-none:hover {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        /* FIX: Prevent content from being hidden behind fixed headers */
-        .py-4 {
-            padding-top: 1.5rem !important;
-            padding-bottom: 1.5rem !important;
-        }
-
-        /* FIX: Smooth scrolling for long pages */
-        .scrollable-content {
-            scroll-behavior: smooth;
-        }
-
-        /* FIX: Ensure progress bars are visible */
-        .progress {
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            transition: width 0.6s ease;
+        .chart-container .dropdown-menu {
+            position: fixed !important;
+            z-index: 1060 !important;
         }
     </style>
 
@@ -777,7 +637,6 @@
                 $progressColor = 'bg-danger';
             }
         @endphp
-
         <!-- Contract Status Alert -->
         @if (Auth::user()->usertype == 3)
             <div class="row mb-4">
@@ -838,8 +697,8 @@
                         @if ($myDuty)
                             <div class="alert alert-warning alert-custom"
                                 style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107;">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                                    <div class="mb-2 mb-md-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
                                         <strong><i class="fas fa-bell me-2"></i> You are on duty this week!</strong>
                                         Please, collect school report to document today's activities.
                                     </div>
@@ -889,13 +748,13 @@
                     @if ($canAccessEPermit)
                         <li class="nav-item mb-3">
                             <div class="card border-0 shadow-sm"
-                                style="border-radius: 12px; background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); overflow: visible !important;">
+                                style="border-radius: 12px; background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);">
                                 <a href="{{ route('teacher.e-permit.dashboard') }}" class="text-decoration-none">
                                     <div class="card-body p-3">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <div class="d-flex align-items-center">
                                                 <div class="me-3"
-                                                    style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                    style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                                                     <i class="fas fa-file-alt text-white fa-lg"></i>
                                                 </div>
                                                 <div>
@@ -934,8 +793,8 @@
 
         <!-- Head Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
-            <!-- Service Status Card - Premium Compact - FIXED Overlap -->
-            <div class="modern-card service-card-premium mb-4" style="position: relative; z-index: 5;">
+            <!-- Service Status Card - Premium Compact -->
+            <div class="modern-card service-card-premium mb-4">
                 <div class="p-4">
                     <!-- Header with Status Bar -->
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -983,8 +842,8 @@
                             <small class="text-muted">{{ $serviceEndDate->format('d M Y') }}</small>
                         </div>
                     </div>
-                    <!-- Countdown Section - FIXED No Overlap -->
-                    <div class="countdown-premium" style="position: relative; z-index: 1;">
+                    <!-- Countdown Section -->
+                    <div class="countdown-premium">
                         <div class="countdown-item">
                             <span class="number" id="days">00</span>
                             <span class="label">Days</span>
@@ -1005,7 +864,7 @@
                 </div>
             </div>
             <div class="row">
-                <!-- Stats Cards for Head Teacher -->
+                <!-- Stats Cards for Head Teacher - No changes needed, these are small cards -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -1158,28 +1017,28 @@
                 <div class="col-12 mb-4">
                     <div class="row">
                         <div class="col-md-8 mb-4">
-                            <div class="chart-container chart-card-fixed" style="overflow: visible !important;">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
                                     </h5>
                                     <p class="chart-subtitle">Distribution of students across classes</p>
                                 </div>
-                                <div class="chart-wrapper" style="overflow: visible !important;">
+                                <div class="chart-wrapper">
                                     <div id="studentChart" class="chart-canvas"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-4 mb-4">
-                            <div class="chart-container chart-card-fixed" style="overflow: visible !important;">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
                                     </h5>
                                     <p class="chart-subtitle">Educational background overview</p>
                                 </div>
-                                <div class="chart-wrapper" style="overflow: visible !important;">
+                                <div class="chart-wrapper">
                                     <div id="qualificationChart" class="chart-canvas"></div>
                                 </div>
                             </div>
@@ -1190,20 +1049,20 @@
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 mb-4">
-                            <div class="chart-container chart-card-fixed" style="overflow: visible !important;">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
                                     </h5>
                                     <p class="chart-subtitle">Male vs Female students ratio</p>
                                 </div>
-                                <div class="chart-wrapper" style="overflow: visible !important;">
+                                <div class="chart-wrapper">
                                     <canvas id="genderChart"></canvas>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-5 mb-4">
-                            <div class="card border-0 shadow-sm attendance-card-fixed" style="overflow: visible !important;">
+                            <div class="card border-0 shadow-sm attendance-card-fixed">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
@@ -1538,7 +1397,7 @@
 
                         <!-- Quick Stats Tables with Fixed Height -->
                         <div class="col-xl-3 mb-4">
-                            <div class="chart-container quick-stats-container" style="overflow: visible !important;">
+                            <div class="chart-container quick-stats-container">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-table me-2"></i> Quick Overview
@@ -1549,7 +1408,7 @@
                                     <div class="row">
                                         <!-- Students by Class -->
                                         <div class="col-12 mb-3">
-                                            <div class="card border-0 bg-light" style="overflow: visible !important;">
+                                            <div class="card border-0 bg-light">
                                                 <div class="card-body p-3">
                                                     <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
                                                     <div class="small-table-scroll">
@@ -1584,7 +1443,7 @@
 
                                         <!-- Teachers by Gender -->
                                         <div class="col-12">
-                                            <div class="card border-0 bg-light" style="overflow: visible !important;">
+                                            <div class="card border-0 bg-light">
                                                 <div class="card-body p-3">
                                                     <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
                                                     </h6>
@@ -1631,7 +1490,7 @@
         <!-- Academic Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
             <div class="row">
-                <!-- Stats Cards for Academic Teacher -->
+                <!-- Stats Cards for Academic Teacher - No changes needed -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -1754,21 +1613,21 @@
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container chart-card-fixed" style="overflow: visible !important;">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-chart-bar me-2"></i> Student Registration
                                     </h5>
                                     <p class="chart-subtitle">Distribution by class and gender</p>
                                 </div>
-                                <div class="chart-wrapper" style="overflow: visible !important;">
+                                <div class="chart-wrapper">
                                     <div id="studentChart" class="chart-canvas"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container fixed-height-card" style="overflow: visible !important;">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-book me-2"></i> My Teaching Subjects
@@ -1793,19 +1652,30 @@
                                                         {{ strtoupper($course->class_code) }}
                                                     </td>
                                                     <td class="text-center">
+                                                        <style>
+                                                            .btn-score {
+                                                                background: var(--success-color);
+                                                                color: white;
+                                                            }
+
+                                                            .btn-result {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+                                                        </style>
                                                         @if ($course->status == 1)
-                                                            <ul class="d-flex justify-content-center" style="list-style: none; padding: 0; margin: 0;">
+                                                            <ul class="d-flex justify-content-center">
                                                                 <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
-                                                                        style="border-radius: 10px; margin-right: 5px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                        style="border-radius: 10px; margin-right: 5px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
                                                                 <li class="">
                                                                     <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-result"
-                                                                        style="border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                        style="border-radius: 10px">
                                                                         <i class="fas fa-file-pdf"></i> Results
                                                                     </a>
                                                                 </li>
@@ -1834,20 +1704,20 @@
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 mb-4">
-                            <div class="chart-container chart-card-fixed" style="overflow: visible !important;">
+                            <div class="chart-container chart-card-fixed">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
                                     </h5>
                                     <p class="chart-subtitle">Male vs Female students ratio</p>
                                 </div>
-                                <div class="chart-wrapper" style="overflow: visible !important;">
+                                <div class="chart-wrapper">
                                     <canvas id="genderChart"></canvas>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-5 mb-4">
-                            <div class="card border-0 shadow-sm attendance-card-fixed" style="overflow: visible !important;">
+                            <div class="card border-0 shadow-sm attendance-card-fixed">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
@@ -2182,7 +2052,7 @@
 
                         <!-- Quick Stats Tables with Fixed Height -->
                         <div class="col-xl-3 mb-4">
-                            <div class="chart-container quick-stats-container" style="overflow: visible !important;">
+                            <div class="chart-container quick-stats-container">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-table me-2"></i> Quick Overview
@@ -2193,7 +2063,7 @@
                                     <div class="row">
                                         <!-- Students by Class -->
                                         <div class="col-12 mb-3">
-                                            <div class="card border-0 bg-light" style="overflow: visible !important;">
+                                            <div class="card border-0 bg-light">
                                                 <div class="card-body p-3">
                                                     <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
                                                     <div class="small-table-scroll">
@@ -2228,7 +2098,7 @@
 
                                         <!-- Teachers by Gender -->
                                         <div class="col-12">
-                                            <div class="card border-0 bg-light" style="overflow: visible !important;">
+                                            <div class="card border-0 bg-light">
                                                 <div class="card-body p-3">
                                                     <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
                                                     </h6>
@@ -2275,7 +2145,7 @@
         <!-- Class Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
             <div class="row">
-                <!-- Stats Cards for Class Teacher -->
+                <!-- Stats Cards for Class Teacher - No changes needed -->
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-4 col-md-6 mb-4">
@@ -2341,7 +2211,7 @@
                 <div class="col-lg-12 mb-4">
                     <div class="row">
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container fixed-height-card" style="overflow: visible !important;">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-users me-2"></i> My Attendance Class
@@ -2365,7 +2235,7 @@
                                                     <td class="text-center">
                                                         <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}"
                                                             class="btn btn-info btn-sm" data-bs-toggle="tooltip"
-                                                            title="Report" style="text-decoration: none;">
+                                                            title="Report">
                                                             <i class="ti-settings me-1"></i> Report
                                                         </a>
                                                     </td>
@@ -2377,7 +2247,7 @@
                             </div>
                         </div>
                         <div class="col-xl-6 mb-4">
-                            <div class="chart-container fixed-height-card" style="overflow: visible !important;">
+                            <div class="chart-container fixed-height-card">
                                 <div class="chart-header">
                                     <h5 class="chart-title">
                                         <i class="fas fa-book me-2"></i> My Teaching Subjects
@@ -2403,18 +2273,29 @@
                                                     </td>
                                                     <td class="text-center">
                                                         @if ($course->status == 1)
-                                                            <ul class="d-flex justify-content-center" style="list-style: none; padding: 0; margin: 0;">
+                                                            <style>
+                                                                .btn-score {
+                                                                    background: var(--success-color);
+                                                                    color: white;
+                                                                }
+
+                                                                .btn-result {
+                                                                    background: var(--secondary-color);
+                                                                    color: white;
+                                                                }
+                                                            </style>
+                                                            <ul class="d-flex justify-content-center">
                                                                 <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
-                                                                        style="border-radius: 10px; margin-right: 5px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                        style="border-radius: 10px; margin-right: 5px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
                                                                 <li class="">
                                                                     <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-result"
-                                                                        style="border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                        style="border-radius: 10px">
                                                                         <i class="fas fa-file-pdf"></i> Results
                                                                     </a>
                                                                 </li>
@@ -2471,7 +2352,7 @@
 
                 <!-- Teaching Subjects with Fixed Height -->
                 <div class="col-lg-12 mb-4">
-                    <div class="chart-container fixed-height-card" style="overflow: visible !important;">
+                    <div class="chart-container fixed-height-card">
                         <div class="chart-header">
                             <h5 class="chart-title">
                                 <i class="fas fa-book me-2"></i> My Teaching Subjects
@@ -2496,17 +2377,28 @@
                                                 {{ strtoupper($course->class_code) }}</td>
                                             <td class="text-center">
                                                 @if ($course->status == 1)
-                                                    <ul class="d-flex justify-content-center" style="list-style: none; padding: 0; margin: 0;">
+                                                    <ul class="d-flex justify-content-center">
+                                                        <style>
+                                                            .btn-score {
+                                                                background: var(--success-color);
+                                                                color: white;
+                                                            }
+
+                                                            .btn-result {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+                                                        </style>
                                                         <li class="mr-3">
                                                             <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                 class="btn btn-xs btn-score"
-                                                                style="border-radius: 10px; margin-right: 5px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                style="border-radius: 10px; margin-right: 5px;">
                                                                 <i class="fas fa-file-edit"></i> Score
                                                             </a>
                                                         </li>
                                                         <li class="">
                                                             <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
-                                                                class="btn btn-xs btn-result" style="border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; text-decoration: none;">
+                                                                class="btn btn-xs btn-result" style="border-radius: 10px">
                                                                 <i class="fas fa-file-pdf"></i> Results
                                                             </a>
                                                         </li>
@@ -2604,7 +2496,6 @@
 
             // Initialize countdown
             initializeCountdown();
-
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -2848,12 +2739,13 @@
                                     'rgba(246, 194, 62, 1)'
                                 ],
                                 borderWidth: 2,
+                                // hoverOffset: 15
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: true,
-                            aspectRatio: 2,
+                            aspectRatio: 2, // <-- HII ITASAIDIA KUONEKANA
                             layout: {
                                 padding: {
                                     top: 20,
@@ -2892,7 +2784,7 @@
                         }
                     });
 
-                    // Force chart to be visible immediately
+                    // FIX: Force chart to be visible immediately
                     setTimeout(() => {
                         attendanceChart.update();
                     }, 100);
@@ -2906,26 +2798,6 @@
             @if (Auth::user()->usertype != 3)
                 window.location.href = '/error-page';
             @endif
-
-            // FIX: Ensure dropdown menus work properly
-            document.querySelectorAll('.dropdown-toggle').forEach(function(dropdown) {
-                dropdown.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const menu = this.nextElementSibling;
-                    if (menu && menu.classList.contains('dropdown-menu')) {
-                        menu.classList.toggle('show');
-                    }
-                });
-            });
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.dropdown')) {
-                    document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
-                        menu.classList.remove('show');
-                    });
-                }
-            });
         });
     </script>
 
@@ -2970,106 +2842,6 @@
 
             .table-responsive td.text-center {
                 justify-content: center;
-            }
-
-            /* Fix for mobile action buttons */
-            .action-buttons {
-                flex-wrap: wrap;
-                gap: 5px;
-            }
-
-            .action-buttons a,
-            .action-buttons button {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
-            }
-
-            /* Fix for countdown on mobile */
-            .countdown-premium {
-                gap: 6px;
-            }
-
-            .countdown-item {
-                min-width: 60px;
-                padding: 10px 4px;
-            }
-
-            .countdown-item .number {
-                font-size: 20px;
-            }
-
-            .countdown-item .label {
-                font-size: 9px;
-            }
-
-            /* Fix for alert buttons on mobile */
-            .alert .btn {
-                margin-top: 8px;
-                width: 100%;
-                text-align: center;
-            }
-
-            .alert .d-flex {
-                flex-direction: column;
-                align-items: stretch !important;
-            }
-
-            .alert .d-flex .mb-2 {
-                margin-bottom: 8px !important;
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .countdown-item {
-                min-width: 75px;
-                padding: 14px 6px;
-            }
-
-            .countdown-item .number {
-                font-size: 28px;
-            }
-
-            .stat-card .card-value {
-                font-size: 1.75rem;
-            }
-        }
-
-        /* Fix for very small screens */
-        @media (max-width: 480px) {
-            .service-card-premium .d-flex {
-                flex-direction: column;
-                align-items: flex-start !important;
-            }
-
-            .service-card-premium .text-end {
-                text-align: left !important;
-                width: 100%;
-                margin-top: 8px;
-            }
-
-            .service-icon-circle {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
-
-            .chart-card-fixed {
-                height: 350px;
-            }
-
-            .attendance-card-fixed {
-                height: 400px;
-            }
-
-            .fixed-height-card {
-                height: auto;
-                min-height: 350px;
-            }
-
-            .quick-stats-container {
-                height: auto;
-                min-height: 350px;
             }
         }
     </style>
