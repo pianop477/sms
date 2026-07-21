@@ -144,7 +144,7 @@ Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVer
 Route::post('/webauthn/delete-credentials', [BiometricController::class, 'deleteCredentials']);
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
-Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent', 'check.bank.details')->group(function () {
+Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
     /*
         =======================MPANGILIO WA ROUTES ZOTE UKO HAPA KULINGANA NA MAHITAJI YA MFUMO NA=========================================
         =================================AINA YA USER, PERMISSION NA ROLE YAKE KATIKA MFUMO================================================
