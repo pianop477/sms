@@ -873,16 +873,16 @@ Route::put('{id}/Update-bank-details', [HomeController::class, 'updateBankDetail
     ->middleware('auth');
 
 // Routes za AJAX requests for modal
-// Route::post('/bank/remind-later', function () {
-//     session(['bank_modal_last_shown' => time()]);
-//     session()->forget(['show_bank_modal', 'teacher_id_for_modal']);
-//     return response()->json(['success' => true]);
-// })->name('bank.remind.later')->middleware('auth');
+Route::post('/bank/remind-later', function () {
+    session(['bank_modal_last_shown' => time()]);
+    session()->forget(['show_bank_modal', 'teacher_id_for_modal']);
+    return response()->json(['success' => true]);
+})->name('bank.remind.later')->middleware('auth');
 
-// Route::post('/bank/modal-closed', function () {
-//     session(['bank_modal_last_shown' => time()]);
-//     return response()->json(['success' => true]);
-// })->name('bank.modal.closed')->middleware('auth');
+Route::post('/bank/modal-closed', function () {
+    session(['bank_modal_last_shown' => time()]);
+    return response()->json(['success' => true]);
+})->name('bank.modal.closed')->middleware('auth');
 
 // ========================================================================
 // SALARY SLIP VERIFICATION ROUTES (Public - Hakuna authentication)
