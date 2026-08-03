@@ -59,8 +59,13 @@
     }
 
     @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Floating Particles */
@@ -82,10 +87,23 @@
     }
 
     @keyframes float {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        25% { transform: translate(100px, -100px) scale(1.2); }
-        50% { transform: translate(200px, 0) scale(0.8); }
-        75% { transform: translate(100px, 100px) scale(1.1); }
+
+        0%,
+        100% {
+            transform: translate(0, 0) scale(1);
+        }
+
+        25% {
+            transform: translate(100px, -100px) scale(1.2);
+        }
+
+        50% {
+            transform: translate(200px, 0) scale(0.8);
+        }
+
+        75% {
+            transform: translate(100px, 100px) scale(1.1);
+        }
     }
 
     /* Main Container */
@@ -113,6 +131,7 @@
             opacity: 0;
             transform: translateY(50px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -488,7 +507,9 @@
     }
 
     @keyframes spin {
-        to { transform: translate(-50%, -50%) rotate(360deg); }
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
     }
 
     /* Toast Notification */
@@ -649,7 +670,7 @@
                     </h3>
                 </div>
                 <a href="{{route('Class.Teachers', ['class' => Hashids::encode($classTeacher->class_id)])}}"
-                   class="btn-back-modern">
+                    class="btn-back-modern">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back</span>
                 </a>
@@ -699,7 +720,8 @@
                         <div class="info-content">
                             <div class="info-label">Current Teacher</div>
                             <div class="info-value">
-                                {{ucwords(strtolower($classTeacher->first_name))}} {{ucwords(strtolower($classTeacher->last_name))}}
+                                {{ucwords(strtolower($classTeacher->first_name))}}
+                                {{ucwords(strtolower($classTeacher->last_name))}}
                             </div>
                         </div>
                     </div>
@@ -707,14 +729,12 @@
             </div>
 
             <!-- Edit Form -->
-            <form action="{{route('roles.update.class.teacher', ['classTeacher' => Hashids::encode($classTeacher->id)])}}"
-                  class="needs-validation"
-                  novalidate
-                  method="POST"
-                  id="classTeacherForm">
+            <form
+                action="{{route('roles.update.class.teacher', ['classTeacher' => Hashids::encode($classTeacher->id)])}}"
+                class="needs-validation" novalidate method="POST" id="classTeacherForm">
                 @csrf
                 @method('PUT')
-
+                {{-- <input type="text" value="{{ $classTeacher->id }}"> --}}
                 <div class="form-section-modern">
                     <div class="row">
                         <!-- Class Name (Disabled) -->
@@ -724,10 +744,8 @@
                                     <i class="fas fa-chalkboard text-primary"></i>
                                     Class Name
                                 </label>
-                                <input type="text"
-                                       class="form-control-modern text-uppercase"
-                                       value="{{$classTeacher->class_name}}"
-                                       disabled>
+                                <input type="text" class="form-control-modern text-uppercase"
+                                    value="{{$classTeacher->class_name}}" disabled>
                             </div>
                         </div>
 
@@ -738,10 +756,8 @@
                                     <i class="fas fa-barcode text-primary"></i>
                                     Class Code
                                 </label>
-                                <input type="text"
-                                       class="form-control-modern text-uppercase"
-                                       value="{{$classTeacher->class_code}}"
-                                       disabled>
+                                <input type="text" class="form-control-modern text-uppercase"
+                                    value="{{$classTeacher->class_code}}" disabled>
                             </div>
                         </div>
 
@@ -752,10 +768,8 @@
                                     <i class="fas fa-layer-group text-primary"></i>
                                     Stream
                                 </label>
-                                <input type="text"
-                                       class="form-control-modern text-uppercase"
-                                       value="{{$classTeacher->group}}"
-                                       disabled>
+                                <input type="text" class="form-control-modern text-uppercase"
+                                    value="{{$classTeacher->group}}" disabled>
                             </div>
                         </div>
 
@@ -769,18 +783,20 @@
                                 </label>
                                 <select name="teacher" id="teacherSelect" class="form-control-modern select2" required>
                                     <option value="{{$classTeacher->teacher_id}}" selected class="fw-bold">
-                                        {{ucwords(strtolower($classTeacher->first_name))}} {{ucwords(strtolower($classTeacher->last_name))}} (Current)
+                                        {{ucwords(strtolower($classTeacher->first_name))}}
+                                        {{ucwords(strtolower($classTeacher->last_name))}} (Current)
                                     </option>
                                     @if ($teachers->isEmpty())
-                                        <option value="" disabled class="text-danger">No other teachers available</option>
+                                    <option value="" disabled class="text-danger">No other teachers available</option>
                                     @else
-                                        @foreach ($teachers as $teacher)
-                                            @if($teacher->id != $classTeacher->teacher_id)
-                                                <option value="{{$teacher->id}}">
-                                                    {{ucwords(strtolower($teacher->first_name))}} {{ucwords(strtolower($teacher->last_name))}}
-                                                </option>
-                                            @endif
-                                        @endforeach
+                                    @foreach ($teachers as $teacher)
+                                    @if($teacher->id != $classTeacher->teacher_id)
+                                    <option value="{{$teacher->id}}">
+                                        {{ucwords(strtolower($teacher->first_name))}}
+                                        {{ucwords(strtolower($teacher->last_name))}}
+                                    </option>
+                                    @endif
+                                    @endforeach
                                     @endif
                                 </select>
                                 <div class="invalid-feedback-modern">
@@ -788,10 +804,10 @@
                                     Please select a teacher
                                 </div>
                                 @error('teacher')
-                                    <div class="invalid-feedback-modern">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        {{ $message }}
-                                    </div>
+                                <div class="invalid-feedback-modern">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}
+                                </div>
                                 @enderror
                             </div>
                         </div>
@@ -819,7 +835,7 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
     // Initialize particles
     createParticles();
 

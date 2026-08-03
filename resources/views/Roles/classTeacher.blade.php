@@ -751,7 +751,7 @@
                             <th>#</th>
                             <th>Class Name</th>
                             <th>Stream</th>
-                            <th>Teacher Information</th>
+                            <th>Teacher's Name</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -794,12 +794,12 @@
                                         <div class="action-icons">
                                             <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}"
                                                class="action-icon edit"
-                                               title="Edit Assignment">
+                                               title="Edit">
                                                 <i class="fas fa-pen"></i>
                                             </a>
                                             <a href="{{route('roles.destroy', ['id' => Hashids::encode($teacher->id)])}}"
                                                class="action-icon delete"
-                                               title="Remove Teacher"
+                                               title="Remove"
                                                onclick="return confirm('⚠️ Are you sure you want to delete {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class? This action cannot be undone.')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
