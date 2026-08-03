@@ -1117,8 +1117,8 @@
     const textarea = document.getElementById('message_content');
     const charCount = document.getElementById('charCount');
     const sendButton = document.getElementById('sendButton');
-    const form = document.querySelector('form');
-    let isSubmitting = false; // kinga dhidi ya uwasilishaji maradufu
+    const form = document.getElementById('smsForm');
+    let isSubmitting = false;
 
     const maxLength = parseInt(textarea.getAttribute('maxlength'));
     const warningThreshold = maxLength - 50;
@@ -1147,12 +1147,22 @@
     textarea.addEventListener('input', updateCharCount);
     updateCharCount();
 
-    // Form submission validation
+    // ============================================
+    // STORE ORIGINAL BUTTON TEXT
+    // ============================================
+    if (!sendButton.getAttribute('data-original-text')) {
+        sendButton.setAttribute('data-original-text', sendButton.innerHTML);
+    }
+
+    // ============================================
+    // FORM SUBMISSION - WITH RACE CONDITION PREVENTION
+    // ============================================
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         // Kama tayari tunasubmit, usiruhusu tena
         if (isSubmitting) {
+            showToast('warning', 'Please Wait!', 'Your message is already being sent...');
             return;
         }
 
@@ -1222,74 +1232,200 @@
                 `📊 Summary:\n` +
                 `• Characters: ${messageText.length}/${charLimit}\n` +
                 `• SMS Count: ${Math.ceil(messageText.length / 153)}/${smsLimit}\n` +
-                `• Package: ${isBasic ? 'Basic' : 'Premium'}\n\n` +
                 `Click OK to send.`
             );
 
             if (confirmed) {
-                // Zima kitufe na onyesha spinner
+                // ============================================
+                // DISABLE BUTTON - Prevent double submission
+                // ============================================
                 isSubmitting = true;
                 sendButton.disabled = true;
                 sendButton.innerHTML = `
                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                     Sending...
                 `;
+                sendButton.style.opacity = '0.7';
+                sendButton.style.cursor = 'not-allowed';
 
-                // Tuma form
-                form.submit();
+                // ============================================
+                // SUBMIT FORM USING XMLHttpRequest (AJAX)
+                // ============================================
+                const formData = new FormData(form);
 
-                // Ikiwa form haijasumbua (kwa mfano, hitilafu ya mtandao), rudisha kitufe baada ya sekunde 10
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', form.action, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+                xhr.setRequestHeader('Accept', 'application/json');
+
+                xhr.onload = function() {
+                    // Re-enable button
+                    isSubmitting = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+                    sendButton.style.opacity = '1';
+                    sendButton.style.cursor = 'pointer';
+
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+
+                        if (xhr.status === 200 || xhr.status === 201) {
+                            // Success
+                            if (response.status === true || response.success === true) {
+                                showToast('success', 'Success!', response.message || 'Message sent successfully!');
+
+                                // Reload page after 3 seconds to show new data
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 3000);
+                            } else {
+                                // Backend returned error
+                                showToast('error', 'Error!', response.message || 'Failed to send message.');
+                            }
+                        } else {
+                            // HTTP error
+                            const errorMsg = response.message || response.error || 'Failed to send message. Please try again.';
+                            showToast('error', 'Error!', errorMsg);
+                        }
+                    } catch (e) {
+                        // Invalid JSON response
+                        console.error('Invalid response:', xhr.responseText);
+                        showToast('error', 'Error!', 'Invalid response from server. Please try again.');
+                    }
+                };
+
+                xhr.onerror = function() {
+                    // Re-enable button on error
+                    isSubmitting = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+                    sendButton.style.opacity = '1';
+                    sendButton.style.cursor = 'pointer';
+                    showToast('error', 'Network Error!', 'Please check your connection and try again.');
+                };
+
+                xhr.ontimeout = function() {
+                    // Re-enable button on timeout
+                    isSubmitting = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+                    sendButton.style.opacity = '1';
+                    sendButton.style.cursor = 'pointer';
+                    showToast('error', 'Timeout!', 'Request timed out. Please try again.');
+                };
+
+                xhr.timeout = 60000; // 60 seconds timeout
+                xhr.send(formData);
+
+                // ============================================
+                // RECOVERY: Re-enable button after timeout
+                // ============================================
                 setTimeout(function() {
                     if (isSubmitting) {
                         isSubmitting = false;
                         sendButton.disabled = false;
-                        sendButton.innerHTML = `
-                            <i class="fas fa-paper-plane me-2"></i> Send Message
-                        `;
-                        // Onyesha arifa ya kushindwa
-                        showErrorAlert(['Sending failed. Please check your connection and try again.']);
+                        sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+                        sendButton.style.opacity = '1';
+                        sendButton.style.cursor = 'pointer';
+                        showToast('error', 'Timeout!', 'Sending failed. Please check your connection and try again.');
                     }
-                }, 10000); // 10 seconds timeout
+                }, 30000); // 30 seconds timeout
             }
         } else {
-            showErrorAlert(errorMessages);
+            showToast('error', 'Validation Error!', errorMessages.join('<br>'));
         }
     });
 
-    function showErrorAlert(messages) {
-        const errorAlert = document.createElement('div');
-        errorAlert.className = 'alert alert-danger alert-dismissible fade show';
-        errorAlert.style.position = 'fixed';
-        errorAlert.style.top = '10px';
-        errorAlert.style.left = '10px';
-        errorAlert.style.right = '10px';
-        errorAlert.style.zIndex = '9999';
-        errorAlert.style.maxWidth = '400px';
-        errorAlert.style.margin = '10px auto';
-        errorAlert.innerHTML = `
-            <div class="d-flex align-items-start">
-                <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
-                <div>
-                    <strong>Please fix the following:</strong>
-                    <ul class="mb-0 mt-1">
-                        ${messages.map(msg => `<li>${msg}</li>`).join('')}
-                    </ul>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        document.body.appendChild(errorAlert);
+    // ============================================
+    // TOAST NOTIFICATION SYSTEM
+    // ============================================
+    function showToast(type, title, message) {
+        // Remove existing toasts
+        document.querySelectorAll('.custom-toast').forEach(el => el.remove());
 
+        const colors = {
+            success: { bg: '#00b894', icon: 'fa-check-circle' },
+            error: { bg: '#e17055', icon: 'fa-exclamation-circle' },
+            warning: { bg: '#fdcb6e', icon: 'fa-exclamation-triangle' },
+            info: { bg: '#4e54c8', icon: 'fa-info-circle' }
+        };
+
+        const color = colors[type] || colors.info;
+
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            min-width: 300px;
+            max-width: 450px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-left: 5px solid ${color.bg};
+            padding: 16px 20px;
+            animation: slideInRight 0.5s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        `;
+
+        toast.innerHTML = `
+            <div style="flex-shrink: 0; width: 36px; height: 36px; background: ${color.bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                <i class="fas ${color.icon}"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; color: #2d3436; font-size: 0.95rem; margin-bottom: 4px;">${title}</div>
+                <div style="color: #636e72; font-size: 0.85rem; line-height: 1.4;">${message}</div>
+            </div>
+            <button type="button" style="background: none; border: none; color: #999; cursor: pointer; font-size: 16px; padding: 4px;" onclick="this.closest('.custom-toast').remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Auto remove after 5 seconds
         setTimeout(() => {
-            if (errorAlert.parentNode) {
-                errorAlert.style.opacity = '0';
-                errorAlert.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => errorAlert.remove(), 300);
+            if (toast.parentNode) {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
             }
         }, 5000);
     }
 
-    // Modal functionality
+    // ============================================
+    // RE-ENABLE BUTTON WHEN PAGE LOADS/RELOADS
+    // ============================================
+    window.addEventListener('beforeunload', function() {
+        if (sendButton) {
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+            sendButton.style.opacity = '1';
+            sendButton.style.cursor = 'pointer';
+        }
+    });
+
+    // ============================================
+    // PREVENT DOUBLE SUBMISSION - Global handler
+    // ============================================
+    document.addEventListener('submit', function(e) {
+        const formElement = e.target;
+        if (formElement.tagName === 'FORM' && formElement.id === 'smsForm') {
+            const submitBtn = formElement.querySelector('button[type="submit"]');
+            if (submitBtn && submitBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    }, true);
+
+    // ============================================
+    // Modal functionality (EXISTING)
+    // ============================================
     document.querySelectorAll('.sms-preview-link, .view-details-btn').forEach(link => {
         link.addEventListener('click', function(e) {
             const data = {
@@ -1323,7 +1459,9 @@
         });
     });
 
-    // Copy SMS
+    // ============================================
+    // Copy SMS (EXISTING)
+    // ============================================
     document.getElementById('copySmsBtn')?.addEventListener('click', function() {
         const text = document.getElementById('modalFullText').textContent;
         navigator.clipboard.writeText(text).then(() => {
@@ -1338,12 +1476,51 @@
         });
     });
 
+    // ============================================
     // Prevent form submission on Enter key in textarea
+    // ============================================
     textarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.ctrlKey) {
             e.preventDefault();
         }
     });
+
+    // ============================================
+    // RECOVERY: Re-enable button on page visibility change
+    // ============================================
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && isSubmitting) {
+            setTimeout(() => {
+                if (isSubmitting) {
+                    isSubmitting = false;
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Broadcast SMS';
+                    sendButton.style.opacity = '1';
+                    sendButton.style.cursor = 'pointer';
+                }
+            }, 5000);
+        }
+    });
+
+    // ============================================
+    // ADD CSS ANIMATION FOR TOAST
+    // ============================================
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    console.log('✅ SMS Form protection initialized successfully');
 });
 </script>
 @endsection

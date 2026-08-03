@@ -169,7 +169,7 @@ class SmsController extends Controller
 
 
 
-    //send sms using nextSms api service***************************************************************************
+   //send sms using nextSms api service***************************************************************************
     public function sendSmsUsingNextSms(Request $request)
     {
         $user = Auth::user();
@@ -215,6 +215,15 @@ class SmsController extends Controller
         });
 
         if ($validator->fails()) {
+            // Return JSON response for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()->all()
+                ], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
@@ -306,14 +315,29 @@ class SmsController extends Controller
             $data = Transport::where('school_id', $user->school_id)->get();
 
             $recipientType = 'Drivers';
-            $recipientType = 7;
+            $recipientId = 7;
         } else {
+            // No recipient selection
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'No recipient selection made'
+                ], 400);
+            }
             Alert()->toast('No recipient selection made', 'error');
             return back()->withInput();
         }
 
         // Check if any recipients were found
         if ($data->isEmpty()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'No phone numbers found for the selected criteria'
+                ], 404);
+            }
             Alert()->toast('No phone numbers found for the selected criteria', 'error');
             return back()->withInput();
         }
@@ -337,6 +361,13 @@ class SmsController extends Controller
 
         // Check if we have phone numbers
         if ($recipientCount === 0) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'No valid phone numbers found'
+                ], 404);
+            }
             Alert()->toast('No valid phone numbers found', 'error');
             return back()->withInput();
         }
@@ -350,32 +381,75 @@ class SmsController extends Controller
 
         try {
             // Send SMS
+            $response = $nextSmsService->sendSmsByNext(
+                $payload['from'],
+                $payload['to'],
+                $payload['text'],
+                $payload['reference']
+            );
 
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-
-            // Log the SMS sending for audit
-            // Log::info('SMS sent successfully', [
-            //     'school_id' => $user->school_id,
-            //     'recipient_count' => $recipientCount,
-            //     'classes_selected' => $selectedClasses,
-            //     'send_to_all' => $sendToAllClasses,
-            //     // 'notification_id' => $notification->id,
-            //     'message_length' => strlen($request->message_content)
-            // ]);
-
+            // Check if SMS was sent successfully
             if (!$response['success']) {
+                // Log the error
+                Log::error('SMS sending failed', [
+                    'error' => $response['error'] ?? 'Unknown error',
+                    'school_id' => $user->school_id,
+                    'recipient_count' => $recipientCount
+                ]);
+
+                // Return JSON error response
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'success' => false,
+                        'message' => 'SMS failed: ' . ($response['error'] ?? 'Unknown error')
+                    ], 500);
+                }
+
                 Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
+            // Success - log the successful sending
+            Log::info('SMS sent successfully', [
+                'school_id' => $user->school_id,
+                'recipient_count' => $recipientCount,
+                'reference' => $reference
+            ]);
+
+            // Return JSON success response
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'success' => true,
+                    'message' => 'Message sent successfully to ' . $recipientCount . ' recipients',
+                    'data' => [
+                        'recipient_count' => $recipientCount,
+                        'reference' => $reference,
+                        'recipient_type' => $recipientType
+                    ]
+                ], 200);
+            }
+
             Alert()->toast('Message Sent Successfully to ' . $recipientCount . ' recipients', 'success');
             return redirect()->back();
+
         } catch (Exception $e) {
+            // Log the error
             Log::error('SMS sending failed', [
                 'error' => $e->getMessage(),
                 'school_id' => $user->school_id,
                 'recipient_count' => $recipientCount
             ]);
+
+            // Return JSON error response
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'Failed to send SMS: ' . $e->getMessage()
+                ], 500);
+            }
 
             Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
             return back()->withInput();
