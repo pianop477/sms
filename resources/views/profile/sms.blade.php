@@ -892,8 +892,8 @@
                     @php
                     $school = Auth::user()->school;
                     $isBasicPackage = $school && $school->package === 'basic';
-                    $maxChars = $isBasicPackage ? 306 : 459;
-                    $smsCount = $isBasicPackage ? 2 : 3;
+                    $maxChars = $isBasicPackage ? 160 : 306;
+                    $smsCount = $isBasicPackage ? 1 : 2;
                     @endphp
 
                     <textarea name="message_content" id="message_content"
@@ -1121,7 +1121,7 @@
     let isSubmitting = false;
 
     const maxLength = parseInt(textarea.getAttribute('maxlength'));
-    const warningThreshold = maxLength - 50;
+    const warningThreshold = maxLength - 30;
 
     // Character counter
     function updateCharCount() {
