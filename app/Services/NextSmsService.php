@@ -15,14 +15,14 @@ class NextSmsService
 
     public function __construct()
     {
-        $this->apiUsername = 'Piano';
-        $this->apiPassword = 'Veronica 24#';
+        $this->apiUsername = config('services.next_sms.username');
+        $this->apiPassword = config('services.next_sms.password');
     }
 
     public function sendSmsByNext($sender, $destination, $message, $reference)
     {
         try {
-            $url = "https://messaging-service.co.tz/api/sms/v1/text/single";
+            $url = config('services.next_sms.base_url') . '/text/single';
             $postData = [
                 'from' => $sender,
                 'to' => $destination,
@@ -58,7 +58,7 @@ class NextSmsService
     public function checkBalance()
     {
         try {
-            $url = "https://messaging-service.co.tz/api/sms/v1/balance";
+            $url = config('services.next_sms.base_url') . '/balance';
 
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode($this->apiUsername . ':' . $this->apiPassword),
@@ -86,7 +86,7 @@ class NextSmsService
 
     public function smsLogs($from, $limit, $offset)
     {
-        $url = "https://messaging-service.co.tz/api/sms/v1/logs";
+        $url = config('services.next_sms.base_url') . '/logs';
 
         try {
 

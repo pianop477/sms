@@ -22,7 +22,7 @@ class other_staffs extends Model
         'joining_year',
         'educational_level',
         'profile_image',
-        'usertype',
+        'usertype', 'school_id',
         'status', 'nida', 'bank_account_number', 'bank_account_name', 'bank_name', 'alternative_phone'
     ];
 

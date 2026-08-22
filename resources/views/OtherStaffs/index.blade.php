@@ -1,1062 +1,3042 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #3f37c9;
-            --accent: #4895ef;
-            --success: #4cc9f0;
-            --warning: #f8961e;
-            --danger: #f94144;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+<style>
+    /* =========================================================
+       STAFF MANAGEMENT PAGE
+       All styles are scoped to .staff-page
+       ========================================================= */
+
+    .staff-page {
+        --sp-primary: #4361ee;
+        --sp-primary-dark: #3a56d4;
+        --sp-secondary: #3f37c9;
+        --sp-success: #1cc88a;
+        --sp-warning: #f6c23e;
+        --sp-danger: #e74a3b;
+        --sp-dark: #212529;
+        --sp-muted: #64748b;
+        --sp-border: #e2e8f0;
+        --sp-light: #f8fafc;
+
+        width: 100%;
+        min-width: 0;
+        position: relative;
+        isolation: isolate;
+    }
+
+
+    /* =========================================================
+       BACKGROUND
+       ========================================================= */
+
+    .staff-page .animated-bg {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+
+        z-index: -2;
+        pointer-events: none;
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at 75% 20%,
+                rgba(67, 97, 238, 0.08),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 20% 80%,
+                rgba(63, 55, 201, 0.07),
+                transparent 30%
+            );
+    }
+
+    .staff-page .animated-bg::before {
+        content: "";
+
+        position: absolute;
+        inset: -50%;
+
+        background:
+            radial-gradient(
+                circle at 70% 30%,
+                rgba(67, 97, 238, 0.08),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 30% 70%,
+                rgba(63, 55, 201, 0.08),
+                transparent 30%
+            );
+
+        animation: staffRotate 60s linear infinite;
+    }
+
+    @keyframes staffRotate {
+
+        from {
+            transform: rotate(0deg);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        to {
+            transform: rotate(360deg);
         }
 
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+    }
+
+
+    /* =========================================================
+       MAIN CONTAINER
+       ========================================================= */
+
+    .staff-page .dashboard-container {
+        width: min(100%, 1600px);
+
+        margin: 24px auto;
+        padding-inline: 20px;
+
+        position: relative;
+        z-index: 1;
+    }
+
+
+    /* =========================================================
+       MAIN CARD
+       ========================================================= */
+
+    .staff-page .modern-card {
+        width: 100%;
+
+        background: rgba(255, 255, 255, 0.96);
+
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+
+        border: 1px solid rgba(255, 255, 255, 0.65);
+
+        border-radius: 24px;
+
+        box-shadow:
+            0 10px 30px rgba(15, 23, 42, 0.08),
+            0 2px 8px rgba(15, 23, 42, 0.04);
+
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .staff-page .card-header-modern {
+        position: relative;
+        overflow: visible;
+
+        padding: 20px 24px;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--sp-primary) 0%,
+                var(--sp-secondary) 100%
+            );
+
+        color: #fff;
+    }
+
+    .staff-page .card-header-modern::before {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        pointer-events: none;
+
+        background:
+            radial-gradient(
+                circle at 85% 20%,
+                rgba(255,255,255,.18),
+                transparent 25%
+            );
+    }
+
+    .staff-page .header-content {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        min-width: 0;
+    }
+
+    .staff-page .header-left {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        min-width: 0;
+    }
+
+    .staff-page .header-icon {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.25);
+
+        color: #fff;
+
+        font-size: 20px;
+    }
+
+    .staff-page .header-title {
+        min-width: 0;
+    }
+
+    .staff-page .header-title h3 {
+        margin: 0;
+
+        color: #fff;
+
+        font-size: clamp(1.05rem, 2vw, 1.45rem);
+        font-weight: 700;
+
+        line-height: 1.2;
+    }
+
+    .staff-page .header-title p {
+        margin: 4px 0 0;
+
+        font-size: .8rem;
+
+        opacity: .85;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+       ========================================================= */
+
+    .staff-page .action-group {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 8px;
+
+        flex-wrap: wrap;
+
+        flex-shrink: 0;
+    }
+
+    .staff-page .btn-modern {
+        min-height: 38px;
+
+        padding: 8px 14px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        border: 1px solid transparent;
+        border-radius: 9px;
+
+        color: #fff;
+
+        font-size: .85rem;
+        font-weight: 600;
+
+        line-height: 1;
+
+        text-decoration: none;
+        white-space: nowrap;
+
+        cursor: pointer;
+
+        transition:
+            background-color .2s ease,
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .staff-page .btn-modern:hover {
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .staff-page .btn-export {
+        background: rgba(255,255,255,.14);
+        border-color: rgba(255,255,255,.25);
+    }
+
+    .staff-page .btn-export:hover {
+        background: rgba(255,255,255,.22);
+    }
+
+    .staff-page .btn-add {
+        background: rgba(255,255,255,.22);
+        border-color: rgba(255,255,255,.30);
+    }
+
+    .staff-page .btn-add:hover {
+        background: rgba(255,255,255,.32);
+    }
+
+
+    /* =========================================================
+       DROPDOWN
+       ========================================================= */
+
+    .staff-page .dropdown-modern {
+        position: relative;
+    }
+
+    .staff-page .dropdown-modern .dropdown-menu {
+        min-width: 180px;
+
+        margin-top: 7px !important;
+
+        padding: 6px;
+
+        border: 0;
+        border-radius: 10px;
+
+        background: #fff;
+
+        box-shadow:
+            0 12px 30px rgba(15,23,42,.15);
+
+        z-index: 1080;
+    }
+
+    .staff-page .dropdown-modern .dropdown-item {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 9px 11px;
+
+        border-radius: 7px;
+
+        color: var(--sp-dark);
+
+        font-size: .85rem;
+    }
+
+    .staff-page .dropdown-modern .dropdown-item:hover {
+        background: #f1f5f9;
+    }
+
+
+    /* =========================================================
+       STATS CARD
+       ========================================================= */
+
+    .staff-page .stats-card {
+        width: 100%;
+
+        margin-bottom: 20px;
+        padding: 15px 18px;
+
+        border-radius: 16px;
+
+        color: #fff;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--sp-primary) 0%,
+                var(--sp-secondary) 100%
+            );
+
+        box-shadow:
+            0 6px 18px rgba(67,97,238,.15);
+    }
+
+    .staff-page .stats-card .row {
+        align-items: center;
+    }
+
+    .staff-page .stat-item {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        min-height: 48px;
+    }
+
+    .staff-page .stat-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: rgba(255,255,255,.16);
+
+        font-size: 18px;
+    }
+
+    .staff-page .stat-label {
+        margin-bottom: 2px;
+
+        color: rgba(255,255,255,.85);
+
+        font-size: .76rem;
+        font-weight: 500;
+    }
+
+    .staff-page .stat-value {
+        color: #fff;
+
+        font-size: 1.35rem;
+        font-weight: 700;
+
+        line-height: 1.2;
+    }
+
+
+    /* =========================================================
+       CARD BODY
+       ========================================================= */
+
+    .staff-page .card-body-modern {
+        padding: 24px;
+    }
+
+
+    /* =========================================================
+       TABLE CONTAINER
+       ========================================================= */
+
+    .staff-page .table-container-modern {
+        width: 100%;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        background: #fff;
+
+        border: 1px solid var(--sp-border);
+        border-radius: 14px;
+
+        box-shadow:
+            0 4px 14px rgba(15,23,42,.05);
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .staff-page .table-modern {
+        width: 100%;
+        min-width: 900px;
+
+        margin: 0;
+
+        border-collapse: separate;
+        border-spacing: 0;
+
+        font-size: .875rem;
+    }
+
+    .staff-page .table-modern thead th {
+        padding: 12px 13px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2b3d5c 0%,
+                #1a2a44 100%
+            );
+
+        color: #fff;
+
+        border: 0;
+
+        font-size: .74rem;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: .45px;
+
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .staff-page .table-modern tbody td {
+        padding: 12px 13px;
+
+        color: #475569;
+
+        background: #fff;
+
+        border-bottom: 1px solid #edf2f7;
+
+        vertical-align: middle;
+
+        white-space: nowrap;
+    }
+
+    .staff-page .table-modern tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .staff-page .table-modern tbody tr {
+        transition: background-color .18s ease;
+    }
+
+    .staff-page .table-modern tbody tr:hover td {
+        background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       STAFF INFO
+       ========================================================= */
+
+    .staff-page .staff-info {
+        display: flex;
+        align-items: center;
+
+        gap: 9px;
+
+        min-width: 190px;
+    }
+
+    .staff-page .staff-avatar-modern {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+
+        object-fit: cover;
+
+        border-radius: 9px;
+
+        border: 2px solid #fff;
+
+        box-shadow:
+            0 2px 7px rgba(15,23,42,.12);
+    }
+
+    .staff-page .staff-name {
+        max-width: 190px;
+
+        color: var(--sp-dark);
+
+        font-size: .86rem;
+        font-weight: 600;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       BADGES
+       ========================================================= */
+
+    .staff-page .staff-id-badge {
+        display: inline-block;
+
+        padding: 4px 8px;
+
+        border-radius: 6px;
+
+        background: #edf2f7;
+        color: #475569;
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Menlo,
+            Monaco,
+            Consolas,
+            monospace;
+
+        font-size: .72rem;
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+    .staff-page .gender-badge {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+        color: #fff;
+
+        font-size: .76rem;
+        font-weight: 700;
+    }
+
+    .staff-page .gender-male {
+        background:
+            linear-gradient(
+                135deg,
+                #4e73df,
+                #224abe
+            );
+    }
+
+    .staff-page .gender-female {
+        background:
+            linear-gradient(
+                135deg,
+                #e83e8c,
+                #c2185b
+            );
+    }
+
+    .staff-page .job-badge {
+        display: inline-block;
+
+        padding: 4px 9px;
+
+        border-radius: 999px;
+
+        background: #f1f5f9;
+        color: #475569;
+
+        font-size: .72rem;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+    .staff-page .year-badge {
+        display: inline-block;
+
+        padding: 4px 8px;
+
+        border-radius: 6px;
+
+        background: #f1f5f9;
+        color: #475569;
+
+        font-size: .72rem;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       PHONE
+       ========================================================= */
+
+    .staff-page .phone-link {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 5px;
+
+        color: #334155;
+
+        text-decoration: none;
+
+        font-size: .82rem;
+
+        white-space: nowrap;
+    }
+
+    .staff-page .phone-link:hover {
+        color: var(--sp-primary);
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .staff-page .status-badge {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 4px 8px;
+
+        border-radius: 6px;
+
+        font-size: .72rem;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+    .staff-page .status-badge i {
+        font-size: .5rem;
+    }
+
+    .staff-page .status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .staff-page .status-blocked {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .staff-page .action-icons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 5px;
+
+        flex-wrap: nowrap;
+    }
+
+    .staff-page .action-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 0;
+        border-radius: 7px;
+
+        color: #fff;
+
+        text-decoration: none;
+
+        font-size: .8rem;
+
+        cursor: pointer;
+
+        transition:
+            transform .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .staff-page .action-icon:hover {
+        color: #fff;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 9px rgba(15,23,42,.16);
+    }
+
+    .staff-page .action-icon.view {
+        background:
+            linear-gradient(
+                135deg,
+                var(--sp-primary),
+                var(--sp-secondary)
+            );
+    }
+
+    .staff-page .action-icon.warning {
+        background:
+            linear-gradient(
+                135deg,
+                #f6c23e,
+                #f4b619
+            );
+    }
+
+    .staff-page .action-icon.success {
+        background:
+            linear-gradient(
+                135deg,
+                #1cc88a,
+                #13855c
+            );
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .staff-page .empty-state-modern {
+        padding: 45px 20px;
+
+        text-align: center;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fff8e1,
+                #fff3cd
+            );
+
+        border: 2px dashed #f6c23e;
+
+        border-radius: 16px;
+    }
+
+    .staff-page .empty-state-modern i {
+        margin-bottom: 12px;
+
+        color: #f6c23e;
+
+        font-size: 44px;
+    }
+
+    .staff-page .empty-state-modern h6 {
+        margin-bottom: 5px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       MODAL
+       ========================================================= */
+
+    .staff-page .modal-modern .modal-content {
+        border: 0;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 20px 50px rgba(15,23,42,.2);
+    }
+
+    .staff-page .modal-modern .modal-header {
+        padding: 15px 20px;
+
+        color: #fff;
+
+        border: 0;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--sp-primary),
+                var(--sp-secondary)
+            );
+    }
+
+    .staff-page .modal-modern .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .staff-page .modal-modern .modal-body {
+        padding: 20px;
+    }
+
+    .staff-page .modal-modern .modal-footer {
+        padding: 14px 20px;
+
+        border: 0;
+
+        background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .staff-page .form-group-modern {
+        margin-bottom: 14px;
+    }
+
+    .staff-page .form-label-modern {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #334155;
+
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+    .staff-page .form-label-modern .required {
+        color: var(--sp-danger);
+    }
+
+    .staff-page .form-control-modern {
+        width: 100%;
+
+        min-height: 40px;
+
+        padding: 8px 11px;
+
+        border: 1px solid #dbe3ec;
+
+        border-radius: 8px;
+
+        background: #fff;
+        color: #334155;
+
+        font-size: .86rem;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .staff-page .form-control-modern:focus {
+        border-color: var(--sp-primary);
+
+        box-shadow:
+            0 0 0 3px rgba(67,97,238,.10);
+
+        outline: none;
+    }
+
+    .staff-page .text-danger {
+        display: block;
+
+        margin-top: 4px;
+
+        font-size: .75rem;
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 992px) {
+
+        .staff-page .dashboard-container {
+            margin: 18px auto;
+            padding-inline: 15px;
         }
 
-        /* Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .staff-page .card-body-modern {
+            padding: 18px;
+        }
+
+        .staff-page .header-content {
+            align-items: flex-start;
+        }
+
+        .staff-page .action-group {
+            justify-content: flex-end;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .staff-page .dashboard-container {
+            margin: 10px auto;
+            padding-inline: 10px;
+        }
+
+        .staff-page .modern-card {
+            border-radius: 16px;
+        }
+
+        .staff-page .card-header-modern {
+            padding: 15px;
+        }
+
+        .staff-page .header-content {
+            flex-direction: column;
+            align-items: stretch;
+
+            gap: 14px;
+        }
+
+        .staff-page .header-left {
             width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
         }
 
-        .animated-bg::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background:
-                radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
-                radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
-            animation: rotate 60s linear infinite;
+        .staff-page .header-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+
+            border-radius: 10px;
+
+            font-size: 17px;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .staff-page .header-title h3 {
+            font-size: 1rem;
         }
 
-        /* Floating Particles */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .staff-page .header-title p {
+            font-size: .72rem;
+        }
+
+
+        /* -------------------------
+           HEADER BUTTONS
+           ------------------------- */
+
+        .staff-page .action-group {
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
 
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: float 20s infinite;
-        }
+            display: grid;
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(100px, -100px) scale(1.2); }
-            50% { transform: translate(200px, 0) scale(0.8); }
-            75% { transform: translate(100px, 100px) scale(1.1); }
-        }
+            grid-template-columns: 1fr 1fr;
 
-        /* Main Container */
-        .dashboard-container {
-            max-width: 1600px;
-            margin: 30px auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Modern Card */
-        .modern-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Card Header */
-        .card-header-modern {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 20px 25px;
-            position: relative;
-            overflow: visible;
-        }
-
-        .card-header-modern::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-            /* animation: rotate 20s linear infinite; */
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-icon {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .header-title {
-            color: white;
-            margin: 0;
-        }
-
-        .header-title h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .header-title p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Action Buttons */
-        .action-group {
-            display: flex;
             gap: 8px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 100;
         }
 
-        .btn-modern {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            color: white;
-            white-space: nowrap;
-        }
-
-        .btn-export {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-export:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .btn-add {
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        .btn-add:hover {
-            background: rgba(255, 255, 255, 0.35);
-        }
-
-        /* Dropdown */
-        .dropdown-modern {
-            position: relative;
-        }
-
-        .dropdown-modern .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 5px;
-            min-width: 150px;
-            border: none;
-            border-radius: 8px;
-            box-shadow: var(--shadow-lg);
-            padding: 6px;
-            background: white;
-            z-index: 1050;
-        }
-
-        .dropdown-modern .dropdown-item {
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--dark);
-        }
-
-        .dropdown-modern .dropdown-item:hover {
-            background: var(--gradient-1);
-            color: white;
-        }
-
-        /* Stats Card */
-        .stats-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .stat-icon {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            margin-bottom: 2px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        /* Card Body */
-        .card-body-modern {
-            padding: 25px;
-        }
-
-        /* Table Container */
-        .table-container-modern {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        /* Modern Table */
-        .table-modern {
+        .staff-page .dropdown-modern {
             width: 100%;
-            border-collapse: collapse;
         }
 
-        .table-modern thead th {
-            background: linear-gradient(135deg, #2b3d5c 0%, #1a2a44 100%);
-            /* color: white; */
-            font-weight: 600;
-            padding: 12px 12px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: none;
-            white-space: nowrap;
+        .staff-page .dropdown-modern .btn-modern,
+        .staff-page .btn-add {
+            width: 100%;
         }
 
-        .table-modern tbody td {
-            padding: 12px 12px;
-            border-bottom: 1px solid #edf2f7;
-            color: #4a5568;
-            vertical-align: middle;
-            font-size: 0.9rem;
+        .staff-page .btn-modern {
+            min-height: 40px;
+
+            padding: 8px 10px;
+
+            font-size: .78rem;
         }
 
-        .table-modern tbody tr {
-            transition: all 0.2s ease;
+
+        /* -------------------------
+           BODY
+           ------------------------- */
+
+        .staff-page .card-body-modern {
+            padding: 12px;
         }
 
-        .table-modern tbody tr:hover {
-            background: #f7fafc;
+
+        /* -------------------------
+           STATS
+           ------------------------- */
+
+        .staff-page .stats-card {
+            margin-bottom: 12px;
+
+            padding: 10px 12px;
+
+            border-radius: 11px;
         }
 
-        /* Staff Info */
-        .staff-info {
+        .staff-page .stats-card .row {
+            flex-direction: column;
+
+            gap: 4px;
+        }
+
+        .staff-page .stats-card [class*="col-"] {
+            width: 100%;
+
+            flex: 1 1 100%;
+
+            padding-inline: 4px;
+        }
+
+        .staff-page .stat-item {
+            min-height: 36px;
+
+            gap: 8px;
+
+            padding: 2px 0;
+        }
+
+        .staff-page .stat-icon {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+        }
+
+        .staff-page .stat-value {
+            font-size: 1rem;
+        }
+
+        .staff-page .stat-label {
+            font-size: .68rem;
+        }
+
+
+        /* =====================================================
+           IMPORTANT:
+           TABLE → MOBILE CARDS
+           ===================================================== */
+
+        .staff-page .table-container-modern {
+            overflow: visible;
+
+            border: 0;
+
+            background: transparent;
+
+            box-shadow: none;
+        }
+
+        .staff-page .table-modern {
+            display: block;
+
+            width: 100%;
+
+            min-width: 0;
+        }
+
+        .staff-page .table-modern thead {
+            display: none;
+        }
+
+        .staff-page .table-modern tbody {
             display: flex;
-            align-items: center;
+
+            flex-direction: column;
+
             gap: 10px;
         }
 
-        .staff-avatar-modern {
+        .staff-page .table-modern tbody tr {
+            display: grid;
+
+            grid-template-columns: 1fr auto;
+
+            gap: 0;
+
+            padding: 13px;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 13px;
+
+            background: #fff;
+
+            box-shadow:
+                0 3px 10px rgba(15,23,42,.05);
+        }
+
+        .staff-page .table-modern tbody tr:hover td {
+            background: transparent;
+        }
+
+        .staff-page .table-modern tbody td {
+            display: flex;
+            align-items: center;
+
+            min-width: 0;
+
+            padding: 6px 0;
+
+            border: 0;
+
+            background: transparent;
+
+            white-space: normal;
+        }
+
+
+        /* -------------------------
+           Hide row number
+           ------------------------- */
+
+        .staff-page .table-modern tbody td:first-child {
+            position: absolute;
+
+            width: 1px;
+            height: 1px;
+
+            overflow: hidden;
+
+            clip: rect(0, 0, 0, 0);
+        }
+
+
+        /* -------------------------
+           Staff header
+           ------------------------- */
+
+        .staff-page .table-modern tbody td:nth-child(3) {
+            grid-column: 1 / -1;
+
+            padding: 0 0 11px;
+
+            margin-bottom: 6px;
+
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .staff-page .table-modern tbody td:nth-child(3)::before {
+            display: none;
+        }
+
+
+        /* -------------------------
+           Data rows
+           ------------------------- */
+
+        .staff-page .table-modern tbody td:nth-child(2),
+        .staff-page .table-modern tbody td:nth-child(4),
+        .staff-page .table-modern tbody td:nth-child(5),
+        .staff-page .table-modern tbody td:nth-child(6),
+        .staff-page .table-modern tbody td:nth-child(7),
+        .staff-page .table-modern tbody td:nth-child(8) {
+
+            grid-column: 1 / -1;
+
+            justify-content: space-between;
+
+            gap: 12px;
+        }
+
+
+        /* -------------------------
+           Mobile labels
+           ------------------------- */
+
+        .staff-page .table-modern tbody td:nth-child(2)::before {
+            content: "Staff ID";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(4)::before {
+            content: "Gender";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(5)::before {
+            content: "Job Title";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(6)::before {
+            content: "Phone";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(7)::before {
+            content: "Joined";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(8)::before {
+            content: "Status";
+        }
+
+        .staff-page .table-modern tbody td:nth-child(2)::before,
+        .staff-page .table-modern tbody td:nth-child(4)::before,
+        .staff-page .table-modern tbody td:nth-child(5)::before,
+        .staff-page .table-modern tbody td:nth-child(6)::before,
+        .staff-page .table-modern tbody td:nth-child(7)::before,
+        .staff-page .table-modern tbody td:nth-child(8)::before {
+
+            flex: 0 0 auto;
+
+            color: #64748b;
+
+            font-size: .72rem;
+            font-weight: 600;
+        }
+
+
+        /* -------------------------
+           Staff profile
+           ------------------------- */
+
+        .staff-page .staff-info {
+            width: 100%;
+
+            min-width: 0;
+        }
+
+        .staff-page .staff-avatar-modern {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+        }
+
+        .staff-page .staff-name {
+            max-width: none;
+
+            font-size: .88rem;
+        }
+
+
+        /* -------------------------
+           Phone
+           ------------------------- */
+
+        .staff-page .phone-link {
+            max-width: 60%;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: .78rem;
+        }
+
+
+        /* -------------------------
+           Actions
+           ------------------------- */
+
+        .staff-page .table-modern tbody td:last-child {
+            grid-column: 1 / -1;
+
+            justify-content: flex-end;
+
+            margin-top: 8px;
+
+            padding-top: 11px;
+
+            border-top: 1px solid #edf2f7;
+        }
+
+        .staff-page .table-modern tbody td:last-child::before {
+            content: "Actions";
+
+            margin-right: auto;
+
+            color: #64748b;
+
+            font-size: .72rem;
+            font-weight: 600;
+        }
+
+        .staff-page .action-icons {
+            justify-content: flex-end;
+        }
+
+        .staff-page .action-icon {
+            width: 34px;
+            height: 34px;
+
+            min-width: 34px;
+
+            font-size: .8rem;
+        }
+
+
+        /* -------------------------
+           Modal
+           ------------------------- */
+
+        .staff-page .modal-modern .modal-dialog {
+            margin: 10px;
+        }
+
+        .staff-page .modal-modern .modal-content {
+            border-radius: 14px;
+        }
+
+        .staff-page .modal-modern .modal-body {
+            padding: 15px;
+        }
+
+        .staff-page .modal-modern .modal-footer {
+            padding: 12px 15px;
+        }
+
+    }
+
+
+    /* =========================================================
+       SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 480px) {
+
+        .staff-page .dashboard-container {
+            margin: 7px auto;
+
+            padding-inline: 7px;
+        }
+
+        .staff-page .card-header-modern {
+            padding: 13px;
+        }
+
+        .staff-page .card-body-modern {
+            padding: 9px;
+        }
+
+
+        /* Header */
+
+        .staff-page .action-group {
+            grid-template-columns: 1fr;
+        }
+
+
+        /* Stats */
+
+        .staff-page .stats-card {
+            padding: 9px 10px;
+
+            border-radius: 9px;
+
+            margin-bottom: 9px;
+        }
+
+        .staff-page .stat-item {
+            gap: 7px;
+        }
+
+        .staff-page .stat-icon {
+            width: 29px;
+            height: 29px;
+            min-width: 29px;
+
+            font-size: 12px;
+        }
+
+        .staff-page .stat-value {
+            font-size: .92rem;
+        }
+
+        .staff-page .stat-label {
+            font-size: .62rem;
+        }
+
+
+        /* Cards */
+
+        .staff-page .table-modern tbody tr {
+            padding: 11px;
+
+            border-radius: 12px;
+        }
+
+        .staff-page .staff-avatar-modern {
+            width: 38px;
+            height: 38px;
+
+            min-width: 38px;
+        }
+
+        .staff-page .staff-name {
+            font-size: .82rem;
+        }
+
+        .staff-page .phone-link {
+            max-width: 55%;
+        }
+
+
+        /* Modal */
+
+        .staff-page .modal-modern .modal-dialog {
+            margin: 6px;
+        }
+
+        .staff-page .modal-modern .modal-content {
+            border-radius: 11px;
+        }
+
+        .staff-page .modal-modern .modal-header {
+            padding: 12px;
+        }
+
+        .staff-page .modal-modern .modal-body {
+            padding: 12px;
+        }
+
+        .staff-page .modal-modern .modal-footer {
+            padding: 10px 12px;
+
+            flex-direction: column;
+        }
+
+        .staff-page .modal-modern .modal-footer .btn {
+            width: 100%;
+        }
+
+        .staff-page .form-group-modern {
+            margin-bottom: 10px;
+        }
+
+        .staff-page .form-control-modern {
+            min-height: 44px;
+
+            font-size: 16px;
+        }
+
+        .staff-page .empty-state-modern {
+            padding: 25px 14px;
+        }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 360px) {
+
+        .staff-page .dashboard-container {
+            margin: 5px auto;
+
+            padding-inline: 5px;
+        }
+
+        .staff-page .card-header-modern {
+            padding: 10px;
+        }
+
+        .staff-page .card-body-modern {
+            padding: 7px;
+        }
+
+        .staff-page .header-icon {
             width: 36px;
             height: 36px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 2px solid white;
-            box-shadow: var(--shadow-sm);
+            min-width: 36px;
+
+            font-size: 15px;
         }
 
-        .staff-name {
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 0.9rem;
+        .staff-page .header-title h3 {
+            font-size: .92rem;
         }
 
-        /* Staff ID Badge */
-        .staff-id-badge {
-            background: #edf2f7;
-            color: #4a5568;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: monospace;
-            display: inline-block;
-            white-space: nowrap;
+        .staff-page .header-title p {
+            font-size: .65rem;
         }
 
-        /* Gender Badge */
-        .gender-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
+        .staff-page .stats-card {
+            padding: 7px 8px;
         }
 
-        .gender-male {
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        .staff-page .stat-icon {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
         }
 
-        .gender-female {
-            background: linear-gradient(135deg, #e83e8c 0%, #c2185b 100%);
+        .staff-page .stat-value {
+            font-size: .82rem;
         }
 
-        /* Job Title Badge */
-        .job-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.75rem;
-            display: inline-block;
-            white-space: nowrap;
-            background: #e9ecef;
-            color: #495057;
+        .staff-page .stat-label {
+            font-size: .55rem;
         }
 
-        /* Phone Link */
-        .phone-link {
-            color: var(--dark);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
-            white-space: nowrap;
+        .staff-page .table-modern tbody tr {
+            padding: 9px;
         }
 
-        /* Year Badge */
-        .year-badge {
-            background: #e9ecef;
-            color: #495057;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: inline-block;
-            white-space: nowrap;
+        .staff-page .staff-avatar-modern {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
         }
 
-        /* Status Badge */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
+        .staff-page .staff-name {
+            font-size: .76rem;
         }
 
-        .status-active {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status-blocked {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        /* Action Icons */
-        .action-icons {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            flex-wrap: nowrap;
-        }
-
-        .action-icon {
+        .staff-page .action-icon {
             width: 30px;
             height: 30px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            min-width: 30px;
+
+            font-size: .7rem;
         }
 
-        .action-icon.view {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .staff-page .animated-bg::before {
+            animation: none;
         }
 
-        .action-icon.warning {
-            background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
+        .staff-page *,
+        .staff-page *::before,
+        .staff-page *::after {
+
+            transition-duration: .01ms !important;
+
+            animation-duration: .01ms !important;
+
+            animation-iteration-count: 1 !important;
+
+            scroll-behavior: auto !important;
         }
 
-        .action-icon.success {
-            background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
-        }
+    }
+</style>
 
-        .action-icon.danger {
-            background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
-        }
 
-        .action-icon:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Empty State */
-        .empty-state-modern {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
-            border-radius: 16px;
-            border: 2px dashed #ffc107;
-        }
-
-        .empty-state-modern i {
-            font-size: 50px;
-            color: #ffc107;
-            margin-bottom: 15px;
-        }
-
-        /* Modal Styles */
-        .modal-modern .modal-content {
-            border-radius: 20px;
-            border: none;
-            overflow: hidden;
-        }
-
-        .modal-modern .modal-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-        }
-
-        .modal-modern .modal-body {
-            padding: 20px;
-        }
-
-        .modal-modern .modal-footer {
-            border: none;
-            padding: 15px 20px;
-            background: #f8f9fa;
-        }
-
-        /* Form Controls - Compact */
-        .form-group-modern {
-            margin-bottom: 15px;
-        }
-
-        .form-label-modern {
-            font-weight: 500;
-            color: var(--dark);
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-        }
-
-        .form-label-modern .required {
-            color: var(--danger);
-        }
-
-        .form-control-modern {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .form-control-modern:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-            outline: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .table-modern {
-                display: block;
-                overflow-x: auto;
-            }
-
-            .action-icons {
-                justify-content: flex-start;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .action-group {
-                justify-content: stretch;
-            }
-
-            .btn-modern {
-                flex: 1;
-                justify-content: center;
-            }
-
-            .dropdown-modern .dropdown-menu {
-                right: auto;
-                left: 0;
-            }
-
-            .stat-item {
-                margin-bottom: 15px;
-            }
-        }
-
-        /* Dark Mode */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
-            }
-
-            .modern-card {
-                background: rgba(33, 37, 41, 0.95);
-            }
-
-            .table-modern tbody td {
-                color: #e9ecef;
-                border-bottom-color: #495057;
-            }
-
-            .table-modern tbody tr:hover {
-                background: #343a40;
-            }
-
-            .staff-name {
-                color: #e9ecef;
-            }
-
-            .staff-id-badge {
-                background: #495057;
-                color: #e9ecef;
-            }
-
-            .job-badge {
-                background: #495057;
-                color: #e9ecef;
-            }
-
-            .year-badge {
-                background: #495057;
-                color: #e9ecef;
-            }
-
-            .status-active {
-                background: #22543d;
-                color: #c6f6d5;
-            }
-
-            .status-blocked {
-                background: #742a2a;
-                color: #fed7d7;
-            }
-
-            .form-control-modern {
-                background: #2b3035;
-                border-color: #495057;
-                color: #e9ecef;
-            }
-        }
-    </style>
+<div class="staff-page">
 
     <div class="animated-bg"></div>
-    <div class="particles"></div>
-    <div class="loading-spinner" id="loadingSpinner"></div>
+
 
     <div class="dashboard-container">
+
         <div class="modern-card">
-            <!-- Header -->
+
+
+            {{-- =====================================================
+                 HEADER
+                 ===================================================== --}}
+
             <div class="card-header-modern">
+
                 <div class="header-content">
+
                     <div class="header-left">
+
                         <div class="header-icon">
                             <i class="fas fa-users-cog"></i>
                         </div>
+
                         <div class="header-title">
-                            <h3>Staff Management</h3>
-                        </div>
-                    </div>
-                    <div class="action-group">
-                        <!-- Export Dropdown -->
-                        <div class="dropdown dropdown-modern">
-                            <button class="btn-modern btn-export dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-download"></i>
-                                <span>Export</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'excel'])}}">
-                                        <i class="fas fa-file-excel text-success"></i> Excel
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'pdf'])}}" target="">
-                                        <i class="fas fa-file-pdf text-danger"></i> PDF
-                                    </a>
-                                </li>
-                            </ul>
+
+                            <h3>
+                                Staff Management
+                            </h3>
+
+                            <p>
+                                Manage non-teaching staff and their accounts
+                            </p>
+
                         </div>
 
-                        <!-- Register Button -->
-                        <button type="button" class="btn-modern btn-add" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Register Staff</span>
-                        </button>
                     </div>
+
+
+                    <div class="action-group">
+
+
+                        {{-- Export --}}
+                        <div class="dropdown dropdown-modern">
+
+                            <button
+                                class="btn-modern btn-export dropdown-toggle"
+                                type="button"
+                                id="exportDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+
+                                <i class="fas fa-download"></i>
+
+                                <span>
+                                    Export
+                                </span>
+
+                            </button>
+
+
+                            <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="exportDropdown"
+                            >
+
+                                <li>
+
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ route(
+                                            'export.other.staffs',
+                                            ['format' => 'excel']
+                                        ) }}"
+                                    >
+
+                                        <i class="fas fa-file-excel text-success"></i>
+
+                                        <span>
+                                            Excel
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+
+                                <li>
+
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ route(
+                                            'export.other.staffs',
+                                            ['format' => 'pdf']
+                                        ) }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+
+                                        <i class="fas fa-file-pdf text-danger"></i>
+
+                                        <span>
+                                            PDF
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+
+                        {{-- Register --}}
+                        <button
+                            type="button"
+                            class="btn-modern btn-add"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addStaffModal"
+                        >
+
+                            <i class="fas fa-user-plus"></i>
+
+                            <span>
+                                Register Staff
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </div>
+
             </div>
 
-            <!-- Body -->
+
+            {{-- =====================================================
+                 BODY
+                 ===================================================== --}}
+
             <div class="card-body-modern">
-                <!-- Statistics Cards -->
+
+
+                {{-- =================================================
+                     STATISTICS
+                     ================================================= --}}
+
                 <div class="stats-card">
+
                     <div class="row">
+
+
+                        {{-- Total --}}
                         <div class="col-md-4">
+
                             <div class="stat-item">
+
                                 <div class="stat-icon">
                                     <i class="fas fa-users"></i>
                                 </div>
+
                                 <div>
-                                    <div class="stat-label">Total Staff</div>
-                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => $s->status === 1)->count() }}</div>
+
+                                    <div class="stat-label">
+                                        Total Staff
+                                    </div>
+
+                                    <div class="stat-value">
+                                        {{
+                                            $combinedStaffs
+                                                ->filter(fn($s) => $s->status === 1)
+                                                ->count()
+                                        }}
+                                    </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
+                        {{-- Male --}}
                         <div class="col-md-4">
+
                             <div class="stat-item">
+
                                 <div class="stat-icon">
                                     <i class="fas fa-male"></i>
                                 </div>
+
                                 <div>
-                                    <div class="stat-label">Male</div>
-                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'male' && $s->status == 1)->count() }}</div>
+
+                                    <div class="stat-label">
+                                        Male
+                                    </div>
+
+                                    <div class="stat-value">
+                                        {{
+                                            $combinedStaffs
+                                                ->filter(
+                                                    fn($s) =>
+                                                        strtolower($s->gender) === 'male'
+                                                        && $s->status == 1
+                                                )
+                                                ->count()
+                                        }}
+                                    </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
+                        {{-- Female --}}
                         <div class="col-md-4">
+
                             <div class="stat-item">
+
                                 <div class="stat-icon">
                                     <i class="fas fa-female"></i>
                                 </div>
+
                                 <div>
-                                    <div class="stat-label">Female</div>
-                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'female' && $s->status == 1)->count() }}</div>
+
+                                    <div class="stat-label">
+                                        Female
+                                    </div>
+
+                                    <div class="stat-value">
+                                        {{
+                                            $combinedStaffs
+                                                ->filter(
+                                                    fn($s) =>
+                                                        strtolower($s->gender) === 'female'
+                                                        && $s->status == 1
+                                                )
+                                                ->count()
+                                        }}
+                                    </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
+
+                {{-- =================================================
+                     EMPTY STATE
+                     ================================================= --}}
 
                 @if ($combinedStaffs->isEmpty())
+
                     <div class="empty-state-modern">
+
                         <i class="fas fa-users-cog"></i>
-                        <h6>No Staff Found</h6>
-                        <p class="text-muted small">Click "Register Staff" to add your first staff member</p>
+
+                        <h6>
+                            No Staff Found
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+                            Click "Register Staff" to add your first staff member.
+                        </p>
+
                     </div>
+
+
                 @else
+
+
+                    {{-- =================================================
+                         STAFF TABLE
+                         ================================================= --}}
+
                     <div class="table-container-modern">
-                        <table class="table-modern" id="myTable">
+
+                        <table
+                            class="table-modern"
+                            id="myTable"
+                        >
+
                             <thead>
+
                                 <tr>
-                                    <th class="text-white">#</th>
-                                    <th>Staff ID</th>
-                                    <th>Staff</th>
-                                    <th>Gender</th>
-                                    <th>Job Title</th>
-                                    <th>Phone</th>
-                                    <th>Joined</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Actions</th>
+
+                                    <th>#</th>
+
+                                    <th>
+                                        Staff ID
+                                    </th>
+
+                                    <th>
+                                        Staff
+                                    </th>
+
+                                    <th>
+                                        Gender
+                                    </th>
+
+                                    <th>
+                                        Job Title
+                                    </th>
+
+                                    <th>
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Joined
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th class="text-end">
+                                        Actions
+                                    </th>
+
                                 </tr>
+
                             </thead>
+
+
                             <tbody>
+
                                 @foreach ($combinedStaffs as $row)
+
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+
+
+                                        {{-- Number --}}
                                         <td>
-                                            <span class="staff-id-badge">{{ strtoupper($row->staff_id ?? 'N/A') }}</span>
+
+                                            <span class="fw-bold">
+                                                {{ $loop->iteration }}
+                                            </span>
+
                                         </td>
+
+
+                                        {{-- Staff ID --}}
                                         <td>
+
+                                            <span class="staff-id-badge">
+                                                {{
+                                                    strtoupper(
+                                                        $row->staff_id ?? 'N/A'
+                                                    )
+                                                }}
+                                            </span>
+
+                                        </td>
+
+
+                                        {{-- Staff --}}
+                                        <td>
+
                                             <div class="staff-info">
+
+
                                                 @php
-                                                    $imageName = $row->profile_image;
-                                                    $imagePath = storage_path('app/public/profile/' . $imageName);
-                                                    $avatarImage = (!empty($imageName) && file_exists($imagePath))
-                                                        ? asset('storage/profile/' . $imageName)
-                                                        : asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+
+                                                    $imageName =
+                                                        $row->profile_image;
+
+                                                    $imagePath =
+                                                        storage_path(
+                                                            'app/public/profile/' .
+                                                            $imageName
+                                                        );
+
+                                                    $avatarImage =
+                                                        !empty($imageName)
+                                                        && file_exists($imagePath)
+
+                                                            ? asset(
+                                                                'storage/profile/' .
+                                                                $imageName
+                                                            )
+
+                                                            : asset(
+                                                                'storage/profile/' .
+                                                                (
+                                                                    $row->gender === 'male'
+                                                                        ? 'avatar.jpg'
+                                                                        : 'avatar-female.jpg'
+                                                                )
+                                                            );
+
                                                 @endphp
-                                                <img src="{{ $avatarImage }}" alt="Avatar" class="staff-avatar-modern">
+
+
+                                                <img
+                                                    src="{{ $avatarImage }}"
+                                                    alt="Staff profile"
+                                                    class="staff-avatar-modern"
+                                                    loading="lazy"
+                                                >
+
+
                                                 @if (isset($row->driver_name))
-                                                    <span class="staff-name">{{ ucwords(strtolower($row->driver_name)) }}</span>
+
+                                                    <span class="staff-name">
+                                                        {{
+                                                            ucwords(
+                                                                strtolower(
+                                                                    $row->driver_name
+                                                                )
+                                                            )
+                                                        }}
+                                                    </span>
+
                                                 @else
-                                                    <span class="staff-name">{{ ucwords(strtolower($row->first_name . ' ' . $row->last_name)) }}</span>
+
+                                                    <span class="staff-name">
+                                                        {{
+                                                            ucwords(
+                                                                strtolower(
+                                                                    $row->first_name .
+                                                                    ' ' .
+                                                                    $row->last_name
+                                                                )
+                                                            )
+                                                        }}
+                                                    </span>
+
                                                 @endif
+
                                             </div>
+
                                         </td>
+
+
+                                        {{-- Gender --}}
                                         <td>
-                                            <div class="gender-badge {{ $row->gender == 'male' ? 'gender-male' : 'gender-female' }}">
-                                                {{ strtoupper(substr($row->gender, 0, 1)) }}
+
+                                            <div
+                                                class="gender-badge {{
+                                                    $row->gender === 'male'
+                                                        ? 'gender-male'
+                                                        : 'gender-female'
+                                                }}"
+                                                title="{{ ucfirst($row->gender) }}"
+                                            >
+
+                                                {{
+                                                    strtoupper(
+                                                        substr(
+                                                            $row->gender,
+                                                            0,
+                                                            1
+                                                        )
+                                                    )
+                                                }}
+
                                             </div>
+
                                         </td>
+
+
+                                        {{-- Job --}}
                                         <td>
-                                            <span class="job-badge">{{ $row->job_title ?? 'N/A' }}</span>
+
+                                            <span class="job-badge">
+                                                {{ $row->job_title ?? 'N/A' }}
+                                            </span>
+
                                         </td>
+
+
+                                        {{-- Phone --}}
                                         <td>
-                                            <a href="tel:{{ $row->phone }}" class="phone-link">
+
+                                            <a
+                                                href="tel:{{ $row->phone }}"
+                                                class="phone-link"
+                                            >
+
                                                 <i class="fas fa-phone-alt"></i>
-                                                {{ $row->phone }}
+
+                                                <span>
+                                                    {{ $row->phone }}
+                                                </span>
+
                                             </a>
+
                                         </td>
+
+
+                                        {{-- Joined --}}
                                         <td>
-                                            <span class="year-badge">{{ $row->joining_year ?? 'N/A' }}</span>
+
+                                            <span class="year-badge">
+                                                {{
+                                                    $row->joining_year ?? 'N/A'
+                                                }}
+                                            </span>
+
                                         </td>
+
+
+                                        {{-- Status --}}
                                         <td>
+
                                             @if ($row->status == 1)
+
                                                 <span class="status-badge status-active">
-                                                    <i class="fas fa-circle"></i> Active
+
+                                                    <i class="fas fa-circle"></i>
+
+                                                    Active
+
                                                 </span>
+
                                             @else
+
                                                 <span class="status-badge status-blocked">
-                                                    <i class="fas fa-circle"></i> Blocked
+
+                                                    <i class="fas fa-circle"></i>
+
+                                                    Blocked
+
                                                 </span>
+
                                             @endif
+
                                         </td>
+
+
+                                        {{-- Actions --}}
                                         <td>
+
                                             <div class="action-icons">
-                                                <a href="{{ route('OtherStaffs.profile', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
-                                                   class="action-icon view"
-                                                   title="View Profile">
+
+
+                                                {{-- View --}}
+                                                <a
+                                                    href="{{ route(
+                                                        'OtherStaffs.profile',
+                                                        [
+                                                            'type' => $row->job_title,
+                                                            'id' => Hashids::encode($row->id)
+                                                        ]
+                                                    ) }}"
+                                                    class="action-icon view"
+                                                    title="View Profile"
+                                                    aria-label="View Profile"
+                                                >
+
                                                     <i class="fas fa-eye"></i>
+
                                                 </a>
 
+
+                                                {{-- Block / Unblock --}}
                                                 @if ($row->status == 1)
-                                                    <form action="{{ route('block.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
-                                                          method="POST"
-                                                          class="d-inline">
+
+                                                    <form
+                                                        action="{{ route(
+                                                            'block.other.staffs',
+                                                            [
+                                                                'type' => $row->job_title,
+                                                                'id' => Hashids::encode($row->id)
+                                                            ]
+                                                        ) }}"
+                                                        method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Block this staff member?')"
+                                                    >
+
                                                         @csrf
+
                                                         @method('PUT')
-                                                        <button type="submit" onclick="return confirm('Block {{ $row->first_name ?? $row->driver_name }}?')" class="action-icon warning" title="Block">
+
+                                                        <button
+                                                            type="submit"
+                                                            class="action-icon warning"
+                                                            title="Block Staff"
+                                                            aria-label="Block Staff"
+                                                        >
+
                                                             <i class="fas fa-ban"></i>
+
                                                         </button>
+
                                                     </form>
+
+
                                                 @else
-                                                    <form action="{{ route('unblock.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
-                                                          method="POST"
-                                                          class="d-inline">
+
+                                                    <form
+                                                        action="{{ route(
+                                                            'unblock.other.staffs',
+                                                            [
+                                                                'type' => $row->job_title,
+                                                                'id' => Hashids::encode($row->id)
+                                                            ]
+                                                        ) }}"
+                                                        method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Unblock this staff member?')"
+                                                    >
+
                                                         @csrf
+
                                                         @method('PUT')
-                                                        <button type="submit" onclick="return confirm('Unblock {{ $row->first_name ?? $row->driver_name }}?')" class="action-icon success" title="Unblock">
+
+                                                        <button
+                                                            type="submit"
+                                                            class="action-icon success"
+                                                            title="Unblock Staff"
+                                                            aria-label="Unblock Staff"
+                                                        >
+
                                                             <i class="fas fa-check"></i>
+
                                                         </button>
+
                                                     </form>
+
                                                 @endif
+
                                             </div>
+
                                         </td>
+
                                     </tr>
+
                                 @endforeach
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 @endif
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- Register Staff Modal -->
-    <div class="modal fade modal-modern" id="addTeacherModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+
+    {{-- =========================================================
+         REGISTER STAFF MODAL
+         ========================================================= --}}
+
+    <div
+        class="modal fade modal-modern"
+        id="addStaffModal"
+        tabindex="-1"
+        aria-labelledby="addStaffModalLabel"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
             <div class="modal-content">
+
+
+                {{-- Header --}}
                 <div class="modal-header">
-                    <h5 class="modal-title">Staff Registration Form</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+                    <h5
+                        class="modal-title"
+                        id="addStaffModalLabel"
+                    >
+                        Staff Registration Form
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+
                 </div>
-                <form class="needs-validation" novalidate action="{{ route('OtherStaffs.store') }}" method="POST" enctype="multipart/form-data">
+
+
+                <form
+                    class="needs-validation"
+                    novalidate
+                    action="{{ route('OtherStaffs.store') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
                     @csrf
+
+
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">First Name <span class="required">*</span></label>
-                                    <input type="text" name="fname" class="form-control-modern" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Other Names <span class="required">*</span></label>
-                                    <input type="text" name="lname" class="form-control-modern" required>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
+                        <div class="row g-2">
+
+
+                            {{-- First Name --}}
                             <div class="col-md-6">
+
                                 <div class="form-group-modern">
-                                    <label class="form-label-modern">Email</label>
-                                    <input type="email" name="email" class="form-control-modern">
+
+                                    <label class="form-label-modern">
+
+                                        First Name
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="hidden"
+                                        name="school"
+                                        value="{{ Hashids::encode($user->school_id) }}"
+                                    >
+
+
+                                    <input
+                                        type="text"
+                                        name="fname"
+                                        class="form-control-modern"
+                                        value="{{ old('fname') }}"
+                                        autocomplete="given-name"
+                                        required
+                                    >
+
+
+                                    @error('fname')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+
+                                    @error('school')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
                                 </div>
+
                             </div>
+
+
+                            {{-- Other Names --}}
                             <div class="col-md-6">
+
                                 <div class="form-group-modern">
-                                    <label class="form-label-modern">Gender <span class="required">*</span></label>
-                                    <select name="gender" class="form-control-modern" required>
-                                        <option value="">Select</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
+
+                                    <label class="form-label-modern">
+
+                                        Other Names
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        name="lname"
+                                        class="form-control-modern"
+                                        value="{{ old('lname') }}"
+                                        autocomplete="family-name"
+                                        required
+                                    >
+
+
+                                    @error('lname')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Email --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+                                        Email
+                                    </label>
+
+
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        class="form-control-modern"
+                                        value="{{ old('email') }}"
+                                        autocomplete="email"
+                                    >
+
+
+                                    @error('email')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Gender --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+
+                                        Gender
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        name="gender"
+                                        class="form-control-modern"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        <option
+                                            value="male"
+                                            @selected(old('gender') === 'male')
+                                        >
+                                            Male
+                                        </option>
+
+                                        <option
+                                            value="female"
+                                            @selected(old('gender') === 'female')
+                                        >
+                                            Female
+                                        </option>
+
                                     </select>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Phone <span class="required">*</span></label>
-                                    <input type="text" name="phone" class="form-control-modern" required>
+
+                                    @error('gender')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
                                 </div>
+
                             </div>
+
+
+                            {{-- Phone --}}
                             <div class="col-md-6">
+
                                 <div class="form-group-modern">
-                                    <label class="form-label-modern">Education Level <span class="required">*</span></label>
-                                    <select name="education" class="form-control-modern" required>
-                                        <option value="">Select</option>
-                                        <option value="university">University</option>
-                                        <option value="college">College</option>
-                                        <option value="high_school">High school</option>
-                                        <option value="secondary">Secondary school</option>
-                                        <option value="primary">Primary school</option>
-                                        <option value="other">Other</option>
+
+                                    <label class="form-label-modern">
+
+                                        Phone
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        class="form-control-modern"
+                                        value="{{ old('phone') }}"
+                                        autocomplete="tel"
+                                        required
+                                    >
+
+
+                                    @error('phone')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Education --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+
+                                        Education Level
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        name="education"
+                                        class="form-control-modern"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        <option value="university">
+                                            University
+                                        </option>
+
+                                        <option value="college">
+                                            College
+                                        </option>
+
+                                        <option value="high_school">
+                                            High school
+                                        </option>
+
+                                        <option value="secondary">
+                                            Secondary school
+                                        </option>
+
+                                        <option value="primary">
+                                            Primary school
+                                        </option>
+
+                                        <option value="other">
+                                            Other
+                                        </option>
+
                                     </select>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Date of Birth <span class="required">*</span></label>
-                                    <input type="date" name="dob" class="form-control-modern" required>
+
+                                    @error('education')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
                                 </div>
+
                             </div>
+
+
+                            {{-- DOB --}}
                             <div class="col-md-6">
+
                                 <div class="form-group-modern">
-                                    <label class="form-label-modern">Year Joined <span class="required">*</span></label>
-                                    <select name="joined" class="form-control-modern" required>
-                                        <option value="">Select</option>
-                                        @for ($year = date('Y'); $year >= 2010; $year--)
-                                            <option value="{{ $year }}">{{ $year }}</option>
+
+                                    <label class="form-label-modern">
+
+                                        Date of Birth
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="date"
+                                        name="dob"
+                                        class="form-control-modern"
+                                        value="{{ old('dob') }}"
+                                        required
+                                    >
+
+
+                                    @error('dob')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Joined --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+
+                                        Year Joined
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        name="joined"
+                                        class="form-control-modern"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        @for (
+                                            $year = date('Y');
+                                            $year >= 2010;
+                                            $year--
+                                        )
+
+                                            <option
+                                                value="{{ $year }}"
+                                                @selected(old('joined') == $year)
+                                            >
+                                                {{ $year }}
+                                            </option>
+
                                         @endfor
+
                                     </select>
+
+
+                                    @error('joined')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
                                 </div>
+
                             </div>
+
+
+                            {{-- Street --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+
+                                        Street / Village
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        name="street"
+                                        class="form-control-modern"
+                                        value="{{ old('street') }}"
+                                        autocomplete="street-address"
+                                        required
+                                    >
+
+
+                                    @error('street')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Job Title --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+
+                                        Job Title
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        name="job_title"
+                                        class="form-control-modern"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        <option value="cooks">
+                                            Cooks
+                                        </option>
+
+                                        <option value="matron">
+                                            Matron
+                                        </option>
+
+                                        <option value="patron">
+                                            Patron
+                                        </option>
+
+                                        <option value="cleaner">
+                                            Cleaner
+                                        </option>
+
+                                        <option value="security guard">
+                                            Security Guard
+                                        </option>
+
+                                        <option value="other">
+                                            Other
+                                        </option>
+
+                                    </select>
+
+
+                                    @error('job_title')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- NIN --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+                                        NIN (NIDA)
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        name="nida"
+                                        class="form-control-modern"
+                                        id="nin"
+                                        value="{{ old('nida') }}"
+                                        maxlength="23"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        placeholder="Enter NIDA"
+                                    >
+
+
+                                    @error('nida')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Profile --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label class="form-label-modern">
+                                        Profile Picture
+                                    </label>
+
+
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        class="form-control-modern"
+                                        accept="image/*"
+                                    >
+
+
+                                    @error('image')
+
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Street/Village <span class="required">*</span></label>
-                                    <input type="text" name="street" class="form-control-modern" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Job Title <span class="required">*</span></label>
-                                    <select name="job_title" class="form-control-modern" required>
-                                        <option value="">Select</option>
-                                        <option value="cooks">Cooks</option>
-                                        <option value="matron">Matron</option>
-                                        <option value="patron">Patron</option>
-                                        <option value="cleaner">Cleaner</option>
-                                        <option value="security guard">Security guard</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">NIN (NIDA)</label>
-                                    <input type="text" name="nida" class="form-control-modern" id="nin" maxlength="23" placeholder="Enter NIDA">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Profile Picture</label>
-                                    <input type="file" name="image" class="form-control-modern">
-                                </div>
-                            </div>
-                        </div>
                     </div>
+
+
+                    {{-- Footer --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" id="saveButton">Save Staff</button>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                            id="saveButton"
+                        >
+                            Save Staff
+                        </button>
+
                     </div>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Form handling
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton");
+</div>
 
-            if (form && submitButton) {
-                form.addEventListener("submit", function(event) {
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /*
+         * =====================================================
+         * STAFF REGISTRATION FORM
+         * =====================================================
+         */
+
+        const form = document.querySelector(
+            '#addStaffModal .needs-validation'
+        );
+
+        const submitButton = document.getElementById(
+            'saveButton'
+        );
+
+
+        if (form && submitButton) {
+
+            form.addEventListener('submit', function (event) {
+
+                if (!form.checkValidity()) {
+
                     event.preventDefault();
+                    event.stopPropagation();
 
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = 'Saving...';
+                    form.classList.add('was-validated');
 
-                    if (!form.checkValidity()) {
-                        form.classList.add("was-validated");
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = 'Save';
-                        return;
-                    }
+                    return;
+                }
 
-                    setTimeout(() => {
-                        form.submit();
-                    }, 500);
-                });
-            }
 
-            // NIN formatting
-            document.getElementById('nin').addEventListener('input', function (e) {
-                let value = e.target.value.replace(/[^0-9]/g, '');
+                /*
+                 * Prevent duplicate submissions.
+                 */
+
+                submitButton.disabled = true;
+
+                submitButton.innerHTML = `
+                    <span
+                        class="spinner-border spinner-border-sm me-1"
+                        role="status"
+                        aria-hidden="true"
+                    ></span>
+                    Saving...
+                `;
+
+            });
+
+        }
+
+
+        /*
+         * =====================================================
+         * NIN FORMATTER
+         *
+         * Format:
+         * 12345678-12345-12345-12
+         * =====================================================
+         */
+
+        const ninInput = document.getElementById('nin');
+
+
+        if (ninInput) {
+
+            ninInput.addEventListener('input', function (event) {
+
+                let value = event.target.value
+                    .replace(/\D/g, '')
+                    .substring(0, 20);
+
+
                 let formatted = '';
+
 
                 if (value.length > 0) {
                     formatted += value.substring(0, 8);
                 }
+
+
                 if (value.length >= 8) {
                     formatted += '-';
                 }
+
+
                 if (value.length > 8) {
                     formatted += value.substring(8, 13);
                 }
+
+
                 if (value.length >= 13) {
                     formatted += '-';
                 }
+
+
                 if (value.length > 13) {
                     formatted += value.substring(13, 18);
                 }
+
+
                 if (value.length >= 18) {
                     formatted += '-';
                 }
+
+
                 if (value.length > 18) {
                     formatted += value.substring(18, 20);
                 }
 
-                e.target.value = formatted;
+
+                event.target.value = formatted;
+
             });
-        });
-    </script>
+
+        }
+
+    });
+</script>
+
 @endsection

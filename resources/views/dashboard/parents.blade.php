@@ -412,24 +412,241 @@
     .student-item {
         animation: fadeIn 0.3s ease-out;
     }
-</style>
 
+    /* =========================================================
+        GLOBAL DASHBOARD GREETING
+        ========================================================= */
+
+        .dashboard-greeting {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(78, 115, 223, 0.98) 0%,
+                    rgba(111, 66, 193, 0.96) 100%
+                );
+            box-shadow:
+                0 12px 30px rgba(78, 115, 223, 0.16);
+            color: #fff;
+        }
+
+        .dashboard-greeting::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: -120px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .dashboard-greeting::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            bottom: -100px;
+            left: 35%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .greeting-content {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 18px;
+            padding: 20px 24px;
+        }
+
+        .greeting-icon {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+
+            font-size: 22px;
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .greeting-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .greeting-message {
+            margin-bottom: 4px;
+
+            font-size: clamp(1.15rem, 2vw, 1.55rem);
+            font-weight: 800;
+
+            line-height: 1.25;
+            letter-spacing: -0.2px;
+        }
+
+        .greeting-subtitle {
+            color: rgba(255, 255, 255, 0.78);
+
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .greeting-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            white-space: nowrap;
+
+            padding: 8px 12px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+
+            color: rgba(255, 255, 255, 0.9);
+
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .greeting-time i {
+            font-size: 0.8rem;
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+            .greeting-content {
+                padding: 17px;
+                gap: 13px;
+            }
+
+            .greeting-icon {
+                width: 45px;
+                height: 45px;
+                min-width: 45px;
+                border-radius: 12px;
+                font-size: 18px;
+            }
+
+            .greeting-message {
+                font-size: 1.1rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.75rem;
+            }
+
+            .greeting-time {
+                padding: 7px 9px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 576px) {
+            .dashboard-greeting {
+                border-radius: 14px;
+            }
+
+            .greeting-content {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                padding: 15px;
+                gap: 11px;
+            }
+
+            .greeting-icon {
+                width: 42px;
+                height: 42px;
+                min-width: 42px;
+            }
+
+            .greeting-message {
+                font-size: 1rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .greeting-time {
+                grid-column: 1 / -1;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Very small devices */
+        @media (max-width: 360px) {
+            .greeting-content {
+                padding: 12px;
+            }
+
+            .greeting-message {
+                font-size: 0.92rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.66rem;
+            }
+        }
+</style>
+    @php
+        $currentUser = Auth::user();
+
+        $currentHour = now()->hour;
+
+        $greeting = match (true) {
+            $currentHour < 12 => 'Good Morning',
+            $currentHour < 18 => 'Good Afternoon',
+            default => 'Good Evening',
+        };
+
+        $firstName = ucwords(strtolower(trim($currentUser->first_name)));
+    @endphp
 <!-- Simple Loading Bar -->
 <div class="loading-bar" id="topLoadingBar"></div>
 
 <div class="container-fluid px-3 px-md-4 py-3 py-md-4">
     <!-- Welcome Header - Fixed Contrast -->
-    <div class="welcome-header">
-        <div class="row align-items-center">
-            <div class="col-12">
-                <h2>
-                    <i class="fas fa-smile-wink me-2"></i>
-                    Welcome, {{ ucwords(strtolower(Auth::user()->first_name)) }}!
-                </h2>
-                <p class="text-warning">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Select a student below to view their academic progress, attendance, reports, and more.
-                </p>
+    <div class="dashboard-greeting mb-4">
+        <div class="greeting-content">
+            <div class="greeting-icon">
+                <i class="fas fa-sun"></i>
+            </div>
+
+            <div class="greeting-text">
+                <div class="greeting-message">
+                    {{ $greeting }}, {{ $firstName }}
+                </div>
+
+                <div class="greeting-subtitle">
+                    Welcome back. Here's what's happening in your dashboard today.
+                </div>
+            </div>
+
+            <div class="greeting-time">
+                <i class="far fa-clock"></i>
+                <span id="dashboardCurrentTime"></span>
             </div>
         </div>
     </div>
@@ -544,6 +761,28 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const clockElement = document.getElementById('dashboardCurrentTime');
+
+            if (!clockElement) {
+                return;
+            }
+
+            function updateDashboardClock() {
+                const now = new Date();
+
+                const time = now.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+
+                clockElement.textContent = time;
+            }
+
+            updateDashboardClock();
+
+            setInterval(updateDashboardClock, 1000);
         // Simple loading bar for navigation
         const loadingBar = document.getElementById('topLoadingBar');
 

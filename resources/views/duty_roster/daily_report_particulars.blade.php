@@ -253,22 +253,6 @@
             color: var(--accent-color);
         }
 
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-        }
-
-        table thead {
-            background: linear-gradient(135deg, var(--primary-color), #1a2530);
-            color: white;
-        }
-
-        table th, table td {
-            text-align: center;
-            vertical-align: middle;
-            padding: 1rem 0.5rem;
-        }
 
         table th {
             font-weight: 600;
@@ -373,6 +357,703 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* =========================================================
+   ATTENDANCE TABLE
+   Production responsive data-table
+   ========================================================= */
+
+.attendance-table-container {
+    width: 100%;
+    max-width: 100%;
+
+    margin-top: 1rem;
+
+    border: 1px solid #dfe6ec;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.055);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   MOBILE SCROLL HINT
+   ========================================================= */
+
+.attendance-scroll-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 8px 12px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #eef7ff,
+            #f4fbff
+        );
+
+    border-bottom:
+        1px solid #dceaf5;
+
+    color: #2980b9;
+
+    font-size: 0.72rem;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.attendance-scroll-hint i {
+    font-size: 0.8rem;
+
+    animation:
+        attendanceSwipeHint 1.5s ease-in-out infinite;
+}
+
+@keyframes attendanceSwipeHint {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+}
+
+
+/* =========================================================
+   SCROLL AREA
+   ========================================================= */
+
+.attendance-table-scroll {
+
+    position: relative;
+
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    /*
+     * Important for touch devices.
+     */
+    -webkit-overflow-scrolling: touch;
+
+    /*
+     * Allow horizontal touch scrolling.
+     */
+    touch-action: pan-x pan-y;
+
+    /*
+     * Keep vertical height reasonable
+     * when many classes are returned.
+     */
+    max-height: 65vh;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+        #3498db
+        #edf2f7;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.attendance-table-scroll::-webkit-scrollbar {
+    width: 7px;
+    height: 9px;
+}
+
+.attendance-table-scroll::-webkit-scrollbar-track {
+    background: #edf2f7;
+}
+
+.attendance-table-scroll::-webkit-scrollbar-thumb {
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--accent-color),
+            var(--success-color)
+        );
+
+    border-radius: 20px;
+}
+
+.attendance-table-scroll::-webkit-scrollbar-thumb:hover {
+
+    background:
+        linear-gradient(
+            90deg,
+            #2980b9,
+            #27ae60
+        );
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.attendance-table {
+
+    /*
+     * 13 logical columns.
+     *
+     * We deliberately give the table enough natural width
+     * instead of forcing it into the mobile viewport.
+     */
+    width: max-content;
+
+    min-width: 100%;
+
+    margin: 0 !important;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    table-layout: fixed;
+
+    font-size: 0.82rem;
+}
+
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+.attendance-table th,
+.attendance-table td {
+
+    min-width: 72px;
+
+    padding:
+        10px
+        13px;
+
+    text-align: center;
+    vertical-align: middle;
+
+    white-space: nowrap;
+}
+
+
+/*
+ * Class column
+ */
+.attendance-table .attendance-class-column,
+.attendance-table tbody td:first-child {
+
+    width: 120px;
+    min-width: 120px;
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.attendance-table thead th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 20;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-color),
+            #1a2530
+        );
+
+    color: #ffffff;
+
+    border-color:
+        rgba(255, 255, 255, 0.15);
+
+    font-size: 0.76rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+}
+
+
+/*
+ * First header row
+ */
+.attendance-table thead tr:first-child th {
+
+    height: 44px;
+
+}
+
+
+/*
+ * Second header row
+ */
+.attendance-table thead tr:nth-child(2) th {
+
+    height: 40px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #34495e,
+            #243342
+        );
+
+    font-size: 0.7rem;
+
+}
+
+
+/* =========================================================
+   STICKY CLASS COLUMN
+   ========================================================= */
+
+.attendance-table .attendance-class-column {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 30;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-color),
+            #1a2530
+        );
+
+}
+
+
+/*
+ * Body Class column.
+ *
+ * It stays visible while user swipes horizontally.
+ */
+.attendance-table tbody td:first-child {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 10;
+
+    background:
+        #ffffff;
+
+    font-weight: 700;
+
+    text-align: left;
+
+    box-shadow:
+        4px 0 8px
+        rgba(0, 0, 0, 0.06);
+
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.attendance-table tbody td {
+
+    color:
+        var(--text-color);
+
+    background:
+        #ffffff;
+
+    border-color:
+        #e5e9ed;
+
+    font-size: 0.8rem;
+
+}
+
+
+/*
+ * Zebra rows
+ */
+.attendance-table tbody tr:nth-child(even) td {
+
+    background:
+        #f8fafc;
+
+}
+
+
+/*
+ * Keep sticky class background matching zebra rows.
+ */
+.attendance-table tbody tr:nth-child(even)
+td:first-child {
+
+    background:
+        #f8fafc;
+
+}
+
+
+/*
+ * Hover
+ */
+.attendance-table tbody tr:hover td {
+
+    background:
+        rgba(52, 152, 219, 0.08);
+
+}
+
+
+/*
+ * Keep sticky class visible during hover.
+ */
+.attendance-table tbody tr:hover
+td:first-child {
+
+    background:
+        #eef7ff;
+
+}
+
+
+/* =========================================================
+   TOTAL ROW
+   ========================================================= */
+
+.attendance-table tbody tr.table-secondary td {
+
+    background:
+        #e9ecef !important;
+
+    color:
+        #212529;
+
+    font-weight: 700;
+
+}
+
+
+/*
+ * Sticky class in total row.
+ */
+.attendance-table tbody tr.table-secondary
+td:first-child {
+
+    background:
+        #e9ecef !important;
+
+}
+
+
+/* =========================================================
+   ZERO VALUES
+   ========================================================= */
+
+.attendance-table tbody td.table-danger {
+
+    background:
+        rgba(231, 76, 60, 0.16)
+        !important;
+
+    color:
+        var(--error-color);
+
+    font-weight: 700;
+
+}
+
+
+/*
+ * Sticky Class column must not accidentally
+ * inherit danger styling.
+ */
+.attendance-table tbody
+td:first-child.table-danger {
+
+    background:
+        rgba(231, 76, 60, 0.16)
+        !important;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.attendance-empty-state {
+
+    padding:
+        28px 15px !important;
+
+    color:
+        #6c757d;
+
+    text-align: center !important;
+
+    background:
+        #ffffff !important;
+
+    font-size:
+        0.85rem !important;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .attendance-table-container {
+
+        margin-top:
+            0.75rem;
+
+        border-radius:
+            10px;
+
+    }
+
+
+    .attendance-table-scroll {
+
+        /*
+         * Important:
+         * We WANT horizontal overflow here.
+         */
+        overflow-x: auto;
+
+        max-height:
+            60vh;
+
+    }
+
+
+    .attendance-table {
+
+        /*
+         * 13 columns need room.
+         *
+         * This prevents the columns from collapsing.
+         */
+        min-width:
+            920px;
+
+    }
+
+
+    .attendance-table th,
+    .attendance-table td {
+
+        min-width:
+            68px;
+
+        padding:
+            9px 10px;
+
+        font-size:
+            0.72rem;
+
+    }
+
+
+    .attendance-table .attendance-class-column,
+    .attendance-table tbody td:first-child {
+
+        width:
+            105px;
+
+        min-width:
+            105px;
+
+    }
+
+
+    .attendance-table thead tr:first-child th {
+
+        height:
+            40px;
+
+        font-size:
+            0.68rem;
+
+    }
+
+
+    .attendance-table thead tr:nth-child(2) th {
+
+        height:
+            36px;
+
+        font-size:
+            0.64rem;
+
+    }
+
+
+    .attendance-table tbody td {
+
+        font-size:
+            0.72rem;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .attendance-table-container {
+
+        /*
+         * Let the scroll area use the full available width.
+         */
+        width:
+            calc(100% + 2px);
+
+    }
+
+
+    .attendance-table-scroll {
+
+        max-height:
+            58vh;
+
+    }
+
+
+    .attendance-table {
+
+        min-width:
+            880px;
+
+    }
+
+
+    .attendance-table th,
+    .attendance-table td {
+
+        min-width:
+            64px;
+
+        padding:
+            8px 9px;
+
+    }
+
+
+    .attendance-table .attendance-class-column,
+    .attendance-table tbody td:first-child {
+
+        width:
+            100px;
+
+        min-width:
+            100px;
+
+    }
+
+
+    .attendance-table thead tr:first-child th {
+
+        font-size:
+            0.64rem;
+
+    }
+
+
+    .attendance-table thead tr:nth-child(2) th {
+
+        font-size:
+            0.6rem;
+
+    }
+
+
+    .attendance-table tbody td {
+
+        font-size:
+            0.68rem;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+    .attendance-table {
+
+        min-width:
+            850px;
+
+    }
+
+
+    .attendance-table th,
+    .attendance-table td {
+
+        min-width:
+            61px;
+
+        padding:
+            8px 8px;
+
+    }
+
+
+    .attendance-table .attendance-class-column,
+    .attendance-table tbody td:first-child {
+
+        width:
+            94px;
+
+        min-width:
+            94px;
+
+    }
+
+}
     </style>
     <div class="form-container">
         <div class="card shadow-sm">
@@ -406,41 +1087,102 @@
 
                         <div class="d-flex justify-content-center mb-4">
                             <button type="button" id="fetchAttendanceBtn" class="btn btn-primary">
-                                <i class="fas fa-sync me-2"></i> Fetch Attendance Records
+                                <i class="fas fa-sync me-2"></i> Fetch Attendance
                             </button>
                         </div>
 
-                        <div class="">
-                            <table class="table table-bordered table-responsive-md">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2">Class</th>
-                                        <th colspan="3">Registered</th>
-                                        <th colspan="3">Attended</th>
-                                        <th colspan="3">Absentees</th>
-                                        <th colspan="3">Permission</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Boys</th><th>Girls</th><th>Total</th>
-                                        <th>Boys</th><th>Girls</th><th>Total</th>
-                                        <th>Boys</th><th>Girls</th><th>Total</th>
-                                        <th>Boys</th><th>Girls</th><th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="attendanceTableBody">
-                                    <tr>
-                                        <td colspan="16" class="text-muted text-center py-4">
-                                            <i class="fas fa-database me-2"></i> No attendance records available yet
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="attendance-table-container">
+
+                            {{-- Mobile scroll hint --}}
+                            <div class="attendance-scroll-hint d-md-none">
+                                <i class="fas fa-arrows-alt-h"></i>
+                                <span>Swipe horizontally to view all attendance columns</span>
+                            </div>
+
+                            <div class="attendance-table-scroll">
+
+                                <table class="table table-bordered attendance-table">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th rowspan="2" class="attendance-class-column">
+                                                Class
+                                            </th>
+
+                                            <th colspan="3">
+                                                Registered
+                                            </th>
+
+                                            <th colspan="3">
+                                                Attended
+                                            </th>
+
+                                            <th colspan="3">
+                                                Absentees
+                                            </th>
+
+                                            <th colspan="3">
+                                                Permission
+                                            </th>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <th>Boys</th>
+                                            <th>Girls</th>
+                                            <th>Total</th>
+
+                                            <th>Boys</th>
+                                            <th>Girls</th>
+                                            <th>Total</th>
+
+                                            <th>Boys</th>
+                                            <th>Girls</th>
+                                            <th>Total</th>
+
+                                            <th>Boys</th>
+                                            <th>Girls</th>
+                                            <th>Total</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="attendanceTableBody">
+
+                                        <tr>
+
+                                            <td
+                                                colspan="13"
+                                                class="attendance-empty-state"
+                                            >
+
+                                                <i class="fas fa-database me-2"></i>
+
+                                                No attendance records available yet
+
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
                         </div>
 
                         <div class="action-buttons">
-                            <button type="button" id="proceedToSectionB" class="btn btn-success float-right">
+                            <button type="button" id="proceedToSectionB" class="btn btn-success float-left">
                                 <i class="fas fa-arrow-right me-2"></i> Confirm & Proceed
                             </button>
+                            <a href="{{route('home')}}" class="btn btn-danger float-right">
+                                <i class="fas fa-close me-2"></i>  Cancel
+                            </a>
                         </div>
                     </div>
 
@@ -723,7 +1465,7 @@
                     if (data.length === 0) {
                         attendanceTableBody.innerHTML = `
                             <tr>
-                                <td colspan="16" class="text-muted text-center py-4">
+                                <td colspan="14" class="text-muted text-center py-4">
                                     <i class="fas fa-database me-2"></i> No attendance records found for today.
                                 </td>
                             </tr>`;
@@ -764,7 +1506,7 @@
                         errorNotification.classList.remove('show');
                     }, 3000);
                 } finally {
-                    fetchBtn.innerHTML = '<i class="fas fa-sync me-2"></i> Fetch Attendance Records';
+                    fetchBtn.innerHTML = '<i class="fas fa-sync me-2"></i> Fetch Attendance';
                     fetchBtn.disabled = false;
                 }
             });

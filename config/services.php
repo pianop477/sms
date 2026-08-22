@@ -42,4 +42,10 @@ return [
         'key' => env('VIRUS_TOTAL_API_KEY'),
     ],
 
+    'next_sms' => [
+        'username' => env('NEXT_SMS_USERNAME'),
+        'password' => env('NEXT_SMS_PASSWORD'),
+        'base_url' => env('NEXT_BASE_URL'),
+    ],
+
 ];

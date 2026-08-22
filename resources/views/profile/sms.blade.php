@@ -1224,8 +1224,8 @@
 
         if (isValid) {
             const isBasic = {{ Auth::user()->school->package === 'basic' ? 'true' : 'false' }};
-            const smsLimit = isBasic ? 2 : 3;
-            const charLimit = isBasic ? 306 : 459;
+            const smsLimit = isBasic ? 1 : 2;
+            const charLimit = isBasic ? 160 : 306;
 
             const confirmed = confirm(
                 `Are you sure you want to send this message?\n\n` +

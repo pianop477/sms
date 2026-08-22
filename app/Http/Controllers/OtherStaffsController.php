@@ -27,6 +27,7 @@ class OtherStaffsController extends Controller
 
     public function index()
     {
+        $user = Auth::user();
         $drivers = Transport::where('status', 1)->get();
         $otherStaffs = other_staffs::where('status', 1)->get();
 
@@ -46,7 +47,7 @@ class OtherStaffsController extends Controller
             ->concat($normalizedDrivers)
             ->sortBy('full_name');
 
-        return view('OtherStaffs.index', compact('combinedStaffs'));
+        return view('OtherStaffs.index', compact('combinedStaffs', 'user'));
     }
 
     public function deletedStaffs()
@@ -75,7 +76,7 @@ class OtherStaffsController extends Controller
 
     public function addStaffInformation(Request $request)
     {
-
+        // dd($request->all());
         $this->validate(
             $request,
             [
@@ -90,6 +91,7 @@ class OtherStaffsController extends Controller
                 'joined' => 'required|date_format:Y',
                 'job_title' => 'required|string|max:255',
                 'nida' => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
+                'school' => 'required',
                 'image' => [
                     'nullable',
                     'file',
@@ -134,8 +136,12 @@ class OtherStaffsController extends Controller
                 }
             }
 
-            $nin = preg_replace('/[^0-9]/', '', $request->nida);
-
+            if(empty($request->nida)) {
+                $nin = null;
+            } else {
+                $nin = preg_replace('/[^0-9]/', '', $request->nida); 
+            }
+            
             // Check for existing student records
             $existingStaff = other_staffs::query()
                 ->when(
@@ -160,6 +166,9 @@ class OtherStaffsController extends Controller
                 return back();
             }
 
+            $schoolId = Hashids::decode($request->school);
+            // dd($schoolId[0]);
+
             $addStaff = other_staffs::create([
                 'staff_id' => $this->getStaffId(),
                 'first_name' => $request->fname,
@@ -173,7 +182,7 @@ class OtherStaffsController extends Controller
                 'street_address' => $request->street,
                 'joining_year' => $request->joined,
                 'nida' => $nin,
-                'school_id' => $user->school_id,
+                'school_id' => $schoolId[0]
                 // 'profile_image' => $profile_img
             ]);
 

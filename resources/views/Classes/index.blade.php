@@ -1,1076 +1,3328 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
+
 <style>
-    :root {
-        --primary: #4361ee;
-        --primary-dark: #3a56d4;
-        --secondary: #3f37c9;
-        --accent: #4895ef;
-        --success: #4cc9f0;
-        --warning: #f8961e;
-        --danger: #f94144;
-        --light: #f8f9fa;
-        --dark: #212529;
-        --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
-    }
+    /* =========================================================
+       CLASS MANAGEMENT PAGE
+       Scoped to .class-management-page
+       ========================================================= */
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    .class-management-page {
 
-    body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-        min-height: 100vh;
+        --cm-primary: #4361ee;
+        --cm-primary-dark: #3a56d4;
+        --cm-secondary: #3f37c9;
+        --cm-accent: #4895ef;
+
+        --cm-success: #1cc88a;
+        --cm-warning: #f8961e;
+        --cm-danger: #e74a3b;
+
+        --cm-dark: #212529;
+        --cm-muted: #64748b;
+        --cm-border: #e2e8f0;
+        --cm-light: #f8fafc;
+
+        width: 100%;
+        min-width: 0;
+
         position: relative;
-        overflow-x: hidden;
+        isolation: isolate;
     }
 
-    /* Animated Background */
-    .animated-bg {
+
+    /* =========================================================
+       BACKGROUND
+       ========================================================= */
+
+    .class-management-page .animated-bg {
+
         position: fixed;
-        top: 0;
-        left: 0;
+
+        inset: 0;
+
         width: 100%;
         height: 100%;
+
+        z-index: -2;
+
+        overflow: hidden;
+
+        pointer-events: none;
+
+        background:
+            radial-gradient(
+                circle at 75% 20%,
+                rgba(67, 97, 238, .08),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 20% 80%,
+                rgba(63, 55, 201, .07),
+                transparent 30%
+            );
+    }
+
+
+    .class-management-page .animated-bg::before {
+
+        content: "";
+
+        position: absolute;
+
+        inset: -50%;
+
+        background:
+            radial-gradient(
+                circle at 70% 30%,
+                rgba(67, 97, 238, .08),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 30% 70%,
+                rgba(63, 55, 201, .08),
+                transparent 30%
+            );
+
+        animation:
+            classManagementRotate 60s linear infinite;
+    }
+
+
+    @keyframes classManagementRotate {
+
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+
+    }
+
+
+    /* =========================================================
+       PARTICLES
+       ========================================================= */
+
+    .class-management-page .particles {
+
+        position: fixed;
+
+        inset: 0;
+
+        width: 100%;
+        height: 100%;
+
+        pointer-events: none;
+
         z-index: -1;
+
         overflow: hidden;
     }
 
-    .animated-bg::before {
-        content: '';
+
+    .class-management-page .particle {
+
         position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
+
         background:
-            radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
-            radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
-        animation: rotate 60s linear infinite;
-    }
+            rgba(255,255,255,.45);
 
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    /* Floating Particles */
-    .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.5);
         border-radius: 50%;
-        animation: float 20s infinite;
+
+        animation:
+            classManagementFloat 20s infinite;
     }
 
-    @keyframes float {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        25% { transform: translate(100px, -100px) scale(1.2); }
-        50% { transform: translate(200px, 0) scale(0.8); }
-        75% { transform: translate(100px, 100px) scale(1.1); }
+
+    @keyframes classManagementFloat {
+
+        0%,
+        100% {
+            transform:
+                translate(0, 0)
+                scale(1);
+        }
+
+        25% {
+            transform:
+                translate(100px, -100px)
+                scale(1.2);
+        }
+
+        50% {
+            transform:
+                translate(200px, 0)
+                scale(.8);
+        }
+
+        75% {
+            transform:
+                translate(100px, 100px)
+                scale(1.1);
+        }
+
     }
 
-    /* Main Container */
-    .dashboard-container {
-        max-width: 1400px;
-        margin: 30px auto;
-        padding: 0 20px;
+
+    /* =========================================================
+       MAIN CONTAINER
+       ========================================================= */
+
+    .class-management-page .dashboard-container {
+
+        width: min(100%, 1500px);
+
+        margin: 24px auto;
+
+        padding-inline: 20px;
+
         position: relative;
+
         z-index: 1;
     }
 
-    /* Modern Card */
-    .modern-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 30px;
-        box-shadow: var(--shadow-lg);
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        height: 100%;
-        position: relative;
-    }
 
-    .modern-card::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
-        border-radius: 32px;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        z-index: -1;
-    }
+    /* =========================================================
+       MODERN CARD
+       ========================================================= */
 
-    .modern-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
-    }
+    .class-management-page .modern-card {
 
-    .modern-card:hover::before {
-        opacity: 0.2;
-    }
-
-    /* Card Header */
-    .card-header-modern {
-        padding: 25px 30px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        position: relative;
-        overflow: hidden;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .header-icon {
-        width: 50px;
-        height: 50px;
-        background: var(--gradient-1);
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        box-shadow: var(--shadow-md);
-    }
-
-    .header-title {
-        margin: 0;
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: var(--dark);
-    }
-
-    /* .header-title span {
-        background: var(--gradient-1);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    } */
-
-    /* Gradient Headers */
-    .gradient-success {
-        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
-    }
-
-    .gradient-primary {
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-    }
-
-    .header-modern.gradient-success,
-    .header-modern.gradient-primary {
-        color: white;
-    }
-
-    .header-modern.gradient-success .header-title,
-    .header-modern.gradient-primary .header-title {
-        color: white;
-    }
-
-    .header-modern.gradient-success .header-title span,
-    .header-modern.gradient-primary .header-title span {
-        -webkit-text-fill-color: white;
-        background: none;
-    }
-
-    /* Add Button */
-    .btn-add-modern {
-        background: white;
-        color: var(--primary);
-        border: none;
-        padding: 12px 25px;
-        border-radius: 50px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-sm);
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-add-modern::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(67, 97, 238, 0.2);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .btn-add-modern:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-        color: var(--primary-dark);
-    }
-
-    .btn-add-modern:hover::before {
-        width: 300px;
-        height: 300px;
-    }
-
-    /* Card Body */
-    .card-body-modern {
-        padding: 30px;
-    }
-
-    /* Table Container */
-    .table-container-modern {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    /* Modern Table */
-    .table-modern {
         width: 100%;
-        border-collapse: collapse;
+
+        height: 100%;
+
+        position: relative;
+
+        overflow: hidden;
+
+        background:
+            rgba(255,255,255,.96);
+
+        backdrop-filter:
+            blur(16px);
+
+        -webkit-backdrop-filter:
+            blur(16px);
+
+        border:
+            1px solid
+            rgba(255,255,255,.65);
+
+        border-radius: 22px;
+
+        box-shadow:
+            0 12px 32px
+            rgba(15,23,42,.08),
+            0 2px 8px
+            rgba(15,23,42,.04);
+
+        transition:
+            box-shadow .3s ease,
+            transform .3s ease;
     }
 
-    .table-modern thead th {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        color: white;
-        font-weight: 600;
-        padding: 18px 15px;
-        font-size: 0.95rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: none;
+
+    .class-management-page .modern-card:hover {
+
+        transform:
+            translateY(-3px);
+
+        box-shadow:
+            0 18px 40px
+            rgba(15,23,42,.12);
     }
 
-    .table-modern tbody td {
-        padding: 18px 15px;
-        border-bottom: 1px solid #e9ecef;
-        color: #495057;
-        vertical-align: middle;
-        font-size: 0.95rem;
-    }
 
-    .table-modern tbody tr {
-        transition: all 0.3s ease;
-    }
+    /* =========================================================
+       HEADER
+       ========================================================= */
 
-    .table-modern tbody tr:hover {
-        background: #f8f9fa;
-        transform: scale(1.01);
-        box-shadow: var(--shadow-sm);
-    }
+    .class-management-page .card-header-modern {
 
-    /* Class Name with Icon */
-    .class-name-modern {
+        min-height: 82px;
+
+        padding: 18px 22px;
+
         display: flex;
+
         align-items: center;
+
+        justify-content: space-between;
+
+        gap: 16px;
+
+        position: relative;
+
+        overflow: hidden;
+
+        color: #fff;
+    }
+
+
+    .class-management-page
+    .card-header-modern::before {
+
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        pointer-events: none;
+
+        background:
+            radial-gradient(
+                circle at 85% 20%,
+                rgba(255,255,255,.15),
+                transparent 25%
+            );
+    }
+
+
+    .class-management-page
+    .card-header-modern::after {
+
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        height: 2px;
+
+        background:
+            linear-gradient(
+                90deg,
+                rgba(255,255,255,.15),
+                rgba(255,255,255,.8),
+                rgba(255,255,255,.15)
+            );
+    }
+
+
+    .class-management-page .gradient-success {
+
+        background:
+            linear-gradient(
+                135deg,
+                #1cc88a,
+                #13855c
+            );
+    }
+
+
+    .class-management-page .gradient-primary {
+
+        background:
+            linear-gradient(
+                135deg,
+                #4e73df,
+                #224abe
+            );
+    }
+
+
+    .class-management-page .header-left {
+
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
         gap: 12px;
+
+        position: relative;
+
+        z-index: 2;
     }
 
-    .class-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--gradient-3);
-        border-radius: 12px;
+
+    .class-management-page .header-icon {
+
+        width: 46px;
+        height: 46px;
+
+        min-width: 46px;
+
         display: flex;
+
         align-items: center;
+
         justify-content: center;
-        color: white;
-        font-size: 18px;
+
+        border-radius: 12px;
+
+        background:
+            rgba(255,255,255,.16);
+
+        border:
+            1px solid
+            rgba(255,255,255,.22);
+
+        color: #fff;
+
+        font-size: 20px;
     }
 
-    .class-details h6 {
+
+    .class-management-page .header-title {
+
         margin: 0;
+
+        color: #fff;
+
+        font-size:
+            clamp(
+                1rem,
+                2vw,
+                1.25rem
+            );
+
         font-weight: 700;
-        color: var(--dark);
+
+        line-height: 1.3;
     }
 
-    .class-details small {
-        color: #6c757d;
-        font-size: 0.8rem;
+
+    .class-management-page .header-title span {
+
+        color: inherit;
     }
 
-    /* Code Badge */
-    .code-badge {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 6px 15px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-        letter-spacing: 1px;
-    }
 
-    /* Action Buttons */
-    .action-group {
-        display: flex;
-        gap: 8px;
+    /* =========================================================
+       ADD BUTTON
+       ========================================================= */
+
+    .class-management-page .btn-add-modern {
+
+        min-height: 40px;
+
+        padding: 9px 15px;
+
+        display: inline-flex;
+
+        align-items: center;
+
         justify-content: center;
-        flex-wrap: wrap;
+
+        gap: 7px;
+
+        position: relative;
+
+        z-index: 3;
+
+        border:
+            1px solid
+            rgba(255,255,255,.35);
+
+        border-radius: 9px;
+
+        background:
+            rgba(255,255,255,.16);
+
+        color: #fff;
+
+        font-size: .82rem;
+
+        font-weight: 600;
+
+        white-space: nowrap;
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            background-color .2s ease,
+            box-shadow .2s ease;
     }
 
-    .btn-action-modern {
+
+    .class-management-page .btn-add-modern:hover {
+
+        color: #fff;
+
+        background:
+            rgba(255,255,255,.25);
+
+        transform:
+            translateY(-1px);
+
+        box-shadow:
+            0 6px 15px
+            rgba(0,0,0,.12);
+    }
+
+
+    /* =========================================================
+       BODY
+       ========================================================= */
+
+    .class-management-page .card-body-modern {
+
+        padding: 20px;
+    }
+
+
+    /* =========================================================
+       TABLE CONTAINER
+       ========================================================= */
+
+    .class-management-page
+    .table-container-modern {
+
+        width: 100%;
+
+        overflow-x: auto;
+
+        overflow-y: hidden;
+
+        background: #fff;
+
+        border:
+            1px solid
+            var(--cm-border);
+
+        border-radius: 14px;
+
+        box-shadow:
+            0 4px 14px
+            rgba(15,23,42,.05);
+
+        -webkit-overflow-scrolling:
+            touch;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .class-management-page .table-modern {
+
+        width: 100%;
+
+        margin: 0;
+
+        border-collapse: separate;
+
+        border-spacing: 0;
+
+        font-size: .83rem;
+    }
+
+
+    .class-management-page
+    .table-modern thead th {
+
+        padding: 12px 13px;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--cm-primary),
+                var(--cm-secondary)
+            );
+
+        color: #fff;
+
+        border: 0;
+
+        font-size: .7rem;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        letter-spacing: .45px;
+
+        white-space: nowrap;
+
+        vertical-align: middle;
+    }
+
+
+    .class-management-page
+    .table-modern tbody td {
+
+        padding: 11px 13px;
+
+        background: #fff;
+
+        color: #475569;
+
+        border-bottom:
+            1px solid #edf2f7;
+
+        vertical-align: middle;
+    }
+
+
+    .class-management-page
+    .table-modern tbody tr:last-child td {
+
+        border-bottom: 0;
+    }
+
+
+    .class-management-page
+    .table-modern tbody tr {
+
+        transition:
+            background-color .18s ease;
+    }
+
+
+    .class-management-page
+    .table-modern tbody tr:hover td {
+
+        background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       CLASS NAME
+       ========================================================= */
+
+    .class-management-page .class-name-modern {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        min-width: 150px;
+    }
+
+
+    .class-management-page .class-icon {
+
         width: 38px;
         height: 38px;
-        border-radius: 12px;
+
+        min-width: 38px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 9px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4facfe,
+                #00c6fb
+            );
+
+        color: #fff;
+
+        font-size: 16px;
+    }
+
+
+    .class-management-page .class-details {
+
+        min-width: 0;
+    }
+
+
+    .class-management-page
+    .class-details h6 {
+
+        margin: 0;
+
+        color:
+            var(--cm-dark);
+
+        font-size: .82rem;
+
+        font-weight: 700;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       CODE BADGE
+       ========================================================= */
+
+    .class-management-page .code-badge {
+
+        display: inline-block;
+
+        padding: 5px 9px;
+
+        border-radius: 7px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #667eea,
+                #764ba2
+            );
+
+        color: #fff;
+
+        font-size: .7rem;
+
+        font-weight: 700;
+
+        letter-spacing: .6px;
+
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+       ========================================================= */
+
+    .class-management-page .action-group {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 6px;
+
+        flex-wrap: nowrap;
+    }
+
+
+    .class-management-page
+    .btn-action-modern {
+
+        width: 32px;
+        height: 32px;
+
+        min-width: 32px;
+
+        padding: 0;
+
         display: inline-flex;
+
         align-items: center;
+
         justify-content: center;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: none;
+
+        border: 0;
+
+        border-radius: 8px;
+
+        color: #fff;
+
+        font-size: .75rem;
+
         cursor: pointer;
-        font-size: 1rem;
-        position: relative;
-        overflow: hidden;
+
+        transition:
+            transform .18s ease,
+            box-shadow .18s ease;
     }
 
-    .btn-action-modern::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.4s, height 0.4s;
-    }
 
-    .btn-action-modern:hover::before {
-        width: 100px;
-        height: 100px;
-    }
-
+    .class-management-page
     .btn-action-modern:hover {
-        transform: translateY(-3px) rotate(360deg);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+
+        color: #fff;
+
+        transform:
+            translateY(-1px);
+
+        box-shadow:
+            0 4px 10px
+            rgba(15,23,42,.15);
     }
 
+
+    .class-management-page
     .btn-warning-modern {
-        background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
+
+        background:
+            linear-gradient(
+                135deg,
+                #f6c23e,
+                #f4b619
+            );
     }
 
+
+    .class-management-page
     .btn-success-modern {
-        background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+
+        background:
+            linear-gradient(
+                135deg,
+                #1cc88a,
+                #17a673
+            );
     }
 
+
+    .class-management-page
     .btn-danger-modern {
-        background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+
+        background:
+            linear-gradient(
+                135deg,
+                #e74a3b,
+                #be2617
+            );
     }
 
-    /* Class Link */
-    .class-link-modern {
+
+    /* =========================================================
+       TEACHER LINK
+       ========================================================= */
+
+    .class-management-page .class-link-modern {
+
+        min-height: 50px;
+
+        padding: 7px 10px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        border:
+            1px solid
+            #e9eef5;
+
+        border-radius: 10px;
+
+        background: #fff;
+
         text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 10px 15px;
-        border-radius: 15px;
-        transition: all 0.3s ease;
-        background: white;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+
+        transition:
+            background-color .2s ease,
+            transform .2s ease,
+            box-shadow .2s ease;
     }
 
+
+    .class-management-page
     .class-link-modern:hover {
-        transform: translateX(10px);
-        background: var(--gradient-1);
-        box-shadow: var(--shadow-md);
+
+        transform:
+            translateX(3px);
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--cm-primary),
+                var(--cm-secondary)
+            );
+
+        box-shadow:
+            0 6px 15px
+            rgba(67,97,238,.16);
     }
 
-    .class-link-modern:hover .class-link-text {
-        color: white;
-    }
 
-    .class-link-modern:hover .link-icon {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
+    .class-management-page
     .link-icon {
-        width: 45px;
-        height: 45px;
-        background: var(--gradient-1);
-        border-radius: 12px;
+
+        width: 34px;
+        height: 34px;
+
+        min-width: 34px;
+
         display: flex;
+
         align-items: center;
+
         justify-content: center;
-        color: white;
-        font-size: 20px;
-        transition: all 0.3s ease;
+
+        border-radius: 8px;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--cm-primary),
+                var(--cm-secondary)
+            );
+
+        color: #fff;
+
+        font-size: 14px;
     }
 
+
+    .class-management-page
+    .class-link-modern:hover .link-icon {
+
+        background:
+            rgba(255,255,255,.18);
+    }
+
+
+    .class-management-page
     .class-link-text {
+
+        min-width: 0;
+
+        flex: 1;
+
+        color:
+            var(--cm-dark);
+
+        font-size: .8rem;
+
         font-weight: 600;
-        color: var(--dark);
-        transition: all 0.3s ease;
-    }
 
-    /* Empty State */
-    .empty-state-modern {
-        text-align: center;
-        padding: 50px 20px;
-        background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
-        border-radius: 20px;
-        border: 2px dashed #ffc107;
-    }
-
-    .empty-state-modern i {
-        font-size: 60px;
-        color: #ffc107;
-        margin-bottom: 20px;
-        animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
-    }
-
-    /* Modal Modern */
-    .modal-modern .modal-content {
-        border-radius: 30px;
-        border: none;
         overflow: hidden;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+
+        transition:
+            color .2s ease;
     }
 
-    .modal-modern .modal-header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        color: white;
-        border: none;
-        padding: 25px 30px;
+
+    .class-management-page
+    .class-link-modern:hover
+    .class-link-text {
+
+        color: #fff;
     }
 
-    .modal-modern .modal-body {
-        padding: 30px;
+
+    .class-management-page
+    .class-link-arrow {
+
+        flex-shrink: 0;
+
+        color:
+            var(--cm-primary);
+
+        font-size: .75rem;
+
+        transition:
+            color .2s ease,
+            transform .2s ease;
     }
 
-    .modal-modern .modal-footer {
-        border: none;
-        padding: 20px 30px;
-        background: #f8f9fa;
+
+    .class-management-page
+    .class-link-modern:hover
+    .class-link-arrow {
+
+        color: #fff;
+
+        transform:
+            translateX(3px);
     }
 
-    /* Form Controls */
-    .form-group-modern {
-        margin-bottom: 20px;
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .class-management-page .empty-state-modern {
+
+        padding: 35px 15px;
+
+        text-align: center;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fff8e1,
+                #fff3cd
+            );
+
+        border:
+            2px dashed
+            #f6c23e;
+
+        border-radius: 13px;
     }
 
-    .form-label-modern {
-        font-weight: 600;
-        color: var(--dark);
+
+    .class-management-page
+    .empty-state-modern i {
+
         margin-bottom: 8px;
-        display: block;
-        font-size: 0.95rem;
+
+        color: #f6c23e;
+
+        font-size: 38px;
+
+        animation:
+            classManagementBounce 2s infinite;
     }
 
-    .form-control-modern {
-        width: 100%;
-        padding: 14px 18px;
-        border: 2px solid #e9ecef;
-        border-radius: 15px;
+
+    @keyframes classManagementBounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-8px);
+        }
+
+    }
+
+
+    .class-management-page
+    .empty-state-modern h6 {
+
+        margin-bottom: 5px;
+
+        color:
+            var(--cm-dark);
+
+        font-weight: 700;
+    }
+
+
+    .class-management-page
+    .empty-state-modern p {
+
+        margin-bottom: 0;
+
+        font-size: .78rem;
+    }
+
+
+    /* =========================================================
+       MODAL
+       ========================================================= */
+
+    .class-management-page .modal-modern
+    .modal-content {
+
+        border: 0;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 20px 50px
+            rgba(15,23,42,.20);
+    }
+
+
+    .class-management-page .modal-modern
+    .modal-header {
+
+        padding: 15px 20px;
+
+        border: 0;
+
+        color: #fff;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--cm-primary),
+                var(--cm-secondary)
+            );
+    }
+
+
+    .class-management-page
+    .modal-modern
+    .modal-title {
+
         font-size: 1rem;
-        transition: all 0.3s ease;
-        background: white;
+
+        font-weight: 700;
     }
 
+
+    .class-management-page
+    .btn-modal-close {
+
+        width: 34px;
+        height: 34px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 0;
+
+        border:
+            1px solid
+            rgba(255,255,255,.25);
+
+        border-radius: 8px;
+
+        background:
+            rgba(255,255,255,.12);
+
+        color: #fff;
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            background-color .2s ease;
+    }
+
+
+    .class-management-page
+    .btn-modal-close:hover {
+
+        background:
+            rgba(255,255,255,.22);
+
+        transform:
+            rotate(90deg);
+    }
+
+
+    .class-management-page
+    .modal-modern
+    .modal-body {
+
+        padding: 20px;
+    }
+
+
+    .class-management-page
+    .modal-modern
+    .modal-footer {
+
+        padding: 13px 20px;
+
+        border: 0;
+
+        background:
+            #f8fafc;
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .class-management-page
+    .form-group-modern {
+
+        margin-bottom: 13px;
+    }
+
+
+    .class-management-page
+    .form-label-modern {
+
+        display: block;
+
+        margin-bottom: 5px;
+
+        color:
+            var(--cm-dark);
+
+        font-size: .8rem;
+
+        font-weight: 600;
+    }
+
+
+    .class-management-page
+    .form-control-modern {
+
+        width: 100%;
+
+        min-height: 42px;
+
+        padding: 9px 11px;
+
+        border:
+            1px solid
+            #dbe3ec;
+
+        border-radius: 8px;
+
+        background: #fff;
+
+        color:
+            #334155;
+
+        font-size: .84rem;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease;
+    }
+
+
+    .class-management-page
     .form-control-modern:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+
+        border-color:
+            var(--cm-primary);
+
+        box-shadow:
+            0 0 0 3px
+            rgba(67,97,238,.10);
+
         outline: none;
     }
 
+
+    .class-management-page
     .form-control-modern.error {
-        border-color: var(--danger);
+
+        border-color:
+            var(--cm-danger);
     }
 
+
+    .class-management-page
     .error-message {
-        color: var(--danger);
-        font-size: 0.85rem;
-        margin-top: 5px;
+
         display: flex;
-        align-items: center;
+
+        align-items: flex-start;
+
         gap: 5px;
+
+        margin-top: 4px;
+
+        color:
+            var(--cm-danger);
+
+        font-size: .72rem;
     }
 
-    /* Modal Buttons */
-    .btn-modal-close {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
+
+    .class-management-page
+    .class-info-note {
+
+        padding: 10px 12px;
+
+        border-radius: 8px;
+
+        background:
+            #f8fafc;
+
+        color:
+            #64748b;
+
+        font-size: .72rem;
+
+        line-height: 1.5;
     }
 
-    .btn-modal-close:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: rotate(90deg);
-    }
 
+    /* =========================================================
+       MODAL BUTTONS
+       ========================================================= */
+
+    .class-management-page
     .btn-modal-save {
-        background: linear-gradient(135deg, var(--success) 0%, #4cc9f0 100%);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 50px;
-        font-weight: 600;
+
+        min-height: 40px;
+
+        padding: 8px 15px;
+
         display: inline-flex;
+
         align-items: center;
-        gap: 10px;
-        transition: all 0.3s ease;
+
+        justify-content: center;
+
+        gap: 6px;
+
+        border: 0;
+
+        border-radius: 8px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #1cc88a,
+                #17a673
+            );
+
+        color: #fff;
+
+        font-size: .8rem;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+
+    .class-management-page
+    .btn-modal-save:hover:not(:disabled) {
+
+        transform:
+            translateY(-1px);
+
+        box-shadow:
+            0 5px 15px
+            rgba(28,200,138,.22);
+    }
+
+
+    .class-management-page
+    .btn-modal-cancel {
+
+        min-height: 40px;
+
+        padding: 8px 15px;
+
+        border: 0;
+
+        border-radius: 8px;
+
+        background:
+            #64748b;
+
+        color: #fff;
+
+        font-size: .8rem;
+
+        font-weight: 600;
+
         cursor: pointer;
     }
 
-    .btn-modal-save:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(76, 201, 240, 0.4);
-    }
 
-    .btn-modal-cancel {
-        background: #6c757d;
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 50px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
+    .class-management-page
     .btn-modal-cancel:hover {
-        background: #5a6268;
-        transform: translateY(-3px);
+
+        background:
+            #475569;
+
+        color: #fff;
     }
 
-    /* Loading Spinner */
-    .loading-spinner {
+
+    /* =========================================================
+       LOADING
+       ========================================================= */
+
+    .class-management-page .loading-spinner {
+
         position: fixed;
+
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        width: 70px;
-        height: 70px;
-        border: 5px solid #f3f3f3;
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        z-index: 9999;
+
+        width: 56px;
+        height: 56px;
+
         display: none;
+
+        transform:
+            translate(-50%, -50%);
+
+        border:
+            4px solid
+            rgba(67,97,238,.15);
+
+        border-top-color:
+            var(--cm-primary);
+
+        border-radius: 50%;
+
+        animation:
+            classManagementSpin 1s linear infinite;
+
+        z-index: 9999;
     }
 
-    /* Toast Notifications */
-    .toast-notification {
+
+    @keyframes classManagementSpin {
+
+        to {
+            transform:
+                translate(-50%, -50%)
+                rotate(360deg);
+        }
+
+    }
+
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
+
+    .class-management-page .toast-notification {
+
         position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border-radius: 15px;
-        padding: 15px 25px;
-        box-shadow: var(--shadow-lg);
+
+        top: 18px;
+        right: 18px;
+
+        max-width: min(360px, calc(100vw - 36px));
+
+        padding: 12px 15px;
+
         display: flex;
+
         align-items: center;
-        gap: 15px;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
+
+        gap: 10px;
+
+        border-left:
+            4px solid;
+
+        border-radius: 10px;
+
+        background: #fff;
+
+        box-shadow:
+            0 12px 30px
+            rgba(15,23,42,.15);
+
+        transform:
+            translateX(120%);
+
+        transition:
+            transform .25s ease;
+
         z-index: 10000;
-        border-left: 5px solid;
+
+        font-size: .8rem;
     }
 
+
+    .class-management-page
     .toast-notification.show {
-        transform: translateX(0);
+
+        transform:
+            translateX(0);
     }
 
+
+    .class-management-page
     .toast-success {
-        border-left-color: #28a745;
+
+        border-left-color:
+            #28a745;
     }
 
+
+    .class-management-page
     .toast-error {
-        border-left-color: var(--danger);
+
+        border-left-color:
+            var(--cm-danger);
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .card-header-modern {
-            flex-direction: column;
-            text-align: center;
-        }
 
-        .header-left {
-            flex-direction: column;
-        }
-    }
+    /* =========================================================
+       TABLET
+       ========================================================= */
 
-    @media (max-width: 768px) {
+    @media (max-width: 991.98px) {
+
+        .class-management-page
         .dashboard-container {
-            margin: 15px auto;
+
+            margin: 18px auto;
+
+            padding-inline: 15px;
         }
 
-        .table-modern {
-            display: block;
-            overflow-x: auto;
-        }
 
-        .action-group {
-            justify-content: flex-start;
-        }
-
-        .btn-add-modern {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .card-body-modern {
-            padding: 20px;
-        }
-
-        .header-title {
-            font-size: 1.3rem;
-        }
-
-        .class-link-modern {
-            flex-direction: column;
-            text-align: center;
-        }
-    }
-
-    /* Dark Mode */
-    @media (prefers-color-scheme: dark) {
-        body {
-            background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
-        }
-
+        .class-management-page
         .modern-card {
-            background: rgba(33, 37, 41, 0.95);
+
+            border-radius: 18px;
         }
 
-        .table-modern tbody td {
-            color: #e9ecef;
-            border-bottom-color: #495057;
+
+        .class-management-page
+        .card-header-modern {
+
+            min-height: auto;
+
+            padding: 15px 17px;
         }
 
+
+        .class-management-page
+        .card-body-modern {
+
+            padding: 16px;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .class-management-page
+        .dashboard-container {
+
+            margin: 10px auto;
+
+            padding-inline: 9px;
+        }
+
+
+        .class-management-page
+        .modern-card {
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 18px
+                rgba(15,23,42,.07);
+        }
+
+
+        .class-management-page
+        .modern-card:hover {
+
+            transform: none;
+        }
+
+
+        .class-management-page
+        .card-header-modern {
+
+            padding: 13px;
+
+            flex-direction: column;
+
+            align-items: stretch;
+
+            gap: 12px;
+        }
+
+
+        .class-management-page
+        .header-left {
+
+            width: 100%;
+        }
+
+
+        .class-management-page
+        .header-icon {
+
+            width: 39px;
+            height: 39px;
+
+            min-width: 39px;
+
+            border-radius: 9px;
+
+            font-size: 16px;
+        }
+
+
+        .class-management-page
+        .header-title {
+
+            font-size: .98rem;
+        }
+
+
+        .class-management-page
+        .btn-add-modern {
+
+            width: 100%;
+
+            min-height: 40px;
+        }
+
+
+        .class-management-page
+        .card-body-modern {
+
+            padding: 10px;
+        }
+
+
+        /* =====================================================
+           TABLE → CARD LIST
+           ===================================================== */
+
+        .class-management-page
+        .table-container-modern {
+
+            overflow: visible;
+
+            border: 0;
+
+            background: transparent;
+
+            box-shadow: none;
+        }
+
+
+        .class-management-page
+        .table-modern {
+
+            display: block;
+
+            width: 100%;
+        }
+
+
+        .class-management-page
+        .table-modern thead {
+
+            display: none;
+        }
+
+
+        .class-management-page
+        .table-modern tbody {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 9px;
+        }
+
+
+        .class-management-page
+        .table-modern tbody tr {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr auto;
+
+            gap: 0;
+
+            padding: 11px;
+
+            border:
+                1px solid
+                #e5eaf0;
+
+            border-radius: 11px;
+
+            background: #fff;
+
+            box-shadow:
+                0 3px 10px
+                rgba(15,23,42,.045);
+        }
+
+
+        .class-management-page
         .table-modern tbody tr:hover {
-            background: #343a40;
+
+            transform: none;
         }
 
+
+        .class-management-page
+        .table-modern tbody td {
+
+            display: flex;
+
+            align-items: center;
+
+            min-width: 0;
+
+            padding: 5px 0;
+
+            border: 0;
+
+            background: transparent;
+
+            white-space: normal;
+        }
+
+
+        /* Class name */
+
+        .class-management-page
+        .table-modern tbody td:first-child {
+
+            grid-column: 1;
+
+            grid-row: 1;
+
+            padding-right: 8px;
+        }
+
+
+        .class-management-page
+        .table-modern tbody td:first-child
+        .class-name-modern {
+
+            width: 100%;
+
+            min-width: 0;
+        }
+
+
+        /* Code */
+
+        .class-management-page
+        .table-modern tbody td:nth-child(2) {
+
+            grid-column: 2;
+
+            grid-row: 1;
+
+            justify-content: flex-end;
+
+            align-self: center;
+        }
+
+
+        /* Actions */
+
+        .class-management-page
+        .table-modern tbody td:last-child {
+
+            grid-column:
+                1 / -1;
+
+            grid-row: 2;
+
+            justify-content:
+                flex-end;
+
+            margin-top: 7px;
+
+            padding-top: 9px;
+
+            border-top:
+                1px solid
+                #edf2f7;
+        }
+
+
+        .class-management-page
+        .table-modern tbody td:last-child::before {
+
+            content: "Actions";
+
+            margin-right: auto;
+
+            color:
+                #64748b;
+
+            font-size: .68rem;
+
+            font-weight: 600;
+        }
+
+
+        .class-management-page
+        .action-group {
+
+            justify-content: flex-end;
+        }
+
+
+        .class-management-page
+        .btn-action-modern {
+
+            width: 34px;
+            height: 34px;
+
+            min-width: 34px;
+
+            border-radius: 8px;
+        }
+
+
+        /* =====================================================
+           TEACHER LINKS
+           ===================================================== */
+
+        .class-management-page
         .class-link-modern {
-            background: #2b3035;
-            border-color: #495057;
+
+            min-height: 48px;
+
+            padding: 7px 9px;
+
+            border-radius: 9px;
         }
 
+
+        .class-management-page
+        .link-icon {
+
+            width: 32px;
+            height: 32px;
+
+            min-width: 32px;
+
+            font-size: 13px;
+        }
+
+
+        .class-management-page
         .class-link-text {
-            color: #e9ecef;
+
+            font-size: .76rem;
         }
 
+
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
+
+        .class-management-page
+        .empty-state-modern {
+
+            padding: 30px 12px;
+        }
+
+
+        .class-management-page
+        .empty-state-modern i {
+
+            font-size: 34px;
+        }
+
+
+        /* =====================================================
+           MODAL
+           ===================================================== */
+
+        .class-management-page
+        .modal-modern
+        .modal-dialog {
+
+            margin: 10px;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-content {
+
+            border-radius: 14px;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-header {
+
+            padding: 13px 15px;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-body {
+
+            padding: 15px;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-footer {
+
+            padding: 11px 15px;
+        }
+
+
+        .class-management-page
         .form-control-modern {
-            background: #2b3035;
-            border-color: #495057;
-            color: #e9ecef;
+
+            min-height: 44px;
+
+            font-size: 16px;
         }
 
-        .modal-modern .modal-content {
-            background: rgba(33, 37, 41, 0.95);
+    }
+
+
+    /* =========================================================
+       SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 480px) {
+
+        .class-management-page
+        .dashboard-container {
+
+            margin: 7px auto;
+
+            padding-inline: 6px;
         }
 
-        .modal-modern .modal-footer {
-            background: #2b3035;
+
+        .class-management-page
+        .card-header-modern {
+
+            padding: 11px;
         }
 
-        .form-label-modern {
-            color: #e9ecef;
+
+        .class-management-page
+        .card-body-modern {
+
+            padding: 8px;
         }
+
+
+        .class-management-page
+        .header-icon {
+
+            width: 36px;
+            height: 36px;
+
+            min-width: 36px;
+        }
+
+
+        .class-management-page
+        .header-title {
+
+            font-size: .88rem;
+        }
+
+
+        .class-management-page
+        .table-modern tbody tr {
+
+            padding: 9px;
+        }
+
+
+        .class-management-page
+        .class-icon {
+
+            width: 34px;
+            height: 34px;
+
+            min-width: 34px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+        }
+
+
+        .class-management-page
+        .class-details h6 {
+
+            max-width: 130px;
+
+            font-size: .76rem;
+        }
+
+
+        .class-management-page
+        .code-badge {
+
+            padding: 4px 7px;
+
+            font-size: .64rem;
+        }
+
+
+        .class-management-page
+        .btn-action-modern {
+
+            width: 32px;
+            height: 32px;
+
+            min-width: 32px;
+
+            font-size: .7rem;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-dialog {
+
+            margin: 6px;
+        }
+
+
+        .class-management-page
+        .modal-modern
+        .modal-footer {
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+
+        .class-management-page
+        .btn-modal-save,
+        .class-management-page
+        .btn-modal-cancel {
+
+            width: 100%;
+        }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 360px) {
+
+        .class-management-page
+        .dashboard-container {
+
+            padding-inline: 4px;
+        }
+
+
+        .class-management-page
+        .card-header-modern {
+
+            padding: 9px;
+        }
+
+
+        .class-management-page
+        .card-body-modern {
+
+            padding: 6px;
+        }
+
+
+        .class-management-page
+        .class-details h6 {
+
+            max-width: 105px;
+
+            font-size: .7rem;
+        }
+
+
+        .class-management-page
+        .class-link-text {
+
+            font-size: .7rem;
+        }
+
+
+        .class-management-page
+        .class-link-arrow {
+
+            font-size: .65rem;
+        }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .class-management-page
+        .animated-bg::before,
+        .class-management-page
+        .particle,
+        .class-management-page
+        .empty-state-modern i {
+
+            animation: none;
+        }
+
+        .class-management-page *,
+        .class-management-page *::before,
+        .class-management-page *::after {
+
+            transition-duration:
+                .01ms !important;
+
+            animation-duration:
+                .01ms !important;
+        }
+
     }
 </style>
 
-<div class="animated-bg"></div>
-<div class="particles"></div>
-<div class="loading-spinner" id="loadingSpinner"></div>
 
-<div class="dashboard-container">
-    <div class="row">
-        <!-- Classes List Section -->
-        <div class="col-lg-6 mb-4">
-            <div class="modern-card">
-                <div class="card-header-modern gradient-success">
-                    <div class="header-left">
-                        <div class="header-icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <h3 class="header-title">
-                            <span>Class</span> Management
-                        </h3>
-                    </div>
-                    <button type="button" class="btn-add-modern" data-bs-toggle="modal" data-bs-target="#addClassModal">
-                        <i class="fas fa-plus"></i>
-                        <span>New Class</span>
-                    </button>
-                </div>
-                <div class="card-body-modern">
-                    <div class="table-container-modern">
-                        <table class="table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Class Name</th>
-                                    <th>Class Code</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($classes->isEmpty())
-                                    <tr>
-                                        <td colspan="3" class="text-center py-5">
-                                            <div class="empty-state-modern">
-                                                <i class="fas fa-layer-group"></i>
-                                                <h6 class="mt-3">No Classes Found</h6>
-                                                <p class="text-muted">Click "New Class" to create your first class</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @else
-                                    @foreach ($classes as $class)
-                                        <tr>
-                                            <td>
-                                                <div class="class-name-modern">
-                                                    <div class="class-icon">
-                                                        <i class="fas fa-graduation-cap"></i>
-                                                    </div>
-                                                    <div class="class-details">
-                                                        <h6>{{ strtoupper($class->class_name) }}</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="code-badge">{{ strtoupper($class->class_code) }}</span>
-                                            </td>
-                                            <td>
-                                                <div class="action-group">
-                                                    @if ($class->status == 1)
-                                                        <form action="{{ route('Classes.block', ['id' => Hashids::encode($class->id)]) }}"
-                                                              method="POST"
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('⚠️ Are you sure you want to disable this class?')">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit"
-                                                                    class="btn-action-modern btn-warning-modern"
-                                                                    title="Disable Class">
-                                                                <i class="fas fa-ban"></i>
-                                                            </button>
-                                                        </form>
-                                                    @else
-                                                        <form action="{{ route('Classes.unblock', ['id' => Hashids::encode($class->id)]) }}"
-                                                              method="POST"
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('✅ Enable this class?')">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit"
-                                                                    class="btn-action-modern btn-success-modern"
-                                                                    title="Enable Class">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
-                                                        <form action="{{ route('Classes.destroy', ['id' => Hashids::encode($class->id)]) }}"
-                                                              method="POST"
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('⚠️ This action cannot be undone. Delete class permanently?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit"
-                                                                    class="btn-action-modern btn-danger-modern"
-                                                                    title="Delete Class">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="class-management-page">
 
-        <!-- Class Teachers Section -->
-        <div class="col-lg-6 mb-4">
-            <div class="modern-card">
-                <div class="card-header-modern gradient-primary">
-                    <div class="header-left">
-                        <div class="header-icon">
-                            <i class="fas fa-chalkboard-teacher"></i>
+    {{-- Background --}}
+    <div class="animated-bg"></div>
+
+    <div class="particles"></div>
+
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
+
+    <div class="dashboard-container">
+
+        <div class="row g-3">
+
+
+            {{-- =====================================================
+                 CLASS MANAGEMENT
+                 ===================================================== --}}
+
+            <div class="col-lg-6">
+
+                <div class="modern-card">
+
+
+                    {{-- Header --}}
+                    <div class="card-header-modern gradient-success">
+
+                        <div class="header-left">
+
+                            <div class="header-icon">
+
+                                <i class="fas fa-layer-group"></i>
+
+                            </div>
+
+
+                            <h3 class="header-title">
+
+                                <span>
+                                    Class
+                                </span>
+
+                                Management
+
+                            </h3>
+
                         </div>
-                        <h3 class="header-title">
-                            <span>Class</span> Teachers Management
-                        </h3>
+
+
+                        <button
+                            type="button"
+                            class="btn-add-modern"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addClassModal"
+                        >
+
+                            <i class="fas fa-plus"></i>
+
+                            <span>
+                                New Class
+                            </span>
+
+                        </button>
+
                     </div>
-                </div>
-                <div class="card-body-modern">
-                    @if ($classes->isEmpty())
-                        <div class="empty-state-modern">
-                            <i class="fas fa-chalkboard"></i>
-                            <h6 class="mt-3">No Classes Available</h6>
-                            <p>Create a class first to assign teachers</p>
-                        </div>
-                    @else
+
+
+                    {{-- Body --}}
+                    <div class="card-body-modern">
+
                         <div class="table-container-modern">
+
                             <table class="table-modern">
+
                                 <thead>
+
                                     <tr>
-                                        <th>Class Name & Code</th>
+
+                                        <th>
+                                            Class Name
+                                        </th>
+
+                                        <th>
+                                            Class Code
+                                        </th>
+
+                                        <th class="text-center">
+                                            Actions
+                                        </th>
+
                                     </tr>
+
                                 </thead>
+
+
                                 <tbody>
-                                    @foreach ($classes as $class)
+
+
+                                    @if ($classes->isEmpty())
+
                                         <tr>
-                                            <td>
-                                                <a href="{{ route('Class.Teachers', ['class' => Hashids::encode($class->id)]) }}"
-                                                   class="class-link-modern">
-                                                    <div class="link-icon">
-                                                        <i class="fas fa-users"></i>
-                                                    </div>
-                                                    <span class="class-link-text">
-                                                        {{ strtoupper($class->class_name) }} - {{ strtoupper($class->class_code) }}
-                                                    </span>
-                                                    <i class="fas fa-arrow-right ms-auto" style="color: var(--primary);"></i>
-                                                </a>
+
+                                            <td
+                                                colspan="3"
+                                                class="text-center py-5"
+                                            >
+
+                                                <div class="empty-state-modern">
+
+                                                    <i class="fas fa-layer-group"></i>
+
+                                                    <h6 class="mt-2">
+                                                        No Classes Found
+                                                    </h6>
+
+                                                    <p class="text-muted">
+                                                        Click "New Class" to create your first class
+                                                    </p>
+
+                                                </div>
+
                                             </td>
+
                                         </tr>
-                                    @endforeach
+
+
+                                    @else
+
+
+                                        @foreach ($classes as $class)
+
+                                            <tr>
+
+
+                                                {{-- Class --}}
+                                                <td>
+
+                                                    <div class="class-name-modern">
+
+                                                        <div class="class-icon">
+
+                                                            <i class="fas fa-graduation-cap"></i>
+
+                                                        </div>
+
+
+                                                        <div class="class-details">
+
+                                                            <h6>
+
+                                                                {{
+                                                                    strtoupper(
+                                                                        $class->class_name
+                                                                    )
+                                                                }}
+
+                                                            </h6>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                {{-- Code --}}
+                                                <td>
+
+                                                    <span class="code-badge">
+
+                                                        {{
+                                                            strtoupper(
+                                                                $class->class_code
+                                                            )
+                                                        }}
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                {{-- Actions --}}
+                                                <td>
+
+                                                    <div class="action-group">
+
+
+                                                        @if ($class->status == 1)
+
+
+                                                            {{-- Disable --}}
+                                                            <form
+                                                                action="{{ route(
+                                                                    'Classes.block',
+                                                                    [
+                                                                        'id' =>
+                                                                            Hashids::encode(
+                                                                                $class->id
+                                                                            )
+                                                                    ]
+                                                                ) }}"
+                                                                method="POST"
+                                                                class="d-inline"
+                                                                data-confirm-action="disable"
+                                                                data-class-name="{{ strtoupper($class->class_name) }}"
+                                                            >
+
+                                                                @csrf
+
+                                                                @method('PUT')
+
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn-action-modern btn-warning-modern"
+                                                                    title="Disable Class"
+                                                                    aria-label="Disable Class"
+                                                                >
+
+                                                                    <i class="fas fa-ban"></i>
+
+                                                                </button>
+
+                                                            </form>
+
+
+                                                        @else
+
+
+                                                            {{-- Enable --}}
+                                                            <form
+                                                                action="{{ route(
+                                                                    'Classes.unblock',
+                                                                    [
+                                                                        'id' =>
+                                                                            Hashids::encode(
+                                                                                $class->id
+                                                                            )
+                                                                    ]
+                                                                ) }}"
+                                                                method="POST"
+                                                                class="d-inline"
+                                                                data-confirm-action="enable"
+                                                                data-class-name="{{ strtoupper($class->class_name) }}"
+                                                            >
+
+                                                                @csrf
+
+                                                                @method('PUT')
+
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn-action-modern btn-success-modern"
+                                                                    title="Enable Class"
+                                                                    aria-label="Enable Class"
+                                                                >
+
+                                                                    <i class="fas fa-check"></i>
+
+                                                                </button>
+
+                                                            </form>
+
+
+                                                            {{-- Delete --}}
+                                                            <form
+                                                                action="{{ route(
+                                                                    'Classes.destroy',
+                                                                    [
+                                                                        'id' =>
+                                                                            Hashids::encode(
+                                                                                $class->id
+                                                                            )
+                                                                    ]
+                                                                ) }}"
+                                                                method="POST"
+                                                                class="d-inline"
+                                                                data-confirm-action="delete"
+                                                                data-class-name="{{ strtoupper($class->class_name) }}"
+                                                            >
+
+                                                                @csrf
+
+                                                                @method('DELETE')
+
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn-action-modern btn-danger-modern"
+                                                                    title="Delete Class"
+                                                                    aria-label="Delete Class"
+                                                                >
+
+                                                                    <i class="fas fa-trash"></i>
+
+                                                                </button>
+
+                                                            </form>
+
+                                                        @endif
+
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+
+                                        @endforeach
+
+                                    @endif
+
                                 </tbody>
+
                             </table>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modern Modal -->
-<div class="modal fade modal-modern" id="addClassModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-plus-circle me-2"></i>
-                    Create New Class
-                </h5>
-                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form class="needs-validation" novalidate action="{{ route('Classes.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">
-                                    <i class="fas fa-school me-2 text-primary"></i>
-                                    Class Name
-                                </label>
-                                <input type="text"
-                                       name="name"
-                                       class="form-control-modern @error('name') error @enderror"
-                                       placeholder="e.g., Form One, Standard Seven"
-                                       value="{{ old('name') }}"
-                                       required>
-                                @error('name')
-                                    <div class="error-message">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">
-                                    <i class="fas fa-barcode me-2 text-primary"></i>
-                                    Class Code
-                                </label>
-                                <input type="text"
-                                       name="code"
-                                       class="form-control-modern @error('code') error @enderror"
-                                       placeholder="e.g., F1, STD7"
-                                       value="{{ old('code') }}"
-                                       required>
-                                @error('code')
-                                    <div class="error-message">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
+
                     </div>
 
-                    <div class="mt-4 p-3 bg-light rounded">
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle me-2 text-info"></i>
-                            Class code should be unique and easy to identify. Example: "F1" for Form One, "STD7" for Standard Seven.
-                        </small>
+                </div>
+
+            </div>
+
+
+            {{-- =====================================================
+                 CLASS TEACHERS
+                 ===================================================== --}}
+
+            <div class="col-lg-6">
+
+                <div class="modern-card">
+
+
+                    {{-- Header --}}
+                    <div class="card-header-modern gradient-primary">
+
+                        <div class="header-left">
+
+                            <div class="header-icon">
+
+                                <i class="fas fa-chalkboard-teacher"></i>
+
+                            </div>
+
+
+                            <h3 class="header-title">
+
+                                <span>
+                                    Class
+                                </span>
+
+                                Teachers Management
+
+                            </h3>
+
+                        </div>
+
                     </div>
+
+
+                    {{-- Body --}}
+                    <div class="card-body-modern">
+
+
+                        @if ($classes->isEmpty())
+
+
+                            <div class="empty-state-modern">
+
+                                <i class="fas fa-chalkboard"></i>
+
+                                <h6 class="mt-2">
+                                    No Classes Available
+                                </h6>
+
+                                <p>
+                                    Create a class first to assign teachers
+                                </p>
+
+                            </div>
+
+
+                        @else
+
+
+                            <div class="table-container-modern">
+
+                                <table class="table-modern">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Class Name & Code
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+
+                                        @foreach ($classes as $class)
+
+                                            <tr>
+
+                                                <td>
+
+                                                    <a
+                                                        href="{{ route(
+                                                            'Class.Teachers',
+                                                            [
+                                                                'class' =>
+                                                                    Hashids::encode(
+                                                                        $class->id
+                                                                    )
+                                                            ]
+                                                        ) }}"
+                                                        class="class-link-modern"
+                                                    >
+
+
+                                                        <div class="link-icon">
+
+                                                            <i class="fas fa-users"></i>
+
+                                                        </div>
+
+
+                                                        <span class="class-link-text">
+
+                                                            {{
+                                                                strtoupper(
+                                                                    $class->class_name
+                                                                )
+                                                            }}
+
+                                                            -
+
+                                                            {{
+                                                                strtoupper(
+                                                                    $class->class_code
+                                                                )
+                                                            }}
+
+                                                        </span>
+
+
+                                                        <i
+                                                            class="fas fa-arrow-right class-link-arrow"
+                                                        ></i>
+
+                                                    </a>
+
+                                                </td>
+
+                                            </tr>
+
+                                        @endforeach
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn-modal-save" id="saveButton">
-                        <i class="fas fa-save me-2"></i>
-                        Save Class
-                    </button>
-                </div>
-            </form>
+
+            </div>
+
         </div>
+
     </div>
+
+
+    {{-- =========================================================
+         ADD CLASS MODAL
+         ========================================================= --}}
+
+    <div
+        class="modal fade modal-modern"
+        id="addClassModal"
+        tabindex="-1"
+        aria-labelledby="addClassModalLabel"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+
+                {{-- Header --}}
+                <div class="modal-header">
+
+                    <h5
+                        class="modal-title"
+                        id="addClassModalLabel"
+                    >
+
+                        <i class="fas fa-plus-circle me-2"></i>
+
+                        Create New Class
+
+                    </h5>
+
+
+                    <button
+                        type="button"
+                        class="btn-modal-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    >
+
+                        <i class="fas fa-times"></i>
+
+                    </button>
+
+                </div>
+
+
+                {{-- Form --}}
+                <form
+                    class="needs-validation"
+                    novalidate
+                    action="{{ route('Classes.store') }}"
+                    method="POST"
+                    id="addClassForm"
+                >
+
+                    @csrf
+
+
+                    <div class="modal-body">
+
+                        <div class="row g-2">
+
+
+                            {{-- Class Name --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label
+                                        for="className"
+                                        class="form-label-modern"
+                                    >
+
+                                        <i
+                                            class="fas fa-school me-1 text-primary"
+                                        ></i>
+
+                                        Class Name
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="className"
+                                        name="name"
+                                        class="form-control-modern @error('name') error @enderror"
+                                        placeholder="e.g. Form One, Standard Seven"
+                                        value="{{ old('name') }}"
+                                        autocomplete="off"
+                                        required
+                                    >
+
+
+                                    @error('name')
+
+                                        <div class="error-message">
+
+                                            <i class="fas fa-exclamation-circle"></i>
+
+                                            <span>
+                                                {{ $message }}
+                                            </span>
+
+                                        </div>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Class Code --}}
+                            <div class="col-md-6">
+
+                                <div class="form-group-modern">
+
+                                    <label
+                                        for="classCode"
+                                        class="form-label-modern"
+                                    >
+
+                                        <i
+                                            class="fas fa-barcode me-1 text-primary"
+                                        ></i>
+
+                                        Class Code
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="classCode"
+                                        name="code"
+                                        class="form-control-modern @error('code') error @enderror"
+                                        placeholder="e.g. F1, STD7"
+                                        value="{{ old('code') }}"
+                                        autocomplete="off"
+                                        maxlength="20"
+                                        required
+                                    >
+
+
+                                    @error('code')
+
+                                        <div class="error-message">
+
+                                            <i class="fas fa-exclamation-circle"></i>
+
+                                            <span>
+                                                {{ $message }}
+                                            </span>
+
+                                        </div>
+
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Information --}}
+                        <div class="class-info-note">
+
+                            <i
+                                class="fas fa-info-circle me-1 text-info"
+                            ></i>
+
+                            Class code should be unique and easy to identify.
+                            Example:
+                            <strong>F1</strong>
+                            for Form One or
+                            <strong>STD7</strong>
+                            for Standard Seven.
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Footer --}}
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn-modal-cancel"
+                            data-bs-dismiss="modal"
+                        >
+
+                            <i class="fas fa-times me-1"></i>
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="btn-modal-save"
+                            id="saveButton"
+                        >
+
+                            <i class="fas fa-save"></i>
+
+                            <span>
+                                Save Class
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
 
 <script>
-// Form validation and loading
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.querySelector(".needs-validation");
-    const submitButton = document.getElementById("saveButton");
+document.addEventListener('DOMContentLoaded', function () {
 
-    if (form && submitButton) {
-        form.addEventListener("submit", function(event) {
-            event.preventDefault();
+    /*
+     * =========================================================
+     * HELPERS
+     * =========================================================
+     */
 
-            // Show loading spinner
-            document.getElementById('loadingSpinner').style.display = 'block';
+    const page =
+        document.querySelector(
+            '.class-management-page'
+        );
 
-            // Disable button
-            submitButton.disabled = true;
-            submitButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                Saving...
-            `;
 
-            // Validate form
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                document.getElementById('loadingSpinner').style.display = 'none';
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Class';
-
-                // Show error toast
-                showToast('Please fill all required fields', 'error');
-                return;
-            }
-
-            // Submit form after delay
-            setTimeout(() => {
-                form.submit();
-            }, 500);
-        });
+    if (!page) {
+        return;
     }
 
-    // Create particles
-    function createParticles() {
-        const particlesContainer = document.querySelector('.particles');
-        for (let i = 0; i < 20; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.width = Math.random() * 10 + 5 + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 20 + 's';
-            particle.style.animationDuration = Math.random() * 10 + 20 + 's';
-            particlesContainer.appendChild(particle);
+
+    const $ = (
+        selector,
+        parent = page
+    ) =>
+        parent.querySelector(selector);
+
+
+    const $$ = (
+        selector,
+        parent = page
+    ) =>
+        Array.from(
+            parent.querySelectorAll(selector)
+        );
+
+
+    /*
+     * =========================================================
+     * PARTICLES
+     * =========================================================
+     */
+
+    const particlesContainer =
+        $('.particles');
+
+
+    if (particlesContainer) {
+
+        const fragment =
+            document.createDocumentFragment();
+
+
+        for (let i = 0; i < 18; i++) {
+
+            const particle =
+                document.createElement('div');
+
+
+            particle.className =
+                'particle';
+
+
+            const size =
+                Math.random() * 8 + 3;
+
+
+            particle.style.width =
+                `${size}px`;
+
+
+            particle.style.height =
+                `${size}px`;
+
+
+            particle.style.left =
+                `${Math.random() * 100}%`;
+
+
+            particle.style.top =
+                `${Math.random() * 100}%`;
+
+
+            particle.style.animationDelay =
+                `${Math.random() * 20}s`;
+
+
+            particle.style.animationDuration =
+                `${Math.random() * 10 + 15}s`;
+
+
+            fragment.appendChild(
+                particle
+            );
+
         }
-    }
-    createParticles();
 
-    // Toast notification function
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast-notification toast-${type}`;
+
+        particlesContainer.appendChild(
+            fragment
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * FORM
+     * =========================================================
+     */
+
+    const form =
+        $('#addClassForm');
+
+
+    const submitButton =
+        $('#saveButton');
+
+
+    const loadingSpinner =
+        $('#loadingSpinner');
+
+
+    /*
+     * =========================================================
+     * TOAST
+     * =========================================================
+     */
+
+    function showToast(
+        message,
+        type = 'success'
+    ) {
+
+        const toast =
+            document.createElement('div');
+
+
+        toast.className =
+            `toast-notification toast-${type}`;
+
+
+        const icon =
+            type === 'success'
+                ? 'fa-check-circle'
+                : 'fa-exclamation-circle';
+
+
         toast.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} fa-2x"></i>
-            <span>${message}</span>
+
+            <i class="fas ${icon}"></i>
+
+            <span>
+                ${message}
+            </span>
+
         `;
-        document.body.appendChild(toast);
+
+
+        page.appendChild(
+            toast
+        );
+
+
+        requestAnimationFrame(() => {
+
+            toast.classList.add(
+                'show'
+            );
+
+        });
+
 
         setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
 
-        setTimeout(() => {
-            toast.classList.remove('show');
+            toast.classList.remove(
+                'show'
+            );
+
+
             setTimeout(() => {
+
                 toast.remove();
-            }, 300);
+
+            }, 250);
+
         }, 3000);
+
     }
 
-    // Input animations
-    document.querySelectorAll('.form-control-modern').forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
 
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
-    });
-});
+    /*
+     * =========================================================
+     * FORM VALIDATION
+     * ========================================================= */
 
-// Auto uppercase for inputs
-document.querySelectorAll('input[type="text"]').forEach(input => {
-    input.addEventListener('input', function() {
-        this.value = this.value.toUpperCase();
-    });
+    if (
+        form &&
+        submitButton
+    ) {
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                if (!form.checkValidity()) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    form.classList.add(
+                        'was-validated'
+                    );
+
+
+                    showToast(
+                        'Please fill all required fields.',
+                        'error'
+                    );
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * Prevent double submission.
+                 */
+
+                submitButton.disabled =
+                    true;
+
+
+                submitButton.innerHTML = `
+
+                    <span
+                        class="spinner-border spinner-border-sm me-1"
+                        role="status"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span>
+                        Saving...
+                    </span>
+
+                `;
+
+
+                if (loadingSpinner) {
+
+                    loadingSpinner.style.display =
+                        'block';
+
+                }
+
+
+                form.classList.add(
+                    'was-validated'
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * CLASS / CODE UPPERCASE
+     * =========================================================
+     *
+     * IMPORTANT:
+     * We scope this only to the class form.
+     * It will NOT affect unrelated inputs in the layout.
+     */
+
+    const classNameInput =
+        $('#className');
+
+
+    const classCodeInput =
+        $('#classCode');
+
+
+    if (classNameInput) {
+
+        classNameInput.addEventListener(
+            'input',
+            function () {
+
+                this.value =
+                    this.value.toUpperCase();
+
+            }
+        );
+
+    }
+
+
+    if (classCodeInput) {
+
+        classCodeInput.addEventListener(
+            'input',
+            function () {
+
+                this.value =
+                    this.value.toUpperCase();
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * CLASS ACTION CONFIRMATION
+     * ========================================================= */
+
+    $$(
+        'form[data-confirm-action]'
+    ).forEach(
+        function (actionForm) {
+
+            actionForm.addEventListener(
+                'submit',
+                function (event) {
+
+                    const action =
+                        this.dataset.confirmAction;
+
+
+                    const className =
+                        this.dataset.className ||
+                        'this class';
+
+
+                    let message =
+                        'Are you sure?';
+
+
+                    if (
+                        action ===
+                        'disable'
+                    ) {
+
+                        message =
+                            `⚠️ Are you sure you want to disable ${className}?`;
+
+                    }
+
+
+                    if (
+                        action ===
+                        'enable'
+                    ) {
+
+                        message =
+                            `✅ Enable ${className}?`;
+
+                    }
+
+
+                    if (
+                        action ===
+                        'delete'
+                    ) {
+
+                        message =
+                            `⚠️ This action cannot be undone. Delete ${className} permanently?`;
+
+                    }
+
+
+                    if (
+                        !confirm(message)
+                    ) {
+
+                        event.preventDefault();
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Show small loading state on action button.
+                     */
+
+                    const button =
+                        this.querySelector(
+                            'button[type="submit"]'
+                        );
+
+
+                    if (button) {
+
+                        button.disabled =
+                            true;
+
+
+                        button.innerHTML = `
+
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+
+                        `;
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    /*
+     * =========================================================
+     * RESET MODAL STATE
+     * ========================================================= */
+
+    const modal =
+        document.getElementById(
+            'addClassModal'
+        );
+
+
+    if (modal) {
+
+        modal.addEventListener(
+            'hidden.bs.modal',
+            function () {
+
+                if (!form) {
+                    return;
+                }
+
+
+                /*
+                 * Only reset if there are no
+                 * server validation errors.
+                 */
+
+                const hasServerErrors =
+                    form.querySelector(
+                        '.error-message'
+                    );
+
+
+                if (!hasServerErrors) {
+
+                    form.reset();
+
+                    form.classList.remove(
+                        'was-validated'
+                    );
+
+                }
+
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+
+                    submitButton.innerHTML = `
+
+                        <i class="fas fa-save"></i>
+
+                        <span>
+                            Save Class
+                        </span>
+
+                    `;
+
+                }
+
+
+                if (loadingSpinner) {
+
+                    loadingSpinner.style.display =
+                        'none';
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * AUTO OPEN MODAL WHEN VALIDATION ERROR EXISTS
+     * =========================================================
+     */
+
+    @if ($errors->has('name') || $errors->has('code'))
+
+        const modalElement =
+            document.getElementById(
+                'addClassModal'
+            );
+
+
+        if (
+            modalElement &&
+            typeof bootstrap !== 'undefined'
+        ) {
+
+            const addClassModal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
+
+
+            addClassModal.show();
+
+        }
+
+    @endif
+
 });
 </script>
+
 @endsection

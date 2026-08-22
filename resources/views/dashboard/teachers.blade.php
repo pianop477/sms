@@ -591,6 +591,202 @@
             position: fixed !important;
             z-index: 1060 !important;
         }
+        /* =========================================================
+        GLOBAL DASHBOARD GREETING
+        ========================================================= */
+
+        .dashboard-greeting {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(78, 115, 223, 0.98) 0%,
+                    rgba(111, 66, 193, 0.96) 100%
+                );
+            box-shadow:
+                0 12px 30px rgba(78, 115, 223, 0.16);
+            color: #fff;
+        }
+
+        .dashboard-greeting::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: -120px;
+            right: -60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .dashboard-greeting::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            bottom: -100px;
+            left: 35%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .greeting-content {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 18px;
+            padding: 20px 24px;
+        }
+
+        .greeting-icon {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+
+            font-size: 22px;
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .greeting-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .greeting-message {
+            margin-bottom: 4px;
+
+            font-size: clamp(1.15rem, 2vw, 1.55rem);
+            font-weight: 800;
+
+            line-height: 1.25;
+            letter-spacing: -0.2px;
+        }
+
+        .greeting-subtitle {
+            color: rgba(255, 255, 255, 0.78);
+
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .greeting-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            white-space: nowrap;
+
+            padding: 8px 12px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+
+            color: rgba(255, 255, 255, 0.9);
+
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .greeting-time i {
+            font-size: 0.8rem;
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+            .greeting-content {
+                padding: 17px;
+                gap: 13px;
+            }
+
+            .greeting-icon {
+                width: 45px;
+                height: 45px;
+                min-width: 45px;
+                border-radius: 12px;
+                font-size: 18px;
+            }
+
+            .greeting-message {
+                font-size: 1.1rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.75rem;
+            }
+
+            .greeting-time {
+                padding: 7px 9px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 576px) {
+            .dashboard-greeting {
+                border-radius: 14px;
+            }
+
+            .greeting-content {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                padding: 15px;
+                gap: 11px;
+            }
+
+            .greeting-icon {
+                width: 42px;
+                height: 42px;
+                min-width: 42px;
+            }
+
+            .greeting-message {
+                font-size: 1rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .greeting-time {
+                grid-column: 1 / -1;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Very small devices */
+        @media (max-width: 360px) {
+            .greeting-content {
+                padding: 12px;
+            }
+
+            .greeting-message {
+                font-size: 0.92rem;
+            }
+
+            .greeting-subtitle {
+                font-size: 0.66rem;
+            }
+        }
     </style>
 
     {{--
@@ -600,6 +796,42 @@
     3. Academic teacher
     4. Class teacher
 --}}
+    @php
+        $currentUser = Auth::user();
+
+        $currentHour = now()->hour;
+
+        $greeting = match (true) {
+            $currentHour < 12 => 'Good Morning',
+            $currentHour < 18 => 'Good Afternoon',
+            default => 'Good Evening',
+        };
+
+        $firstName = ucwords(strtolower(trim($currentUser->first_name)));
+    @endphp
+    <!-- Global User Greeting -->
+    <div class="dashboard-greeting mb-4">
+        <div class="greeting-content">
+            <div class="greeting-icon">
+                <i class="fas fa-sun"></i>
+            </div>
+
+            <div class="greeting-text">
+                <div class="greeting-message">
+                    {{ $greeting }}, {{ $firstName }}
+                </div>
+
+                <div class="greeting-subtitle">
+                    Welcome back. Here's what's happening in your dashboard today.
+                </div>
+            </div>
+
+            <div class="greeting-time">
+                <i class="far fa-clock"></i>
+                <span id="dashboardCurrentTime"></span>
+            </div>
+        </div>
+    </div>
     <div class="py-4">
         @php
             $school = App\Models\school::find(Auth::user()->school_id);
@@ -700,9 +932,8 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong><i class="fas fa-bell me-2"></i> You are on duty this week!</strong>
-                                        Please, collect school report to document today's activities.
                                     </div>
-                                    <a href="{{ route('tod.report.create') }}" class="btn btn-warning btn-sm"
+                                    <a href="{{ route('tod.report.create') }}" class="btn btn-warning btn-sm" style="border-radius: 10px;"
                                         onclick="return confirm('Are you sure you want to fill the daily report?')">
                                         <i class="fas fa-file-pen me-1"></i> Collect Report
                                     </a>
@@ -2435,7 +2666,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
             function initializeCountdown() {
                 const endDateStr = '{{ $jsEndDate }}';
                 // Parse the date properly
@@ -2798,6 +3028,32 @@
             @if (Auth::user()->usertype != 3)
                 window.location.href = '/error-page';
             @endif
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const clockElement = document.getElementById('dashboardCurrentTime');
+
+            if (!clockElement) {
+                return;
+            }
+
+            function updateDashboardClock() {
+                const now = new Date();
+
+                const time = now.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+
+                clockElement.textContent = time;
+            }
+
+            updateDashboardClock();
+
+            setInterval(updateDashboardClock, 1000);
         });
     </script>
 
