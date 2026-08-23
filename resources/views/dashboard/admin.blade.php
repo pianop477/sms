@@ -473,7 +473,7 @@
 
         $greeting = match (true) {
             $currentHour < 12 => 'Good Morning',
-            $currentHour < 18 => 'Good Afternoon',
+            $currentHour < 16 => 'Good Afternoon',
             default => 'Good Evening',
         };
 
@@ -482,10 +482,6 @@
     <!-- Global User Greeting -->
     <div class="dashboard-greeting mb-4">
         <div class="greeting-content">
-            <div class="greeting-icon">
-                <i class="fas fa-sun"></i>
-            </div>
-
             <div class="greeting-text">
                 <div class="greeting-message">
                     {{ $greeting }}, {{ $firstName }}
