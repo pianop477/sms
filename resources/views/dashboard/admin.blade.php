@@ -472,9 +472,9 @@
         $currentHour = now()->hour;
 
         $greeting = match (true) {
-            $currentHour < 12 => 'Good Morning',
-            $currentHour < 16 => 'Good Afternoon',
-            default => 'Good Evening',
+            $currentHour < 12 => '🌄 Good Morning',
+            $currentHour < 16 => '☀️ Good Afternoon',
+            default => '🌙 Good Evening',
         };
 
         $firstName = ucwords(strtolower(trim($currentUser->first_name)));
