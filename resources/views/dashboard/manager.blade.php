@@ -946,11 +946,11 @@
                                 <table class="table table-premium sticky-table-header">
                                     <thead>
                                         <tr>
-                                            <th>Class</th>
-                                            <th class="text-center">Pres</th>
-                                            <th class="text-center">Abs</th>
-                                            <th class="text-center">Perm</th>
-                                            <th class="text-center">Rate</th>
+                                            <th class="text-white">Class</th>
+                                            <th class="text-center text-white">Pres</th>
+                                            <th class="text-center text-white">Abs</th>
+                                            <th class="text-center text-white">Perm</th>
+                                            <th class="text-center text-white">Rate</th>
                                         </tr>
                                     </thead>
                                     <tbody>

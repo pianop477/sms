@@ -1324,18 +1324,18 @@
                                             <table class="table table-hover mb-0 table-sm sticky-header">
                                                 <thead>
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">Class</th>
+                                                        <th class="border-0 py-3 ps-4 text-white">Class</th>
                                                         <th class="border-0 py-3 text-center">
-                                                            <span class="text-success">Pres</span>
+                                                            <span class="text-white">Pres</span>
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
-                                                            <span class="text-danger">Abs</span>
+                                                            <span class="text-white">Abs</span>
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
-                                                            <span class="text-secondary">Perm</span>
+                                                            <span class="text-white">Perm</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center pe-4">Total</th>
-                                                        <th class="border-0 py-3 text-center">Rate</th>
+                                                        <th class="border-0 py-3 text-center text-white pe-4">Total</th>
+                                                        <th class="border-0 py-3 text-center text-white">Rate</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1979,18 +1979,18 @@
                                             <table class="table table-hover mb-0 table-sm sticky-header">
                                                 <thead>
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">Class</th>
-                                                        <th class="border-0 py-3 text-center">
-                                                            <span class="text-success">Pres</span>
+                                                        <th class="border-0 py-3 ps-4 text-white">Class</th>
+                                                        <th class="border-0 py-3 text-center text-white">
+                                                            <span class="text-white">Pres</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center">
-                                                            <span class="text-danger">Abs</span>
+                                                        <th class="border-0 py-3 text-center text-white">
+                                                            <span class="text-white">Abs</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center">
-                                                            <span class="text-secondary">Perm</span>
+                                                        <th class="border-0 py-3 text-center text-white">
+                                                            <span class="text-white">Perm</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center pe-4">Total</th>
-                                                        <th class="border-0 py-3 text-center">Rate</th>
+                                                        <th class="border-0 py-3 text-center pe-4 text-white">Total</th>
+                                                        <th class="border-0 py-3 text-center text-white">Rate</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
