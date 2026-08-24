@@ -402,24 +402,6 @@
             </div>
         </div>
 
-        <!-- NOTICE / REMINDER -->
-        <div class="notice-box mt-4" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px;">
-            <div class="d-flex align-items-start gap-3">
-                <div style="font-size: 1.5rem; color: #dc2626;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div>
-                    <div style="font-weight: 700; color: #991b1b; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                        <i class="fas fa-arrow-right me-2"></i> NB / KUMBUKA
-                    </div>
-                    <p style="margin: 5px 0 0 0; color: #7f1d1d; font-size: 0.9rem; font-weight: 500;">
-                        Fomu hii <strong>INAPASWA KURUDISHWA</strong> shuleni siku ya kurudi (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>)
-                        na kupewa Mwalimu Mkuu / Mwalimu wa Darasa kwa ajili ya kuthibitisha kurudi kwa mwanafunzi.
-                    </p>
-                </div>
-            </div>
-        </div>
-
         <div class="row align-items-center mt-5">
             {{-- <div class="col-4 text-center">
                 <div style="border: 1px solid var(--border-color); padding: 10px; display: inline-block; border-radius: 8px;">
@@ -435,6 +417,20 @@
                     <div class="sig-box">
                         <p>Authority / Stamp</p>
                     </div>
+                </div>
+            </div>
+        </div>
+        <!-- NOTICE / REMINDER -->
+        <div class="notice-box mt-4" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px;">
+            <div class="d-flex align-items-start gap-3">
+                <div>
+                    <div style="font-weight: 700; color: #991b1b; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        KUMBUKA
+                    </div>
+                    <p style="margin: 5px 0 0 0; color: #7f1d1d; font-size: 0.9rem; font-weight: 500;">
+                        Fomu hii <strong>INAPASWA KURUDISHWA</strong> shuleni siku ya kurudi (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>)
+                        na kupewa Mwalimu Mkuu / Mwalimu wa Darasa kwa ajili ya kuthibitisha kurudi kwa mwanafunzi.
+                    </p>
                 </div>
             </div>
         </div>
