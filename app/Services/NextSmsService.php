@@ -24,7 +24,7 @@ class NextSmsService
     public function sendSmsByNext($sender, $destination, $message, $reference)
     {
         try {
-            $url = $this->baseUrl . '/api/sms/v2/text/single';
+            $url = $this->baseUrl . '/api/sms/v1/text/single';
             $postData = [
                 'from' => $sender,
                 'to' => $destination,
@@ -60,7 +60,7 @@ class NextSmsService
     public function checkBalance()
     {
         try {
-            $url = $this->baseUrl . '/api/v2/balance';
+            $url = $this->baseUrl . '/api/sms/v1/balance';
 
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode($this->apiUsername . ':' . $this->apiPassword),
@@ -88,7 +88,7 @@ class NextSmsService
 
     public function smsLogs($from, $limit, $offset)
     {
-        $url = $this->baseUrl . '/api/v2/logs';
+        $url = $this->baseUrl . '/api/sms/v1/logs';
 
         try {
 
