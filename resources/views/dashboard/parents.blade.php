@@ -616,10 +616,17 @@
         $currentHour = now()->hour;
 
         $greeting = match (true) {
-            $currentHour < 12 => '🌄 Good Morning',
-            $currentHour < 16 => '☀️ Good Afternoon',
-            default => '🌙 Good Evening',
+            $currentHour < 12 => 'Good Morning',
+            $currentHour < 16 => 'Good Afternoon',
+            default => 'Good Evening',
         };
+        if($greeting === 'Good Morning') {
+            $icon = '🌄';
+        } elseif($greeting === 'Good Afternoon') {
+            $icon = '☀️';
+        } else {
+            $icon = '🌙';
+        }
 
         $firstName = ucwords(strtolower(trim($currentUser->first_name)));
     @endphp
@@ -630,6 +637,9 @@
     <!-- Welcome Header - Fixed Contrast -->
     <div class="dashboard-greeting mb-4">
         <div class="greeting-content">
+            <div class="greeting-icon">
+                {{ $icon }}
+            </div>
             <div class="greeting-text">
                 <div class="greeting-message">
                     {{ $greeting }}, {{ $firstName }}
