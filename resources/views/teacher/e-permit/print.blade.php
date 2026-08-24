@@ -207,6 +207,11 @@
                 background: white;
             }
 
+            .notice-box {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
             .print-container {
                 margin: 0;
                 box-shadow: none;
@@ -252,14 +257,14 @@
         <div class="header-grid">
             <div class="d-flex align-items-center gap-4">
                 @if ($school->logo)
-                    <img src="{{ asset('storage/logo/' . $school->logo) }}" alt="Logo"
-                        style="height: 80px; width: auto; object-fit: contain;">
+                <img src="{{ asset('storage/logo/' . $school->logo) }}" alt="Logo"
+                    style="height: 80px; width: auto; object-fit: contain;">
                 @endif
                 <div class="school-info">
                     <h4 class="mb-1 text-uppercase">{{ $school->school_name }}</h4>
                     <div class="small text-muted" style="line-height: 1.3">
                         @if ($school->postal_name || $school->postal_address)
-                            <div> {{ strtoupper($school->postal_address) }} - {{ ucfirst($school->postal_name) }}</div>
+                        <div> {{ strtoupper($school->postal_address) }} - {{ ucfirst($school->postal_name) }}</div>
                         @endif
                         <div>
                             <i class="fas fa-phone me-1" style="font-size: 10px;"></i> {{ $school->school_phone }}
@@ -278,11 +283,11 @@
         <div class="section-title">Student Identification</div>
         <div class="student-hero">
             @php
-                $studentImage =
-                    $permit->student->image &&
-                    file_exists(storage_path('app/public/students/' . $permit->student->image))
-                        ? asset('storage/students/' . $permit->student->image)
-                        : asset('storage/students/student.jpg');
+            $studentImage =
+            $permit->student->image &&
+            file_exists(storage_path('app/public/students/' . $permit->student->image))
+            ? asset('storage/students/' . $permit->student->image)
+            : asset('storage/students/student.jpg');
             @endphp
             <img src="{{ $studentImage }}" class="student-photo" alt="Profile">
             <table class="info-table">
@@ -319,10 +324,10 @@
                     <tr>
                         <td class="label">Relationship</td>
                         @php
-                            $guardianType = match ($permit->guardian_type) {
-                                'parent' =>  'Mzazi',
-                                'guardian' => 'Mlezi',
-                            }
+                        $guardianType = match ($permit->guardian_type) {
+                        'parent' => 'Mzazi',
+                        'guardian' => 'Mlezi',
+                        }
                         @endphp
                         <td class="value">{{ ucfirst($guardianType)}} - {{ucfirst($permit->relationship)}}</td>
                     </tr>
@@ -334,7 +339,8 @@
                     <tr>
                         <td class="label">Departure</td>
                         <td class="value">{{ $permit->departure_date->format('d M, Y') }} -
-                            {{ $permit->departure_time->format('H:i') }}</td>
+                            {{ $permit->departure_time->format('H:i') }}
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Return By</td>
@@ -349,15 +355,15 @@
             <p class="value"
                 style="background: #fffbeb; padding: 10px; border-radius: 6px; border-left: 4px solid #f59e0b;">
                 @php
-                    $reasonText = match ($permit->reason) {
-                        'medical' => 'Matibabu',
-                        'family_matter' => 'Mambo ya Kifamilia',
-                        default => ucfirst($permit->reason),
-                    };
+                $reasonText = match ($permit->reason) {
+                'medical' => 'Matibabu',
+                'family_matter' => 'Mambo ya Kifamilia',
+                default => ucfirst($permit->reason),
+                };
                 @endphp
                 {{ $reasonText }}
                 @if ($permit->other_reason)
-                    <span class="text-muted fw-normal"> — {{ $permit->other_reason }}</span>
+                <span class="text-muted fw-normal"> — {{ $permit->other_reason }}</span>
                 @endif
             </p>
         </div>
@@ -392,6 +398,24 @@
                 <div class="status-stamp">
                     <i class="fas {{ $permit->head_teacher_approved_at ? 'fa-check-circle' : 'fa-clock' }}"></i>
                     {{ $permit->head_teacher_approved_at ? 'Authorized' : 'Pending' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTICE / REMINDER -->
+        <div class="notice-box mt-4" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px;">
+            <div class="d-flex align-items-start gap-3">
+                <div style="font-size: 1.5rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 700; color: #991b1b; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-arrow-right me-2"></i> NB / KUMBUKA
+                    </div>
+                    <p style="margin: 5px 0 0 0; color: #7f1d1d; font-size: 0.9rem; font-weight: 500;">
+                        Fomu hii <strong>INAPASWA KURUDISHWA</strong> shuleni siku ya kurudi (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>)
+                        na kupewa Mwalimu Mkuu / Mwalimu wa Darasa kwa ajili ya kuthibitisha kurudi kwa mwanafunzi.
+                    </p>
                 </div>
             </div>
         </div>
