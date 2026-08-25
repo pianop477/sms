@@ -684,11 +684,11 @@
     };
 
     if($greeting === 'Good Morning') {
-        $icon = '🌄';
+        $greetingIcon = '🌄';
     } elseif($greeting === 'Good Afternoon') {
-        $icon = '☀️';
+        $greetingIcon = '☀️';
     } else {
-        $icon = '🌙';
+        $greetingIcon = '🌙';
     }
 
     $firstName = ucwords(strtolower(trim($currentUser->first_name)));
@@ -697,7 +697,7 @@
 <div class="dashboard-greeting mb-4">
     <div class="greeting-content">
         <div class="greeting-icon">
-            {{ $icon }}
+            {{ $greetingIcon }}
         </div>
         <div class="greeting-text">
             <div class="greeting-message">
