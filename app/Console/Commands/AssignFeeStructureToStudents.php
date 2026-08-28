@@ -118,173 +118,155 @@ class AssignFeeStructureToStudents extends Command
         Student::with(['class', 'transport'])
             ->chunk((int) $this->option('chunk'), function ($students) use (&$stats, $dryRun, $force, $showDetails, $shouldCheckTransport, $shouldCheckClass, $fullSync, $progressBar, $academicYear) {
                 foreach ($students as $student) {
-                    try {
-                        $stats['processed']++;
+                    $stats['processed']++;
 
-                        // ✅ Check if student has existing bills for this academic year
-                        $hasBills = school_fees::where('student_id', $student->id)
-                            ->where('academic_year', $academicYear)
-                            ->whereNotIn('status', ['expired', 'cancelled'])
-                            ->exists();
+                    // ✅ Check if student has existing bills for this academic year
+                    $hasBills = school_fees::where('student_id', $student->id)
+                        ->where('academic_year', $academicYear)
+                        ->whereNotIn('status', ['expired', 'cancelled'])
+                        ->exists();
 
-                        if ($hasBills) {
-                            $stats['has_bills']++;
-                        } else {
-                            $stats['no_bills']++;
-                            // 🔧 FIX: Only skip if NOT in full-sync mode and NOT forced
-                            if (!$fullSync && !$force) {
-                                if ($showDetails) {
-                                    $this->line("\n   ⏭️  {$student->admission_number} - No existing bills for year {$academicYear}, skipping assignment (use --full-sync to assign anyway)");
-                                }
-                                $progressBar->advance();
-                                continue;
-                            }
+                    if ($hasBills) {
+                        $stats['has_bills']++;
+                    } else {
+                        $stats['no_bills']++;
+                        // 🔧 FIX: Only skip if NOT in full-sync mode and NOT forced
+                        if (!$fullSync && !$force) {
                             if ($showDetails) {
-                                $this->warn("\n   🔄 FULL SYNC: {$student->admission_number} - No bills for {$academicYear} but assigning fee structure anyway");
+                                $this->line("\n   ⏭️  {$student->admission_number} - No existing bills for year {$academicYear}, skipping assignment (use --full-sync to assign anyway)");
                             }
-                        }
-
-                        // ✅ Get current eligibility criteria from student model
-                        $hasTransport = !is_null($student->transport_id);
-                        $currentClassId = $student->class_id;
-
-                        // ✅ Get previously assigned fee structure for THIS academic year
-                        $previousAssignment = StudentFeeAssignment::where('student_id', $student->id)
-                            ->where('academic_year', $academicYear)
-                            ->first();
-
-                        $previousStructureId = $previousAssignment->fee_structure_id ?? null;
-
-                        // 🔥 CRITICAL FIX: Get previous values from assignment, NOT from student
-                        // These values represent the last known state when assignment was created/updated
-                        $previousTransportStatus = $previousAssignment->had_transport ?? false;
-                        $previousClassId = $previousAssignment->assigned_class_id ?? null;
-
-                        // ✅ Check if changes occurred by comparing current vs previous (from assignment)
-                        $transportChanged = $shouldCheckTransport && ($previousTransportStatus != $hasTransport);
-                        $classChanged = $shouldCheckClass && ($previousClassId != $currentClassId);
-
-                        // ✅ Determine if we need to reassign
-                        $needsReassignment = $force || $fullSync || $transportChanged || $classChanged || !$previousAssignment;
-
-                        // ✅ Find the correct fee structure based on current student data
-                        $selectedStructure = $this->findBestFeeStructure($student->school_id, $currentClassId, $hasTransport);
-
-                        // ✅ If no structure found, skip
-                        if (!$selectedStructure) {
-                            if ($showDetails) {
-                                $className = $student->class ? $student->class->class_name : 'NO CLASS';
-                                $this->warn("\n   ⚠️  {$student->admission_number} - No fee structure found for class: {$className}, transport: " . ($hasTransport ? 'Yes' : 'No'));
-                            }
-                            $stats['skipped']++;
                             $progressBar->advance();
                             continue;
                         }
-
-                        // ✅ Check if the selected structure is different from the one currently assigned
-                        $structureChanged = $previousStructureId != $selectedStructure->id;
-
-                        // ✅ Only proceed if there's a change OR forced
-                        if (!$needsReassignment && !$structureChanged) {
-                            if ($showDetails) {
-                                $this->line("\n   ⏭️  SKIP: {$student->admission_number} - No changes detected");
-                            }
-                            $stats['skipped']++;
-                            $progressBar->advance();
-                            continue;
-                        }
-
-                        // ✅ Log the changes
-                        if ($transportChanged || $classChanged || $structureChanged) {
-                            if ($showDetails) {
-                                $this->line("\n   🔄 CHANGE DETECTED: {$student->admission_number}");
-                                if ($transportChanged) {
-                                    $this->line("      🚌 Transport: " . ($previousTransportStatus ? 'Yes' : 'No') . " → " . ($hasTransport ? 'Yes' : 'No'));
-                                }
-                                if ($classChanged) {
-                                    $oldClass = Grade::find($previousClassId);
-                                    $newClass = Grade::find($currentClassId);
-                                    $this->line("      📚 Class: " . ($oldClass->class_name ?? 'Unknown') . " → " . ($newClass->class_name ?? 'Unknown'));
-                                }
-                                if ($structureChanged) {
-                                    $oldStructure = FeeStructure::find($previousStructureId);
-                                    $this->line("      💰 Structure: " . ($oldStructure->name ?? 'None') . " → " . $selectedStructure->name);
-                                }
-                            }
-                        }
-
-                        // ✅ Perform the assignment update
-                        if (!$dryRun) {
-                            DB::transaction(function () use ($student, $selectedStructure, $hasTransport, $currentClassId, $academicYear, $transportChanged, $classChanged) {
-                                // Determine the reason for this assignment
-                                $reason = 'initial';
-                                if ($transportChanged) $reason = 'transport_change';
-                                if ($classChanged) $reason = 'class_change';
-                                if ($transportChanged && $classChanged) $reason = 'both_changed';
-
-                                // Create or update assignment for THIS academic year
-                                StudentFeeAssignment::updateOrCreate(
-                                    [
-                                        'student_id' => $student->id,
-                                        'academic_year' => $academicYear
-                                    ],
-                                    [
-                                        'fee_structure_id' => $selectedStructure->id,
-                                        'assigned_class_id' => $currentClassId,
-                                        'had_transport' => $hasTransport,
-                                        'assignment_reason' => $selectedStructure->class_id ? 'class_specific' : 'general',
-                                        'is_active' => true,
-                                        'last_reassigned_at' => now(),
-                                        'last_reassign_reason' => $reason
-                                    ]
-                                );
-
-                                // Update student's current fee_structure_id only if this is current year
-                                if ($academicYear == date('Y')) {
-                                    $student->update(['fee_structure_id' => $selectedStructure->id]);
-                                }
-
-                                // ✅ FIX: Delete existing school fees (bills) for this student/year
-                                // instead of fee_installments which doesn't have student_id
-                                school_fees::where('student_id', $student->id)
-                                    ->where('academic_year', $academicYear)
-                                    ->delete();
-
-                                // ✅ Also clear any student fee assignments for this year if needed
-                                // StudentFeeAssignment::where('student_id', $student->id)
-                                //     ->where('academic_year', $academicYear)
-                                //     ->delete();
-                                
-                                // Note: FeeInstallment doesn't have student_id, so we don't delete from there
-                                // FeeInstallments are structure-based, not student-based
-                            });
-                        }
-
-                        // ✅ Update statistics
-                        if ($transportChanged) $stats['transport_changes']++;
-                        if ($classChanged) $stats['class_changes']++;
-                        if ($structureChanged || $transportChanged || $classChanged) {
-                            $stats['reassigned']++;
-                        } else {
-                            $stats['assigned']++;
-                        }
-
-                        if ($selectedStructure->class_id) {
-                            $stats['class_specific']++;
-                        } else {
-                            $stats['general']++;
-                        }
-
-                        $progressBar->advance();
-                    } catch (\Exception $e) {
-                        $stats['errors']++;
-                        $this->error("\n   ❌ Error processing student {$student->id}: " . $e->getMessage());
                         if ($showDetails) {
-                            $this->error("      " . $e->getTraceAsString());
+                            $this->warn("\n   🔄 FULL SYNC: {$student->admission_number} - No bills for {$academicYear} but assigning fee structure anyway");
                         }
+                    }
+
+                    // ✅ Get current eligibility criteria from student model
+                    $hasTransport = !is_null($student->transport_id);
+                    $currentClassId = $student->class_id;
+
+                    // ✅ Get previously assigned fee structure for THIS academic year
+                    $previousAssignment = StudentFeeAssignment::where('student_id', $student->id)
+                        ->where('academic_year', $academicYear)
+                        ->first();
+
+                    $previousStructureId = $previousAssignment->fee_structure_id ?? null;
+
+                    // 🔥 CRITICAL FIX: Get previous values from assignment, NOT from student
+                    // These values represent the last known state when assignment was created/updated
+                    $previousTransportStatus = $previousAssignment->had_transport ?? false;
+                    $previousClassId = $previousAssignment->assigned_class_id ?? null;
+
+                    // ✅ Check if changes occurred by comparing current vs previous (from assignment)
+                    $transportChanged = $shouldCheckTransport && ($previousTransportStatus != $hasTransport);
+                    $classChanged = $shouldCheckClass && ($previousClassId != $currentClassId);
+
+                    // ✅ Determine if we need to reassign
+                    $needsReassignment = $force || $fullSync || $transportChanged || $classChanged || !$previousAssignment;
+
+                    // ✅ Find the correct fee structure based on current student data
+                    $selectedStructure = $this->findBestFeeStructure($student->school_id, $currentClassId, $hasTransport);
+
+                    // ✅ If no structure found, skip
+                    if (!$selectedStructure) {
+                        if ($showDetails) {
+                            $className = $student->class ? $student->class->class_name : 'NO CLASS';
+                            $this->warn("\n   ⚠️  {$student->admission_number} - No fee structure found for class: {$className}, transport: " . ($hasTransport ? 'Yes' : 'No'));
+                        }
+                        $stats['skipped']++;
                         $progressBar->advance();
                         continue;
                     }
+
+                    // ✅ Check if the selected structure is different from the one currently assigned
+                    $structureChanged = $previousStructureId != $selectedStructure->id;
+
+                    // ✅ Only proceed if there's a change OR forced
+                    if (!$needsReassignment && !$structureChanged) {
+                        if ($showDetails) {
+                            $this->line("\n   ⏭️  SKIP: {$student->admission_number} - No changes detected");
+                        }
+                        $stats['skipped']++;
+                        $progressBar->advance();
+                        continue;
+                    }
+
+                    // ✅ Log the changes
+                    if ($transportChanged || $classChanged || $structureChanged) {
+                        if ($showDetails) {
+                            $this->line("\n   🔄 CHANGE DETECTED: {$student->admission_number}");
+                            if ($transportChanged) {
+                                $this->line("      🚌 Transport: " . ($previousTransportStatus ? 'Yes' : 'No') . " → " . ($hasTransport ? 'Yes' : 'No'));
+                            }
+                            if ($classChanged) {
+                                $oldClass = Grade::find($previousClassId);
+                                $newClass = Grade::find($currentClassId);
+                                $this->line("      📚 Class: " . ($oldClass->class_name ?? 'Unknown') . " → " . ($newClass->class_name ?? 'Unknown'));
+                            }
+                            if ($structureChanged) {
+                                $oldStructure = FeeStructure::find($previousStructureId);
+                                $this->line("      💰 Structure: " . ($oldStructure->name ?? 'None') . " → " . $selectedStructure->name);
+                            }
+                        }
+                    }
+
+                    // ✅ Perform the assignment update
+                    if (!$dryRun) {
+                        DB::transaction(function () use ($student, $selectedStructure, $hasTransport, $currentClassId, $academicYear, $transportChanged, $classChanged) {
+                            // Determine the reason for this assignment
+                            $reason = 'initial';
+                            if ($transportChanged) $reason = 'transport_change';
+                            if ($classChanged) $reason = 'class_change';
+                            if ($transportChanged && $classChanged) $reason = 'both_changed';
+
+                            // Create or update assignment for THIS academic year
+                            StudentFeeAssignment::updateOrCreate(
+                                [
+                                    'student_id' => $student->id,
+                                    'academic_year' => $academicYear
+                                ],
+                                [
+                                    'fee_structure_id' => $selectedStructure->id,
+                                    'assigned_class_id' => $currentClassId,
+                                    'had_transport' => $hasTransport,
+                                    'assignment_reason' => $selectedStructure->class_id ? 'class_specific' : 'general',
+                                    'is_active' => true,
+                                    'last_reassigned_at' => now(),
+                                    'last_reassign_reason' => $reason
+                                ]
+                            );
+
+                            // Update student's current fee_structure_id only if this is current year
+                            if ($academicYear == date('Y')) {
+                                $student->update(['fee_structure_id' => $selectedStructure->id]);
+                            }
+
+                            // ✅ Clear any cached or old installment data if needed
+                            // This ensures the new structure is reflected in fee generation
+                            FeeInstallment::where('student_id', $student->id)
+                                ->where('academic_year', $academicYear)
+                                ->delete();
+                        });
+                    }
+
+                    // ✅ Update statistics
+                    if ($transportChanged) $stats['transport_changes']++;
+                    if ($classChanged) $stats['class_changes']++;
+                    if ($structureChanged || $transportChanged || $classChanged) {
+                        $stats['reassigned']++;
+                    } else {
+                        $stats['assigned']++;
+                    }
+
+                    if ($selectedStructure->class_id) {
+                        $stats['class_specific']++;
+                    } else {
+                        $stats['general']++;
+                    }
+
+                    $progressBar->advance();
                 }
             });
 
