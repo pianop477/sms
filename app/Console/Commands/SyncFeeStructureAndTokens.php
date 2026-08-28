@@ -34,7 +34,7 @@ class SyncFeeStructureAndTokens extends Command
                             {--force : Force sync even if no changes detected}
                             {--chunk=100 : Number of records to process per chunk}';
 
-    protected $description = 'Intelligent fee sync - updates assignments & tokens, sends SMS only when token becomes active from inactive/expired state';
+    protected $description = 'Intelligent fee sync - updates assignments & tokens, sends SMS only when token becomes active from expired state';
 
     protected $tokenGenerator;
 
@@ -269,8 +269,9 @@ class SyncFeeStructureAndTokens extends Command
             if (!$dryRun) {
                 if (!$isEligible) {
                     // Deactivate token if exists and is active
-                    if ($existingToken && $existingToken->status !== 'inactive' && $existingToken->status !== 'expired') {
-                        $existingToken->status = 'inactive';
+                    // Use 'expired' instead of 'inactive' since ENUM only has 'active' and 'expired'
+                    if ($existingToken && $existingToken->status === FeeClearanceToken::STATUS_ACTIVE) {
+                        $existingToken->status = FeeClearanceToken::STATUS_EXPIRED;
                         $existingToken->save();
                         $tokenAction = 'token_deactivated';
                         $tokenUpdated = true;
@@ -303,9 +304,9 @@ class SyncFeeStructureAndTokens extends Command
                             $needsUpdate = true;
                             $changes[] = "expiry_date";
                         }
-                        if ($existingToken->status !== 'active') {
+                        if ($existingToken->status !== FeeClearanceToken::STATUS_ACTIVE) {
                             $needsUpdate = true;
-                            $changes[] = "status: {$existingToken->status} → active";
+                            $changes[] = "status: {$existingToken->status} → " . FeeClearanceToken::STATUS_ACTIVE;
                         }
 
                         // Only update if there are changes OR force flag
@@ -315,7 +316,7 @@ class SyncFeeStructureAndTokens extends Command
                             $existingToken->installment_id = $targetInstallment->id;
                             $existingToken->fee_structure_id = $selectedStructure->id;
                             $existingToken->expires_at = $targetInstallment->end_date;
-                            $existingToken->status = 'active';
+                            $existingToken->status = FeeClearanceToken::STATUS_ACTIVE;
                             $existingToken->save();
 
                             $tokenUpdated = true;
@@ -325,7 +326,7 @@ class SyncFeeStructureAndTokens extends Command
                             // ★★★ INTELLIGENT SMS LOGIC ★★★
                             // Send SMS ONLY IF: token was NOT active before
                             // ============================================
-                            $wasActiveBefore = in_array($previousTokenStatus, ['active']);
+                            $wasActiveBefore = ($previousTokenStatus === FeeClearanceToken::STATUS_ACTIVE);
 
                             if (!$wasActiveBefore && !empty($changes)) {
                                 $smsSent = $this->sendTokenSms($student, $academicYear);
@@ -344,7 +345,7 @@ class SyncFeeStructureAndTokens extends Command
                                     $this->line("      • {$change}");
                                 }
                                 $this->line("      • Previous status: {$previousTokenStatus}");
-                                $this->line("      • New status: active");
+                                $this->line("      • New status: " . FeeClearanceToken::STATUS_ACTIVE);
                                 $this->line("      • SMS sent: " . ($smsSent ? '✅ YES' : '❌ NO'));
                             }
                         } else {
@@ -363,7 +364,7 @@ class SyncFeeStructureAndTokens extends Command
                             'installment_id' => $targetInstallment->id,
                             'token' => $tokenCode,
                             'expires_at' => $targetInstallment->end_date,
-                            'status' => 'active',
+                            'status' => FeeClearanceToken::STATUS_ACTIVE,
                         ]);
 
                         $tokenUpdated = true;
@@ -410,7 +411,7 @@ class SyncFeeStructureAndTokens extends Command
                 'structure_changed' => $structureChanged,
                 'sms_sent' => $smsSent,
                 'previous_token_status' => $previousTokenStatus,
-                'new_token_status' => $existingToken ? $existingToken->status : 'active'
+                'new_token_status' => $existingToken ? $existingToken->status : FeeClearanceToken::STATUS_ACTIVE
             ];
 
         } catch (\Exception $e) {
@@ -421,6 +422,7 @@ class SyncFeeStructureAndTokens extends Command
                 'trace' => $e->getTraceAsString()
             ]);
 
+            
             if ($showDetails) {
                 $this->error("\n   ❌ {$student->admission_number} - Error: " . $e->getMessage());
             }
@@ -437,7 +439,7 @@ class SyncFeeStructureAndTokens extends Command
         try {
             $token = FeeClearanceToken::where('student_id', $student->id)
                 ->where('academic_year', $academicYear)
-                ->where('status', 'active')
+                ->where('status', FeeClearanceToken::STATUS_ACTIVE)
                 ->first();
 
             if (!$token) {
