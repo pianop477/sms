@@ -83,7 +83,6 @@
             letter-spacing: -1px;
             color: var(--primary-dark);
             margin: 0;
-            /* text-transform: uppercase; */
         }
 
         .permit-meta {
@@ -131,10 +130,19 @@
         .label {
             color: var(--text-muted);
             font-weight: 500;
-            width: 150px;
+            width: 180px;
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             letter-spacing: 0.5px;
+        }
+
+        .label-sw {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.65rem;
+            font-style: italic;
+            display: block;
+            margin-top: 1px;
         }
 
         .value {
@@ -152,6 +160,23 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
             margin-bottom: 15px;
+        }
+
+        .section-title .sw-label {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+            text-transform: lowercase;
+            margin-left: 8px;
+        }
+
+        .section-title .sw-label::before {
+            content: "(";
+        }
+
+        .section-title .sw-label::after {
+            content: ")";
         }
 
         /* Workflow Grid */
@@ -201,31 +226,175 @@
             margin: 0;
         }
 
-        /* Print Override */
-        @media print {
-            body {
-                background: white;
-            }
+        .sig-box .sw-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-style: italic;
+            display: block;
+            margin-top: 2px;
+        }
 
-            .notice-box {
-                break-inside: avoid;
-                page-break-inside: avoid;
+        /* Print Override - FIXED with balanced spacing */
+        @media print {
+            /* Reset body and html for print */
+            html, body {
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                overflow: visible !important;
             }
 
             .print-container {
-                margin: 0;
-                box-shadow: none;
-                max-width: 100%;
-                padding: 1cm;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                min-height: 100% !important;
+                height: 100% !important;
+                overflow: visible !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+            }
+
+            .notice-box {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
             }
 
             .no-print {
                 display: none !important;
             }
 
+            /* Critical fix: Prevent content from spilling to next page */
+            .header-grid,
+            .student-hero,
+            .workflow-container,
+            .signature-grid,
+            .notice-box {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Maintain original spacing but balanced */
+            .security-bar {
+                margin: -1.5cm -1.5cm 1.2cm -1.5cm !important;
+            }
+
+            .header-grid {
+                padding-bottom: 15px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .student-hero {
+                padding: 15px !important;
+                margin-bottom: 20px !important;
+                gap: 20px !important;
+            }
+
+            .student-photo {
+                width: 120px !important;
+                height: 120px !important;
+            }
+
+            .section-title {
+                margin-bottom: 10px !important;
+                padding-bottom: 5px !important;
+                font-size: 0.8rem !important;
+            }
+
+            .workflow-container {
+                margin-top: 15px !important;
+                gap: 12px !important;
+            }
+
+            .workflow-card {
+                padding: 12px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .signature-grid {
+                margin-top: 25px !important;
+                gap: 40px !important;
+            }
+
+            .info-table td {
+                padding: 4px 0 !important;
+                font-size: 0.85rem !important;
+            }
+
+            .label {
+                font-size: 0.65rem !important;
+                width: 160px !important;
+            }
+
+            .label-sw {
+                font-size: 0.6rem !important;
+            }
+
+            .digital-hash {
+                margin-top: 20px !important;
+                font-size: 8px !important;
+            }
+
+            .notice-box {
+                padding: 12px 18px !important;
+                margin-top: 20px !important;
+            }
+
+            .notice-box p {
+                font-size: 0.8rem !important;
+                margin: 0 !important;
+            }
+
+            .notice-box .sw-label {
+                font-size: 0.7rem !important;
+            }
+
+            /* Ensure everything stays on one page */
             @page {
-                size: A4;
-                margin: 0;
+                size: A4 portrait;
+                margin: 0.8cm !important;
+            }
+
+            /* Force single page */
+            .print-container {
+                page-break-after: avoid !important;
+            }
+
+            /* Adjust logo size */
+            .school-info h4 {
+                font-size: 1.2rem !important;
+            }
+
+            .permit-id-badge {
+                font-size: 0.95rem !important;
+                padding: 4px 12px !important;
+            }
+
+            /* Reduce spacing in hero section */
+            .student-hero .info-table .label {
+                width: 140px !important;
+            }
+
+            /* Ensure content is vertically centered */
+            .print-container > *:last-child {
+                margin-bottom: 0 !important;
+            }
+
+            .row {
+                margin-bottom: 5px !important;
+            }
+
+            .mt-4 {
+                margin-top: 15px !important;
+            }
+
+            .mt-5 {
+                margin-top: 20px !important;
             }
         }
 
@@ -280,7 +449,10 @@
             </div>
         </div>
 
-        <div class="section-title">Student Identification</div>
+        <div class="section-title">
+            Student Identification
+            <span class="sw-label">Utambulisho wa Mwanafunzi</span>
+        </div>
         <div class="student-hero">
             @php
             $studentImage =
@@ -292,17 +464,26 @@
             <img src="{{ $studentImage }}" class="student-photo" alt="Profile">
             <table class="info-table">
                 <tr>
-                    <td class="label">Full Name</td>
+                    <td class="label">
+                        Full Name
+                        <span class="label-sw">Jina Kamili</span>
+                    </td>
                     <td class="value">
                         {{ ucwords(strtolower($permit->student->first_name . ' ' . ($permit->student->middle_name ?? '') . ' ' . $permit->student->last_name)) }}
                     </td>
                 </tr>
                 <tr>
-                    <td class="label">Student ID</td>
+                    <td class="label">
+                        Student ID
+                        <span class="label-sw">Namba ya Mwanafunzi</span>
+                    </td>
                     <td class="value">{{ strtoupper($permit->student->admission_number) }}</td>
                 </tr>
                 <tr>
-                    <td class="label">Class</td>
+                    <td class="label">
+                        Class
+                        <span class="label-sw">Darasa</span>
+                    </td>
                     <td class="value">{{ strtoupper($permit->student->class->class_name ?? 'N/A') }}
                         ({{ strtoupper($permit->student->group ?? ($permit->student->stream ?? 'N/A')) }})</td>
                 </tr>
@@ -311,18 +492,30 @@
 
         <div class="row">
             <div class="col-6">
-                <div class="section-title">Guardian Information</div>
+                <div class="section-title">
+                    Guardian Information
+                    <span class="sw-label">Maelezo ya Mlezi/Mzazi</span>
+                </div>
                 <table class="info-table">
                     <tr>
-                        <td class="label">Full Name</td>
+                        <td class="label">
+                            Full Name
+                            <span class="label-sw">Jina Kamili</span>
+                        </td>
                         <td class="value">{{ ucwords(strtolower($permit->guardian_name)) }}</td>
                     </tr>
                     <tr>
-                        <td class="label">Phone</td>
+                        <td class="label">
+                            Phone
+                            <span class="label-sw">Namba ya Simu</span>
+                        </td>
                         <td class="value">{{ $permit->guardian_phone }}</td>
                     </tr>
                     <tr>
-                        <td class="label">Relationship</td>
+                        <td class="label">
+                            Relationship
+                            <span class="label-sw">Uhusiano</span>
+                        </td>
                         @php
                         $guardianType = match ($permit->guardian_type) {
                         'parent' => 'Mzazi',
@@ -334,16 +527,25 @@
                 </table>
             </div>
             <div class="col-6">
-                <div class="section-title">Permission Details</div>
+                <div class="section-title">
+                    Permission Details
+                    <span class="sw-label">Maelezo ya Ruhusa</span>
+                </div>
                 <table class="info-table">
                     <tr>
-                        <td class="label">Departure</td>
+                        <td class="label">
+                            Departure
+                            <span class="label-sw">Kuondoka</span>
+                        </td>
                         <td class="value">{{ $permit->departure_date->format('d M, Y') }} -
                             {{ $permit->departure_time->format('H:i') }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">Return By</td>
+                        <td class="label">
+                            Return By
+                            <span class="label-sw">Kurudi</span>
+                        </td>
                         <td class="value">{{ $permit->expected_return_date->format('d M, Y') }}</td>
                     </tr>
                 </table>
@@ -351,7 +553,10 @@
         </div>
 
         <div class="mt-4">
-            <div class="section-title">Reason for Exit</div>
+            <div class="section-title">
+                Reason for Exit
+                <span class="sw-label">Sababu ya Kuondoka</span>
+            </div>
             <p class="value"
                 style="background: #fffbeb; padding: 10px; border-radius: 6px; border-left: 4px solid #f59e0b;">
                 @php
@@ -368,75 +573,102 @@
             </p>
         </div>
 
-        <div class="section-title mt-4">Permission Authorization Approval</div>
+        <div class="section-title mt-4">
+            Permission Authorization Approval
+            <span class="sw-label">Idhini ya Ruhusa</span>
+        </div>
         <div class="workflow-container">
             <div class="workflow-card {{ $permit->class_teacher_approved_at ? 'approved' : '' }}">
-                <div class="text-muted small">Class Teacher</div>
+                <div class="text-muted small">
+                    Class Teacher
+                    <span class="label-sw" style="display: block; font-size: 0.6rem;">Mwalimu wa Darasa</span>
+                </div>
                 <div class="fw-bold mb-1">
                     {{ ucwords(strtolower($permit->classTeacher?->user?->first_name . ' ' . $permit->classTeacher?->user?->last_name)) }}
                 </div>
                 <div class="status-stamp">
                     <i class="fas {{ $permit->class_teacher_approved_at ? 'fa-check-circle' : 'fa-clock' }}"></i>
                     {{ $permit->class_teacher_approved_at ? 'Verified' : 'Pending' }}
+                    <span class="label-sw" style="display: block; font-size: 0.55rem; color: #22c55e;">
+                        {{ $permit->class_teacher_approved_at ? 'Imethibitishwa' : 'Inasubiri' }}
+                    </span>
                 </div>
             </div>
             <div class="workflow-card {{ $permit->academic_teacher_approved_at ? 'approved' : '' }}">
-                <div class="text-muted small">Academic Office</div>
+                <div class="text-muted small">
+                    Academic Office
+                    <span class="label-sw" style="display: block; font-size: 0.6rem;">Ofisi ya Masomo</span>
+                </div>
                 <div class="fw-bold mb-1">
                     {{ ucwords(strtolower($permit->academicTeacher?->user?->first_name . ' ' . $permit->academicTeacher?->user?->last_name)) }}
                 </div>
                 <div class="status-stamp">
                     <i class="fas {{ $permit->academic_teacher_approved_at ? 'fa-check-circle' : 'fa-clock' }}"></i>
                     {{ $permit->academic_teacher_approved_at ? 'Verified' : 'Pending' }}
+                    <span class="label-sw" style="display: block; font-size: 0.55rem; color: #22c55e;">
+                        {{ $permit->academic_teacher_approved_at ? 'Imethibitishwa' : 'Inasubiri' }}
+                    </span>
                 </div>
             </div>
             <div class="workflow-card {{ $permit->head_teacher_approved_at ? 'approved' : '' }}">
-                <div class="text-muted small">Head Teacher Office</div>
+                <div class="text-muted small">
+                    Head Teacher Office
+                    <span class="label-sw" style="display: block; font-size: 0.6rem;">Ofisi ya Mkuu wa Shule</span>
+                </div>
                 <div class="fw-bold mb-1">
                     {{ ucwords(strtolower($permit->headTeacher?->user?->first_name . ' ' . $permit->headTeacher?->user?->last_name)) }}
                 </div>
                 <div class="status-stamp">
                     <i class="fas {{ $permit->head_teacher_approved_at ? 'fa-check-circle' : 'fa-clock' }}"></i>
                     {{ $permit->head_teacher_approved_at ? 'Authorized' : 'Pending' }}
+                    <span class="label-sw" style="display: block; font-size: 0.55rem; color: #22c55e;">
+                        {{ $permit->head_teacher_approved_at ? 'Imeidhinishwa' : 'Inasubiri' }}
+                    </span>
                 </div>
             </div>
         </div>
 
         <div class="row align-items-center mt-5">
-            {{-- <div class="col-4 text-center">
-                <div style="border: 1px solid var(--border-color); padding: 10px; display: inline-block; border-radius: 8px;">
-                     <i class="fas fa-qrcode fa-5x"></i>
-                </div>
-                <p class="text-muted mt-2" style="font-size: 9px;">VERIFY VIA SCHOOL PORTAL</p>
-            </div> --}}
             <div class="col-12">
                 <div class="signature-grid">
                     <div class="sig-box">
-                        <p>Parent/Guardian Signature</p>
+                        <p>
+                            Parent/Guardian Signature
+                        </p>
                     </div>
                     <div class="sig-box">
-                        <p>Authority / Stamp</p>
+                        <p>
+                            Authority / Stamp
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
+        
         <!-- NOTICE / REMINDER -->
         <div class="notice-box mt-4" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px;">
             <div class="d-flex align-items-start gap-3">
                 <div>
                     <div style="font-weight: 700; color: #991b1b; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                        KUMBUKA
+                        KUMBUKA:
+                        <span class="sw-label" style="font-weight: 400; color: #991b1b; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            Fomu hii <strong>INAPASWA KURUDISHWA</strong> shuleni siku ya kurudi (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>)
+                            kwa ajili ya kuthibitisha kurudi kwa mwanafunzi.
+                        </span>
                     </div>
-                    <p style="margin: 5px 0 0 0; color: #7f1d1d; font-size: 0.9rem; font-weight: 500;">
-                        Fomu hii <strong>INAPASWA KURUDISHWA</strong> shuleni siku ya kurudi (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>)
-                        na kupewa Mwalimu Mkuu / Mwalimu wa Darasa kwa ajili ya kuthibitisha kurudi kwa mwanafunzi.
+                    <p style="margin: 5px 0 0 0; color: #991b1b; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <br>
+                        <b>REMINDER:</b>
+                        <span class="sw-label" style="font-weight: 400; color: #991b1b; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            This form <strong>MUST BE RETURNED</strong> to school on the day of return (<strong>{{ $permit->expected_return_date->format('d M, Y') }}</strong>) to confirm the student's return.
+                        </span>
                     </p>
                 </div>
             </div>
         </div>
 
         <div class="digital-hash">
-            Generated via ShuleApp e-Permit System Module
+            Generated via ShuleApp e-Permit System
         </div>
     </div>
 </body>
