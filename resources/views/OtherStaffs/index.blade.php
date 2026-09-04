@@ -23,7 +23,7 @@
         width: 100%;
         min-width: 0;
         position: relative;
-        isolation: isolate;
+        /* isolation: isolate; */
     }
 
 
@@ -37,7 +37,7 @@
         width: 100%;
         height: 100%;
 
-        z-index: -2;
+        /* z-index: -2; */
         pointer-events: none;
         overflow: hidden;
 
@@ -99,7 +99,7 @@
         padding-inline: 20px;
 
         position: relative;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
 
@@ -165,7 +165,7 @@
 
     .staff-page .header-content {
         position: relative;
-        z-index: 2;
+        /* z-index: 2; */
 
         display: flex;
         align-items: center;
@@ -323,7 +323,7 @@
         box-shadow:
             0 12px 30px rgba(15,23,42,.15);
 
-        z-index: 1080;
+        /* z-index: 1080; */
     }
 
     .staff-page .dropdown-modern .dropdown-item {

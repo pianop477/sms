@@ -32,7 +32,7 @@
         min-width: 0;
 
         position: relative;
-        isolation: isolate;
+        /* isolation: isolate; */
     }
 
 
@@ -49,7 +49,7 @@
         width: 100%;
         height: 100%;
 
-        z-index: -2;
+        /* z-index: -2; */
 
         overflow: hidden;
 
@@ -120,7 +120,7 @@
         width: 100%;
         height: 100%;
 
-        z-index: -1;
+        /* z-index: -1; */
 
         pointer-events: none;
 
@@ -185,7 +185,7 @@
 
         position: relative;
 
-        z-index: 1;
+        /* z-index: 1; */
     }
 
 
@@ -282,7 +282,7 @@
 
         position: relative;
 
-        z-index: 2;
+        /* z-index: 2; */
 
         display: flex;
 
@@ -386,7 +386,7 @@
 
         position: relative;
 
-        z-index: 100;
+        /* z-index: 100; */
     }
 
 
@@ -501,7 +501,7 @@
         box-shadow:
             0 12px 30px rgba(15,23,42,.15);
 
-        z-index: 1080;
+        /* z-index: 1080; */
     }
 
 

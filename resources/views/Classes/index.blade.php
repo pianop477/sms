@@ -28,7 +28,7 @@
         min-width: 0;
 
         position: relative;
-        isolation: isolate;
+        /* isolation: isolate; */
     }
 
 
@@ -45,7 +45,7 @@
         width: 100%;
         height: 100%;
 
-        z-index: -2;
+        /* z-index: -2; */
 
         overflow: hidden;
 
@@ -118,7 +118,7 @@
 
         pointer-events: none;
 
-        z-index: -1;
+        /* z-index: -1; */
 
         overflow: hidden;
     }
@@ -182,7 +182,7 @@
 
         position: relative;
 
-        z-index: 1;
+        /* z-index: 1; */
     }
 
 
@@ -341,7 +341,7 @@
 
         position: relative;
 
-        z-index: 2;
+        /* z-index: 2; */
     }
 
 
@@ -418,7 +418,7 @@
 
         position: relative;
 
-        z-index: 3;
+        /* z-index: 3; */
 
         border:
             1px solid
@@ -1361,7 +1361,7 @@
         animation:
             classManagementSpin 1s linear infinite;
 
-        z-index: 9999;
+        /* z-index: 9999; */
     }
 
 
@@ -1414,7 +1414,7 @@
         transition:
             transform .25s ease;
 
-        z-index: 10000;
+        /* z-index: 10000; */
 
         font-size: .8rem;
     }

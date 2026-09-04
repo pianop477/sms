@@ -23,7 +23,7 @@
         width: 100%;
         min-width: 0;
         position: relative;
-        isolation: isolate;
+        /* isolation: isolate; */
     }
 
     /* =========================================================

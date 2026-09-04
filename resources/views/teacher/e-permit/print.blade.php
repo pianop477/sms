@@ -143,6 +143,7 @@
             font-style: italic;
             display: block;
             margin-top: 1px;
+            text-transform: capitalize;
         }
 
         .value {
@@ -167,7 +168,7 @@
             color: var(--text-muted);
             font-size: 0.7rem;
             letter-spacing: 0.5px;
-            text-transform: lowercase;
+            text-transform: capitalize;
             margin-left: 8px;
         }
 
@@ -597,7 +598,7 @@
             <div class="workflow-card {{ $permit->academic_teacher_approved_at ? 'approved' : '' }}">
                 <div class="text-muted small">
                     Academic Office
-                    <span class="label-sw" style="display: block; font-size: 0.6rem;">Ofisi ya Masomo</span>
+                    <span class="label-sw" style="display: block; font-size: 0.6rem;">Ofisi ya Taaluma</span>
                 </div>
                 <div class="fw-bold mb-1">
                     {{ ucwords(strtolower($permit->academicTeacher?->user?->first_name . ' ' . $permit->academicTeacher?->user?->last_name)) }}

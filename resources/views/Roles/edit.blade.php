@@ -41,7 +41,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 0;
+        /* z-index: 0; */
         overflow: hidden;
     }
 
@@ -76,7 +76,7 @@
         width: 100%;
         height: 100%;
         pointer-events: none;
-        z-index: 0;
+        /* z-index: 0; */
     }
 
     .particle {
@@ -112,7 +112,7 @@
         margin: 40px auto;
         padding: 0 20px;
         position: relative;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     /* Modern Card */
@@ -169,7 +169,7 @@
 
     .header-content {
         position: relative;
-        z-index: 1;
+        /* z-index: 1; */
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -502,7 +502,7 @@
         border-top-color: var(--primary);
         border-radius: 50%;
         animation: spin 1s linear infinite;
-        z-index: 9999;
+        /* z-index: 9999; */
         display: none;
     }
 
@@ -526,7 +526,7 @@
         gap: 15px;
         transform: translateX(400px);
         transition: transform 0.3s ease;
-        z-index: 10000;
+        /* z-index: 10000; */
         border-left: 5px solid;
     }
 

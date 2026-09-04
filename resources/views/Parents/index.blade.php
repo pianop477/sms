@@ -23,7 +23,7 @@
         width: 100%;
         min-width: 0;
         position: relative;
-        isolation: isolate;
+        /* isolation: isolate; */
     }
 
 
@@ -39,6 +39,7 @@
         height: 100%;
 
         z-index: -2;
+        /* z-index: -2; */
         pointer-events: none;
         overflow: hidden;
 

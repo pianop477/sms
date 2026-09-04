@@ -53,7 +53,7 @@
             font-weight: 700;
             margin: 0;
             position: relative;
-            z-index: 1;
+            /* z-index: 1; */
             font-size: 24px;
         }
 
@@ -71,7 +71,7 @@
             transition: all 0.3s;
             backdrop-filter: blur(5px);
             position: relative;
-            z-index: 1;
+            /* z-index: 1; */
         }
 
         .btn-back:hover {

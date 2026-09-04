@@ -213,7 +213,7 @@
             font-size: 60px;
             opacity: 0.1;
             color: white;
-            z-index: 0;
+            /* z-index: 0; */   
         }
 
         .user-avatar {
