@@ -253,7 +253,6 @@
             color: var(--accent-color);
         }
 
-
         table th {
             font-weight: 600;
             font-size: 0.9rem;
@@ -331,736 +330,298 @@
         }
 
         @media (max-width: 768px) {
-            .card-header {
-                padding: 1.2rem;
-            }
-
-            .form-section {
-                padding: 1.5rem;
-            }
-
+            .card-header { padding: 1.2rem; }
+            .form-section { padding: 1.5rem; }
             .action-buttons {
                 flex-direction: column;
                 gap: 1rem;
             }
-
-            .action-buttons button {
-                width: 100%;
-            }
-
+            .action-buttons button { width: 100%; }
             .step-indicator {
                 flex-direction: column;
                 gap: 5px;
             }
-
-            .step {
-                font-size: 0.8rem;
-            }
+            .step { font-size: 0.8rem; }
         }
 
         /* =========================================================
-   ATTENDANCE TABLE
-   Production responsive data-table
-   ========================================================= */
-
-.attendance-table-container {
-    width: 100%;
-    max-width: 100%;
-
-    margin-top: 1rem;
-
-    border: 1px solid #dfe6ec;
-    border-radius: 12px;
-
-    background: #ffffff;
-
-    box-shadow:
-        0 6px 20px rgba(0, 0, 0, 0.055);
-
-    overflow: hidden;
-}
-
-
-/* =========================================================
-   MOBILE SCROLL HINT
-   ========================================================= */
-
-.attendance-scroll-hint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    padding: 8px 12px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #eef7ff,
-            #f4fbff
-        );
-
-    border-bottom:
-        1px solid #dceaf5;
-
-    color: #2980b9;
-
-    font-size: 0.72rem;
-    font-weight: 600;
-
-    white-space: nowrap;
-}
-
-.attendance-scroll-hint i {
-    font-size: 0.8rem;
-
-    animation:
-        attendanceSwipeHint 1.5s ease-in-out infinite;
-}
-
-@keyframes attendanceSwipeHint {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    50% {
-        transform: translateX(5px);
-    }
-
-}
-
-
-/* =========================================================
-   SCROLL AREA
-   ========================================================= */
-
-.attendance-table-scroll {
-
-    position: relative;
-
-    width: 100%;
-    max-width: 100%;
-
-    overflow-x: auto;
-    overflow-y: auto;
-
-    /*
-     * Important for touch devices.
-     */
-    -webkit-overflow-scrolling: touch;
-
-    /*
-     * Allow horizontal touch scrolling.
-     */
-    touch-action: pan-x pan-y;
-
-    /*
-     * Keep vertical height reasonable
-     * when many classes are returned.
-     */
-    max-height: 65vh;
-
-    scrollbar-width: thin;
-    scrollbar-color:
-        #3498db
-        #edf2f7;
-}
-
-
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
-
-.attendance-table-scroll::-webkit-scrollbar {
-    width: 7px;
-    height: 9px;
-}
-
-.attendance-table-scroll::-webkit-scrollbar-track {
-    background: #edf2f7;
-}
-
-.attendance-table-scroll::-webkit-scrollbar-thumb {
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--accent-color),
-            var(--success-color)
-        );
-
-    border-radius: 20px;
-}
-
-.attendance-table-scroll::-webkit-scrollbar-thumb:hover {
-
-    background:
-        linear-gradient(
-            90deg,
-            #2980b9,
-            #27ae60
-        );
-}
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-.attendance-table {
-
-    /*
-     * 13 logical columns.
-     *
-     * We deliberately give the table enough natural width
-     * instead of forcing it into the mobile viewport.
-     */
-    width: max-content;
-
-    min-width: 100%;
-
-    margin: 0 !important;
-
-    border-collapse: separate;
-    border-spacing: 0;
-
-    table-layout: fixed;
-
-    font-size: 0.82rem;
-}
-
-
-/* =========================================================
-   COLUMN WIDTHS
-   ========================================================= */
-
-.attendance-table th,
-.attendance-table td {
-
-    min-width: 72px;
-
-    padding:
-        10px
-        13px;
-
-    text-align: center;
-    vertical-align: middle;
-
-    white-space: nowrap;
-}
-
-
-/*
- * Class column
- */
-.attendance-table .attendance-class-column,
-.attendance-table tbody td:first-child {
-
-    width: 120px;
-    min-width: 120px;
-
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.attendance-table thead th {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 20;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-color),
-            #1a2530
-        );
-
-    color: #ffffff;
-
-    border-color:
-        rgba(255, 255, 255, 0.15);
-
-    font-size: 0.76rem;
-
-    font-weight: 700;
-
-    letter-spacing: 0.2px;
-
-    text-align: center;
-
-    vertical-align: middle;
-
-}
-
-
-/*
- * First header row
- */
-.attendance-table thead tr:first-child th {
-
-    height: 44px;
-
-}
-
-
-/*
- * Second header row
- */
-.attendance-table thead tr:nth-child(2) th {
-
-    height: 40px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #34495e,
-            #243342
-        );
-
-    font-size: 0.7rem;
-
-}
-
-
-/* =========================================================
-   STICKY CLASS COLUMN
-   ========================================================= */
-
-.attendance-table .attendance-class-column {
-
-    position: sticky;
-
-    left: 0;
-
-    z-index: 30;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-color),
-            #1a2530
-        );
-
-}
-
-
-/*
- * Body Class column.
- *
- * It stays visible while user swipes horizontally.
- */
-.attendance-table tbody td:first-child {
-
-    position: sticky;
-
-    left: 0;
-
-    z-index: 10;
-
-    background:
-        #ffffff;
-
-    font-weight: 700;
-
-    text-align: left;
-
-    box-shadow:
-        4px 0 8px
-        rgba(0, 0, 0, 0.06);
-
-}
-
-
-/* =========================================================
-   BODY
-   ========================================================= */
-
-.attendance-table tbody td {
-
-    color:
-        var(--text-color);
-
-    background:
-        #ffffff;
-
-    border-color:
-        #e5e9ed;
-
-    font-size: 0.8rem;
-
-}
-
-
-/*
- * Zebra rows
- */
-.attendance-table tbody tr:nth-child(even) td {
-
-    background:
-        #f8fafc;
-
-}
-
-
-/*
- * Keep sticky class background matching zebra rows.
- */
-.attendance-table tbody tr:nth-child(even)
-td:first-child {
-
-    background:
-        #f8fafc;
-
-}
-
-
-/*
- * Hover
- */
-.attendance-table tbody tr:hover td {
-
-    background:
-        rgba(52, 152, 219, 0.08);
-
-}
-
-
-/*
- * Keep sticky class visible during hover.
- */
-.attendance-table tbody tr:hover
-td:first-child {
-
-    background:
-        #eef7ff;
-
-}
-
-
-/* =========================================================
-   TOTAL ROW
-   ========================================================= */
-
-.attendance-table tbody tr.table-secondary td {
-
-    background:
-        #e9ecef !important;
-
-    color:
-        #212529;
-
-    font-weight: 700;
-
-}
-
-
-/*
- * Sticky class in total row.
- */
-.attendance-table tbody tr.table-secondary
-td:first-child {
-
-    background:
-        #e9ecef !important;
-
-}
-
-
-/* =========================================================
-   ZERO VALUES
-   ========================================================= */
-
-.attendance-table tbody td.table-danger {
-
-    background:
-        rgba(231, 76, 60, 0.16)
-        !important;
-
-    color:
-        var(--error-color);
-
-    font-weight: 700;
-
-}
-
-
-/*
- * Sticky Class column must not accidentally
- * inherit danger styling.
- */
-.attendance-table tbody
-td:first-child.table-danger {
-
-    background:
-        rgba(231, 76, 60, 0.16)
-        !important;
-
-}
-
-
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
-.attendance-empty-state {
-
-    padding:
-        28px 15px !important;
-
-    color:
-        #6c757d;
-
-    text-align: center !important;
-
-    background:
-        #ffffff !important;
-
-    font-size:
-        0.85rem !important;
-
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-    .attendance-table-container {
-
-        margin-top:
-            0.75rem;
-
-        border-radius:
-            10px;
-
-    }
-
-
-    .attendance-table-scroll {
-
-        /*
-         * Important:
-         * We WANT horizontal overflow here.
-         */
-        overflow-x: auto;
-
-        max-height:
-            60vh;
-
-    }
-
-
-    .attendance-table {
-
-        /*
-         * 13 columns need room.
-         *
-         * This prevents the columns from collapsing.
-         */
-        min-width:
-            920px;
-
-    }
-
-
-    .attendance-table th,
-    .attendance-table td {
-
-        min-width:
-            68px;
-
-        padding:
-            9px 10px;
-
-        font-size:
-            0.72rem;
-
-    }
-
-
-    .attendance-table .attendance-class-column,
-    .attendance-table tbody td:first-child {
-
-        width:
-            105px;
-
-        min-width:
-            105px;
-
-    }
-
-
-    .attendance-table thead tr:first-child th {
-
-        height:
-            40px;
-
-        font-size:
-            0.68rem;
-
-    }
-
-
-    .attendance-table thead tr:nth-child(2) th {
-
-        height:
-            36px;
-
-        font-size:
-            0.64rem;
-
-    }
-
-
-    .attendance-table tbody td {
-
-        font-size:
-            0.72rem;
-
-    }
-
-}
-
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 480px) {
-
-    .attendance-table-container {
-
-        /*
-         * Let the scroll area use the full available width.
-         */
-        width:
-            calc(100% + 2px);
-
-    }
-
-
-    .attendance-table-scroll {
-
-        max-height:
-            58vh;
-
-    }
-
-
-    .attendance-table {
-
-        min-width:
-            880px;
-
-    }
-
-
-    .attendance-table th,
-    .attendance-table td {
-
-        min-width:
-            64px;
-
-        padding:
-            8px 9px;
-
-    }
-
-
-    .attendance-table .attendance-class-column,
-    .attendance-table tbody td:first-child {
-
-        width:
-            100px;
-
-        min-width:
-            100px;
-
-    }
-
-
-    .attendance-table thead tr:first-child th {
-
-        font-size:
-            0.64rem;
-
-    }
-
-
-    .attendance-table thead tr:nth-child(2) th {
-
-        font-size:
-            0.6rem;
-
-    }
-
-
-    .attendance-table tbody td {
-
-        font-size:
-            0.68rem;
-
-    }
-
-}
-
-
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-    .attendance-table {
-
-        min-width:
-            850px;
-
-    }
-
-
-    .attendance-table th,
-    .attendance-table td {
-
-        min-width:
-            61px;
-
-        padding:
-            8px 8px;
-
-    }
-
-
-    .attendance-table .attendance-class-column,
-    .attendance-table tbody td:first-child {
-
-        width:
-            94px;
-
-        min-width:
-            94px;
-
-    }
-
-}
+           ATTENDANCE TABLE
+           ========================================================= */
+
+        .attendance-table-container {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 1rem;
+            border: 1px solid #dfe6ec;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.055);
+            overflow: hidden;
+        }
+
+        .attendance-scroll-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 12px;
+            background: linear-gradient(90deg, #eef7ff, #f4fbff);
+            border-bottom: 1px solid #dceaf5;
+            color: #2980b9;
+            font-size: 0.72rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .attendance-scroll-hint i {
+            font-size: 0.8rem;
+            animation: attendanceSwipeHint 1.5s ease-in-out infinite;
+        }
+
+        @keyframes attendanceSwipeHint {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+
+        .attendance-table-scroll {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y;
+            max-height: 65vh;
+            scrollbar-width: thin;
+            scrollbar-color: #3498db #edf2f7;
+        }
+
+        .attendance-table-scroll::-webkit-scrollbar {
+            width: 7px;
+            height: 9px;
+        }
+
+        .attendance-table-scroll::-webkit-scrollbar-track {
+            background: #edf2f7;
+        }
+
+        .attendance-table-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            border-radius: 20px;
+        }
+
+        .attendance-table-scroll::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #2980b9, #27ae60);
+        }
+
+        .attendance-table {
+            width: max-content;
+            min-width: 100%;
+            margin: 0 !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            font-size: 0.82rem;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            min-width: 72px;
+            padding: 10px 13px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .attendance-table .attendance-class-column,
+        .attendance-table tbody td:first-child {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .attendance-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(135deg, var(--primary-color), #1a2530);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.15);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .attendance-table thead tr:first-child th {
+            height: 44px;
+        }
+
+        .attendance-table thead tr:nth-child(2) th {
+            height: 40px;
+            background: linear-gradient(135deg, #34495e, #243342);
+            font-size: 0.7rem;
+        }
+
+        .attendance-table .attendance-class-column {
+            position: sticky;
+            left: 0;
+            z-index: 30;
+            background: linear-gradient(135deg, var(--primary-color), #1a2530);
+        }
+
+        .attendance-table tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: #ffffff;
+            font-weight: 700;
+            text-align: left;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .attendance-table tbody td {
+            color: var(--text-color);
+            background: #ffffff;
+            border-color: #e5e9ed;
+            font-size: 0.8rem;
+        }
+
+        .attendance-table tbody tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .attendance-table tbody tr:nth-child(even) td:first-child {
+            background: #f8fafc;
+        }
+
+        .attendance-table tbody tr:hover td {
+            background: rgba(52, 152, 219, 0.08);
+        }
+
+        .attendance-table tbody tr:hover td:first-child {
+            background: #eef7ff;
+        }
+
+        .attendance-table tbody tr.table-secondary td {
+            background: #e9ecef !important;
+            color: #212529;
+            font-weight: 700;
+        }
+
+        .attendance-table tbody tr.table-secondary td:first-child {
+            background: #e9ecef !important;
+        }
+
+        .attendance-table tbody td.table-danger {
+            background: rgba(231, 76, 60, 0.16) !important;
+            color: var(--error-color);
+            font-weight: 700;
+        }
+
+        .attendance-table tbody td:first-child.table-danger {
+            background: rgba(231, 76, 60, 0.16) !important;
+        }
+
+        .attendance-empty-state {
+            padding: 28px 15px !important;
+            color: #6c757d;
+            text-align: center !important;
+            background: #ffffff !important;
+            font-size: 0.85rem !important;
+        }
+
+        @media (max-width: 768px) {
+            .attendance-table-container {
+                margin-top: 0.75rem;
+                border-radius: 10px;
+            }
+            .attendance-table-scroll {
+                overflow-x: auto;
+                max-height: 60vh;
+            }
+            .attendance-table {
+                min-width: 920px;
+            }
+            .attendance-table th,
+            .attendance-table td {
+                min-width: 68px;
+                padding: 9px 10px;
+                font-size: 0.72rem;
+            }
+            .attendance-table .attendance-class-column,
+            .attendance-table tbody td:first-child {
+                width: 105px;
+                min-width: 105px;
+            }
+            .attendance-table thead tr:first-child th {
+                height: 40px;
+                font-size: 0.68rem;
+            }
+            .attendance-table thead tr:nth-child(2) th {
+                height: 36px;
+                font-size: 0.64rem;
+            }
+            .attendance-table tbody td {
+                font-size: 0.72rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .attendance-table-container {
+                width: calc(100% + 2px);
+            }
+            .attendance-table-scroll {
+                max-height: 58vh;
+            }
+            .attendance-table {
+                min-width: 880px;
+            }
+            .attendance-table th,
+            .attendance-table td {
+                min-width: 64px;
+                padding: 8px 9px;
+            }
+            .attendance-table .attendance-class-column,
+            .attendance-table tbody td:first-child {
+                width: 100px;
+                min-width: 100px;
+            }
+            .attendance-table thead tr:first-child th {
+                font-size: 0.64rem;
+            }
+            .attendance-table thead tr:nth-child(2) th {
+                font-size: 0.6rem;
+            }
+            .attendance-table tbody td {
+                font-size: 0.68rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .attendance-table {
+                min-width: 850px;
+            }
+            .attendance-table th,
+            .attendance-table td {
+                min-width: 61px;
+                padding: 8px 8px;
+            }
+            .attendance-table .attendance-class-column,
+            .attendance-table tbody td:first-child {
+                width: 94px;
+                min-width: 94px;
+            }
+        }
     </style>
+
     <div class="form-container">
         <div class="card shadow-sm">
             <div class="card-header text-white text-center">
                 <h4 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> SCHOOL DAILY REPORT</h4>
                 <p class="mb-0 mt-1 text-white">School Routine Tracking System</p>
             </div>
+
             <div class="progress-container">
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
@@ -1072,8 +633,9 @@ td:first-child.table-danger {
             </div>
 
             @if ($reports->isEmpty())
-                <form id="dailyReportForm" action="{{route('tod.report.store')}}" method="POST">
+                <form id="dailyReportForm" action="{{ route('tod.report.store') }}" method="POST">
                     @csrf
+
                     <!-- Section A - Student Attendance -->
                     <div class="form-section active" id="section-a">
                         <div class="section-title">
@@ -1082,7 +644,7 @@ td:first-child.table-danger {
 
                         <div class="alert alert-info d-flex align-items-center" role="alert">
                             <i class="fas fa-info-circle me-2"></i>
-                            <div>Click the button below to fetch attendance records for the date {{\Carbon\Carbon::parse(now())->format('d-m-Y')}}</div>
+                            <div>Click the button below to fetch attendance records for the date {{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}</div>
                         </div>
 
                         <div class="d-flex justify-content-center mb-4">
@@ -1092,96 +654,54 @@ td:first-child.table-danger {
                         </div>
 
                         <div class="attendance-table-container">
-
-                            {{-- Mobile scroll hint --}}
                             <div class="attendance-scroll-hint d-md-none">
                                 <i class="fas fa-arrows-alt-h"></i>
                                 <span>Swipe horizontally to view all attendance columns</span>
                             </div>
 
                             <div class="attendance-table-scroll">
-
                                 <table class="table table-bordered attendance-table">
-
                                     <thead>
-
                                         <tr>
-
-                                            <th rowspan="2" class="attendance-class-column">
-                                                Class
-                                            </th>
-
-                                            <th colspan="3">
-                                                Registered
-                                            </th>
-
-                                            <th colspan="3">
-                                                Attended
-                                            </th>
-
-                                            <th colspan="3">
-                                                Absentees
-                                            </th>
-
-                                            <th colspan="3">
-                                                Permission
-                                            </th>
-
+                                            <th rowspan="2" class="attendance-class-column">Class</th>
+                                            <th colspan="3">Registered</th>
+                                            <th colspan="3">Attended</th>
+                                            <th colspan="3">Absentees</th>
+                                            <th colspan="3">Permission</th>
                                         </tr>
-
                                         <tr>
-
                                             <th>Boys</th>
                                             <th>Girls</th>
                                             <th>Total</th>
-
                                             <th>Boys</th>
                                             <th>Girls</th>
                                             <th>Total</th>
-
                                             <th>Boys</th>
                                             <th>Girls</th>
                                             <th>Total</th>
-
                                             <th>Boys</th>
                                             <th>Girls</th>
                                             <th>Total</th>
-
                                         </tr>
-
                                     </thead>
-
                                     <tbody id="attendanceTableBody">
-
                                         <tr>
-
-                                            <td
-                                                colspan="13"
-                                                class="attendance-empty-state"
-                                            >
-
+                                            <td colspan="13" class="attendance-empty-state">
                                                 <i class="fas fa-database me-2"></i>
-
                                                 No attendance records available yet
-
                                             </td>
-
                                         </tr>
-
                                     </tbody>
-
                                 </table>
-
                             </div>
-
                         </div>
 
                         <div class="action-buttons">
                             <button type="button" id="proceedToSectionB" class="btn btn-success float-left">
                                 <i class="fas fa-arrow-right me-2"></i> Confirm & Proceed
                             </button>
-                            <a href="{{route('home')}}" class="btn btn-danger float-right">
-                                <i class="fas fa-close me-2"></i>  Cancel
+                            <a href="{{ route('home') }}" class="btn btn-danger float-right">
+                                <i class="fas fa-close me-2"></i> Cancel
                             </a>
                         </div>
                     </div>
@@ -1282,16 +802,19 @@ td:first-child.table-danger {
                     Daily School report already submitted for the date ({{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}).
                 </div>
             @endif
+
             <div class="card-footer text-muted text-center py-3">
                 <small><i class="fas fa-info-circle me-1"></i> Once submitted, your report will be uneditable.</small>
             </div>
         </div>
     </div>
+
     <div class="notification error-notification" id="errorNotification">
         <i class="fas fa-exclamation-circle me-2"></i> <span id="errorMessage">Please fill out all required fields before you proceed.</span>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Elements
             const sectionA = document.getElementById('section-a');
             const sectionB = document.getElementById('section-b');
@@ -1308,6 +831,9 @@ td:first-child.table-danger {
             const errorNotification = document.getElementById('errorNotification');
             const errorMessage = document.getElementById('errorMessage');
 
+            // State: has fetch been done?
+            let attendanceFetched = false;
+
             // Required fields
             const requiredFields = [
                 'report_date',
@@ -1318,14 +844,17 @@ td:first-child.table-danger {
                 'tod_remarks'
             ];
 
-            // Event toggle functionality
-            eventToggle.addEventListener('change', function() {
+            // ============================================
+            // Event toggle
+            // ============================================
+            eventToggle.addEventListener('change', function () {
                 eventField.style.display = this.checked ? 'block' : 'none';
             });
 
+            // ============================================
             // Reset form
-            resetBtn.addEventListener('click', function() {
-                // Hide all error messages and remove error borders
+            // ============================================
+            resetBtn.addEventListener('click', function () {
                 document.querySelectorAll('.error-message').forEach(el => {
                     el.style.display = 'none';
                 });
@@ -1333,36 +862,32 @@ td:first-child.table-danger {
                     el.classList.remove('error-border');
                 });
 
-                // Hide event field if shown
                 eventField.style.display = 'none';
                 eventToggle.checked = false;
 
-                // Reset date to today
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('report_date').value = today;
             });
 
+            // ============================================
             // Proceed to Section B
-            proceedBtn.addEventListener('click', function() {
-                // Validate if attendance data has been fetched
-                if (attendanceTableBody.querySelector('input')) {
-                    // Switch to Section B
+            // ============================================
+            proceedBtn.addEventListener('click', function () {
+                if (attendanceFetched) {
                     sectionA.classList.remove('active');
                     sectionB.classList.add('active');
 
-                    // Update progress
                     progressBar.style.width = '100%';
                     steps[0].classList.remove('active');
+                    steps[0].classList.add('completed');
                     steps[1].classList.add('active');
                 } else {
-                    // Show error notification
                     errorMessage.textContent = 'Please fetch attendance records before proceeding.';
                     errorNotification.classList.add('show');
                     setTimeout(() => {
                         errorNotification.classList.remove('show');
                     }, 3000);
 
-                    // Highlight fetch button
                     fetchBtn.classList.add('btn-danger');
                     setTimeout(() => {
                         fetchBtn.classList.remove('btn-danger');
@@ -1370,28 +895,31 @@ td:first-child.table-danger {
                 }
             });
 
+            // ============================================
             // Back to Section A
-            backBtn.addEventListener('click', function() {
+            // ============================================
+            backBtn.addEventListener('click', function () {
                 sectionB.classList.remove('active');
                 sectionA.classList.add('active');
 
-                // Update progress
                 progressBar.style.width = '50%';
                 steps[1].classList.remove('active');
+                steps[0].classList.remove('completed');
                 steps[0].classList.add('active');
             });
 
-            // Add validation on input change
+            // ============================================
+            // Field validation
+            // ============================================
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    field.addEventListener('input', function() {
+                    field.addEventListener('input', function () {
                         validateField(fieldId);
                     });
                 }
             });
 
-            // Validate a single field
             function validateField(fieldId) {
                 const field = document.getElementById(fieldId);
                 const errorElement = document.getElementById(fieldId + '_error');
@@ -1407,38 +935,33 @@ td:first-child.table-danger {
                 }
             }
 
-            // Validate all required fields
             function validateAllFields() {
                 let isValid = true;
-
                 requiredFields.forEach(fieldId => {
                     if (!validateField(fieldId)) {
                         isValid = false;
                     }
                 });
-
                 return isValid;
             }
 
+            // ============================================
             // Form submission
-            document.getElementById('dailyReportForm').addEventListener('submit', function(e) {
-                // Validate all required fields before submission
+            // ============================================
+            document.getElementById('dailyReportForm').addEventListener('submit', function (e) {
                 if (!validateAllFields()) {
                     e.preventDefault();
 
-                    // Show error notification
                     errorNotification.classList.add('show');
                     setTimeout(() => {
                         errorNotification.classList.remove('show');
                     }, 3000);
 
-                    // Scroll to first error
                     const firstErrorField = document.querySelector('.error-border');
                     if (firstErrorField) {
                         firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                } else {
-                    // Show success notification
+                } else if (notification) {
                     notification.classList.add('show');
                     setTimeout(() => {
                         notification.classList.remove('show');
@@ -1446,57 +969,109 @@ td:first-child.table-danger {
                 }
             });
 
+            // ============================================
             // Fetch attendance data
-            fetchBtn.addEventListener('click', async function() {
-                fetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Fetching, Please wait.....';
+            // ============================================
+            fetchBtn.addEventListener('click', async function () {
+                fetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Retrieving, Please wait.....';
                 fetchBtn.disabled = true;
 
                 try {
                     const res = await fetch(`/api/attendance/fetch`, {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
+                        headers: { 'Accept': 'application/json' }
                     });
 
                     const data = await res.json();
 
-                    attendanceTableBody.innerHTML = "";
+                    attendanceTableBody.innerHTML = '';
 
-                    if (data.length === 0) {
+                    // ✅ FILTER: Ondoa madarasa yenye registered_boys + registered_girls = 0
+                    const filteredData = data.filter(record => {
+                        if (record.class_code === 'TOTAL') return true;
+                        const totalRegistered = Number(record.registered_boys) + Number(record.registered_girls);
+                        return totalRegistered > 0;
+                    });
+
+                    // ✅ Recalculate TOTAL row based on filtered data
+                    const realRecords = filteredData.filter(r => r.class_code !== 'TOTAL');
+
+                    if (realRecords.length === 0) {
                         attendanceTableBody.innerHTML = `
                             <tr>
-                                <td colspan="14" class="text-muted text-center py-4">
+                                <td colspan="13" class="attendance-empty-state">
                                     <i class="fas fa-database me-2"></i> No attendance records found for today.
                                 </td>
                             </tr>`;
+                        attendanceFetched = false;
                     } else {
-                        data.forEach(record => {
-                            const isTotal = record.class_code === "TOTAL";
+                        // Recalculate totals from real records only
+                        const totals = {
+                            registered_boys: 0,
+                            registered_girls: 0,
+                            attended_boys: 0,
+                            attended_girls: 0,
+                            absent_boys: 0,
+                            absent_girls: 0,
+                            permission_boys: 0,
+                            permission_girls: 0,
+                        };
 
+                        realRecords.forEach(r => {
+                            totals.registered_boys += Number(r.registered_boys) || 0;
+                            totals.registered_girls += Number(r.registered_girls) || 0;
+                            totals.attended_boys += Number(r.attended_boys) || 0;
+                            totals.attended_girls += Number(r.attended_girls) || 0;
+                            totals.absent_boys += Number(r.absent_boys) || 0;
+                            totals.absent_girls += Number(r.absent_girls) || 0;
+                            totals.permission_boys += Number(r.permission_boys) || 0;
+                            totals.permission_girls += Number(r.permission_girls) || 0;
+                        });
+
+                        // Render real records
+                        realRecords.forEach(record => {
                             function highlightIfZero(value) {
-                                return value === 0 ? 'class="table-danger"' : '';
+                                return Number(value) === 0 ? 'class="table-danger"' : '';
                             }
 
-                            // Badilisha kwenye JavaScript code yako
                             attendanceTableBody.innerHTML += `
-                                <tr ${isTotal ? 'class="table-secondary fw-bold"' : ''}>
+                                <tr>
                                     <td style="text-transform:uppercase">${record.class_code} ${record.stream ?? ''}</td>
-                                    <td>${record.registered_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_boys]" value="${record.registered_boys}">` : ''}</td>
-                                    <td>${record.registered_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_girls]" value="${record.registered_girls}">` : ''}</td>
+                                    <td>${record.registered_boys}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_boys]" value="${record.registered_boys}"></td>
+                                    <td>${record.registered_girls}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_girls]" value="${record.registered_girls}"></td>
                                     <td>${Number(record.registered_boys) + Number(record.registered_girls)}</td>
-                                    <td ${highlightIfZero(record.attended_boys)}>${record.attended_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_boys]" value="${record.attended_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.attended_girls)}>${record.attended_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_girls]" value="${record.attended_girls}">` : ''}</td>
-                                    <td ${highlightIfZero(record.attended_boys + record.attended_girls)}>${record.attended_boys + record.attended_girls}</td>
-                                    <td ${highlightIfZero(record.absent_boys)}>${record.absent_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_boys]" value="${record.absent_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.absent_girls)}>${record.absent_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_girls]" value="${record.absent_girls}">` : ''}</td>
-                                    <td ${highlightIfZero(record.absent_boys + record.absent_girls)}>${record.absent_boys + record.absent_girls}</td>
-                                    <td ${highlightIfZero(record.permission_boys)}>${record.permission_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_boys]" value="${record.permission_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.permission_girls)}>${record.permission_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_girls]" value="${record.permission_girls}">` : ''}</td>
-                                    <td ${highlightIfZero(record.permission_boys + record.permission_girls)}>${record.permission_boys + record.permission_girls}</td>
-                                    ${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][group]" value="${record.stream || ''}">` : ''}
-                                    ${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][class_id]" value="${record.class_id}">` : ''}
+                                    <td ${highlightIfZero(record.attended_boys)}>${record.attended_boys}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_boys]" value="${record.attended_boys}"></td>
+                                    <td ${highlightIfZero(record.attended_girls)}>${record.attended_girls}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_girls]" value="${record.attended_girls}"></td>
+                                    <td ${highlightIfZero(Number(record.attended_boys) + Number(record.attended_girls))}>${Number(record.attended_boys) + Number(record.attended_girls)}</td>
+                                    <td ${highlightIfZero(record.absent_boys)}>${record.absent_boys}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_boys]" value="${record.absent_boys}"></td>
+                                    <td ${highlightIfZero(record.absent_girls)}>${record.absent_girls}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_girls]" value="${record.absent_girls}"></td>
+                                    <td ${highlightIfZero(Number(record.absent_boys) + Number(record.absent_girls))}>${Number(record.absent_boys) + Number(record.absent_girls)}</td>
+                                    <td ${highlightIfZero(record.permission_boys)}>${record.permission_boys}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_boys]" value="${record.permission_boys}"></td>
+                                    <td ${highlightIfZero(record.permission_girls)}>${record.permission_girls}<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_girls]" value="${record.permission_girls}"></td>
+                                    <td ${highlightIfZero(Number(record.permission_boys) + Number(record.permission_girls))}>${Number(record.permission_boys) + Number(record.permission_girls)}</td>
+                                    <input type="hidden" name="attendance[${record.class_id}_${record.stream}][group]" value="${record.stream || ''}">
+                                    <input type="hidden" name="attendance[${record.class_id}_${record.stream}][class_id]" value="${record.class_id}">
                                 </tr>`;
                         });
+
+                        // Append recalculated TOTAL row
+                        attendanceTableBody.innerHTML += `
+                            <tr class="table-secondary fw-bold">
+                                <td>TOTAL</td>
+                                <td>${totals.registered_boys}</td>
+                                <td>${totals.registered_girls}</td>
+                                <td>${totals.registered_boys + totals.registered_girls}</td>
+                                <td>${totals.attended_boys}</td>
+                                <td>${totals.attended_girls}</td>
+                                <td>${totals.attended_boys + totals.attended_girls}</td>
+                                <td>${totals.absent_boys}</td>
+                                <td>${totals.absent_girls}</td>
+                                <td>${totals.absent_boys + totals.absent_girls}</td>
+                                <td>${totals.permission_boys}</td>
+                                <td>${totals.permission_girls}</td>
+                                <td>${totals.permission_boys + totals.permission_girls}</td>
+                            </tr>`;
+
+                        attendanceFetched = true;
                     }
                 } catch (err) {
                     console.error(err);
@@ -1505,6 +1080,7 @@ td:first-child.table-danger {
                     setTimeout(() => {
                         errorNotification.classList.remove('show');
                     }, 3000);
+                    attendanceFetched = false;
                 } finally {
                     fetchBtn.innerHTML = '<i class="fas fa-sync me-2"></i> Fetch Attendance';
                     fetchBtn.disabled = false;
