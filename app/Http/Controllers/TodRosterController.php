@@ -207,9 +207,10 @@ class TodRosterController extends Controller
         $schoolId = $authUser->school_id;
         $today = Carbon::today()->format('Y-m-d');
 
-        // Step 1: Pata classes zote (grades) na group ya students, hata kama registered=0
+        // Step 1: Pata classes zote (grades) na group ya students
+        // Tumia inner join ili madarasa yenye wanafunzi tu yaonekane
         $classes = DB::table('grades')
-            ->leftJoin('students', function ($join) use ($schoolId) {
+            ->join('students', function ($join) use ($schoolId) {
                 $join->on('students.class_id', '=', 'grades.id')
                     ->where('students.school_id', $schoolId)
                     ->where('students.status', 1);
@@ -239,7 +240,7 @@ class TodRosterController extends Controller
         ];
 
         foreach ($classes as $class) {
-            $classId = $class->class_id; // sasa ipo sahihi
+            $classId = $class->class_id;
             $classCode = $class->class_code;
             $stream = $class->stream ?? '';
 
@@ -329,19 +330,21 @@ class TodRosterController extends Controller
             $totals['permission_girls'] += $permission_girls;
         }
 
-        // TOTAL row
-        $response[] = [
-            'class_code' => 'TOTAL',
-            'stream' => '',
-            'registered_boys' => $totals['registered_boys'],
-            'registered_girls' => $totals['registered_girls'],
-            'attended_boys' => $totals['attended_boys'],
-            'attended_girls' => $totals['attended_girls'],
-            'absent_boys' => $totals['absent_boys'],
-            'absent_girls' => $totals['absent_girls'],
-            'permission_boys' => $totals['permission_boys'],
-            'permission_girls' => $totals['permission_girls'],
-        ];
+        // TOTAL row - ionyeshwe tu kama kuna data
+        if (count($response) > 0) {
+            $response[] = [
+                'class_code' => 'TOTAL',
+                'stream' => '',
+                'registered_boys' => $totals['registered_boys'],
+                'registered_girls' => $totals['registered_girls'],
+                'attended_boys' => $totals['attended_boys'],
+                'attended_girls' => $totals['attended_girls'],
+                'absent_boys' => $totals['absent_boys'],
+                'absent_girls' => $totals['absent_girls'],
+                'permission_boys' => $totals['permission_boys'],
+                'permission_girls' => $totals['permission_girls'],
+            ];
+        }
 
         return response()->json($response);
     }
