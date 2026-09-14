@@ -208,6 +208,7 @@ class TodRosterController extends Controller
         $today = Carbon::today()->format('Y-m-d');
 
         // Step 1: Pata classes zote (grades) na group ya students
+        // Ongeza COUNT(students.id) ili kupima kama darasa lina wanafunzi kweli
         $classes = DB::table('grades')
             ->join('students', function ($join) use ($schoolId) {
                 $join->on('students.class_id', '=', 'grades.id')
@@ -218,18 +219,20 @@ class TodRosterController extends Controller
                 'grades.id as class_id',
                 'grades.class_code',
                 'students.group as stream',
-                DB::raw('SUM(CASE WHEN students.gender = "Male" THEN 1 ELSE 0 END) as registered_boys'),
-                DB::raw('SUM(CASE WHEN students.gender = "Female" THEN 1 ELSE 0 END) as registered_girls')
+                DB::raw('COUNT(students.id) as total_students'),
+                DB::raw('SUM(CASE WHEN LOWER(TRIM(students.gender)) = "male" THEN 1 ELSE 0 END) as registered_boys'),
+                DB::raw('SUM(CASE WHEN LOWER(TRIM(students.gender)) = "female" THEN 1 ELSE 0 END) as registered_girls')
             )
             ->groupBy('grades.id', 'grades.class_code', 'students.group')
+            ->havingRaw('COUNT(students.id) > 0')
             ->orderBy('grades.class_code')
             ->orderBy('stream')
             ->get()
-            // Filter: onyesha tu madarasa/stream yenye angalau mwanafunzi mmoja
             ->filter(function ($class) {
-                return ((int) $class->registered_boys + (int) $class->registered_girls) > 0;
+                // Chuja madarasa yenye wanafunzi 0 (hakuna hata mmoja)
+                return ((int) $class->total_students) > 0;
             })
-            ->values(); // Re-index ili kuepuka gaps kwenye array
+            ->values();
 
         $response = [];
         $totals = [
@@ -249,6 +252,7 @@ class TodRosterController extends Controller
             $stream = $class->stream ?? '';
 
             // Step 2: Attendance counts (present, absent, permission)
+            // Tumia LOWER(TRIM()) kuhakikisha gender inalinganishwa kwa usahihi
             $attended_boys = DB::table('attendances')
                 ->join('students', 'attendances.student_id', '=', 'students.id')
                 ->where('attendances.school_id', $schoolId)
@@ -256,7 +260,7 @@ class TodRosterController extends Controller
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
                 ->where('attendances.attendance_status', 'present')
-                ->where('students.gender', 'Male')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['male'])
                 ->count();
 
             $attended_girls = DB::table('attendances')
@@ -265,8 +269,8 @@ class TodRosterController extends Controller
                 ->whereDate('attendances.attendance_date', $today)
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
-                ->where('students.gender', 'Female')
                 ->where('attendances.attendance_status', 'present')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['female'])
                 ->count();
 
             $absent_boys = DB::table('attendances')
@@ -275,8 +279,8 @@ class TodRosterController extends Controller
                 ->whereDate('attendances.attendance_date', $today)
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
-                ->where('students.gender', 'Male')
                 ->where('attendances.attendance_status', 'absent')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['male'])
                 ->count();
 
             $absent_girls = DB::table('attendances')
@@ -285,8 +289,8 @@ class TodRosterController extends Controller
                 ->whereDate('attendances.attendance_date', $today)
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
-                ->where('students.gender', 'Female')
                 ->where('attendances.attendance_status', 'absent')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['female'])
                 ->count();
 
             $permission_boys = DB::table('attendances')
@@ -295,8 +299,8 @@ class TodRosterController extends Controller
                 ->whereDate('attendances.attendance_date', $today)
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
-                ->where('students.gender', 'Male')
                 ->where('attendances.attendance_status', 'permission')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['male'])
                 ->count();
 
             $permission_girls = DB::table('attendances')
@@ -305,8 +309,8 @@ class TodRosterController extends Controller
                 ->whereDate('attendances.attendance_date', $today)
                 ->where('attendances.class_group', $stream)
                 ->where('attendances.class_id', $classId)
-                ->where('students.gender', 'Female')
                 ->where('attendances.attendance_status', 'permission')
+                ->whereRaw('LOWER(TRIM(students.gender)) = ?', ['female'])
                 ->count();
 
             $response[] = [
