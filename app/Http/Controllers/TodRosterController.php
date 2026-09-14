@@ -208,7 +208,6 @@ class TodRosterController extends Controller
         $today = Carbon::today()->format('Y-m-d');
 
         // Step 1: Pata classes zote (grades) na group ya students
-        // Tumia inner join ili madarasa yenye wanafunzi tu yaonekane
         $classes = DB::table('grades')
             ->join('students', function ($join) use ($schoolId) {
                 $join->on('students.class_id', '=', 'grades.id')
@@ -225,7 +224,12 @@ class TodRosterController extends Controller
             ->groupBy('grades.id', 'grades.class_code', 'students.group')
             ->orderBy('grades.class_code')
             ->orderBy('stream')
-            ->get();
+            ->get()
+            // Filter: onyesha tu madarasa/stream yenye angalau mwanafunzi mmoja
+            ->filter(function ($class) {
+                return ((int) $class->registered_boys + (int) $class->registered_girls) > 0;
+            })
+            ->values(); // Re-index ili kuepuka gaps kwenye array
 
         $response = [];
         $totals = [
