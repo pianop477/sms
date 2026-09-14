@@ -207,24 +207,46 @@ class TodRosterController extends Controller
         $schoolId = $authUser->school_id;
         $today = Carbon::today()->format('Y-m-d');
 
-        // Step 1: Pata classes zote (grades) na group ya students
-        // Filter: status = 1 AND graduated = 0 (active students tu)
+        // Step 1: Get only classes/streams that have
+        // registered active students who have NOT graduated.
         $classes = DB::table('grades')
             ->join('students', function ($join) use ($schoolId) {
                 $join->on('students.class_id', '=', 'grades.id')
                     ->where('students.school_id', $schoolId)
                     ->where('students.status', 1)
-                    ->where('students.graduated', 0);
+                    ->where('students.graduated', 0)
+                    ->whereIn('students.gender', ['Male', 'Female']);
             })
             ->select(
                 'grades.id as class_id',
                 'grades.class_code',
                 'students.group as stream',
+
                 DB::raw('COUNT(students.id) as total_students'),
-                DB::raw('SUM(CASE WHEN students.gender = "Male" THEN 1 ELSE 0 END) as registered_boys'),
-                DB::raw('SUM(CASE WHEN students.gender = "Female" THEN 1 ELSE 0 END) as registered_girls')
+
+                DB::raw('
+            SUM(
+                CASE
+                    WHEN students.gender = "Male" THEN 1
+                    ELSE 0
+                END
+            ) as registered_boys
+        '),
+
+                DB::raw('
+            SUM(
+                CASE
+                    WHEN students.gender = "Female" THEN 1
+                    ELSE 0
+                END
+            ) as registered_girls
+        ')
             )
-            ->groupBy('grades.id', 'grades.class_code', 'students.group')
+            ->groupBy(
+                'grades.id',
+                'grades.class_code',
+                'students.group'
+            )
             ->havingRaw('COUNT(students.id) > 0')
             ->orderBy('grades.class_code')
             ->orderBy('stream')
