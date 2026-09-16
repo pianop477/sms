@@ -63,7 +63,7 @@ class BillsController extends Controller
     {
         $user = Auth::user();
         $students = Student::where('school_id', $user->school_id)
-            ->whereIn('status', [1, 2])
+            // ->where('status', [1, 2])
             ->orderBy('first_name')
             ->get();
 

@@ -1287,7 +1287,7 @@
                                         The following classes have not submitted today's Attendance!
                                     </p>
                                     <ul class="list-unstyled missing-list">
-                                        ${listHtml}
+                                        ${listHtml.toUpperCase()}
                                     </ul>
                                     <div class="alert alert-info mb-0">
                                         <i class="fas fa-info-circle me-1"></i>
