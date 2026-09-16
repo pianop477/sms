@@ -389,7 +389,7 @@ class TodRosterController extends Controller
 
     public function store(Request $request)
     {
-        // ✅ validate inputs
+        // ✅ Validate only Section B inputs
         $request->validate([
             'report_date'          => 'required|date',
             'parade'               => 'required|string',
@@ -405,39 +405,10 @@ class TodRosterController extends Controller
             return back();
         }
 
-        $invalidClasses = [];
-        foreach ($request->attendance as $key => $values) {
-            // Skip invalid keys
-            $keyParts = explode('_', $key);
-            if (count($keyParts) < 2) continue;
-
-            $classId = $keyParts[0];
-            $stream = $keyParts[1];
-
-            // Skip invalid class IDs
-            if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) continue;
-
-            // CHECK KAMA PRESENT IMEKUWA 0 KWA AIDHA BOYS AU GIRLS
-            $presentBoys = isset($values['present_boys']) ? (int)$values['present_boys'] : 0;
-            $presentGirls = isset($values['present_girls']) ? (int)$values['present_girls'] : 0;
-
-            if ($presentBoys === 0 || $presentGirls === 0) {
-                // Pata class name kwa ajili ya error message
-                $className = $this->getClassName($classId); // Unda method hii au tumia model
-                $invalidClasses[] = "Class {$className} ({$stream}) - Present Boys: {$presentBoys}, Present Girls: {$presentGirls}";
-            }
-        }
-
-        if (!empty($invalidClasses)) {
-            $message = "Attendance not collected for the following classes:\n" . implode("\n", $invalidClasses);
-            Alert()->toast($message, 'error');
-            return back()->withInput();
-        }
-
         DB::beginTransaction();
 
         try {
-            // 1️⃣ Pata active tod_roster ya mwalimu aliye login
+            // 1️⃣ Get active tod_roster of the logged-in teacher
             $user = Auth::user();
             if (!$user) {
                 Alert()->toast('User not authorized.', 'error');
@@ -450,7 +421,10 @@ class TodRosterController extends Controller
                 return back();
             }
 
-            $todRoster = TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
+            $todRoster = TodRoster::where('teacher_id', $teacher->id)
+                ->where('status', 'active')
+                ->first();
+
             if (!$todRoster) {
                 Alert()->toast('No active Teacher On Duty roster found.', 'error');
                 return back();
@@ -466,7 +440,7 @@ class TodRosterController extends Controller
                 return back();
             }
 
-            // 2️⃣ Hifadhi daily report particulars
+            // 2️⃣ Save daily report particulars
             $report = daily_report_details::create([
                 'tod_roster_id'        => $todRoster->id,
                 'report_date'          => $request->report_date,
@@ -479,32 +453,33 @@ class TodRosterController extends Controller
                 'submitted_by'         => Auth::user()->first_name . ' ' . Auth::user()->last_name,
             ]);
 
-            // 3️⃣ Hifadhi attendance records ikiwa zipo
+            // 3️⃣ Save attendance records (no validation — skip is allowed)
             foreach ($request->attendance as $key => $values) {
                 $keyParts = explode('_', $key);
                 if (count($keyParts) < 2) continue;
 
                 $classId = $keyParts[0];
-                $stream = $keyParts[1];
+                $stream  = $keyParts[1];
 
                 if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) continue;
 
                 try {
-                    $attendance = daily_report_attendance::create([
+                    daily_report_attendance::create([
                         'daily_report_id'  => $report->id,
                         'class_id'         => (int)$classId,
                         'group'            => $stream,
-                        'registered_boys'  => isset($values['registered_boys']) ? (int)$values['registered_boys'] : 0,
+                        'registered_boys'  => isset($values['registered_boys'])  ? (int)$values['registered_boys']  : 0,
                         'registered_girls' => isset($values['registered_girls']) ? (int)$values['registered_girls'] : 0,
-                        'present_boys'     => isset($values['present_boys']) ? (int)$values['present_boys'] : 0,
-                        'present_girls'    => isset($values['present_girls']) ? (int)$values['present_girls'] : 0,
-                        'absent_boys'      => isset($values['absent_boys']) ? (int)$values['absent_boys'] : 0,
-                        'absent_girls'     => isset($values['absent_girls']) ? (int)$values['absent_girls'] : 0,
-                        'permission_boys'  => isset($values['permission_boys']) ? (int)$values['permission_boys'] : 0,
+                        'present_boys'     => isset($values['present_boys'])     ? (int)$values['present_boys']     : 0,
+                        'present_girls'    => isset($values['present_girls'])    ? (int)$values['present_girls']    : 0,
+                        'absent_boys'      => isset($values['absent_boys'])      ? (int)$values['absent_boys']      : 0,
+                        'absent_girls'     => isset($values['absent_girls'])     ? (int)$values['absent_girls']     : 0,
+                        'permission_boys'  => isset($values['permission_boys'])  ? (int)$values['permission_boys']  : 0,
                         'permission_girls' => isset($values['permission_girls']) ? (int)$values['permission_girls'] : 0,
                     ]);
                 } catch (\Exception $e) {
-                    // Log error but continue
+                    // Log error but continue (attendance row might have invalid data)
+                    \Log::warning("Failed saving attendance for class {$classId} ({$stream}): " . $e->getMessage());
                     continue;
                 }
             }

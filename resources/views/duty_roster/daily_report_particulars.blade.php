@@ -102,11 +102,19 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 0.85rem;
@@ -114,7 +122,8 @@
             font-size: 1rem;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
             transform: translateY(-2px);
@@ -218,11 +227,11 @@
             border-radius: 50%;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: var(--success-color);
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(30px);
         }
 
@@ -330,23 +339,36 @@
         }
 
         @media (max-width: 768px) {
-            .card-header { padding: 1.2rem; }
-            .form-section { padding: 1.5rem; }
+            .card-header {
+                padding: 1.2rem;
+            }
+
+            .form-section {
+                padding: 1.5rem;
+            }
+
             .action-buttons {
                 flex-direction: column;
                 gap: 1rem;
             }
-            .action-buttons button { width: 100%; }
+
+            .action-buttons button {
+                width: 100%;
+            }
+
             .step-indicator {
                 flex-direction: column;
                 gap: 5px;
             }
-            .step { font-size: 0.8rem; }
+
+            .step {
+                font-size: 0.8rem;
+            }
         }
 
         /* =========================================================
-           ATTENDANCE TABLE
-           ========================================================= */
+               ATTENDANCE TABLE
+               ========================================================= */
 
         .attendance-table-container {
             width: 100%;
@@ -379,8 +401,15 @@
         }
 
         @keyframes attendanceSwipeHint {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
         }
 
         .attendance-table-scroll {
@@ -536,32 +565,39 @@
                 margin-top: 0.75rem;
                 border-radius: 10px;
             }
+
             .attendance-table-scroll {
                 overflow-x: auto;
                 max-height: 60vh;
             }
+
             .attendance-table {
                 min-width: 920px;
             }
+
             .attendance-table th,
             .attendance-table td {
                 min-width: 68px;
                 padding: 9px 10px;
                 font-size: 0.72rem;
             }
+
             .attendance-table .attendance-class-column,
             .attendance-table tbody td:first-child {
                 width: 105px;
                 min-width: 105px;
             }
+
             .attendance-table thead tr:first-child th {
                 height: 40px;
                 font-size: 0.68rem;
             }
+
             .attendance-table thead tr:nth-child(2) th {
                 height: 36px;
                 font-size: 0.64rem;
             }
+
             .attendance-table tbody td {
                 font-size: 0.72rem;
             }
@@ -571,28 +607,35 @@
             .attendance-table-container {
                 width: calc(100% + 2px);
             }
+
             .attendance-table-scroll {
                 max-height: 58vh;
             }
+
             .attendance-table {
                 min-width: 880px;
             }
+
             .attendance-table th,
             .attendance-table td {
                 min-width: 64px;
                 padding: 8px 9px;
             }
+
             .attendance-table .attendance-class-column,
             .attendance-table tbody td:first-child {
                 width: 100px;
                 min-width: 100px;
             }
+
             .attendance-table thead tr:first-child th {
                 font-size: 0.64rem;
             }
+
             .attendance-table thead tr:nth-child(2) th {
                 font-size: 0.6rem;
             }
+
             .attendance-table tbody td {
                 font-size: 0.68rem;
             }
@@ -602,16 +645,66 @@
             .attendance-table {
                 min-width: 850px;
             }
+
             .attendance-table th,
             .attendance-table td {
                 min-width: 61px;
                 padding: 8px 8px;
             }
+
             .attendance-table .attendance-class-column,
             .attendance-table tbody td:first-child {
                 width: 94px;
                 min-width: 94px;
             }
+        }
+
+        /* =========================================================
+               MISSING ATTENDANCE MODAL
+               ========================================================= */
+        #missingAttendanceModal .modal-header {
+            border-bottom: none;
+        }
+
+        #missingAttendanceModal .modal-content {
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        #missingAttendanceModal .modal-body {
+            padding: 1.5rem;
+        }
+
+        #missingAttendanceModal .missing-list {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #f1c40f;
+            background: #fffdf5;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 1rem;
+        }
+
+        #missingAttendanceModal .missing-list li {
+            padding: 4px 0;
+            font-weight: 600;
+            color: #7d5a00;
+            border-bottom: 1px dashed #f7e6a1;
+        }
+
+        #missingAttendanceModal .missing-list li:last-child {
+            border-bottom: none;
+        }
+
+        #missingAttendanceModal .missing-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #missingAttendanceModal .missing-list::-webkit-scrollbar-thumb {
+            background: #f39c12;
+            border-radius: 20px;
         }
     </style>
 
@@ -624,7 +717,8 @@
 
             <div class="progress-container">
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0"
+                        aria-valuemax="100"></div>
                 </div>
                 <div class="step-indicator">
                     <div class="step active">SECTION A: STUDENT'S ATTENDANCES</div>
@@ -644,7 +738,8 @@
 
                         <div class="alert alert-info d-flex align-items-center" role="alert">
                             <i class="fas fa-info-circle me-2"></i>
-                            <div>Click the button below to fetch attendance records for the date {{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}</div>
+                            <div>Click the button below to fetch attendance records for the date
+                                {{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}</div>
                         </div>
 
                         <div class="d-flex justify-content-center mb-4">
@@ -698,7 +793,7 @@
 
                         <div class="action-buttons">
                             <button type="button" id="proceedToSectionB" class="btn btn-success float-left">
-                                <i class="fas fa-arrow-right me-2"></i> Confirm & Proceed
+                                <i class="fas fa-arrow-right me-2"></i> Confirm
                             </button>
                             <a href="{{ route('home') }}" class="btn btn-danger float-right">
                                 <i class="fas fa-close me-2"></i> Cancel
@@ -712,7 +807,8 @@
                             <label for="report_date" class="form-label required-field">
                                 <i class="fas fa-calendar-alt"></i>Report Date
                             </label>
-                            <input type="date" name="report_date" id="report_date" class="form-control" value="{{ date('Y-m-d') }}" required readonly>
+                            <input type="date" name="report_date" id="report_date" class="form-control"
+                                value="{{ date('Y-m-d') }}" required readonly>
                             <div class="error-message" id="report_date_error">Please select the valid report date.</div>
                         </div>
 
@@ -724,7 +820,8 @@
                             <label for="parade" class="form-label required-field">
                                 <i class="fas fa-users"></i>Morning Parade
                             </label>
-                            <textarea name="parade" id="parade" rows="3" class="form-control" placeholder="Enter parade details..." required></textarea>
+                            <textarea name="parade" id="parade" rows="3" class="form-control" placeholder="Enter parade details..."
+                                required></textarea>
                             <div class="error-message" id="parade_error">Please fill out parade details.</div>
                         </div>
 
@@ -732,16 +829,20 @@
                             <label for="break_time" class="form-label required-field">
                                 <i class="fas fa-coffee"></i>Break Time
                             </label>
-                            <textarea name="break_time" id="break_time" rows="3" class="form-control" placeholder="Enter break time details..." required></textarea>
-                            <div class="error-message" id="break_time_error">Please fill out Break time details. E.g. Breakfast etc.</div>
+                            <textarea name="break_time" id="break_time" rows="3" class="form-control"
+                                placeholder="Enter break time details..." required></textarea>
+                            <div class="error-message" id="break_time_error">Please fill out Break time details. E.g.
+                                Breakfast etc.</div>
                         </div>
 
                         <div class="form-group mb-4">
                             <label for="lunch_time" class="form-label required-field">
                                 <i class="fas fa-utensils"></i>Lunch Time
                             </label>
-                            <textarea name="lunch_time" id="lunch_time" rows="3" class="form-control" placeholder="Enter lunch time details..." required></textarea>
-                            <div class="error-message" id="lunch_time_error">Please fill out Lunch time details E.g. Lunch food etc.</div>
+                            <textarea name="lunch_time" id="lunch_time" rows="3" class="form-control"
+                                placeholder="Enter lunch time details..." required></textarea>
+                            <div class="error-message" id="lunch_time_error">Please fill out Lunch time details E.g. Lunch
+                                food etc.</div>
                         </div>
 
                         <div class="section-title">
@@ -752,12 +853,14 @@
                             <label for="teachers_attendance" class="form-label required-field">
                                 <i class="fas fa-chalkboard-teacher"></i>Teachers Attendance
                             </label>
-                            <textarea name="teachers_attendance" id="teachers_attendance" rows="3" class="form-control" placeholder="Enter teachers attendance details..." required></textarea>
-                            <div class="error-message" id="teachers_attendance_error">Please fill out the teachers attendance details</div>
+                            <textarea name="teachers_attendance" id="teachers_attendance" rows="3" class="form-control"
+                                placeholder="Enter teachers attendance details..." required></textarea>
+                            <div class="error-message" id="teachers_attendance_error">Please fill out the teachers
+                                attendance details</div>
                         </div>
 
                         <div class="toggle-container">
-                            <span class="toggle-label">Was there a special event that disrupted the school schedule?</span>
+                            <span class="toggle-label">Any special event that disrupted normal school timetable?</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="event_toggle" name="event_toggle">
                                 <span class="slider"></span>
@@ -768,7 +871,8 @@
                             <label for="daily_new_event" class="form-label">
                                 <i class="fas fa-calendar-plus"></i>Event Details
                             </label>
-                            <textarea name="daily_new_event" id="daily_new_event" rows="3" class="form-control" placeholder="Enter event details here...."></textarea>
+                            <textarea name="daily_new_event" id="daily_new_event" rows="3" class="form-control"
+                                placeholder="Enter event details here...."></textarea>
                         </div>
 
                         <div class="section-title">
@@ -779,8 +883,10 @@
                             <label for="tod_remarks" class="form-label required-field">
                                 <i class="fas fa-sticky-note"></i>Teacher on Duty Remarks
                             </label>
-                            <textarea name="tod_remarks" id="tod_remarks" rows="3" class="form-control" placeholder="Enter your remarks..." required></textarea>
-                            <div class="error-message" id="tod_remarks_error">Please fill out your overall general remarks for the day schedule</div>
+                            <textarea name="tod_remarks" id="tod_remarks" rows="3" class="form-control"
+                                placeholder="Enter your remarks..." required></textarea>
+                            <div class="error-message" id="tod_remarks_error">Please fill out your overall general remarks
+                                for the day schedule</div>
                         </div>
 
                         <div class="action-buttons">
@@ -790,7 +896,8 @@
                             <button type="reset" class="btn btn-outline-secondary" id="resetFormBtn">
                                 <i class="fas fa-redo-alt me-2"></i> Reset Form
                             </button>
-                            <button type="submit" class="btn btn-success float-right" onclick="return confirm('Are you sure you want to submit final report?')">
+                            <button type="submit" class="btn btn-success float-right"
+                                onclick="return confirm('Are you sure you want to submit final report?')">
                                 <i class="fas fa-paper-plane me-2"></i> Submit Final Report
                             </button>
                         </div>
@@ -798,8 +905,12 @@
                 </form>
             @else
                 <div class="alert alert-success text-center my-4 fs-4" role="alert">
-                    <i class="fas fa-check-square-o me-2"></i>
-                    Daily School report already submitted for the date ({{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}).
+                    
+                    <p>
+                        <i class="fas fa-check-square-o me-2"></i>
+                        Daily School report already submitted for the date
+                    ({{ \Carbon\Carbon::parse(now())->format('d-m-Y') }}).
+                    </p>
                 </div>
             @endif
 
@@ -810,12 +921,15 @@
     </div>
 
     <div class="notification error-notification" id="errorNotification">
-        <i class="fas fa-exclamation-circle me-2"></i> <span id="errorMessage">Please fill out all required fields before you proceed.</span>
+        <i class="fas fa-exclamation-circle me-2"></i> <span id="errorMessage">Please fill out all required fields before
+            you proceed.</span>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            // ============================================
             // Elements
+            // ============================================
             const sectionA = document.getElementById('section-a');
             const sectionB = document.getElementById('section-b');
             const proceedBtn = document.getElementById('proceedToSectionB');
@@ -827,14 +941,14 @@
             const eventField = document.getElementById('event_field');
             const fetchBtn = document.getElementById('fetchAttendanceBtn');
             const attendanceTableBody = document.getElementById('attendanceTableBody');
-            const notification = document.getElementById('saveNotification');
             const errorNotification = document.getElementById('errorNotification');
             const errorMessage = document.getElementById('errorMessage');
 
-            // State: has fetch been done?
+            // State
             let attendanceFetched = false;
+            let missingAttendanceModalInstance = null;
 
-            // Required fields
+            // Required fields for Section B
             const requiredFields = [
                 'report_date',
                 'parade',
@@ -847,14 +961,14 @@
             // ============================================
             // Event toggle
             // ============================================
-            eventToggle.addEventListener('change', function () {
+            eventToggle.addEventListener('change', function() {
                 eventField.style.display = this.checked ? 'block' : 'none';
             });
 
             // ============================================
             // Reset form
             // ============================================
-            resetBtn.addEventListener('click', function () {
+            resetBtn.addEventListener('click', function() {
                 document.querySelectorAll('.error-message').forEach(el => {
                     el.style.display = 'none';
                 });
@@ -872,16 +986,8 @@
             // ============================================
             // Proceed to Section B
             // ============================================
-            proceedBtn.addEventListener('click', function () {
-                if (attendanceFetched) {
-                    sectionA.classList.remove('active');
-                    sectionB.classList.add('active');
-
-                    progressBar.style.width = '100%';
-                    steps[0].classList.remove('active');
-                    steps[0].classList.add('completed');
-                    steps[1].classList.add('active');
-                } else {
+            proceedBtn.addEventListener('click', function() {
+                if (!attendanceFetched) {
                     errorMessage.textContent = 'Please fetch attendance records before proceeding.';
                     errorNotification.classList.add('show');
                     setTimeout(() => {
@@ -892,13 +998,22 @@
                     setTimeout(() => {
                         fetchBtn.classList.remove('btn-danger');
                     }, 2000);
+                    return;
+                }
+
+                const missingClasses = getClassesWithMissingAttendance();
+
+                if (missingClasses.length > 0) {
+                    showMissingAttendancePrompt(missingClasses);
+                } else {
+                    goToSectionB();
                 }
             });
 
             // ============================================
             // Back to Section A
             // ============================================
-            backBtn.addEventListener('click', function () {
+            backBtn.addEventListener('click', function() {
                 sectionB.classList.remove('active');
                 sectionA.classList.add('active');
 
@@ -909,12 +1024,12 @@
             });
 
             // ============================================
-            // Field validation
+            // Field validation (Section B)
             // ============================================
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    field.addEventListener('input', function () {
+                    field.addEventListener('input', function() {
                         validateField(fieldId);
                     });
                 }
@@ -923,6 +1038,8 @@
             function validateField(fieldId) {
                 const field = document.getElementById(fieldId);
                 const errorElement = document.getElementById(fieldId + '_error');
+
+                if (!field || !errorElement) return true;
 
                 if (!field.value.trim()) {
                     field.classList.add('error-border');
@@ -948,7 +1065,7 @@
             // ============================================
             // Form submission
             // ============================================
-            document.getElementById('dailyReportForm').addEventListener('submit', function (e) {
+            document.getElementById('dailyReportForm').addEventListener('submit', function(e) {
                 if (!validateAllFields()) {
                     e.preventDefault();
 
@@ -959,40 +1076,41 @@
 
                     const firstErrorField = document.querySelector('.error-border');
                     if (firstErrorField) {
-                        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstErrorField.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
-                } else if (notification) {
-                    notification.classList.add('show');
-                    setTimeout(() => {
-                        notification.classList.remove('show');
-                    }, 3000);
                 }
             });
 
             // ============================================
             // Fetch attendance data
             // ============================================
-            fetchBtn.addEventListener('click', async function () {
-                fetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Retrieving, Please wait.....';
+            fetchBtn.addEventListener('click', async function() {
+                fetchBtn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin me-2"></i> Retrieving, Please wait.....';
                 fetchBtn.disabled = true;
 
                 try {
                     const res = await fetch(`/api/attendance/fetch`, {
-                        headers: { 'Accept': 'application/json' }
+                        headers: {
+                            'Accept': 'application/json'
+                        }
                     });
 
                     const data = await res.json();
 
                     attendanceTableBody.innerHTML = '';
 
-                    // ✅ FILTER: Ondoa madarasa yenye registered_boys + registered_girls = 0
+                    // Filter classes with registered students
                     const filteredData = data.filter(record => {
                         if (record.class_code === 'TOTAL') return true;
-                        const totalRegistered = Number(record.registered_boys) + Number(record.registered_girls);
+                        const totalRegistered = Number(record.registered_boys) + Number(record
+                            .registered_girls);
                         return totalRegistered > 0;
                     });
 
-                    // ✅ Recalculate TOTAL row based on filtered data
                     const realRecords = filteredData.filter(r => r.class_code !== 'TOTAL');
 
                     if (realRecords.length === 0) {
@@ -1004,7 +1122,7 @@
                             </tr>`;
                         attendanceFetched = false;
                     } else {
-                        // Recalculate totals from real records only
+                        // Recalculate totals
                         const totals = {
                             registered_boys: 0,
                             registered_girls: 0,
@@ -1053,7 +1171,7 @@
                                 </tr>`;
                         });
 
-                        // Append recalculated TOTAL row
+                        // Append TOTAL
                         attendanceTableBody.innerHTML += `
                             <tr class="table-secondary fw-bold">
                                 <td>TOTAL</td>
@@ -1086,6 +1204,142 @@
                     fetchBtn.disabled = false;
                 }
             });
+
+            // ============================================
+            // Helper: Get classes with missing attendance
+            // ============================================
+            function getClassesWithMissingAttendance() {
+                const missing = [];
+                const rows = attendanceTableBody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    if (row.classList.contains('table-secondary')) return;
+                    if (row.querySelector('.attendance-empty-state')) return;
+
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 13) return;
+
+                    const className = cells[0].textContent.trim();
+                    const regBoys = parseInt(cells[1].textContent.trim()) || 0;
+                    const regGirls = parseInt(cells[2].textContent.trim()) || 0;
+                    const totalRegistered = regBoys + regGirls;
+
+                    if (totalRegistered === 0) return;
+
+                    const attendedBoys = parseInt(cells[4].textContent.trim()) || 0;
+                    const attendedGirls = parseInt(cells[5].textContent.trim()) || 0;
+                    const absentBoys = parseInt(cells[7].textContent.trim()) || 0;
+                    const absentGirls = parseInt(cells[8].textContent.trim()) || 0;
+                    const permBoys = parseInt(cells[10].textContent.trim()) || 0;
+                    const permGirls = parseInt(cells[11].textContent.trim()) || 0;
+
+                    const hasAttendanceData =
+                        attendedBoys > 0 || attendedGirls > 0 ||
+                        absentBoys > 0 || absentGirls > 0 ||
+                        permBoys > 0 || permGirls > 0;
+
+                    if (!hasAttendanceData) {
+                        missing.push(className);
+                    }
+                });
+
+                return missing;
+            }
+
+            // ============================================
+            // Helper: Go to Section B
+            // ============================================
+            function goToSectionB() {
+                sectionA.classList.remove('active');
+                sectionB.classList.add('active');
+
+                progressBar.style.width = '100%';
+                steps[0].classList.remove('active');
+                steps[0].classList.add('completed');
+                steps[1].classList.add('active');
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            // ============================================
+            // Prompt: Missing Attendance
+            // ============================================
+            function showMissingAttendancePrompt(missingClasses) {
+                const listHtml = missingClasses
+                    .map(c => `<li><i class="fas fa-exclamation-circle me-2"></i>${c}</li>`)
+                    .join('');
+
+                const modalHtml = `
+                    <div class="modal fade" id="missingAttendanceModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-warning text-dark">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Missing Attendance Data
+                                    </h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="mb-2">
+                                        The following classes have not submitted today's Attendance!
+                                    </p>
+                                    <ul class="list-unstyled missing-list">
+                                        ${listHtml}
+                                    </ul>
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Skip to Proceed or re-fetch attendance again?
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" id="cancelMissingAttendance">
+                                        <i class="fas fa-times me-1"></i> Re-fetch
+                                    </button>
+                                    <button type="button" class="btn btn-success" id="skipMissingAttendance">
+                                        <i class="fas fa-forward me-1"></i> Proceed
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const existing = document.getElementById('missingAttendanceModal');
+                if (existing) existing.remove();
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                const modalEl = document.getElementById('missingAttendanceModal');
+                missingAttendanceModalInstance = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+                document.getElementById('skipMissingAttendance').addEventListener('click', function() {
+                    missingAttendanceModalInstance.hide();
+                    goToSectionB();
+                });
+
+                document.getElementById('cancelMissingAttendance').addEventListener('click', function() {
+                    missingAttendanceModalInstance.hide();
+                    fetchBtn.classList.add('btn-danger');
+                    setTimeout(() => {
+                        fetchBtn.classList.remove('btn-danger');
+                    }, 2000);
+                });
+
+                modalEl.addEventListener('hidden.bs.modal', function() {
+                    modalEl.remove();
+                    missingAttendanceModalInstance = null;
+                }, {
+                    once: true
+                });
+
+                missingAttendanceModalInstance.show();
+            }
         });
     </script>
 @endsection

@@ -38,7 +38,7 @@ class BillsController extends Controller
     {
         $user = Auth::user();
 
-        $students = Student::where('school_id', $user->school_id)->where('status', 1)->orderBy('first_name')->get();
+        $students = Student::where('school_id', $user->school_id)->whereIn('status', [1, 2])->orderBy('first_name')->get();
         $services = payment_service::orderBy('service_name')->where('status', 'active')->get();
 
         $currentYear = date('Y');
@@ -63,7 +63,7 @@ class BillsController extends Controller
     {
         $user = Auth::user();
         $students = Student::where('school_id', $user->school_id)
-            ->where('status', 1)
+            ->whereIn('status', [1, 2])
             ->orderBy('first_name')
             ->get();
 
